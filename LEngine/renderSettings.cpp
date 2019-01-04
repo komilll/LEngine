@@ -311,85 +311,88 @@ bool RenderSettings::Initialize(int screenWidth, int screenHeight, bool vsync, H
 	// Create the viewport.
 	m_deviceContext->RSSetViewports(1, &viewport);
 
-	//// Setup the projection matrix.
-	//fieldOfView = (float)D3DX_PI / 4.0f;
-	//screenAspect = (float)screenWidth / (float)screenHeight;
+	// Setup the projection matrix.
+	fieldOfView = (float)22.0f/7.0f / 4.0f;
+	screenAspect = (float)screenWidth / (float)screenHeight;
 
-	//// Create the projection matrix for 3D rendering.
+	// Create the projection matrix for 3D rendering.
 	//D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
+	m_projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 
-	//// Initialize the world matrix to the identity matrix.
+	// Initialize the world matrix to the identity matrix.
 	//D3DXMatrixIdentity(&m_worldMatrix);
+	m_worldMatrix = DirectX::XMMatrixIdentity();
 
-	//// Create an orthographic projection matrix for 2D rendering.
+	// Create an orthographic projection matrix for 2D rendering.
 	//D3DXMatrixOrthoLH(&m_orthoMatrix, (float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+	m_orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
-	//// Clear the second depth stencil state before setting the parameters.
-	//ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
+	// Clear the second depth stencil state before setting the parameters.
+	ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
 
-	//// Now create a second depth stencil state which turns off the Z buffer for 2D rendering.  The only difference is 
-	//// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
-	//depthDisabledStencilDesc.DepthEnable = false;
-	//depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	//depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	//depthDisabledStencilDesc.StencilEnable = true;
-	//depthDisabledStencilDesc.StencilReadMask = 0xFF;
-	//depthDisabledStencilDesc.StencilWriteMask = 0xFF;
-	//depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	//depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	//depthDisabledStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	//depthDisabledStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	//depthDisabledStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	//depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	//depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	//depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	// Now create a second depth stencil state which turns off the Z buffer for 2D rendering.  The only difference is 
+	// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
+	depthDisabledStencilDesc.DepthEnable = false;
+	depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthDisabledStencilDesc.StencilEnable = true;
+	depthDisabledStencilDesc.StencilReadMask = 0xFF;
+	depthDisabledStencilDesc.StencilWriteMask = 0xFF;
+	depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthDisabledStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthDisabledStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	//// Create the state using the device.
-	//result = m_device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	// Create the state using the device.
+	result = m_device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
-	//ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
 
-	//// Create an alpha enabled blend state description.
-	//blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
-	//blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	//blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	//blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	//blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	//blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	//blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	//blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+	// Create an alpha enabled blend state description.
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
 
-	//// Create the blend state using the description.
-	//result = m_device->CreateBlendState(&blendStateDescription, &m_alphaEnableBlendingState);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	// Create the blend state using the description.
+	result = m_device->CreateBlendState(&blendStateDescription, &m_alphaEnableBlendingState);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
-	//// Modify the description to create an alpha disabled blend state description.
-	//blendStateDescription.RenderTarget[0].BlendEnable = FALSE;
+	// Modify the description to create an alpha disabled blend state description.
+	blendStateDescription.RenderTarget[0].BlendEnable = FALSE;
 
-	//// Create the blend state using the description.
-	//result = m_device->CreateBlendState(&blendStateDescription, &m_alphaDisableBlendingState);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	// Create the blend state using the description.
+	result = m_device->CreateBlendState(&blendStateDescription, &m_alphaDisableBlendingState);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
-	//// Modify the description to create an alpha disabled blend state description.
-	//blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
-	//blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	// Modify the description to create an alpha disabled blend state description.
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 
-	//// Create the blend state using the description.
-	//result = m_device->CreateBlendState(&blendStateDescription, &m_alphaEnableBlendingStateUseAlpha);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	// Create the blend state using the description.
+	result = m_device->CreateBlendState(&blendStateDescription, &m_alphaEnableBlendingStateUseAlpha);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -398,4 +401,29 @@ void RenderSettings::ClearScene(float red, float green, float blue, float alpha)
 {
 	//float color[4] = { red, green, blue, alpha };
 	m_deviceContext->ClearRenderTargetView(m_renderTargetView, new float[4]{ red, green, blue, alpha });
+}
+
+void RenderSettings::PresentScene()
+{
+	// Present the back buffer to the screen since rendering is complete.
+	if (m_vsync_enabled)
+	{
+		// Lock to screen refresh rate.
+		m_swapChain->Present(1, 0);
+	}
+	else
+	{
+		// Present as fast as possible.
+		m_swapChain->Present(0, 0);
+	}
+}
+
+ID3D11Device * RenderSettings::GetDevice()
+{
+	return m_device;
+}
+
+ID3D11DeviceContext * RenderSettings::GetDeviceContext()
+{
+	return m_deviceContext;
 }

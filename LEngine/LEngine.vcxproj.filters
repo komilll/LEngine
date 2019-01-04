@@ -27,6 +27,12 @@
     <ClInclude Include="renderSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="modelClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="engineController.cpp">
@@ -41,5 +47,20 @@
     <ClCompile Include="renderSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="modelClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="colorShader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="colorShader.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

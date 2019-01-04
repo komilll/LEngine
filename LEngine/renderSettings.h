@@ -15,8 +15,13 @@ class RenderSettings
 public:
 	RenderSettings();
 	bool Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen,
-		float screenDepth, float screenNear);
+	float screenDepth, float screenNear);
 	void ClearScene(float red, float green, float blue, float alpha);
+	void PresentScene();
+
+	ID3D11Device* GetDevice();
+	ID3D11DeviceContext* GetDeviceContext();
+
 
 private:
 	bool m_vsync_enabled;
@@ -31,9 +36,9 @@ private:
 	ID3D11DepthStencilState* m_depthDisabledStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RasterizerState* m_rasterState;
-	DirectX::XMFLOAT4X4 m_projectionMatrix;
-	DirectX::XMFLOAT4X4 m_worldMatrix;
-	DirectX::XMFLOAT4X4A m_orthoMatrix;
+	DirectX::XMMATRIX m_projectionMatrix;
+	DirectX::XMMATRIX m_worldMatrix;
+	DirectX::XMMATRIX m_orthoMatrix;
 	ID3D11BlendState* m_alphaEnableBlendingStateUseAlpha;
 	ID3D11BlendState* m_alphaEnableBlendingState;
 	ID3D11BlendState* m_alphaDisableBlendingState;

@@ -5,6 +5,8 @@
 #include <Windows.h>
 
 #include "renderSettings.h"
+#include "modelClass.h"
+#include "shaderController.h"
 
 class Renderer
 {
@@ -17,6 +19,7 @@ public:
 
 private:
 	HWND m_hwnd;
+
 };
 
 

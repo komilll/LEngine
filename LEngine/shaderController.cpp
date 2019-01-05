@@ -10,7 +10,7 @@ bool ShaderController::Initialize(HWND hwnd, ID3D11Device* device)
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[1];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc, colorBufferDesc;
 
@@ -24,7 +24,7 @@ bool ShaderController::Initialize(HWND hwnd, ID3D11Device* device)
 	static LPCSTR VSCompilerTarget = "vs_5_0";
 	ID3DBlob* errorMessages = nullptr;
 
-	result = D3DCompileFromFile(vsFilename, nullptr, nullptr, VSEntryPoint, VSCompilerTarget, 0, 0, &vertexShaderBuffer, &errorMessages);
+	result = D3DCompileFromFile(vsFilename, NULL, NULL, VSEntryPoint, VSCompilerTarget, D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBuffer, &errorMessages);
 	// Compile the vertex shader code.
 	//result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 	//	&vertexShaderBuffer, &errorMessage, NULL);
@@ -49,7 +49,7 @@ bool ShaderController::Initialize(HWND hwnd, ID3D11Device* device)
 	static LPCSTR PSEntryPoint = "ColorPixelShader";
 	static LPCSTR PSCompilerTarget = "ps_5_0";
 
-	result = D3DCompileFromFile(vsFilename, nullptr, nullptr, PSEntryPoint, PSCompilerTarget, 0, 0, &pixelShaderBuffer, &errorMessages);
+	result = D3DCompileFromFile(psFilename, NULL, NULL, PSEntryPoint, PSCompilerTarget, D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBuffer, &errorMessages);
 	//result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 	//	&pixelShaderBuffer, &errorMessage, NULL);
 	//if (FAILED(result))
@@ -92,22 +92,13 @@ bool ShaderController::Initialize(HWND hwnd, ID3D11Device* device)
 	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[0].InstanceDataStepRate = 0;
 
-	polygonLayout[1].SemanticName = "COLOR";
-	polygonLayout[1].SemanticIndex = 0;
-	polygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	polygonLayout[1].InputSlot = 0;
-	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[1].InstanceDataStepRate = 0;
-
-	polygonLayout[2].SemanticName = "TEXCOORD";
-	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
-	polygonLayout[2].InputSlot = 0;
-	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[2].InstanceDataStepRate = 0;
-
+	//polygonLayout[1].SemanticName = "COLOR";
+	//polygonLayout[1].SemanticIndex = 0;
+	//polygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	//polygonLayout[1].InputSlot = 0;
+	//polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	//polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	//polygonLayout[1].InstanceDataStepRate = 0;
 
 	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -127,20 +118,20 @@ bool ShaderController::Initialize(HWND hwnd, ID3D11Device* device)
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = 0;
 
-	//// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
-	//matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	//matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	//matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//matrixBufferDesc.MiscFlags = 0;
-	//matrixBufferDesc.StructureByteStride = 0;
+	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
 
-	//// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	//result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
 	//colorBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	//colorBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -158,10 +149,54 @@ bool ShaderController::Initialize(HWND hwnd, ID3D11Device* device)
 	return true;
 }
 
-void ShaderController::Render(ID3D11DeviceContext* deviceContext, int indexCount)
+void ShaderController::Render(ID3D11DeviceContext* deviceContext, int indexCount,
+	DirectX::XMMATRIX &worldMatrix, DirectX::XMMATRIX &viewMatrix, DirectX::XMMATRIX &projectionMatrix)
 {
-	RenderShader(deviceContext, indexCount);
+	if (SetBuffersOnRender(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
+	{
+		RenderShader(deviceContext, indexCount);
+	}
 }
+
+bool ShaderController::SetBuffersOnRender(ID3D11DeviceContext* deviceContext, DirectX::XMMATRIX &worldMatrix, DirectX::XMMATRIX &viewMatrix,
+	DirectX::XMMATRIX &projectionMatrix)
+{
+	HRESULT result;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	MatrixBufferType* dataPtr;
+	unsigned int bufferNumber;
+
+	// Transpose the matrices to prepare them for the shader.
+	//DirectX::XMMatrixTranspose(worldMatrix);
+	//DirectX::XMMatrixTranspose(viewMatrix);
+	//DirectX::XMMatrixTranspose(projectionMatrix);
+
+	// Lock the constant buffer so it can be written to.
+	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Get a pointer to the data in the constant buffer.
+	dataPtr = (MatrixBufferType*)mappedResource.pData;
+
+	// Copy the matrices into the constant buffer.
+	dataPtr->world = worldMatrix;
+	dataPtr->view = viewMatrix;
+	dataPtr->projection = projectionMatrix;
+
+	// Unlock the constant buffer.
+	deviceContext->Unmap(m_matrixBuffer, 0);
+
+	// Set the position of the constant buffer in the vertex shader.
+	bufferNumber = 0;
+
+	// Finanly set the constant buffer in the vertex shader with the updated values.
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	return true;
+}
+
 
 void ShaderController::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {

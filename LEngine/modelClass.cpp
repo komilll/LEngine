@@ -31,49 +31,34 @@ bool ModelClass::InitializeModel()
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 
-	int m_vertexCount = 4;
-	int m_indicesCount = 6;
+	int m_vertexCount = 3;
+	int m_indicesCount = 3;
 	m_indexCount = m_indicesCount;
 
 	vertices = new VertexType[m_vertexCount];
 	indices = new unsigned long[m_indicesCount];
 
-	float left = 0.2f;
-	float top = 0.8f;
-	float bottom = 0.2f;
-	float right = 0.8f;
+	vertices[0].position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
+	//vertices[0].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[0].position = DirectX::XMFLOAT3(left, top, 0.0f);  // Top left.
-	vertices[0].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	vertices[0].tex = DirectX::XMFLOAT2(0.0, 0.0);
+	vertices[1].position = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);  // Top middle.
+	//vertices[1].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[1].position = DirectX::XMFLOAT3(right, top, 0.0f);  // Top right.
-	vertices[1].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	vertices[1].tex = DirectX::XMFLOAT2(1.0f, 0.0f);
-
-	vertices[2].position = DirectX::XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
-	vertices[2].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	vertices[2].tex = DirectX::XMFLOAT2(1.0f, 1.0f);
-
-	vertices[3].position = DirectX::XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
-	vertices[3].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	vertices[3].tex = DirectX::XMFLOAT2(0.0, 1.0f);
+	vertices[2].position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);  // Bottom right.
+	//vertices[2].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
 	// Load the index array with data.
 	indices[0] = 0;  // Bottom left.
 	indices[1] = 1;  // Top middle.
 	indices[2] = 2;  // Bottom right.
-	indices[3] = 0;  // Bottom left.
-	indices[4] = 2;  // Top middle.
-	indices[5] = 3;  // Bottom right.
 
 	//Create vertex buffer description
-	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.StructureByteStride = 0;
-	vertexBufferDesc.CPUAccessFlags = 0;
 	//Fill subresource data with vertices
 	vertexData.pSysMem = vertices;
 	vertexData.SysMemPitch = 0;
@@ -86,12 +71,12 @@ bool ModelClass::InitializeModel()
 	}
 
 	//Create index buffer description
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indicesCount;
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.StructureByteStride = 0;
-	indexBufferDesc.CPUAccessFlags = 0;
 	//Fill subresource data with indices
 	indexData.pSysMem = indices;
 	indexData.SysMemPitch = 0;

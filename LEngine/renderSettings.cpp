@@ -312,7 +312,8 @@ bool RenderSettings::Initialize(int screenWidth, int screenHeight, bool vsync, H
 	m_deviceContext->RSSetViewports(1, &viewport);
 
 	// Setup the projection matrix.
-	fieldOfView = (float)22.0f/7.0f / 4.0f;
+	#define D3DX_PI    (3.14159265358979323846)
+	fieldOfView = (float)D3DX_PI / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// Create the projection matrix for 3D rendering.
@@ -401,6 +402,8 @@ void RenderSettings::ClearScene(float red, float green, float blue, float alpha)
 {
 	//float color[4] = { red, green, blue, alpha };
 	m_deviceContext->ClearRenderTargetView(m_renderTargetView, new float[4]{ red, green, blue, alpha });
+
+	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
 void RenderSettings::PresentScene()
@@ -426,4 +429,55 @@ ID3D11Device * RenderSettings::GetDevice()
 ID3D11DeviceContext * RenderSettings::GetDeviceContext()
 {
 	return m_deviceContext;
+}
+
+void RenderSettings::GetWorldMatrix(DirectX::XMMATRIX & worldMatrix)
+{
+	worldMatrix = m_worldMatrix;
+}
+
+void RenderSettings::GetProjectionMatrix(DirectX::XMMATRIX & projectionMatrix)
+{
+	projectionMatrix = m_projectionMatrix;
+}
+
+void RenderSettings::TurnOnAlphaBlending()
+{
+	float blendFactor[4];
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	// Turn on the alpha blending.
+	m_deviceContext->OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
+
+	return;
+}
+
+void RenderSettings::TurnOffAlphaBlending()
+{
+	float blendFactor[4];
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	// Turn off the alpha blending.
+	m_deviceContext->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
+}
+
+void RenderSettings::TurnZBufferOn()
+{
+	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
+}
+
+
+void RenderSettings::TurnZBufferOff()
+{
+	m_deviceContext->OMSetDepthStencilState(m_depthDisabledStencilState, 1);
 }

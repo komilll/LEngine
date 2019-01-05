@@ -21,7 +21,13 @@ public:
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
+	void GetWorldMatrix(DirectX::XMMATRIX &worldMatrix);
+	void GetProjectionMatrix(DirectX::XMMATRIX &projectionMatrix);
 
+	void TurnOnAlphaBlending();
+	void TurnOffAlphaBlending();
+	void TurnZBufferOn();
+	void TurnZBufferOff();
 
 private:
 	bool m_vsync_enabled;

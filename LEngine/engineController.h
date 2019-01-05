@@ -75,6 +75,7 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 
+	Renderer* m_renderer;
 };
 
 

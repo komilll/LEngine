@@ -11,8 +11,8 @@ private:
 	struct VertexType
 	{
 		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT4 color;
-		DirectX::XMFLOAT2 tex;
+		float padding;
+		//DirectX::XMFLOAT4 color;
 	};
 
 public:

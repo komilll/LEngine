@@ -17,8 +17,8 @@ bool EngineController::Initialize()
 	// Initialize the windows api.
 	InitializeWindows(screenWidth, screenHeight);
 
-	Renderer *renderer = new Renderer;
-	renderer->Initialize(m_hwnd);
+	m_renderer = new Renderer;
+	m_renderer->Initialize(m_hwnd);
 	return true;
 }
 
@@ -72,6 +72,7 @@ void EngineController::Run()
 bool EngineController::Frame()
 {
 	bool result;
+	m_renderer->RenderFrame();
 
 	return true;
 }

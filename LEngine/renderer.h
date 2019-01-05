@@ -7,6 +7,7 @@
 #include "renderSettings.h"
 #include "modelClass.h"
 #include "shaderController.h"
+#include "baseCamera.h"
 
 class Renderer
 {
@@ -19,7 +20,10 @@ public:
 
 private:
 	HWND m_hwnd;
-
+	RenderSettings* m_renderSettings;
+	BaseCamera *m_camera;
+	ModelClass *m_model;
+	ShaderController *m_shader;
 };
 
 

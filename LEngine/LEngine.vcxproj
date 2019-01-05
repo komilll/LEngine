@@ -113,6 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="baseCamera.h" />
     <ClInclude Include="engineController.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="modelClass.h" />
@@ -121,6 +122,7 @@
     <ClInclude Include="shaderController.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="baseCamera.cpp" />
     <ClCompile Include="engineController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelClass.cpp" />
@@ -129,8 +131,8 @@
     <ClCompile Include="shaderController.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="colorShader.ps" />
-    <None Include="colorShader.vs" />
+    <None Include="basicColor.ps" />
+    <None Include="basicColor.vs" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

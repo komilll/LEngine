@@ -1,26 +1,33 @@
-#include "engineController.h"
+////////////////////////////////////////////////////////////////////////////////
+// Filename: main.cpp
+////////////////////////////////////////////////////////////////////////////////
+#include "systemclass.h"
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	EngineController* engine;
-
+	SystemClass* System;
+	bool result;
+	
+	
 	// Create the system object.
-	engine = new EngineController;
-	if (!engine)
+	System = new SystemClass;
+	if(!System)
 	{
 		return 0;
 	}
 
 	// Initialize and run the system object.
-	if (!engine->Initialize())
-		return 0;
-
-	engine->Run();
+	result = System->Initialize();
+	if(result)
+	{
+		System->Run();
+	}
 
 	// Shutdown and release the system object.
-	engine->Shutdown();
-	delete engine;
-	engine = 0;
+	System->Shutdown();
+	delete System;
+	System = 0;
 
 	return 0;
 }

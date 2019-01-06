@@ -1,37 +1,53 @@
-#pragma once
-#ifndef _MODEL_CLASS_H_
-#define _MODEL_CLASS_H_
+////////////////////////////////////////////////////////////////////////////////
+// Filename: modelclass.h
+////////////////////////////////////////////////////////////////////////////////
+#ifndef _MODELCLASS_H_
+#define _MODELCLASS_H_
 
+
+//////////////
+// INCLUDES //
+//////////////
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
 
+using namespace DirectX;
+
+////////////////////////////////////////////////////////////////////////////////
+// Class name: ModelClass
+////////////////////////////////////////////////////////////////////////////////
 class ModelClass
 {
 private:
 	struct VertexType
 	{
-		DirectX::XMFLOAT3 position;
-		float padding;
-		//DirectX::XMFLOAT4 color;
+		XMFLOAT3 position;
+	    XMFLOAT4 color;
 	};
 
 public:
 	ModelClass();
+	ModelClass(const ModelClass&);
+	~ModelClass();
 
-	bool Initialize(ID3D11Device *device, ID3D11DeviceContext *deviceContext);
-	bool RenderModel();
+	bool Initialize(ID3D11Device*);
+	void Shutdown();
+	void Render(ID3D11DeviceContext*);
+
 	int GetIndexCount();
 
 private:
-	bool InitializeModel();
-	void RenderBuffers();
+	bool InitializeBuffers(ID3D11Device*);
+	void ShutdownBuffers();
+	void RenderBuffers(ID3D11DeviceContext*);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-
-	ID3D11Device *m_device;
-	ID3D11DeviceContext *m_deviceContext;
-	int m_indexCount;
+	int m_vertexCount, m_indexCount;
 };
 
-#endif // !_MODEL_CLASS_H_
+#endif

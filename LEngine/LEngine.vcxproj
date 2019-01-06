@@ -113,27 +113,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="baseCamera.h" />
-    <ClInclude Include="engineController.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="modelClass.h" />
-    <ClInclude Include="renderer.h" />
-    <ClInclude Include="renderSettings.h" />
-    <ClInclude Include="shaderController.h" />
+    <None Include="color.ps" />
+    <None Include="color.vs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="baseCamera.cpp" />
-    <ClCompile Include="engineController.cpp" />
+    <ClInclude Include="cameraclass.h" />
+    <ClInclude Include="colorshaderclass.h" />
+    <ClInclude Include="d3dclass.h" />
+    <ClInclude Include="graphicsclass.h" />
+    <ClInclude Include="inputclass.h" />
+    <ClInclude Include="modelClass.h" />
+    <ClInclude Include="systemclass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cameraclass.cpp" />
+    <ClCompile Include="colorshaderclass.cpp" />
+    <ClCompile Include="d3dclass.cpp" />
+    <ClCompile Include="graphicsclass.cpp" />
+    <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelClass.cpp" />
-    <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="renderSettings.cpp" />
-    <ClCompile Include="shaderController.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="basicColor.ps" />
-    <None Include="basicColor.vs" />
-    <None Include="packages.config" />
+    <ClCompile Include="systemclass.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

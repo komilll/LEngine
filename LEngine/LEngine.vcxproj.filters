@@ -15,58 +15,61 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engineController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="renderSettings.h">
+    <None Include="packages.config" />
+    <None Include="color.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="color.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="colorshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="modelClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shaderController.h">
+    <ClInclude Include="cameraclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="baseCamera.h">
+    <ClInclude Include="systemclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inputclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphicsclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="engineController.cpp">
+    <ClCompile Include="cameraclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="colorshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="renderer.cpp">
+    <ClCompile Include="d3dclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="renderSettings.cpp">
+    <ClCompile Include="graphicsclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="inputclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="modelClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shaderController.cpp">
+    <ClCompile Include="systemclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="baseCamera.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="basicColor.ps">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="basicColor.vs">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace DirectX;
 
@@ -26,7 +27,8 @@ private:
 	struct VertexType
 	{
 		XMFLOAT3 position;
-	    XMFLOAT4 color;
+		XMFLOAT2 tex;
+		XMFLOAT3 normal;
 	};
 
 public:
@@ -44,6 +46,7 @@ private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
+	void SetIndices(std::string input, int &vertexIndex, int &textureIndex, int &normalIndex);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

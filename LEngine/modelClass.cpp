@@ -70,160 +70,127 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	HRESULT result;
 
 	/////////// GET VERTEX COUNT ////////
-	//int m_vertexCount = 0;
+	int m_vertexCount = 0;
 
-	//char curChar;
-	//std::string curLine;
-	//std::ifstream input;
-	//input.open("model.obj");
+	char curChar;
+	std::string curLine;
+	std::ifstream input;
+	//input.open("plane.obj");
 
 	//if (input.fail())
 	//	return false;
 
 	//std::getline(input, curLine);
-	//while (curLine[0] != 'v')
+	//while (curLine[0] != 'v') //Skip no vertex
 	//	std::getline(input, curLine);
 
-
-	//while (curLine[0] == 'v' && curLine[1] == ' ')
+	//while (curLine[0] == 'v' && curLine[1] == ' ') //Get vertex count
 	//{
 	//	std::getline(input, curLine);
 	//	m_vertexCount++;
 	//}
+
 	//input.close();
-	//int m_indicesCount = 36;
+
+	///////// CORRECT VERTICES LOADING ////////
+	std::vector<DirectX::XMFLOAT3> vertexPosition;
+	std::vector<DirectX::XMFLOAT2> texPosition;
+	std::vector<DirectX::XMFLOAT3> normalPosition;
+	std::vector<int> vertexIndices;
+	std::vector<int> texIndices;
+	std::vector<int> normalIndices;
+	input.open("plane.obj");
+
+	if (input.fail())
+		return false;
+
+	std::getline(input, curLine);
+	//while (curLine[0] != 'v')
+	//	std::getline(input, curLine);
+
+	std::string x, y, z;
+	std::string type = "";
+	int curIndex = 0;
+	while (!input.eof())
+	{
+		std::istringstream iss(curLine);
+		iss >> type;
+		if (type == "v")
+		{
+			iss >> x >> y >> z;
+			vertexPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+		}
+		else if (type == "vt")
+		{
+			iss >> x >> y;
+			texPosition.push_back(DirectX::XMFLOAT2(std::stof(x), std::stof(y)));
+		}
+		else if (type == "vn")
+		{
+			iss >> x >> y >> z;
+			normalPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+		}
+
+		std::getline(input, curLine);
+
+	}
+	int m_indicesCount = 6;
+	m_indexCount = m_indicesCount;
+
+	vertices = new VertexType[m_vertexCount = vertexPosition.size()];
+	indices = new unsigned long[m_indicesCount];
+
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		vertices[i].position = vertexPosition.at(i);
+	}
+	////////// FEEDING INDICES WITH DATA /////////
+	input.close();
+	input.open("plane.obj");
+	std::getline(input, curLine);
+	while (curLine[0] != 'f')
+		std::getline(input, curLine);
+
+	int vIndex, vtIndex, vnIndex;
+	while (curLine[0] == 'f' && curLine[1] == ' ')
+	{
+		curLine = curLine.substr(2);
+		std::istringstream iss(curLine);
+		
+		while (iss >> x)
+		{
+			SetIndices(x, vIndex, vtIndex, vnIndex);
+			indices[curIndex] = vIndex;
+			//vertices[vIndex].tex = texPosition.at(texPosition.size() - 1 - vtIndex);
+			//vertices[vIndex].normal = normalPosition.at(normalPosition.size() - 1 - vnIndex);
+			curIndex++;
+		}
+		std::getline(input, curLine);
+	}
+
+	input.close();
+
+	//int m_vertexCount = 4;
+	//int m_indicesCount = 6;
 	//m_indexCount = m_indicesCount;
 
 	//vertices = new VertexType[m_vertexCount];
 	//indices = new unsigned long[m_indicesCount];
-	/////////// CORRECT VERTICES LOADING ////////
-	//input.open("model.obj");
 
-	//if (input.fail())
-	//	return false;
+	//vertices[0].position = DirectX::XMFLOAT3(-1.0f, 1.0f, 5.0f);  // Top left.
+	//vertices[1].position = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);  // Top right.
+	//vertices[2].position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);  // Bottom right.
+	//vertices[3].position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
 
-	//std::getline(input, curLine);
-	//while (curLine[0] != 'v')
-	//	std::getline(input, curLine);
+	//															   // Load the index array with data.
+	//indices[0] = 0;  // Bottom left.
+	//indices[1] = 1;  // Top middle.
+	//indices[2] = 2;  // Bottom right.
+	//indices[3] = 0;  // Bottom left.
+	//indices[4] = 2;  // Top middle.
+	//indices[5] = 3;  // Bottom right.
 
-	//float x = INFINITY;
-	//float y = INFINITY;
-	//float z = INFINITY;
-	//std::string curNumber = "";
-	//int curIndex = 0;
-	//while (curLine[0] == 'v' && curLine[1] == ' ')
-	//{
-	//	for (int i = 2; i < curLine.length(); i++)
-	//	{
-	//		if (curLine[i] == ' ')
-	//		{
-	//			if (x == INFINITY)
-	//				x = atof(curNumber.c_str());
-	//			else if (y == INFINITY)
-	//				y = atof(curNumber.c_str());
-
-	//			curNumber = "";
-	//		}
-	//		else
-	//			curNumber += curLine[i];
-	//	}
-	//	z = atof(curNumber.c_str());;
-	//	curNumber = "";
-
-	//	std::getline(input, curLine);
-	//	//Feeding struct with vertex data
-	//	vertices[curIndex].position = DirectX::XMFLOAT3(x, y, z);
-	//	curIndex++;
-	//}
-	//////////// FEEDING INDICES WITH DATA /////////
-	//std::string lookUp = "";
-	//curNumber = "";
-	//curIndex = 0;
-	//x = INFINITY;
-	//y = INFINITY;
-	//z = INFINITY;
-	//while (curLine[0] != 'f')
-	//	std::getline(input, curLine);
-	//while (curLine[0] == 'f' && curLine[1] == ' ')
-	//{
-	//	for (int i = 2; i < curLine.length(); i++)
-	//	{
-	//		if (curLine[i] == ' ')
-	//		{
-	//			z = atoi(curNumber.c_str());;
-	//			if (x != INFINITY)
-	//			{
-	//				indices[curIndex] = x - 1;
-	//				curIndex++;
-	//				lookUp += ((int)x);
-	//		/*		lookUp += ", ";*/
-	//			}
-	//			x = INFINITY;
-	//			y = INFINITY;
-	//			z = INFINITY;
-	//			curNumber = "";
-	//		}
-	//		else if (curLine[i] == '/')
-	//		{
-	//			if (x == INFINITY)
-	//				x = atoi(curNumber.c_str());
-	//			else if (y == INFINITY)
-	//			{
-	//				y = 0;
-	//				y = atoi(curNumber.c_str());
-	//			}
-
-	//			curNumber = "";
-	//		}
-	//		else
-	//			curNumber += curLine[i];
-	//	}
-	//	z = atoi(curNumber.c_str());;
-	//	if (x != INFINITY)
-	//	{
-	//		indices[curIndex] = x - 1;
-	//		curIndex++;
-	//		int toSave = x;
-	//		const char* c = (char*)toSave;
-	//		lookUp += ((int)x);
-	//		//lookUp += "\n";
-	//	}
-	//	x = INFINITY;
-	//	y = INFINITY;
-	//	z = INFINITY;
-	//	curNumber = "";
-
-	//	if (input.eof())
-	//		break;
-	//	std::getline(input, curLine);
-	//}
-	////for (int i = 0; i < m_indexCount; i++)
-	////{
-	////	indices[i] = i;
-	////}
-	//input.close();
-
-	int m_vertexCount = 4;
-	int m_indicesCount = 6;
-	m_indexCount = m_indicesCount;
-
-	vertices = new VertexType[m_vertexCount];
-	indices = new unsigned long[m_indicesCount];
-
-	vertices[0].position = DirectX::XMFLOAT3(-1.0f, 1.0f, 5.0f);  // Top left.
-	vertices[1].position = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);  // Top right.
-	vertices[2].position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);  // Bottom right.
-	vertices[3].position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
-
-																   // Load the index array with data.
-	indices[0] = 0;  // Bottom left.
-	indices[1] = 1;  // Top middle.
-	indices[2] = 2;  // Bottom right.
-	indices[3] = 0;  // Bottom left.
-	indices[4] = 2;  // Top middle.
-	indices[5] = 3;  // Bottom right.
-
-					 //Create vertex buffer description
+	//Create vertex buffer description
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -300,4 +267,26 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
+}
+
+void ModelClass::SetIndices(std::string input, int & vertexIndex, int & textureIndex, int & normalIndex)
+{
+	std::string curOut = "";
+	std::stringstream newStream(input);
+	int curIndex = 0;
+	while (std::getline(newStream, curOut, '/'))
+	{
+		int index = -1;
+		if (curOut != "")
+			index += stoi(curOut);
+		
+		if (curIndex == 0)
+			vertexIndex = index;
+		else if (curIndex == 1)
+			textureIndex = index;
+		else
+			normalIndex = index;
+
+		curIndex++;
+	}
 }

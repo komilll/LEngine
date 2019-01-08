@@ -51,7 +51,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -100.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -61,7 +61,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice());
+	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if(!result)
 	{
 		//MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
@@ -82,6 +82,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		//MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 		return false;
 	}
+
+	result = m_ColorShader->LoadTexture(m_D3D->GetDevice(), L"seafloor.dds");
+	if (!result)
+		return false;
+	m_ColorShader->SetLightDirection(0.0f, 0.5f, -1.0f);
 
 	return true;
 }
@@ -130,6 +135,9 @@ bool GraphicsClass::Frame()
 
 
 	// Render the graphics scene.
+	m_rotationY += 0.1f;
+	if (m_rotationY >= 360.0f)
+		m_rotationY = 0.0f;
 	result = Render();
 	if(!result)
 	{
@@ -160,6 +168,7 @@ bool GraphicsClass::Render()
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
 
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
 	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)

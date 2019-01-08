@@ -21,13 +21,13 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D11Device* device)
+bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 {
 	bool result;
 
 
 	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(device);
+	result = InitializeBuffers(device, modelFilename);
 	if(!result)
 	{
 		return false;
@@ -54,14 +54,13 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-
 int ModelClass::GetIndexCount()
 {
 	return m_indexCount;
 }
 
 
-bool ModelClass::InitializeBuffers(ID3D11Device* device)
+bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)
 {
 	VertexType* vertices;
 	unsigned long* indices;
@@ -75,22 +74,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	char curChar;
 	std::string curLine;
 	std::ifstream input;
-	//input.open("plane.obj");
-
-	//if (input.fail())
-	//	return false;
-
-	//std::getline(input, curLine);
-	//while (curLine[0] != 'v') //Skip no vertex
-	//	std::getline(input, curLine);
-
-	//while (curLine[0] == 'v' && curLine[1] == ' ') //Get vertex count
-	//{
-	//	std::getline(input, curLine);
-	//	m_vertexCount++;
-	//}
-
-	//input.close();
 
 	///////// CORRECT VERTICES LOADING ////////
 	std::vector<DirectX::XMFLOAT3> vertexPosition;
@@ -99,14 +82,12 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	std::vector<int> vertexIndices;
 	std::vector<int> texIndices;
 	std::vector<int> normalIndices;
-	input.open("plane.obj");
+	input.open(modelFilename);
 
 	if (input.fail())
 		return false;
 
 	std::getline(input, curLine);
-	//while (curLine[0] != 'v')
-	//	std::getline(input, curLine);
 
 	std::string x, y, z;
 	std::string type = "";
@@ -134,11 +115,9 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 		std::getline(input, curLine);
 
 	}
-	int m_indicesCount = 6;
-	m_indexCount = m_indicesCount;
 
+	std::vector<long> indicesVec;
 	vertices = new VertexType[m_vertexCount = vertexPosition.size()];
-	indices = new unsigned long[m_indicesCount];
 
 	for (int i = 0; i < m_vertexCount; i++)
 	{
@@ -146,7 +125,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	}
 	////////// FEEDING INDICES WITH DATA /////////
 	input.close();
-	input.open("plane.obj");
+	input.open(modelFilename);
 	std::getline(input, curLine);
 	while (curLine[0] != 'f')
 		std::getline(input, curLine);
@@ -160,35 +139,24 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 		while (iss >> x)
 		{
 			SetIndices(x, vIndex, vtIndex, vnIndex);
-			indices[curIndex] = vIndex;
-			//vertices[vIndex].tex = texPosition.at(texPosition.size() - 1 - vtIndex);
-			//vertices[vIndex].normal = normalPosition.at(normalPosition.size() - 1 - vnIndex);
-			curIndex++;
+			indicesVec.push_back(vIndex);
+			//indices[curIndex] = vIndex;
+			vertices[vIndex].tex = texPosition.at(vtIndex);
+			vertices[vIndex].normal = normalPosition.at(vnIndex);
+			//curIndex++;
 		}
 		std::getline(input, curLine);
 	}
 
+	auto m_indicesCount = indicesVec.size();
+	m_indexCount = m_indicesCount;
+	indices = new unsigned long[m_indicesCount];
+	for (int i = 0; i < m_indexCount; i++)
+	{
+		indices[i] = indicesVec.at(i);
+	}
+
 	input.close();
-
-	//int m_vertexCount = 4;
-	//int m_indicesCount = 6;
-	//m_indexCount = m_indicesCount;
-
-	//vertices = new VertexType[m_vertexCount];
-	//indices = new unsigned long[m_indicesCount];
-
-	//vertices[0].position = DirectX::XMFLOAT3(-1.0f, 1.0f, 5.0f);  // Top left.
-	//vertices[1].position = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);  // Top right.
-	//vertices[2].position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);  // Bottom right.
-	//vertices[3].position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
-
-	//															   // Load the index array with data.
-	//indices[0] = 0;  // Bottom left.
-	//indices[1] = 1;  // Top middle.
-	//indices[2] = 2;  // Bottom right.
-	//indices[3] = 0;  // Bottom left.
-	//indices[4] = 2;  // Top middle.
-	//indices[5] = 3;  // Bottom right.
 
 	//Create vertex buffer description
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;

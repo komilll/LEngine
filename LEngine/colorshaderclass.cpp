@@ -74,9 +74,10 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, CHAR* v
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 	unsigned int numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D11_BUFFER_DESC matrixBufferDesc, lightingBufferDesc;
+	D3D11_SAMPLER_DESC samplerDesc;
 
 
 	// Initialize the pointers this function will use to null.
@@ -149,13 +150,21 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, CHAR* v
 	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[0].InstanceDataStepRate = 0;
 
-	polygonLayout[1].SemanticName = "COLOR";
+	polygonLayout[1].SemanticName = "TEXCOORD";
 	polygonLayout[1].SemanticIndex = 0;
-	polygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	polygonLayout[1].InputSlot = 0;
 	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
+
+	polygonLayout[2].SemanticName = "NORMAL";
+	polygonLayout[2].SemanticIndex = 0;
+	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	polygonLayout[2].InputSlot = 0;
+	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[2].InstanceDataStepRate = 0;
 
 	// Get a count of the elements in the layout.
     numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -186,6 +195,40 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, CHAR* v
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
 	if(FAILED(result))
+	{
+		return false;
+	}
+
+	lightingBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	lightingBufferDesc.ByteWidth = sizeof(LightingBufferType);
+	lightingBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	lightingBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	lightingBufferDesc.MiscFlags = 0;
+	lightingBufferDesc.StructureByteStride = 0;
+
+	result = device->CreateBuffer(&lightingBufferDesc, NULL, &m_lightingBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	// Create the texture sampler state.
+	result = device->CreateSamplerState(&samplerDesc, &m_samplerState);
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -263,6 +306,19 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND h
 	return;
 }
 
+bool ColorShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename)
+{
+	HRESULT result = CreateDDSTextureFromFile(device, filename, &m_texture, &m_textureView);
+	if (FAILED(result))
+		return false;
+
+	return true;
+}
+
+void ColorShaderClass::SetLightDirection(float x, float y, float z)
+{
+	m_lightDirection = XMFLOAT3(x, y, z);
+}
 
 bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix,
 										   XMMATRIX& projectionMatrix)
@@ -270,6 +326,7 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
 	HRESULT result;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
+	LightingBufferType* dataPtr2;
 	unsigned int bufferNumber;
 
 
@@ -291,19 +348,29 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
 	// Get a pointer to the data in the constant buffer.
 	dataPtr = (MatrixBufferType*)mappedResource.pData;
 
-	// Copy the matrices into the constant buffer.
 	dataPtr->world = worldMatrix;
 	dataPtr->view = viewMatrix;
 	dataPtr->projection = projectionMatrix;
 
-	// Unlock the constant buffer.
     deviceContext->Unmap(m_matrixBuffer, 0);
-
-	// Set the position of the constant buffer in the vertex shader.
 	bufferNumber = 0;
-
-	// Finanly set the constant buffer in the vertex shader with the updated values.
     deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+
+	//Lighting buffer
+	result = deviceContext->Map(m_lightingBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	dataPtr2 = (LightingBufferType*)mappedResource.pData;
+	dataPtr2->direction = m_lightDirection;
+	dataPtr2->padding = 0;
+
+	deviceContext->Unmap(m_lightingBuffer, 0);
+	bufferNumber = 0;
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightingBuffer);
+
+	//Pixel shader resources
+	deviceContext->PSSetShaderResources(0, 1, &m_textureView);
 
 	return true;
 }
@@ -317,6 +384,8 @@ void ColorShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int inde
     // Set the vertex and pixel shaders that will be used to render this triangle.
     deviceContext->VSSetShader(m_vertexShader, NULL, 0);
     deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+
+	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
 
 	// Render the triangle.
 	deviceContext->DrawIndexed(indexCount, 0, 0);

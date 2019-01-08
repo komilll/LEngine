@@ -36,14 +36,14 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*);
+	bool Initialize(ID3D11Device* device, const char* modelFilename);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
 
 private:
-	bool InitializeBuffers(ID3D11Device*);
+	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	void SetIndices(std::string input, int &vertexIndex, int &textureIndex, int &normalIndex);

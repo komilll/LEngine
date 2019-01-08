@@ -10,6 +10,7 @@
 // INCLUDES //
 //////////////
 #include <d3d11.h>
+#include <DDSTextureLoader.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 #include <fstream>
@@ -30,6 +31,12 @@ private:
 		XMMATRIX projection;
 	};
 
+	struct LightingBufferType 
+	{
+		XMFLOAT3 direction;
+		float padding;
+	};
+
 public:
 	ColorShaderClass();
 	ColorShaderClass(const ColorShaderClass&);
@@ -38,6 +45,8 @@ public:
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&);
+	bool LoadTexture(ID3D11Device * device, const wchar_t * filename);
+	void SetLightDirection(float x, float y, float z);
 
 private:
 	bool InitializeShader(ID3D11Device*, HWND, CHAR*, CHAR*);
@@ -52,6 +61,11 @@ private:
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
+	ID3D11Buffer* m_lightingBuffer;
+	ID3D11Resource* m_texture;
+	ID3D11ShaderResourceView* m_textureView;
+	ID3D11SamplerState* m_samplerState;
+	XMFLOAT3 m_lightDirection;
 };
 
 #endif

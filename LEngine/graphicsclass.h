@@ -45,6 +45,7 @@ private:
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
+	float m_rotationY = 0.0f;
 };
 
 #endif

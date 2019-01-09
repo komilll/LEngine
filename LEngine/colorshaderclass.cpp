@@ -76,7 +76,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, CHAR* v
 	ID3D10Blob* pixelShaderBuffer;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 	unsigned int numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc, lightingBufferDesc;
+	D3D11_BUFFER_DESC matrixBufferDesc, lightingBufferDesc, cameraBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 
 
@@ -212,6 +212,19 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, CHAR* v
 		return false;
 	}
 
+	cameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cameraBufferDesc.ByteWidth = sizeof(CameraBufferType);
+	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cameraBufferDesc.MiscFlags = 0;
+	cameraBufferDesc.StructureByteStride = 0;
+
+	result = device->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -320,6 +333,11 @@ void ColorShaderClass::SetLightDirection(float x, float y, float z)
 	m_lightDirection = XMFLOAT3(x, y, z);
 }
 
+void ColorShaderClass::SetCameraPosition(XMFLOAT3 && position)
+{
+	m_cameraPosition = position;
+}
+
 bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix,
 										   XMMATRIX& projectionMatrix)
 {
@@ -327,6 +345,7 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	LightingBufferType* dataPtr2;
+	CameraBufferType* dataPtr3;
 	unsigned int bufferNumber;
 
 
@@ -369,9 +388,21 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
 	bufferNumber = 0;
 	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightingBuffer);
 
+	//Camera buffer
+	result = deviceContext->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	dataPtr3 = (CameraBufferType*)mappedResource.pData;
+	dataPtr3->cameraDirection = m_cameraPosition;
+	dataPtr3->padding = 0;
+	
+	deviceContext->Unmap(m_cameraBuffer, 0);
+	bufferNumber = 1;
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+
 	//Pixel shader resources
 	deviceContext->PSSetShaderResources(0, 1, &m_textureView);
-
 	return true;
 }
 

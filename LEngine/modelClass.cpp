@@ -94,6 +94,12 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	int curIndex = 0;
 	while (!input.eof())
 	{
+		if (curLine == "")
+		{
+			std::getline(input, curLine);
+			continue;
+		}
+
 		std::istringstream iss(curLine);
 		iss >> type;
 		if (type == "v")

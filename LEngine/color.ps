@@ -19,6 +19,7 @@ struct PixelInputType
     float4 position : SV_POSITION;
     float2 tex: TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,13 +28,25 @@ struct PixelInputType
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 textureColor;
-	float3 lightDir;
 	float lightIntensity;
+	float3 reflectionVector;
+	float3 viewDir;
+	float specular;
+	float3 lightDir = normalize(direction);
+	float specularPower = 5.0;
+	float specularStrength = 0.5;
+	float4 color;
 
 	textureColor = shaderTexture.Sample(SampleType, input.tex);
 
-	lightIntensity = saturate(dot(input.normal, direction));	
-	textureColor *= lightIntensity;
+	lightIntensity = saturate(dot(input.normal, lightDir));	
 
-	return textureColor;
+	reflectionVector = normalize(-lightDir + 2 * input.normal * lightIntensity);
+	specular = pow(saturate(dot(reflectionVector, input.viewDirection)), specularPower) * specularStrength;
+	textureColor *= (lightIntensity + specular);
+
+	color = saturate(textureColor);
+	return color;
+	//return float4(specular, specular, specular, 1.0);
+	//return float4(1.0, 1.0, 1.0, 1.0);
 }

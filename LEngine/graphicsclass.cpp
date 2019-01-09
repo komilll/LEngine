@@ -51,7 +51,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -100.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -83,10 +83,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	result = m_ColorShader->LoadTexture(m_D3D->GetDevice(), L"seafloor.dds");
+	result = m_ColorShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds");
 	if (!result)
 		return false;
-	m_ColorShader->SetLightDirection(0.0f, 0.5f, -1.0f);
+	m_ColorShader->SetLightDirection(-1.0f, 0.0f, -1.0f);
 
 	return true;
 }
@@ -135,7 +135,7 @@ bool GraphicsClass::Frame()
 
 
 	// Render the graphics scene.
-	m_rotationY += 0.1f;
+	m_rotationY += 0.01f;
 	if (m_rotationY >= 360.0f)
 		m_rotationY = 0.0f;
 	result = Render();
@@ -170,6 +170,7 @@ bool GraphicsClass::Render()
 
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
+	m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
 	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)
 	{

@@ -37,6 +37,12 @@ private:
 		float padding;
 	};
 
+	struct CameraBufferType
+	{
+		XMFLOAT3 cameraDirection;
+		float padding;
+	};
+
 public:
 	ColorShaderClass();
 	ColorShaderClass(const ColorShaderClass&);
@@ -47,6 +53,7 @@ public:
 	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&);
 	bool LoadTexture(ID3D11Device * device, const wchar_t * filename);
 	void SetLightDirection(float x, float y, float z);
+	void SetCameraPosition(XMFLOAT3 &&position);
 
 private:
 	bool InitializeShader(ID3D11Device*, HWND, CHAR*, CHAR*);
@@ -62,10 +69,12 @@ private:
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
 	ID3D11Buffer* m_lightingBuffer;
+	ID3D11Buffer* m_cameraBuffer;
 	ID3D11Resource* m_texture;
 	ID3D11ShaderResourceView* m_textureView;
 	ID3D11SamplerState* m_samplerState;
 	XMFLOAT3 m_lightDirection;
+	XMFLOAT3 m_cameraPosition;
 };
 
 #endif

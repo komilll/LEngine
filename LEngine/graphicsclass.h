@@ -12,6 +12,7 @@
 #include "cameraclass.h"
 #include "modelclass.h"
 #include "colorshaderclass.h"
+#include "ShaderSpecularClass.h"
 
 
 /////////////
@@ -45,6 +46,7 @@ private:
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
+	ShaderSpecularClass* m_specularShader;
 	float m_rotationY = 0.0f;
 };
 

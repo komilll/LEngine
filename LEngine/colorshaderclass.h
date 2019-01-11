@@ -51,7 +51,7 @@ public:
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&);
-	bool LoadTexture(ID3D11Device * device, const wchar_t * filename);
+	bool LoadTexture(ID3D11Device * device, const wchar_t * filename, ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView);
 	void SetLightDirection(float x, float y, float z);
 	void SetCameraPosition(XMFLOAT3 &&position);
 
@@ -63,6 +63,10 @@ private:
 	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&);
 	void RenderShader(ID3D11DeviceContext*, int);
 
+public:
+	ID3D11Resource* m_texture;
+	ID3D11ShaderResourceView* m_textureView;
+
 private:
 	ID3D11VertexShader* m_vertexShader;
 	ID3D11PixelShader* m_pixelShader;
@@ -70,8 +74,6 @@ private:
 	ID3D11Buffer* m_matrixBuffer;
 	ID3D11Buffer* m_lightingBuffer;
 	ID3D11Buffer* m_cameraBuffer;
-	ID3D11Resource* m_texture;
-	ID3D11ShaderResourceView* m_textureView;
 	ID3D11SamplerState* m_samplerState;
 	XMFLOAT3 m_lightDirection;
 	XMFLOAT3 m_cameraPosition;

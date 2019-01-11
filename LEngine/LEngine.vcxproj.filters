@@ -45,6 +45,12 @@
     <ClInclude Include="graphicsclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BaseShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderSpecularClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cameraclass.cpp">
@@ -69,6 +75,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderSpecularClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

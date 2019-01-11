@@ -68,25 +68,35 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	if (!(m_specularShader = new ShaderSpecularClass))
+		return false;
+
+	if (!m_specularShader->Initialize(m_D3D->GetDevice(), hwnd, L"color.vs", L"color.ps"))
+		return false;
+
+	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_specularShader->m_diffuseTexture, m_specularShader->m_diffuseTextureView))
+		return false;
+	m_specularShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
+
 	// Create the color shader object.
-	m_ColorShader = new ColorShaderClass;
-	if(!m_ColorShader)
-	{
-		return false;
-	}
+	//m_ColorShader = new ColorShaderClass;
+	//if(!m_ColorShader)
+	//{
+	//	return false;
+	//}
 
-	// Initialize the color shader object.
-	result = m_ColorShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if(!result)
-	{
-		//MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
-		return false;
-	}
+	//// Initialize the color shader object.
+	//result = m_ColorShader->Initialize(m_D3D->GetDevice(), hwnd);
+	//if(!result)
+	//{
+	//	//MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
+	//	return false;
+	//}
 
-	result = m_ColorShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds");
-	if (!result)
-		return false;
-	m_ColorShader->SetLightDirection(-1.0f, 0.0f, -1.0f);
+	//result = m_ColorShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_ColorShader->m_texture, m_ColorShader->m_textureView);
+	//if (!result)
+	//	return false;
+	//m_ColorShader->SetLightDirection(-1.0f, 0.0f, -1.0f);
 
 	return true;
 }
@@ -170,8 +180,8 @@ bool GraphicsClass::Render()
 
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
-	m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
-	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_specularShader->m_cameraPosition = m_Camera->GetPosition();
+	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)
 	{
 		return false;

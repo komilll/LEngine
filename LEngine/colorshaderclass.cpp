@@ -319,9 +319,9 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND h
 	return;
 }
 
-bool ColorShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename)
+bool ColorShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView)
 {
-	HRESULT result = CreateDDSTextureFromFile(device, filename, &m_texture, &m_textureView);
+	HRESULT result = CreateDDSTextureFromFile(device, filename, &resource, &resourceView);
 	if (FAILED(result))
 		return false;
 

@@ -70,8 +70,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	if (!(m_specularShader = new ShaderSpecularClass))
 		return false;
-
-	if (!m_specularShader->Initialize(m_D3D->GetDevice(), hwnd, L"color.vs", L"color.ps"))
+	
+	std::vector <BaseShaderClass::vertexInputNameType> names;
+	names.push_back("position");
+	names.push_back("texcoord");
+	names.push_back("normal");
+	std::vector <DXGI_FORMAT> formats;
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	BaseShaderClass::vertexInputType input(names, formats);
+	
+	if (!m_specularShader->Initialize(m_D3D->GetDevice(), hwnd, L"color.vs", L"color.ps", input))
 		return false;
 
 	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_specularShader->m_diffuseTexture, m_specularShader->m_diffuseTextureView))

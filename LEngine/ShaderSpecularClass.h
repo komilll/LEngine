@@ -33,7 +33,7 @@ public:
 	XMFLOAT3 m_cameraPosition;
 
 protected:
-	virtual bool CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer) override;
+	//virtual bool CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer) override;
 	virtual bool CreateBuffers(ID3D11Device * device) override;
 	virtual bool CreateSamplerState(ID3D11Device* device) override;
 	virtual void ShutdownShader() override;

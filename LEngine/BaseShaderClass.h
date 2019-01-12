@@ -13,6 +13,8 @@
 #include <d3dcompiler.h>
 #include <fstream>
 #include <vector>
+#include <map>
+#include <locale>
 using namespace std;
 using namespace DirectX;
 
@@ -22,17 +24,29 @@ using namespace DirectX;
 class BaseShaderClass
 {
 public:
+	using vertexInputNameType = LPCSTR;
+
+	using vertexInputMap = std::map<vertexInputNameType, int>;
+	struct vertexInputType
+	{
+		std::vector<vertexInputNameType> &name;
+		std::vector<DXGI_FORMAT> &format;
+
+		BaseShaderClass::vertexInputType(std::vector<vertexInputNameType> &n, std::vector<DXGI_FORMAT> &f) : name(n), format(f) { }
+	};
+
+public:
 	BaseShaderClass();
 	BaseShaderClass(const BaseShaderClass&);
 	~BaseShaderClass();
 
-	bool Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename);
+	bool Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&);
 	bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView);
 
 protected:
-	virtual bool CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer);
+	virtual bool CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer, vertexInputType vertexInput);
 	virtual bool CreateBuffers(ID3D11Device * device);
 	virtual bool CreateSamplerState(ID3D11Device* device);
 	virtual void ShutdownShader();
@@ -40,7 +54,7 @@ protected:
 	virtual void RenderShader(ID3D11DeviceContext*, int);
 
 private:
-	bool InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename);
+	bool InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput);
 	void OutputShaderErrorMessage(ID3D10Blob*, HWND, CHAR*);
 
 protected:
@@ -49,5 +63,4 @@ protected:
 	ID3D11InputLayout* m_layout;
 	ID3D11SamplerState* m_samplerState;
 };
-
 #endif

@@ -18,13 +18,13 @@ BaseShaderClass::~BaseShaderClass()
 }
 
 
-bool BaseShaderClass::Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool BaseShaderClass::Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput)
 {
 	bool result;
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader(device, hwnd, vsFilename, psFilename);
+	result = InitializeShader(device, hwnd, vsFilename, psFilename, vertexInput);
 	if (!result)
 	{
 		return false;
@@ -63,7 +63,7 @@ bool BaseShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount,
 }
 
 
-bool BaseShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool BaseShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
@@ -94,7 +94,7 @@ bool BaseShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	if (FAILED(result))
 		return false;
 
-	if (!CreateInputLayout(device, vertexShaderBuffer))
+	if (!CreateInputLayout(device, vertexShaderBuffer, vertexInput))
 		return false;
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
@@ -115,35 +115,61 @@ bool BaseShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	return true;
 }
 
-bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer)
+bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer, vertexInputType vertexInput)
 {
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
+	if (vertexInput.name.size() != vertexInput.format.size())
+		return false;
+
+	int size = vertexInput.name.size();
+	D3D11_INPUT_ELEMENT_DESC* polygonLayout = new D3D11_INPUT_ELEMENT_DESC[size];
+	auto map = new vertexInputMap();
+	std::locale loc;
+
+	for (int i = 0; i < size; i++)
+	{
+		auto name = vertexInput.name.at(i);
+		auto format = vertexInput.format.at(i);
+		auto val = map->find(name);
+
+		polygonLayout[0].SemanticName = std::toupper(name, loc);
+		polygonLayout[0].SemanticIndex = (val != map->end()) ? val->second : 0;
+		polygonLayout[0].Format = format;
+		polygonLayout[0].InputSlot = 0;
+		polygonLayout[0].AlignedByteOffset = i == 0 ? 0 : D3D11_APPEND_ALIGNED_ELEMENT;
+		polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		polygonLayout[0].InstanceDataStepRate = 0;
+
+		if (val != map->end())
+			val->second += 1;
+		else
+			map->insert(std::pair<vertexInputNameType, int>(name, 1));
+	}
 	unsigned int numElements;
 
 	// Create the vertex input layout description.
-	polygonLayout[0].SemanticName = "POSITION";
-	polygonLayout[0].SemanticIndex = 0;
-	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[0].InputSlot = 0;
-	polygonLayout[0].AlignedByteOffset = 0;
-	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[0].InstanceDataStepRate = 0;
+	//polygonLayout[0].SemanticName = "POSITION";
+	//polygonLayout[0].SemanticIndex = 0;
+	//polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	//polygonLayout[0].InputSlot = 0;
+	//polygonLayout[0].AlignedByteOffset = 0;
+	//polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	//polygonLayout[0].InstanceDataStepRate = 0;
 
-	polygonLayout[1].SemanticName = "TEXCOORD";
-	polygonLayout[1].SemanticIndex = 0;
-	polygonLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	polygonLayout[1].InputSlot = 0;
-	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[1].InstanceDataStepRate = 0;
+	//polygonLayout[1].SemanticName = "TEXCOORD";
+	//polygonLayout[1].SemanticIndex = 0;
+	//polygonLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	//polygonLayout[1].InputSlot = 0;
+	//polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	//polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	//polygonLayout[1].InstanceDataStepRate = 0;
 
-	polygonLayout[2].SemanticName = "NORMAL";
-	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[2].InputSlot = 0;
-	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[2].InstanceDataStepRate = 0;
+	//polygonLayout[2].SemanticName = "NORMAL";
+	//polygonLayout[2].SemanticIndex = 0;
+	//polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	//polygonLayout[2].InputSlot = 0;
+	//polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	//polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	//polygonLayout[2].InstanceDataStepRate = 0;
 
 	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);

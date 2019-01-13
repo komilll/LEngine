@@ -51,7 +51,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -100.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -61,7 +61,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere_optimized.obj");
 	if(!result)
 	{
 		//MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
@@ -86,9 +86,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_specularShader->m_diffuseTexture, m_specularShader->m_diffuseTextureView))
 		return false;
+
 	m_specularShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
 
-	// Create the color shader object.
+	//// Create the color shader object.
 	//m_ColorShader = new ColorShaderClass;
 	//if(!m_ColorShader)
 	//{
@@ -191,6 +192,7 @@ bool GraphicsClass::Render()
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
 	m_specularShader->m_cameraPosition = m_Camera->GetPosition();
+	//m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
 	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)
 	{

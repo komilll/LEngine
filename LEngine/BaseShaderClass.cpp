@@ -121,7 +121,7 @@ bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertex
 		return false;
 
 	int size = vertexInput.name.size();
-	D3D11_INPUT_ELEMENT_DESC* polygonLayout = new D3D11_INPUT_ELEMENT_DESC[size];
+	D3D11_INPUT_ELEMENT_DESC *polygonLayout = new D3D11_INPUT_ELEMENT_DESC[size];
 	auto map = new vertexInputMap();
 	std::locale loc;
 
@@ -131,13 +131,13 @@ bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertex
 		auto format = vertexInput.format.at(i);
 		auto val = map->find(name);
 
-		polygonLayout[0].SemanticName = std::toupper(name, loc);
-		polygonLayout[0].SemanticIndex = (val != map->end()) ? val->second : 0;
-		polygonLayout[0].Format = format;
-		polygonLayout[0].InputSlot = 0;
-		polygonLayout[0].AlignedByteOffset = i == 0 ? 0 : D3D11_APPEND_ALIGNED_ELEMENT;
-		polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		polygonLayout[0].InstanceDataStepRate = 0;
+		polygonLayout[i].SemanticName = name;
+		polygonLayout[i].SemanticIndex = (val != map->end()) ? val->second : 0;
+		polygonLayout[i].Format = format;
+		polygonLayout[i].InputSlot = 0;
+		polygonLayout[i].AlignedByteOffset = i == 0 ? 0 : D3D11_APPEND_ALIGNED_ELEMENT;
+		polygonLayout[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		polygonLayout[i].InstanceDataStepRate = 0;
 
 		if (val != map->end())
 			val->second += 1;
@@ -172,7 +172,7 @@ bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertex
 	//polygonLayout[2].InstanceDataStepRate = 0;
 
 	// Get a count of the elements in the layout.
-	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
+	numElements = size;//sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
 	// Create the vertex input layout.
 	HRESULT result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
@@ -185,47 +185,26 @@ bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertex
 
 bool BaseShaderClass::CreateBuffers(ID3D11Device * device)
 {
-	//// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
-	//matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	//matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	//matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//matrixBufferDesc.MiscFlags = 0;
-	//matrixBufferDesc.StructureByteStride = 0;
+	D3D11_BUFFER_DESC matrixBufferDesc;
 
-	//// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	//result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
 
-	//lightingBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	//lightingBufferDesc.ByteWidth = sizeof(LightingBufferType);
-	//lightingBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//lightingBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//lightingBufferDesc.MiscFlags = 0;
-	//lightingBufferDesc.StructureByteStride = 0;
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	HRESULT result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result))
+		return false;
 
-	//result = device->CreateBuffer(&lightingBufferDesc, NULL, &m_lightingBuffer);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	return CreateBufferAdditionals(device);
+}
 
-	//cameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	//cameraBufferDesc.ByteWidth = sizeof(CameraBufferType);
-	//cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//cameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//cameraBufferDesc.MiscFlags = 0;
-	//cameraBufferDesc.StructureByteStride = 0;
-
-	//result = device->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
-
+bool BaseShaderClass::CreateBufferAdditionals(ID3D11Device *& device)
+{
 	return true;
 }
 
@@ -252,12 +231,19 @@ bool BaseShaderClass::CreateSamplerState(ID3D11Device * device)
 	if (FAILED(result))
 		return false;
 
+	AddSampler(false, 0, 1, m_samplerState);
+
 	return true;
 }
 
 
 void BaseShaderClass::ShutdownShader()
 {
+	if (m_matrixBuffer)
+	{
+		m_matrixBuffer->Release();
+		m_matrixBuffer = 0;
+	}
 	if (m_pixelShader)
 	{
 		m_pixelShader->Release();
@@ -321,9 +307,39 @@ bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename
 	return true;
 }
 
+void BaseShaderClass::AddSampler(bool isVectorResource, UINT startSlot, UINT numSapmlers, ID3D11SamplerState *& samplerStates)
+{
+	m_samplers.push_back(new BaseShaderClass::SamplerType(isVectorResource, startSlot, numSapmlers, samplerStates));
+}
+
 bool BaseShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix,
 	XMMATRIX& projectionMatrix)
 {
+	HRESULT result;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	MatrixBufferType* dataPtr;
+	unsigned int bufferNumber;
+
+	worldMatrix = XMMatrixTranspose(worldMatrix);
+	viewMatrix = XMMatrixTranspose(viewMatrix);
+	projectionMatrix = XMMatrixTranspose(projectionMatrix);
+
+	// Lock the constant buffer so it can be written to.
+	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	// Get a pointer to the data in the constant buffer.
+	dataPtr = (MatrixBufferType*)mappedResource.pData;
+
+	dataPtr->world = worldMatrix;
+	dataPtr->view = viewMatrix;
+	dataPtr->projection = projectionMatrix;
+
+	deviceContext->Unmap(m_matrixBuffer, 0);
+	bufferNumber = 0;
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+
 	return true;
 }
 
@@ -337,7 +353,14 @@ void BaseShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int index
 	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
 	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 
-	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
+	for (int i = 0; i < m_samplers.size(); i++)
+	{
+		SamplerType* sampler = m_samplers.at(i);
+		if (sampler->isVectorSampler)
+			deviceContext->VSSetSamplers(sampler->startSlot, sampler->numSamplers, &sampler->samplerStates);
+		else
+			deviceContext->PSSetSamplers(sampler->startSlot, sampler->numSamplers, &sampler->samplerStates);
+	}
 
 	// Render the triangle.
 	deviceContext->DrawIndexed(indexCount, 0, 0);

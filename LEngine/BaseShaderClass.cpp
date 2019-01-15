@@ -239,6 +239,13 @@ bool BaseShaderClass::CreateSamplerState(ID3D11Device * device)
 
 void BaseShaderClass::ShutdownShader()
 {
+	for (int i = 0; i < m_buffers.size(); i++)
+	{
+		m_buffers.at(i)->Release();
+		m_buffers.at(i) = 0;
+	}
+	m_buffers.clear();
+
 	if (m_matrixBuffer)
 	{
 		m_matrixBuffer->Release();
@@ -259,7 +266,6 @@ void BaseShaderClass::ShutdownShader()
 		m_layout->Release();
 		m_layout = 0;
 	}
-	return;
 }
 
 

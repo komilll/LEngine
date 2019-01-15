@@ -2,7 +2,7 @@
 // Filename: color.ps
 ////////////////////////////////////////////////////////////////////////////////
 
-Texture2D shaderTexture;
+Texture2D shaderTexture[2];
 SamplerState SampleType;
 
 cbuffer LightingBuffer
@@ -20,6 +20,8 @@ struct PixelInputType
     float2 tex: TEXCOORD0;
 	float3 normal : NORMAL;
 	float3 viewDirection : TEXCOORD1;
+	float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +30,8 @@ struct PixelInputType
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 textureColor;
+	float4 normalMap;
+	float3 normalFromTexture;
 	float lightIntensity;
 	float3 reflectionVector;
 	float3 viewDir;
@@ -37,9 +41,16 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float specularStrength = 0.5;
 	float4 color;
 
-	textureColor = shaderTexture.Sample(SampleType, input.tex);
+	textureColor = shaderTexture[0].Sample(SampleType, input.tex);
+	normalMap = shaderTexture[1].Sample(SampleType, input.tex);
+	
+	//From [0, 1] to [-1, 1]
+	normalMap = (normalMap * 2.0f) - 1.0f;
 
-	lightIntensity = saturate(dot(input.normal, lightDir));	
+	normalFromTexture = (normalMap.x * input.tangent) + (normalMap.y * input.binormal) + (normalMap.z * input.normal);
+	normalFromTexture = normalize(normalFromTexture);
+
+	lightIntensity = saturate(dot(normalFromTexture, lightDir));	
 
 	reflectionVector = normalize(-lightDir + 2 * input.normal * lightIntensity);
 	specular = pow(saturate(dot(reflectionVector, input.viewDirection)), specularPower) * specularStrength;

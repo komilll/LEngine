@@ -77,7 +77,6 @@ public:
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device);
 	virtual bool CreateSamplerState(ID3D11Device* device);
-	virtual void ShutdownShader();
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&);
 
 private:
@@ -86,6 +85,7 @@ private:
 	bool InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput);
 	void OutputShaderErrorMessage(ID3D10Blob*, HWND, CHAR*);
 	void RenderShader(ID3D11DeviceContext*, int);
+	void ShutdownShader();
 
 //////// VARIABLES ////////
 protected:
@@ -94,6 +94,7 @@ protected:
 	ID3D11InputLayout* m_layout;
 	ID3D11SamplerState* m_samplerState;
 	std::vector<SamplerType*> m_samplers;
+	std::vector<ID3D11Buffer*> m_buffers;
 
 private:
 	ID3D11Buffer* m_matrixBuffer;

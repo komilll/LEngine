@@ -163,6 +163,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	}
 
 	input.close();
+	CalculateDataForNormalMapping(vertices);
 
 	//Create vertex buffer description
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -263,4 +264,105 @@ void ModelClass::SetIndices(std::string input, int & vertexIndex, int & textureI
 
 		curIndex++;
 	}
+}
+
+void ModelClass::CalculateDataForNormalMapping(VertexType* &vertices)
+{
+	int faceCount = m_vertexCount / 3;
+	int index = 0;
+
+	VertexType vertex1, vertex2, vertex3;
+	XMFLOAT3 tangent, binormal, normal;
+
+	for (int i = 0; i < faceCount; i++)
+	{
+		vertex1 = vertices[index++];
+		vertex2 = vertices[index++];
+		vertex3 = vertices[index++];
+
+		CalculateTangentBinormal(vertex1, vertex2, vertex3, tangent, binormal);
+		CalculateNormal(tangent, binormal, normal);
+
+		vertices[index - 1].normal = normal;
+		vertices[index - 1].tangent = tangent;
+		vertices[index - 1].binormal = binormal;
+
+		vertices[index - 2].normal = normal;
+		vertices[index - 2].tangent = tangent;
+		vertices[index - 2].binormal = binormal;
+
+		vertices[index - 3].normal = normal;
+		vertices[index - 3].tangent = tangent;
+		vertices[index - 3].binormal = binormal;
+	}
+}
+
+void ModelClass::CalculateTangentBinormal(VertexType vertex1, VertexType vertex2, VertexType vertex3, XMFLOAT3 & tangent, XMFLOAT3 & binormal)
+{
+	float vector1[3], vector2[3];
+	float tuVector[2], tvVector[2];
+	float den;
+	float length;
+
+	// Calculate the two vectors for this face.
+	vector1[0] = vertex2.position.x - vertex1.position.x;
+	vector1[1] = vertex2.position.y - vertex1.position.y;
+	vector1[2] = vertex2.position.z - vertex1.position.z;
+
+	vector2[0] = vertex3.position.x - vertex1.position.x;
+	vector2[1] = vertex3.position.y - vertex1.position.y;
+	vector2[2] = vertex3.position.z - vertex1.position.z;
+
+	// Calculate the tu and tv texture space vectors.
+	tuVector[0] = vertex2.tex.x - vertex1.tex.x;
+	tvVector[0] = vertex2.tex.y - vertex1.tex.y;
+
+	tuVector[1] = vertex3.tex.x - vertex1.tex.x;
+	tvVector[1] = vertex3.tex.y - vertex1.tex.y;
+
+	// Calculate the denominator of the tangent/binormal equation.
+	den = 1.0f / (tuVector[0] * tvVector[1] - tuVector[1] * tvVector[0]);
+
+	// Calculate the cross products and multiply by the coefficient to get the tangent and binormal.
+	tangent.x = (tvVector[1] * vector1[0] - tvVector[0] * vector2[0]) * den;
+	tangent.y = (tvVector[1] * vector1[1] - tvVector[0] * vector2[1]) * den;
+	tangent.z = (tvVector[1] * vector1[2] - tvVector[0] * vector2[2]) * den;
+
+	binormal.x = (tuVector[0] * vector2[0] - tuVector[1] * vector1[0]) * den;
+	binormal.y = (tuVector[0] * vector2[1] - tuVector[1] * vector1[1]) * den;
+	binormal.z = (tuVector[0] * vector2[2] - tuVector[1] * vector1[2]) * den;
+
+	// Calculate the length of this normal.
+	length = sqrt((tangent.x * tangent.x) + (tangent.y * tangent.y) + (tangent.z * tangent.z));
+
+	// Normalize the normal and then store it
+	tangent.x = tangent.x / length;
+	tangent.y = tangent.y / length;
+	tangent.z = tangent.z / length;
+
+	// Calculate the length of this normal.
+	length = sqrt((binormal.x * binormal.x) + (binormal.y * binormal.y) + (binormal.z * binormal.z));
+
+	// Normalize the normal and then store it
+	binormal.x = binormal.x / length;
+	binormal.y = binormal.y / length;
+	binormal.z = binormal.z / length;
+}
+
+void ModelClass::CalculateNormal(XMFLOAT3 & tangent, XMFLOAT3 & binormal, XMFLOAT3 & normal)
+{
+	float length;
+
+	// Calculate the cross product of the tangent and binormal which will give the normal vector.
+	normal.x = (tangent.y * binormal.z) - (tangent.z * binormal.y);
+	normal.y = (tangent.z * binormal.x) - (tangent.x * binormal.z);
+	normal.z = (tangent.x * binormal.y) - (tangent.y * binormal.x);
+
+	// Calculate the length of the normal.
+	length = sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+
+	// Normalize the normal.
+	normal.x = normal.x / length;
+	normal.y = normal.y / length;
+	normal.z = normal.z / length;
 }

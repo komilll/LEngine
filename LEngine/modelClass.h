@@ -29,6 +29,8 @@ private:
 		XMFLOAT3 position;
 		XMFLOAT2 tex;
 		XMFLOAT3 normal;
+		XMFLOAT3 tangent;
+		XMFLOAT3 binormal;
 	};
 
 public:
@@ -47,6 +49,9 @@ private:
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	void SetIndices(std::string input, int &vertexIndex, int &textureIndex, int &normalIndex);
+	void CalculateDataForNormalMapping(VertexType* &vertices);
+	void CalculateTangentBinormal(VertexType vertex1, VertexType vertex2, VertexType vertex3, XMFLOAT3 &tangent, XMFLOAT3 &binormal);
+	void CalculateNormal(XMFLOAT3 &tangent, XMFLOAT3 &binormal, XMFLOAT3 &normal);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

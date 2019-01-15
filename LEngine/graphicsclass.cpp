@@ -75,9 +75,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	names.push_back("position");
 	names.push_back("texcoord");
 	names.push_back("normal");
+	names.push_back("tangent");
+	names.push_back("binormal");
 	std::vector <DXGI_FORMAT> formats;
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	BaseShaderClass::vertexInputType input(names, formats);
 	
@@ -85,6 +89,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_specularShader->m_diffuseTexture, m_specularShader->m_diffuseTextureView))
+		return false;
+	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood_normal.dds", m_specularShader->m_normalTexture, m_specularShader->m_normalTextureView))
 		return false;
 
 	m_specularShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);

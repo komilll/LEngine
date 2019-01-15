@@ -24,27 +24,6 @@ bool ShaderSpecularClass::CreateBufferAdditionals(ID3D11Device * &device)
 	return true;
 }
 
-void ShaderSpecularClass::ShutdownShader()
-{
-	BaseShaderClass::ShutdownShader();
-
-	//for (int i = 0; i < m_buffers.size(); i++)
-	//{
-
-	//}
-
-	if (m_lightingBuffer)
-	{
-		m_lightingBuffer->Release();
-		m_lightingBuffer = 0;
-	}
-	if (m_cameraBuffer)
-	{
-		m_cameraBuffer->Release();
-		m_cameraBuffer = 0;
-	}
-}
-
 bool ShaderSpecularClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
 	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
@@ -87,5 +66,6 @@ bool ShaderSpecularClass::SetShaderParameters(ID3D11DeviceContext *deviceContext
 	/////// RESOURCES ///////
 	//Pixel shader resources
 	deviceContext->PSSetShaderResources(0, 1, &m_diffuseTextureView);
+	deviceContext->PSSetShaderResources(1, 1, &m_normalTextureView);
 	return true;
 }

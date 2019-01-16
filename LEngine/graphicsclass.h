@@ -37,6 +37,12 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
+	void MoveCamera(XMVECTOR movement);
+	void MoveCameraForward();
+	void MoveCameraBackward();
+	void MoveCameraLeft();
+	void MoveCameraRight();
+	void RotateCamera(XMVECTOR rotation);
 
 private:
 	bool Render();

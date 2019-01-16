@@ -129,21 +129,12 @@ void SystemClass::Run()
 
 bool SystemClass::Frame()
 {
-	bool result;
-
-
-	// Check if the user pressed escape and wants to exit the application.
 	if(m_Input->IsKeyDown(VK_ESCAPE))
-	{
 		return false;
-	}
 
-	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame();
-	if(!result)
-	{
+	HandleInput();
+	if (m_Graphics->Frame() == false)
 		return false;
-	}
 
 	return true;
 }
@@ -283,6 +274,43 @@ void SystemClass::ShutdownWindows()
 	ApplicationHandle = NULL;
 
 	return;
+}
+
+void SystemClass::HandleInput()
+{
+	XMVECTOR cameraMovement{ 0, 0, 0 };
+	XMVECTOR cameraRotation{0, 0, 0};
+	float movementPerTick = 0.5f;
+	float rotatePerTick = 1.0f;
+
+	if (m_Input->IsKeyDown(VK_W))
+		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, 0, movementPerTick });
+		m_Graphics->MoveCameraForward();
+	if (m_Input->IsKeyDown(VK_S))
+		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, 0, -movementPerTick });
+		m_Graphics->MoveCameraBackward();
+	if (m_Input->IsKeyDown(VK_A))
+		m_Graphics->MoveCameraLeft();
+		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ -movementPerTick, 0, 0});
+	if (m_Input->IsKeyDown(VK_D))
+		m_Graphics->MoveCameraRight();
+		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ movementPerTick, 0, 0});
+	if (m_Input->IsKeyDown(VK_E))
+		cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, movementPerTick, 0 });
+	if (m_Input->IsKeyDown(VK_Q))
+		cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, -movementPerTick, 0 });
+
+	if (m_Input->IsKeyDown(VK_RIGHT))
+		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, rotatePerTick, 0 });
+	if (m_Input->IsKeyDown(VK_LEFT))
+		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -rotatePerTick, 0 });
+	if (m_Input->IsKeyDown(VK_UP))
+		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ -rotatePerTick, 0, 0 });
+	if (m_Input->IsKeyDown(VK_DOWN))
+		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ rotatePerTick, 0, 0 });
+
+	//m_Graphics->MoveCamera(cameraMovement);
+	m_Graphics->RotateCamera(cameraRotation);
 }
 
 

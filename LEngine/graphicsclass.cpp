@@ -174,12 +174,58 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
+void GraphicsClass::MoveCamera(XMVECTOR movement)
+{
+	//float yaw, pitch, roll;
+	//XMMATRIX rotationMatrix;
+
+	//pitch = m_Camera->GetRotation().x * 0.0174532925f;
+	//yaw = m_Camera->GetRotation().y * 0.0174532925f;
+	//roll = m_Camera->GetRotation().z * 0.0174532925f;
+	//rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+
+	//movement = XMVector3Transform(movement, rotationMatrix);
+	m_Camera->SetPosition(m_Camera->GetPosition().x + movement.m128_f32[0], m_Camera->GetPosition().y + movement.m128_f32[1], m_Camera->GetPosition().z + movement.m128_f32[2]);
+}
+
+void GraphicsClass::MoveCameraForward()
+{
+	//XMMATRIX RotateYTempMatrix = XMMatrixRotationY(0.0174532925f * m_Camera->GetRotation().y);
+	//XMVECTOR camForward = XMVector3TransformCoord(XMVECTOR{ 0, 0, 1, 0 }, RotateYTempMatrix);
+
+	//m_Camera->SetPosition(m_Camera->GetPosition().x + camForward.m128_f32[0], m_Camera->GetPosition().y + camForward.m128_f32[1], m_Camera->GetPosition().z + camForward.m128_f32[2]);
+	m_Camera->AddPosition(0, 0.5f);
+}
+
+void GraphicsClass::MoveCameraBackward()
+{
+	/*XMMATRIX RotateYTempMatrix = XMMatrixRotationY(0.0174532925f * m_Camera->GetRotation().y);
+	XMVECTOR camForward = -XMVector3TransformCoord(XMVECTOR{ 0, 0, 1, 0 }, RotateYTempMatrix);
+
+	m_Camera->SetPosition(m_Camera->GetPosition().x + camForward.m128_f32[0], m_Camera->GetPosition().y + camForward.m128_f32[1], m_Camera->GetPosition().z + camForward.m128_f32[2]);*/
+	m_Camera->AddPosition(0, -0.5f);
+}
+
+void GraphicsClass::MoveCameraLeft()
+{
+	m_Camera->AddPosition(-0.5f, 0);
+}
+
+void GraphicsClass::MoveCameraRight()
+{
+	m_Camera->AddPosition(0.5f, 0);
+}
+
+void GraphicsClass::RotateCamera(XMVECTOR rotation)
+{
+	m_Camera->SetRotation(m_Camera->GetRotation().x + rotation.m128_f32[0], m_Camera->GetRotation().y + rotation.m128_f32[1], m_Camera->GetRotation().z + rotation.m128_f32[2]);
+}
+
 
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
-
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);

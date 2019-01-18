@@ -162,7 +162,7 @@ bool GraphicsClass::Frame()
 
 
 	// Render the graphics scene.
-	m_rotationY += 0.01f;
+	//m_rotationY += 0.01f;
 	if (m_rotationY >= 360.0f)
 		m_rotationY = 0.0f;
 	result = Render();
@@ -174,46 +174,34 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
-void GraphicsClass::MoveCamera(XMVECTOR movement)
-{
-	//float yaw, pitch, roll;
-	//XMMATRIX rotationMatrix;
-
-	//pitch = m_Camera->GetRotation().x * 0.0174532925f;
-	//yaw = m_Camera->GetRotation().y * 0.0174532925f;
-	//roll = m_Camera->GetRotation().z * 0.0174532925f;
-	//rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-
-	//movement = XMVector3Transform(movement, rotationMatrix);
-	m_Camera->SetPosition(m_Camera->GetPosition().x + movement.m128_f32[0], m_Camera->GetPosition().y + movement.m128_f32[1], m_Camera->GetPosition().z + movement.m128_f32[2]);
-}
-
 void GraphicsClass::MoveCameraForward()
 {
-	//XMMATRIX RotateYTempMatrix = XMMatrixRotationY(0.0174532925f * m_Camera->GetRotation().y);
-	//XMVECTOR camForward = XMVector3TransformCoord(XMVECTOR{ 0, 0, 1, 0 }, RotateYTempMatrix);
-
-	//m_Camera->SetPosition(m_Camera->GetPosition().x + camForward.m128_f32[0], m_Camera->GetPosition().y + camForward.m128_f32[1], m_Camera->GetPosition().z + camForward.m128_f32[2]);
-	m_Camera->AddPosition(0, 0.5f);
+	m_Camera->AddPosition(0, 0.5f, 0);
 }
 
 void GraphicsClass::MoveCameraBackward()
 {
-	/*XMMATRIX RotateYTempMatrix = XMMatrixRotationY(0.0174532925f * m_Camera->GetRotation().y);
-	XMVECTOR camForward = -XMVector3TransformCoord(XMVECTOR{ 0, 0, 1, 0 }, RotateYTempMatrix);
-
-	m_Camera->SetPosition(m_Camera->GetPosition().x + camForward.m128_f32[0], m_Camera->GetPosition().y + camForward.m128_f32[1], m_Camera->GetPosition().z + camForward.m128_f32[2]);*/
-	m_Camera->AddPosition(0, -0.5f);
+	m_Camera->AddPosition(0, -0.5f, 0);
 }
 
 void GraphicsClass::MoveCameraLeft()
 {
-	m_Camera->AddPosition(-0.5f, 0);
+	m_Camera->AddPosition(-0.5f, 0, 0);
 }
 
 void GraphicsClass::MoveCameraRight()
 {
-	m_Camera->AddPosition(0.5f, 0);
+	m_Camera->AddPosition(0.5f, 0, 0);
+}
+
+void GraphicsClass::MoveCameraUp()
+{
+	m_Camera->AddPosition(0, 0, 0.5f);
+}
+
+void GraphicsClass::MoveCameraDown()
+{
+	m_Camera->AddPosition(0, 0, -0.5f);
 }
 
 void GraphicsClass::RotateCamera(XMVECTOR rotation)
@@ -241,6 +229,7 @@ bool GraphicsClass::Render()
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
 
+	//worldMatrix = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
 	m_specularShader->m_cameraPosition = m_Camera->GetPosition();

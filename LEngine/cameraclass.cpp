@@ -13,6 +13,10 @@ CameraClass::CameraClass()
 	m_rotationX = 0.0f;
 	m_rotationY = 0.0f;
 	m_rotationZ = 0.0f;
+
+	m_storedLeftRight = 0;
+	m_storedBackForward = 0;
+	m_storedUpDown = 0;
 }
 
 
@@ -43,10 +47,11 @@ void CameraClass::SetRotation(float x, float y, float z)
 	return;
 }
 
-void CameraClass::AddPosition(float rightLeft, float backForward)
+void CameraClass::AddPosition(float rightLeft, float backForward, float upDown)
 {
 	m_storedLeftRight += rightLeft;
 	m_storedBackForward += backForward;
+	m_storedUpDown += upDown;
 }
 
 
@@ -91,19 +96,21 @@ void CameraClass::Render()
 	YrotationMatrix = XMMatrixRotationY(yaw);
 
 	camRight = XMVector3TransformCoord(right, YrotationMatrix);
-	//camUp = XMVector3TransformCoord(right, YrotationMatrix);
 	camForward = XMVector3TransformCoord(forward, YrotationMatrix);
-
-	//m_positionX += camRight.m128_f32[0] * m_storedLeftRight + camForward.m128_f32[0] * m_storedBackForward;
-	//m_positionY += camRight.m128_f32[1] * m_storedLeftRight + camForward.m128_f32[1] * m_storedBackForward;
-	//m_positionZ += camRight.m128_f32[2] * m_storedLeftRight + camForward.m128_f32[2] * m_storedBackForward;
-
-	m_storedBackForward = 0;
-	m_storedLeftRight = 0;
 
 	target = { m_positionX + target.m128_f32[0] , m_positionY + target.m128_f32[1], m_positionZ + target.m128_f32[2], 0.0f };
 
 	m_viewMatrix = XMMatrixLookAtLH(position, target, up);
+
+	XMVECTOR addPos = camRight * m_storedLeftRight + camForward * m_storedBackForward;
+	m_positionX += addPos.m128_f32[0];
+	m_positionY += addPos.m128_f32[1];
+	m_positionZ += addPos.m128_f32[2];
+	m_positionY += m_storedUpDown;
+
+	m_storedLeftRight = 0;
+	m_storedBackForward = 0;
+	m_storedUpDown = 0;
 
 	return;
 }

@@ -133,23 +133,31 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	input.close();
 	input.open(modelFilename);
 	std::getline(input, curLine);
-	while (curLine[0] != 'f')
-		std::getline(input, curLine);
+	type = "";
 
-	int vIndex, vtIndex, vnIndex;
-	while (curLine[0] == 'f' && curLine[1] == ' ')
+	int vIndex = 0;
+	int vtIndex = 0;
+	int vnIndex = 0;
+	while (!input.eof())
 	{
-		curLine = curLine.substr(2);
 		std::istringstream iss(curLine);
-		
-		while (iss >> x)
+		iss >> type;
+
+		if (type == "f")
 		{
-			SetIndices(x, vIndex, vtIndex, vnIndex);
-			indicesVec.push_back(vIndex);
-			//indices[curIndex] = vIndex;
-			vertices[vIndex].tex = texPosition.at(vtIndex);
-			vertices[vIndex].normal = normalPosition.at(vnIndex);
-			//curIndex++;
+			if (texPosition.size() == 0)
+				vtIndex = -1;
+			while (iss >> x)
+			{
+				SetIndices(x, vIndex, vtIndex, vnIndex);
+				indicesVec.push_back(vIndex);
+				//indices[curIndex] = vIndex;
+				if (texPosition.size() > 0)
+					vertices[vIndex].tex = texPosition.at(vtIndex);
+				if (normalPosition.size() > 0)
+					vertices[vIndex].normal = normalPosition.at(vnIndex);
+				//curIndex++;
+			}
 		}
 		std::getline(input, curLine);
 	}
@@ -257,7 +265,7 @@ void ModelClass::SetIndices(std::string input, int & vertexIndex, int & textureI
 		
 		if (curIndex == 0)
 			vertexIndex = index;
-		else if (curIndex == 1)
+		else if (curIndex == 1 && textureIndex != -1)
 			textureIndex = index;
 		else
 			normalIndex = index;

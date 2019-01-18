@@ -284,21 +284,17 @@ void SystemClass::HandleInput()
 	float rotatePerTick = 1.0f;
 
 	if (m_Input->IsKeyDown(VK_W))
-		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, 0, movementPerTick });
 		m_Graphics->MoveCameraForward();
 	if (m_Input->IsKeyDown(VK_S))
-		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, 0, -movementPerTick });
 		m_Graphics->MoveCameraBackward();
 	if (m_Input->IsKeyDown(VK_A))
 		m_Graphics->MoveCameraLeft();
-		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ -movementPerTick, 0, 0});
 	if (m_Input->IsKeyDown(VK_D))
 		m_Graphics->MoveCameraRight();
-		//cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ movementPerTick, 0, 0});
 	if (m_Input->IsKeyDown(VK_E))
-		cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, movementPerTick, 0 });
+		m_Graphics->MoveCameraUp();
 	if (m_Input->IsKeyDown(VK_Q))
-		cameraMovement = XMVectorAdd(cameraMovement, XMVECTOR{ 0, -movementPerTick, 0 });
+		m_Graphics->MoveCameraDown();
 
 	if (m_Input->IsKeyDown(VK_RIGHT))
 		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, rotatePerTick, 0 });
@@ -309,7 +305,6 @@ void SystemClass::HandleInput()
 	if (m_Input->IsKeyDown(VK_DOWN))
 		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ rotatePerTick, 0, 0 });
 
-	//m_Graphics->MoveCamera(cameraMovement);
 	m_Graphics->RotateCamera(cameraRotation);
 }
 

@@ -79,87 +79,90 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	std::vector<DirectX::XMFLOAT3> vertexPosition;
 	std::vector<DirectX::XMFLOAT2> texPosition;
 	std::vector<DirectX::XMFLOAT3> normalPosition;
-	std::vector<int> vertexIndices;
 	std::vector<int> texIndices;
 	std::vector<int> normalIndices;
-	input.open(modelFilename);
-
-	if (input.fail())
-		return false;
-
-	std::getline(input, curLine);
-
-	std::string x, y, z;
-	std::string type = "";
-	int curIndex = 0;
-	while (!input.eof())
-	{
-		if (curLine == "")
-		{
-			std::getline(input, curLine);
-			continue;
-		}
-
-		std::istringstream iss(curLine);
-		iss >> type;
-		if (type == "v")
-		{
-			iss >> x >> y >> z;
-			vertexPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
-		}
-		else if (type == "vt")
-		{
-			iss >> x >> y;
-			texPosition.push_back(DirectX::XMFLOAT2(std::stof(x), std::stof(y)));
-		}
-		else if (type == "vn")
-		{
-			iss >> x >> y >> z;
-			normalPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
-		}
-
-		std::getline(input, curLine);
-
-	}
-
 	std::vector<long> indicesVec;
-	vertices = new VertexType[m_vertexCount = vertexPosition.size()];
 
-	for (int i = 0; i < m_vertexCount; i++)
+	//if (!ReadBinary(vertexPosition, texPosition, normalPosition, indicesVec, texIndices, normalIndices))
 	{
-		vertices[i].position = vertexPosition.at(i);
-	}
-	////////// FEEDING INDICES WITH DATA /////////
-	input.close();
-	input.open(modelFilename);
-	std::getline(input, curLine);
-	type = "";
+		input.open(modelFilename);
 
-	int vIndex = 0;
-	int vtIndex = 0;
-	int vnIndex = 0;
-	while (!input.eof())
-	{
-		std::istringstream iss(curLine);
-		iss >> type;
+		if (input.fail())
+			return false;
 
-		if (type == "f")
-		{
-			if (texPosition.size() == 0)
-				vtIndex = -1;
-			while (iss >> x)
-			{
-				SetIndices(x, vIndex, vtIndex, vnIndex);
-				indicesVec.push_back(vIndex);
-				//indices[curIndex] = vIndex;
-				if (texPosition.size() > 0)
-					vertices[vIndex].tex = texPosition.at(vtIndex);
-				if (normalPosition.size() > 0)
-					vertices[vIndex].normal = normalPosition.at(vnIndex);
-				//curIndex++;
-			}
-		}
 		std::getline(input, curLine);
+
+		std::string x, y, z;
+		std::string type = "";
+		int curIndex = 0;
+		while (!input.eof())
+		{
+			if (curLine == "")
+			{
+				std::getline(input, curLine);
+				continue;
+			}
+
+			std::istringstream iss(curLine);
+			iss >> type;
+			if (type == "v")
+			{
+				iss >> x >> y >> z;
+				vertexPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+			}
+			else if (type == "vt")
+			{
+				iss >> x >> y;
+				texPosition.push_back(DirectX::XMFLOAT2(std::stof(x), std::stof(y)));
+			}
+			else if (type == "vn")
+			{
+				iss >> x >> y >> z;
+				normalPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+			}
+
+			std::getline(input, curLine);
+
+		}
+
+		vertices = new VertexType[m_vertexCount = vertexPosition.size()];
+
+		for (int i = 0; i < m_vertexCount; i++)
+		{
+			vertices[i].position = vertexPosition.at(i);
+		}
+		////////// FEEDING INDICES WITH DATA /////////
+		input.close();
+		input.open(modelFilename);
+		std::getline(input, curLine);
+		type = "";
+
+		int vIndex = 0;
+		int vtIndex = 0;
+		int vnIndex = 0;
+		while (!input.eof())
+		{
+			std::istringstream iss(curLine);
+			iss >> type;
+
+			if (type == "f")
+			{
+				if (texPosition.size() == 0)
+					vtIndex = -1;
+				while (iss >> x)
+				{
+					SetIndices(x, vIndex, vtIndex, vnIndex);
+					indicesVec.push_back(vIndex);
+					//indices[curIndex] = vIndex;
+					if (texPosition.size() > 0)
+						vertices[vIndex].tex = texPosition.at(vtIndex);
+					if (normalPosition.size() > 0)
+						vertices[vIndex].normal = normalPosition.at(vnIndex);
+					//curIndex++;
+				}
+			}
+			std::getline(input, curLine);
+		}
 	}
 
 	auto m_indicesCount = indicesVec.size();
@@ -216,6 +219,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	delete[] indices;
 	indices = 0;
 
+	SaveBinary(vertexPosition, texPosition, normalPosition, indicesVec, texIndices, normalIndices);
 	return true;
 }
 
@@ -373,4 +377,97 @@ void ModelClass::CalculateNormal(XMFLOAT3 & tangent, XMFLOAT3 & binormal, XMFLOA
 	normal.x = normal.x / length;
 	normal.y = normal.y / length;
 	normal.z = normal.z / length;
+}
+
+/////// BINARY FILES MANAGMENT ///////
+
+void ModelClass::SaveBinary(std::vector<DirectX::XMFLOAT3>& vertexPosition, std::vector<DirectX::XMFLOAT2>& texPosition, std::vector<DirectX::XMFLOAT3>& normalPosition, 
+	std::vector<long>& vertexIndices, std::vector<int>& texIndices, std::vector<int>& normalIndices)
+{
+	std::ofstream output("test_model.modelclass", std::ios::binary);
+
+	//Write each vector length at the beginning
+	int length = static_cast<int>(vertexPosition.size());
+	output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	length = static_cast<int>(texPosition.size());
+	output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	length = static_cast<int>(normalPosition.size());
+	output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	length = static_cast<int>(vertexIndices.size());
+	output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	length = static_cast<int>(texIndices.size());
+	output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	length = static_cast<int>(normalIndices.size());
+	output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+
+	for (const auto& val : vertexPosition)
+		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+	for (const auto& val : texPosition)
+		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+	for (const auto& val : normalPosition)
+		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+	for (const auto& val : vertexIndices)
+		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+	for (const auto& val : texIndices)
+		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+	for (const auto& val : normalIndices)
+		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+
+	output.clear();
+	output.close();
+}
+
+bool ModelClass::ReadBinary(std::vector<DirectX::XMFLOAT3>& vertexPosition, std::vector<DirectX::XMFLOAT2>& texPosition, std::vector<DirectX::XMFLOAT3>& normalPosition,
+	std::vector<long>& vertexIndices, std::vector<int>& texIndices, std::vector<int>& normalIndices)
+{
+	std::ifstream input("test_model.modelclass", std::ios::binary);
+
+	if (input.fail())
+		return false;
+
+	DirectX::XMFLOAT3 valFloat3;
+	DirectX::XMFLOAT2 valFloat2;
+	int valInt;
+	long valLong;
+	std::vector<int> length;
+	int lengthTemp = 0;
+	
+	for (int i = 0; i < 6; i++)
+	{
+		input.read(reinterpret_cast<char*>(&lengthTemp), sizeof(lengthTemp)); 
+		length.push_back(lengthTemp);
+	}
+	for (int i = 0; i < length.at(0); i++)
+	{
+		input.read(reinterpret_cast<char*>(&valFloat3), sizeof(valFloat3));
+		vertexPosition.push_back(valFloat3);
+	}
+	for (int i = 0; i < length.at(1); i++)
+	{
+		input.read(reinterpret_cast<char*>(&valFloat2), sizeof(valFloat2));
+		texPosition.push_back(valFloat2);
+	}
+	for (int i = 0; i < length.at(2); i++)
+	{
+		input.read(reinterpret_cast<char*>(&valFloat3), sizeof(valFloat3));
+		normalPosition.push_back(valFloat3);
+	}
+	for (int i = 0; i < length.at(3); i++)
+	{
+		input.read(reinterpret_cast<char*>(&valLong), sizeof(valLong));
+		vertexIndices.push_back(valLong);
+	}
+	for (int i = 0; i < length.at(4); i++)
+	{
+		input.read(reinterpret_cast<char*>(&valInt), sizeof(valInt));
+		texIndices.push_back(valInt);
+	}
+	for (int i = 0; i < length.at(5); i++)
+	{
+		input.read(reinterpret_cast<char*>(&valInt), sizeof(valInt));
+		normalIndices.push_back(valInt);
+	}
+	input.clear();
+	input.close();
+	return true;
 }

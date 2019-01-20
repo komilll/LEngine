@@ -53,10 +53,8 @@ private:
 	void CalculateTangentBinormal(VertexType vertex1, VertexType vertex2, VertexType vertex3, XMFLOAT3 &tangent, XMFLOAT3 &binormal);
 	void CalculateNormal(XMFLOAT3 &tangent, XMFLOAT3 &binormal, XMFLOAT3 &normal);
 	//Save and Load binary data format
-	void SaveBinary(std::vector<DirectX::XMFLOAT3> &vertexPosition, std::vector<DirectX::XMFLOAT2> &texPosition, std::vector<DirectX::XMFLOAT3> &normalPosition,
-						std::vector<long> &vertexIndices, std::vector<int> &texIndices, std::vector<int> &normalIndices);
-	bool ReadBinary(std::vector<DirectX::XMFLOAT3>& vertexPosition, std::vector<DirectX::XMFLOAT2>& texPosition, std::vector<DirectX::XMFLOAT3>& normalPosition,
-		std::vector<long>& vertexIndices, std::vector<int>& texIndices, std::vector<int>& normalIndices);
+	void SaveBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
+	bool ReadBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

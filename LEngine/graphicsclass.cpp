@@ -51,7 +51,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -100.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -61,7 +61,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere_optimized.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if(!result)
 	{
 		//MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);

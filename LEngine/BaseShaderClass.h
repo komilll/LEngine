@@ -78,13 +78,13 @@ protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device);
 	virtual bool CreateSamplerState(ID3D11Device* device);
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&);
+	void RenderShader(ID3D11DeviceContext*, int);
 
 private:
 	bool CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer, vertexInputType vertexInput);
 	bool CreateBuffers(ID3D11Device * device);
 	bool InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput);
-	void OutputShaderErrorMessage(ID3D10Blob*, HWND, CHAR*);
-	void RenderShader(ID3D11DeviceContext*, int);
+	void OutputShaderErrorMessage(ID3D10Blob*, HWND, CHAR*);	
 	void ShutdownShader();
 
 //////// VARIABLES ////////

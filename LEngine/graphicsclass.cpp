@@ -95,6 +95,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_specularShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
 
+
+	m_UIBase = new UIBase;
+	if (!m_UIBase->Initialize(m_D3D->GetDevice(), hwnd, L"uibase.vs", L"uibase.ps", input))
+		return false;
+	if (!m_UIBase->InitializeModel(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f))
+		return false;
+
 	//// Create the color shader object.
 	//m_ColorShader = new ColorShaderClass;
 	//if(!m_ColorShader)
@@ -234,7 +241,7 @@ bool GraphicsClass::Render()
 	// Render the model using the color shader.
 	m_specularShader->m_cameraPosition = m_Camera->GetPosition();
 	//m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
-	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	result = m_UIBase->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)
 	{
 		return false;

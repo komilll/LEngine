@@ -22,6 +22,12 @@
     <None Include="color.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="uibase.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="uibase.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="colorshaderclass.h">
@@ -49,6 +55,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShaderSpecularClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShaderSpecularClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

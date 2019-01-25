@@ -23,19 +23,19 @@ ModelClass::~ModelClass()
 
 bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 {
-	bool result;
-
-
-	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(device, modelFilename);
-	if(!result)
-	{
+	if(!InitializeBuffers(device, modelFilename))
 		return false;
-	}
 
 	return true;
 }
 
+bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom)
+{
+	if (shape == ModelClass::ShapeSize::RECTANGLE)
+		return CreateRectangle(device, left, right, top, bottom);
+
+	return false;
+}
 
 void ModelClass::Shutdown()
 {
@@ -65,8 +65,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	std::vector<VertexType> verticesVector(0);
 	VertexType* vertices;
 	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 
 	/////////// GET VERTEX COUNT ////////
@@ -84,7 +82,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	std::vector<int> normalIndices;
 	std::vector<unsigned long> indicesVec;
 
-	//if (!ReadBinary(vertexPosition, texPosition, normalPosition, indicesVec, texIndices, normalIndices))
+#pragma region Read and save data from file
 	if (!ReadBinary(modelFilename, verticesVector, indicesVec))
 	{
 		input.open(modelFilename);
@@ -178,6 +176,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 		for (int i = 0 ; i < m_vertexCount; i++)
 			vertices[i] = verticesVector.at(i);
 	}
+#pragma endregion
 
 	auto m_indicesCount = indicesVec.size();
 	if (m_indicesCount == 0)
@@ -193,41 +192,8 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	input.close();
 	//CalculateDataForNormalMapping(vertices);
 
-	//Create vertex buffer description
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
-	//Fill subresource data with vertices
-	vertexData.pSysMem = vertices;
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
-	//Try to create vertex buffer and store it in varaible
-	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
-	{
+	if (CreateBuffers(device, vertices, indices, m_vertexCount, m_indexCount) == false)
 		return false;
-	}
-
-	//Create index buffer description
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
-	//Fill subresource data with indices
-	indexData.pSysMem = indices;
-	indexData.SysMemPitch = 0;
-	indexData.SysMemSlicePitch = 0;
-	//Try to create index buffer and store it in varaible
-	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
 
 	if (verticesVector.size() == 0)
 	{
@@ -404,6 +370,49 @@ void ModelClass::CalculateNormal(XMFLOAT3 & tangent, XMFLOAT3 & binormal, XMFLOA
 	normal.z = normal.z / length;
 }
 
+bool ModelClass::CreateBuffers(ID3D11Device* device, VertexType * &vertices, unsigned long * &indices, int vertexCount, int indexCount)
+{
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	//Create vertex buffer description
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * vertexCount;
+ 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+	//Fill subresource data with vertices
+	vertexData.pSysMem = vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+	//Try to create vertex buffer and store it in varaible
+	HRESULT result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//Create index buffer description
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(unsigned long) * indexCount;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.StructureByteStride = 0;
+	//Fill subresource data with indices
+	indexData.pSysMem = indices;
+	indexData.SysMemPitch = 0;
+	indexData.SysMemSlicePitch = 0;
+	//Try to create index buffer and store it in varaible
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 /////// BINARY FILES MANAGMENT ///////
 void ModelClass::SaveBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices)
 {
@@ -459,4 +468,28 @@ bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &
 	input.clear();
 	input.close();
 	return true;
+}
+
+/////// SHAPES DRAWING ///////
+bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom)
+{
+	VertexType* vertices;
+	unsigned long* indices;
+
+	vertices = new VertexType[6];
+	//First triangle
+	vertices[0].position = XMFLOAT3(left, top, 0.0f);  // Top left.	
+	vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+	vertices[2].position = XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
+	//Second triangle
+	vertices[3].position = XMFLOAT3(left, top, 0.0f);  // Top left.
+	vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
+	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+
+	indices = new unsigned long[6];
+	for (int i = 0; i < 6; i++)
+		indices[i] = i;
+
+	if (CreateBuffers(device, vertices, indices, 6, 6) == false)
+		return false;
 }

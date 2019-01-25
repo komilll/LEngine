@@ -13,7 +13,7 @@
 #include "modelclass.h"
 #include "colorshaderclass.h"
 #include "ShaderSpecularClass.h"
-
+#include "UIBase.h"
 
 /////////////
 // GLOBALS //
@@ -54,6 +54,9 @@ private:
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
 	ShaderSpecularClass* m_specularShader;
+
+	UIBase* m_UIBase;
+
 	float m_rotationY = 0.0f;
 };
 

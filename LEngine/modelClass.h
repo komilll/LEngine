@@ -32,6 +32,10 @@ private:
 		XMFLOAT3 tangent;
 		XMFLOAT3 binormal;
 	};
+public:
+	enum ShapeSize {
+		TRIANGLE, CIRCLE, SQUARE, RECTANGLE
+	};
 
 public:
 	ModelClass();
@@ -39,6 +43,7 @@ public:
 	~ModelClass();
 
 	bool Initialize(ID3D11Device* device, const char* modelFilename);
+	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
@@ -52,9 +57,13 @@ private:
 	void CalculateDataForNormalMapping(VertexType* &vertices);
 	void CalculateTangentBinormal(VertexType vertex1, VertexType vertex2, VertexType vertex3, XMFLOAT3 &tangent, XMFLOAT3 &binormal);
 	void CalculateNormal(XMFLOAT3 &tangent, XMFLOAT3 &binormal, XMFLOAT3 &normal);
+	bool CreateBuffers(ID3D11Device* device, VertexType * &vertices, unsigned long * &indices, int vertexCount, int indexCount);
 	//Save and Load binary data format
 	void SaveBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
 	bool ReadBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
+
+	//Create shapes
+	bool CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

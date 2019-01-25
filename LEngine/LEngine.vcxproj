@@ -116,6 +116,8 @@
     <None Include="color.ps" />
     <None Include="color.vs" />
     <None Include="packages.config" />
+    <None Include="uibase.ps" />
+    <None Include="uibase.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseShaderClass.h" />
@@ -127,6 +129,7 @@
     <ClInclude Include="modelClass.h" />
     <ClInclude Include="ShaderSpecularClass.h" />
     <ClInclude Include="systemclass.h" />
+    <ClInclude Include="UIBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseShaderClass.cpp" />
@@ -139,6 +142,7 @@
     <ClCompile Include="modelClass.cpp" />
     <ClCompile Include="ShaderSpecularClass.cpp" />
     <ClCompile Include="systemclass.cpp" />
+    <ClCompile Include="UIBase.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

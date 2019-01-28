@@ -14,6 +14,7 @@
 #include "colorshaderclass.h"
 #include "ShaderSpecularClass.h"
 #include "UIBase.h"
+#include "TextEngine.h"
 
 /////////////
 // GLOBALS //
@@ -54,10 +55,13 @@ private:
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
 	ShaderSpecularClass* m_specularShader;
+	TextEngine* m_textEngine;
 
 	UIBase* m_UIBase;
 
 	float m_rotationY = 0.0f;
+	int m_screenWidth = 0;
+	int m_screenHeight = 0;
 };
 
 #endif

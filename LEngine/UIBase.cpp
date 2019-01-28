@@ -13,21 +13,60 @@ bool UIBase::InitializeModel(ID3D11Device * device, ModelClass::ShapeSize shape,
 	return true;
 }
 
+bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size)
+{
+	m_model = new ModelClass;
+	if (!m_model->InitializeSquare(device, centerX, centerY, size))
+		return false;
+
+	return true;
+}
+
 bool UIBase::Render(ID3D11DeviceContext * deviceContext, int indexCount, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	/*if (m_model == nullptr)
+	if (m_model == nullptr)
 		return false;
-	m_model->Render(deviceContext);*/
+	m_model->Render(deviceContext);
 
 	if (!SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
 	RenderShader(deviceContext, indexCount);
+
+	return true;
+}
+
+void UIBase::ChangeColor(XMFLOAT4 color)
+{
+	m_uiColor = color;
+}
+
+void UIBase::ChangeColor(float r, float g, float b, float a)
+{
+	m_uiColor = XMFLOAT4(r, g, b, a);
+}
+
+void UIBase::ChangeAlpha(float alpha)
+{
+	m_uiColor.w = alpha;
 }
 
 bool UIBase::CreateBufferAdditionals(ID3D11Device *& device)
 {
-	return BaseShaderClass::CreateBufferAdditionals(device);
+	BaseShaderClass::CreateBufferAdditionals(device);
+	D3D11_BUFFER_DESC tempBufferDesc;
+
+	tempBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	tempBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	tempBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	tempBufferDesc.MiscFlags = 0;
+	tempBufferDesc.StructureByteStride = 0;
+
+	tempBufferDesc.ByteWidth = sizeof(AppearanceBuffer);
+	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_appearanceBuffer)))
+		return false;
+
+	m_buffers = { m_appearanceBuffer };
 }
 
 bool UIBase::CreateSamplerState(ID3D11Device * device)
@@ -37,5 +76,26 @@ bool UIBase::CreateSamplerState(ID3D11Device * device)
 
 bool UIBase::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	return BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
+	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+		return false;
+
+	HRESULT result;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	AppearanceBuffer* dataPtr2;
+	unsigned int bufferNumber;
+
+	/////// PIXEL BUFFERS ///////
+	//Appearance buffer
+	result = deviceContext->Map(m_appearanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	dataPtr2 = (AppearanceBuffer*)mappedResource.pData;
+	dataPtr2->color = m_uiColor;
+
+	deviceContext->Unmap(m_appearanceBuffer, 0);
+	bufferNumber = 0;
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_appearanceBuffer);
+
+	return true;
 }

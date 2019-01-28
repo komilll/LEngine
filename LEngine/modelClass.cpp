@@ -31,10 +31,22 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 
 bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom)
 {
-	if (shape == ModelClass::ShapeSize::RECTANGLE)
-		return CreateRectangle(device, left, right, top, bottom);
+	switch (shape)
+	{
+		case ModelClass::ShapeSize::RECTANGLE:
+			return CreateRectangle(device, left, right, top, bottom);
+		case ModelClass::ShapeSize::TRIANGLE:
+			return CreateTriangle(device, left, right, top, bottom);
+		default:
+			return false;
+	}
 
 	return false;
+}
+
+bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size)
+{
+	return CreateSquare(device, centerX, centerY, size);
 }
 
 void ModelClass::Shutdown()
@@ -476,7 +488,9 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 	VertexType* vertices;
 	unsigned long* indices;
 
-	vertices = new VertexType[6];
+	constexpr int verticesCount = 6;
+
+	vertices = new VertexType[verticesCount];
 	//First triangle
 	vertices[0].position = XMFLOAT3(left, top, 0.0f);  // Top left.	
 	vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
@@ -486,10 +500,70 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 	vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
 	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
 
-	indices = new unsigned long[6];
-	for (int i = 0; i < 6; i++)
+	indices = new unsigned long[verticesCount];
+	for (int i = 0; i < verticesCount; i++)
 		indices[i] = i;
 
-	if (CreateBuffers(device, vertices, indices, 6, 6) == false)
+	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
 		return false;
+
+	return true;
+}
+
+bool ModelClass::CreateTriangle(ID3D11Device * device, float left, float right, float top, float bottom)
+{
+	VertexType* vertices;
+	unsigned long* indices;
+
+	constexpr int verticesCount = 3;
+
+	vertices = new VertexType[verticesCount];
+	//Only triangle
+	vertices[0].position = XMFLOAT3((left + right) / 2, top, 0.0f);  // Top	
+	vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+	vertices[2].position = XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
+
+	indices = new unsigned long[verticesCount];
+	for (int i = 0; i < verticesCount; i++)
+		indices[i] = i;
+
+	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
+		return false;
+
+	return true;
+}
+
+bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float centerY, float size)
+{
+	VertexType* vertices;
+	unsigned long* indices;
+
+	constexpr int verticesCount = 6;
+	vertices = new VertexType[verticesCount];
+
+	float left = centerX - size * 0.5f;
+	float right = centerX + size * 0.5f;
+	float top = centerY + size * 0.5f;
+	float bottom = centerY - size * 0.5f;
+
+	top *= 16.0 / 9.0;
+	bottom *= 16.0 / 9.0;
+
+	//First triangle	
+	vertices[0].position = XMFLOAT3(left, top, 0.0f);  // Top left.	
+	vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+	vertices[2].position = XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
+	//Second triangle
+	vertices[3].position = XMFLOAT3(left, top, 0.0f);  // Top left.
+	vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
+	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+
+	indices = new unsigned long[verticesCount];
+	for (int i = 0; i < verticesCount; i++)
+		indices[i] = i;
+
+	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
+		return false;
+
+	return true;
 }

@@ -129,6 +129,7 @@
     <ClInclude Include="modelClass.h" />
     <ClInclude Include="ShaderSpecularClass.h" />
     <ClInclude Include="systemclass.h" />
+    <ClInclude Include="TextEngine.h" />
     <ClInclude Include="UIBase.h" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +143,7 @@
     <ClCompile Include="modelClass.cpp" />
     <ClCompile Include="ShaderSpecularClass.cpp" />
     <ClCompile Include="systemclass.cpp" />
+    <ClCompile Include="TextEngine.cpp" />
     <ClCompile Include="UIBase.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

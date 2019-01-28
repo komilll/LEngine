@@ -27,6 +27,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
 
+	m_screenWidth = screenWidth;
+	m_screenHeight = screenHeight;
 
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
@@ -99,8 +101,16 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_UIBase = new UIBase;
 	if (!m_UIBase->Initialize(m_D3D->GetDevice(), hwnd, L"uibase.vs", L"uibase.ps", input))
 		return false;
-	if (!m_UIBase->InitializeModel(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f))
+	if (!m_UIBase->InitializeModel(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -0.95f, -0.5f, 0.9f, 0.0f))
+	//if (!m_UIBase->InitializeSquare(m_D3D->GetDevice(), 0, 0, 0.5f))
 		return false;
+
+	m_UIBase->ChangeColor(102.0f/255.0f, 163.0f/255.0f, 1.0f, 0.4f);
+
+	m_textEngine = new TextEngine;
+	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
+	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, L"Hello World", 0.5f, TextEngine::Align::CENTER);
+	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.75f, L"TEST TEST", 0.5f, TextEngine::Align::CENTER, Colors::ForestGreen);
 
 	//// Create the color shader object.
 	//m_ColorShader = new ColorShaderClass;
@@ -241,11 +251,20 @@ bool GraphicsClass::Render()
 	// Render the model using the color shader.
 	m_specularShader->m_cameraPosition = m_Camera->GetPosition();
 	//m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
+	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
+
+	m_D3D->EnableAlphaBlending();
+	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+	{
+		return false;
+	}
 	result = m_UIBase->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)
 	{
 		return false;
 	}
+	m_D3D->DisableAlphaBlending();
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();

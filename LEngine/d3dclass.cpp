@@ -49,6 +49,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
 
+	m_hwnd = &hwnd;
 
 	// Store the vsync setting.
 	m_vsync_enabled = vsync;
@@ -491,6 +492,11 @@ ID3D11Device* D3DClass::GetDevice()
 ID3D11DeviceContext* D3DClass::GetDeviceContext()
 {
 	return m_deviceContext;
+}
+
+HWND * D3DClass::GetHWND()
+{
+	return m_hwnd;
 }
 
 

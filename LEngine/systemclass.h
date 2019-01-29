@@ -21,6 +21,7 @@
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "inputclass.h"
+#include "MouseClass.h"
 #include "graphicsclass.h"
 
 #pragma region KEYBOARD_KEYS
@@ -85,6 +86,7 @@ private:
 	HWND m_hwnd;
 
 	InputClass* m_Input;
+	MouseClass* m_Mouse;
 	GraphicsClass* m_Graphics;
 };
 

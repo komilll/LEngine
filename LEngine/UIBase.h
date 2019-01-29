@@ -4,6 +4,11 @@
 
 #include "BaseShaderClass.h"
 #include "modelClass.h"
+#include "d3dclass.h"
+#include "MouseClass.h"
+
+constexpr WCHAR* UI_SHADER_VS = L"uibase.vs";
+constexpr WCHAR* UI_SHADER_PS = L"uibase.ps";
 
 class UIBase : public BaseShaderClass
 {
@@ -16,19 +21,23 @@ private:
 public:
 	UIBase();
 
-	bool InitializeModel(ID3D11Device* device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom);
-	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size);
 	bool Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix);
 	void ChangeColor(XMFLOAT4 color);
 	void ChangeColor(float r, float g, float b, float a);
 	void ChangeAlpha(float alpha);
+	virtual bool MouseOnArea(MouseClass* mouse);
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
 	virtual bool CreateSamplerState(ID3D11Device* device) override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
 
-private:
+	virtual bool InitializeModelGeneric(ID3D11Device* device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom);
+	virtual bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty = false);
+	virtual std::vector<LPCSTR> GetInputNames() final;
+	virtual std::vector<DXGI_FORMAT> GetInputFormats() final;
+
+protected:
 	ModelClass* m_model;
 	XMFLOAT4 m_uiColor = XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 

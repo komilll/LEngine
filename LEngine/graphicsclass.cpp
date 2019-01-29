@@ -73,7 +73,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!(m_specularShader = new ShaderSpecularClass))
 		return false;
 	
-	std::vector <BaseShaderClass::vertexInputNameType> names;
+	std::vector <LPCSTR> names;
 	names.push_back("position");
 	names.push_back("texcoord");
 	names.push_back("normal");
@@ -98,14 +98,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_specularShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
 
 
-	m_UIBase = new UIBase;
-	if (!m_UIBase->Initialize(m_D3D->GetDevice(), hwnd, L"uibase.vs", L"uibase.ps", input))
+	m_debugBackground = new UIBackground;
+	if (!m_debugBackground->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -0.95f, -0.5f, 0.9f, -0.0f))
 		return false;
-	if (!m_UIBase->InitializeModel(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -0.95f, -0.5f, 0.9f, 0.0f))
-	//if (!m_UIBase->InitializeSquare(m_D3D->GetDevice(), 0, 0, 0.5f))
-		return false;
+	m_debugBackground->ChangeColor(102.0f/255.0f, 163.0f/255.0f, 1.0f, 0.4f);
 
-	m_UIBase->ChangeColor(102.0f/255.0f, 163.0f/255.0f, 1.0f, 0.4f);
+	m_debugTick = new UITick;
+	if (!m_debugTick->Initialize(m_D3D, -0.9f, 0.85f, 0.03f))
+		return false;
 
 	m_textEngine = new TextEngine;
 	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
@@ -226,6 +226,20 @@ void GraphicsClass::RotateCamera(XMVECTOR rotation)
 	m_Camera->SetRotation(m_Camera->GetRotation().x + rotation.m128_f32[0], m_Camera->GetRotation().y + rotation.m128_f32[1], m_Camera->GetRotation().z + rotation.m128_f32[2]);
 }
 
+void GraphicsClass::UpdateUI()
+{
+	if (m_mouse == nullptr)
+		return;
+
+	if (m_debugTick->MouseOnArea(m_mouse))
+		PostQuitMessage(0);
+}
+
+void GraphicsClass::SetMouseRef(MouseClass * mouse)
+{
+	m_mouse = mouse;
+}
+
 
 bool GraphicsClass::Render()
 {
@@ -256,14 +270,16 @@ bool GraphicsClass::Render()
 	m_D3D->EnableAlphaBlending();
 	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
-	{
 		return false;
-	}
-	result = m_UIBase->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+
+	result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if(!result)
-	{
 		return false;
-	}
+
+	result = m_debugTick->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
+
 	m_D3D->DisableAlphaBlending();
 
 	// Present the rendered scene to the screen.

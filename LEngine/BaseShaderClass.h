@@ -22,19 +22,27 @@ using namespace DirectX;
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: ColorShaderClass
 ////////////////////////////////////////////////////////////////////////////////
+
+
 class BaseShaderClass
 {
 //////// STRUCTS ////////
 public:
-	using vertexInputNameType = LPCSTR;
-
-	using vertexInputMap = std::map<vertexInputNameType, int>;
+	using vertexInputMap = std::map<LPCSTR, int>;
 	struct vertexInputType
 	{
-		std::vector<vertexInputNameType> &name;
+		std::vector<LPCSTR> &name;
 		std::vector<DXGI_FORMAT> &format;
 
-		BaseShaderClass::vertexInputType(std::vector<vertexInputNameType> &n, std::vector<DXGI_FORMAT> &f) : name(n), format(f) { }
+		vertexInputType(std::vector<LPCSTR> &n, std::vector<DXGI_FORMAT> &f) : name(n), format(f) { }
+		vertexInputType vertexInputType::operator=(const vertexInputType &ref);
+		vertexInputType();
+
+		void SaveData(std::vector<LPCSTR> &n, std::vector<DXGI_FORMAT> &f)
+		{
+			name = n;
+			format = f;
+		}
 	};
 
 protected:

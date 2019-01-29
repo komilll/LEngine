@@ -44,7 +44,7 @@ public:
 
 	bool Initialize(ID3D11Device* device, const char* modelFilename);
 	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom);
-	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size);
+	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
@@ -66,7 +66,7 @@ private:
 	//Create shapes
 	bool CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom);
 	bool CreateTriangle(ID3D11Device* device, float left, float right, float top, float bottom);
-	bool CreateSquare(ID3D11Device* device, float centerX, float centerY, float size);
+	bool CreateSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty);
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

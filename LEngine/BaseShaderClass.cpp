@@ -142,7 +142,7 @@ bool BaseShaderClass::CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertex
 		if (val != map->end())
 			val->second += 1;
 		else
-			map->insert(std::pair<vertexInputNameType, int>(name, 1));
+			map->insert(std::pair<LPCSTR, int>(name, 1));
 	}
 	unsigned int numElements;
 
@@ -372,4 +372,14 @@ void BaseShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int index
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 
 	return;
+}
+
+
+BaseShaderClass::vertexInputType BaseShaderClass::vertexInputType::operator=(const vertexInputType &ref)
+{
+	return vertexInputType(ref.name, ref.format);
+}
+
+BaseShaderClass::vertexInputType::vertexInputType() : name(std::vector<LPCSTR>{}), format(std::vector<DXGI_FORMAT>{})
+{
 }

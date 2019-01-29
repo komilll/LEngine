@@ -44,9 +44,9 @@ bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, 
 	return false;
 }
 
-bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size)
+bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty)
 {
-	return CreateSquare(device, centerX, centerY, size);
+	return CreateSquare(device, centerX, centerY, size, isEmpty);
 }
 
 void ModelClass::Shutdown()
@@ -533,30 +533,75 @@ bool ModelClass::CreateTriangle(ID3D11Device * device, float left, float right, 
 	return true;
 }
 
-bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float centerY, float size)
+bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty)
 {
 	VertexType* vertices;
 	unsigned long* indices;
 
-	constexpr int verticesCount = 6;
+	int verticesCount = isEmpty ? 24 : 6;
 	vertices = new VertexType[verticesCount];
 
 	float left = centerX - size * 0.5f;
 	float right = centerX + size * 0.5f;
-	float top = centerY + size * 0.5f;
-	float bottom = centerY - size * 0.5f;
+	float top = centerY / 2 + size * 0.5f;
+	float bottom = centerY / 2 - size * 0.5f;
 
 	top *= 16.0 / 9.0;
 	bottom *= 16.0 / 9.0;
 
-	//First triangle	
-	vertices[0].position = XMFLOAT3(left, top, 0.0f);  // Top left.	
-	vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
-	vertices[2].position = XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
-	//Second triangle
-	vertices[3].position = XMFLOAT3(left, top, 0.0f);  // Top left.
-	vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
-	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+	float widthLeft = 0.003f;
+	float widthTop = widthLeft * 16.0f / 9.0f;
+
+	if (isEmpty == false)
+	{
+		//First triangle	
+		vertices[0].position = XMFLOAT3(left, top, 0.0f);  // Top left.	
+		vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+		vertices[2].position = XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
+		//Second triangle
+		vertices[3].position = XMFLOAT3(left, top, 0.0f);  // Top left.
+		vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
+		vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+	}
+	else
+	{
+		////// LEFT //////
+		//First triangle
+		vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.	
+		vertices[1].position = XMFLOAT3(left, bottom - widthTop, 0.0f);  // Bottom right.
+		vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, 0.0f);  // Bottom left.
+		//Second triangle
+		vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.
+		vertices[4].position = XMFLOAT3(left, top + widthTop, 0.0f);  // Top right.
+		vertices[5].position = XMFLOAT3(left, bottom - widthTop, 0.0f);  // Bottom right.
+		////// TOP //////
+		//First triangle
+		vertices[6].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.	
+		vertices[7].position = XMFLOAT3(right + widthLeft, top, 0.0f);  // Bottom right.
+		vertices[8].position = XMFLOAT3(left - widthLeft, top, 0.0f);  // Bottom left.
+		//Second triangle
+		vertices[9].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.
+		vertices[10].position = XMFLOAT3(right + widthLeft, top + widthTop, 0.0f);  // Top right.
+		vertices[11].position = XMFLOAT3(right + widthLeft, top, 0.0f);  // Bottom right.
+		////// RIGHT //////
+		//First triangle
+		vertices[12].position = XMFLOAT3(right, top + widthTop, 0.0f);  // Top left.	
+		vertices[13].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+		vertices[14].position = XMFLOAT3(right, bottom - widthTop, 0.0f);  // Bottom left.
+		//Second triangle
+		vertices[15].position = XMFLOAT3(right, top + widthTop, 0.0f);  // Top left.
+		vertices[16].position = XMFLOAT3(right + widthLeft, top + widthTop, 0.0f);  // Top right.
+		vertices[17].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+		////// BOTTOM //////
+		//First triangle
+		vertices[18].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.	
+		vertices[19].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+		vertices[20].position = XMFLOAT3(left - widthLeft, bottom - widthTop, 0.0f);  // Bottom left.
+		//Second triangle
+		vertices[21].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.
+		vertices[22].position = XMFLOAT3(right + widthLeft, bottom, 0.0f);  // Top right.
+		vertices[23].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+	}
 
 	indices = new unsigned long[verticesCount];
 	for (int i = 0; i < verticesCount; i++)

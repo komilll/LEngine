@@ -15,6 +15,10 @@
 #include "ShaderSpecularClass.h"
 #include "UIBase.h"
 #include "TextEngine.h"
+#include "UIBackground.h"
+#include "UIButton.h"
+#include "UITick.h"
+#include "MouseClass.h"
 
 /////////////
 // GLOBALS //
@@ -46,6 +50,9 @@ public:
 	void MoveCameraDown();
 	void RotateCamera(XMVECTOR rotation);
 
+	void UpdateUI();
+	void SetMouseRef(MouseClass* mouse);
+		
 private:
 	bool Render();
 
@@ -57,7 +64,9 @@ private:
 	ShaderSpecularClass* m_specularShader;
 	TextEngine* m_textEngine;
 
-	UIBase* m_UIBase;
+	UIBackground* m_debugBackground;
+	UITick* m_debugTick;
+	MouseClass* m_mouse;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

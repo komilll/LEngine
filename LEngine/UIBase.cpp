@@ -2,9 +2,10 @@
 
 UIBase::UIBase()
 {
+	BaseShaderClass::BaseShaderClass();
 }
 
-bool UIBase::InitializeModel(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom)
+bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom)
 {
 	m_model = new ModelClass;
 	if (!m_model->Initialize(device, shape, left, right, top, bottom))
@@ -13,13 +14,35 @@ bool UIBase::InitializeModel(ID3D11Device * device, ModelClass::ShapeSize shape,
 	return true;
 }
 
-bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size)
+bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty)
 {
 	m_model = new ModelClass;
-	if (!m_model->InitializeSquare(device, centerX, centerY, size))
+	if (!m_model->InitializeSquare(device, centerX, centerY, size, isEmpty))
 		return false;
 
 	return true;
+}
+
+std::vector<LPCSTR> UIBase::GetInputNames()
+{
+	std::vector <LPCSTR> names;
+	names.push_back("position");
+	names.push_back("texcoord");
+	names.push_back("normal");
+	names.push_back("tangent");
+	names.push_back("binormal");
+	return names;
+}
+
+std::vector<DXGI_FORMAT> UIBase::GetInputFormats()
+{
+	std::vector <DXGI_FORMAT> formats;
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	return formats;
 }
 
 bool UIBase::Render(ID3D11DeviceContext * deviceContext, int indexCount, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
@@ -49,6 +72,11 @@ void UIBase::ChangeColor(float r, float g, float b, float a)
 void UIBase::ChangeAlpha(float alpha)
 {
 	m_uiColor.w = alpha;
+}
+
+bool UIBase::MouseOnArea(MouseClass* mouse)
+{
+	return false;
 }
 
 bool UIBase::CreateBufferAdditionals(ID3D11Device *& device)

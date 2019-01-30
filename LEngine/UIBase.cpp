@@ -45,6 +45,11 @@ std::vector<DXGI_FORMAT> UIBase::GetInputFormats()
 	return formats;
 }
 
+void UIBase::GetColor(XMFLOAT4 & color)
+{
+	color = m_uiColor;
+}
+
 bool UIBase::Render(ID3D11DeviceContext * deviceContext, int indexCount, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
 	if (m_model == nullptr)
@@ -77,6 +82,11 @@ void UIBase::ChangeAlpha(float alpha)
 bool UIBase::MouseOnArea(MouseClass* mouse)
 {
 	return false;
+}
+
+ModelClass * UIBase::GetModel()
+{
+	return m_model;
 }
 
 bool UIBase::CreateBufferAdditionals(ID3D11Device *& device)

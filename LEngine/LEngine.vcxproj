@@ -128,12 +128,14 @@
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="modelClass.h" />
     <ClInclude Include="MouseClass.h" />
+    <ClInclude Include="MouseClassContainer.h" />
     <ClInclude Include="ShaderSpecularClass.h" />
     <ClInclude Include="systemclass.h" />
     <ClInclude Include="TextEngine.h" />
     <ClInclude Include="UIBackground.h" />
     <ClInclude Include="UIBase.h" />
     <ClInclude Include="UIButton.h" />
+    <ClInclude Include="UISlider.h" />
     <ClInclude Include="UITick.h" />
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +148,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelClass.cpp" />
     <ClCompile Include="MouseClass.cpp" />
+    <ClCompile Include="MouseClassContainer.cpp" />
     <ClCompile Include="ShaderSpecularClass.cpp" />
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="TextEngine.cpp" />
     <ClCompile Include="UIBackground.cpp" />
     <ClCompile Include="UIBase.cpp" />
     <ClCompile Include="UIButton.cpp" />
+    <ClCompile Include="UISlider.cpp" />
     <ClCompile Include="UITick.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

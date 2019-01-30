@@ -50,6 +50,10 @@ public:
 
 	int GetIndexCount();
 
+	void SetPosition(float x, float y, float z);
+	void SetPosition(XMFLOAT3 position);
+	XMFLOAT4 GetPosition();
+
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
 	void ShutdownBuffers();
@@ -71,6 +75,7 @@ private:
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
+	XMFLOAT4 m_position;
 };
 
 #endif

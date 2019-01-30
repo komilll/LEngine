@@ -21,11 +21,14 @@ private:
 public:
 	UIBase();
 
-	bool Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix);
+	virtual bool Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix);
+	virtual bool MouseOnArea(MouseClass* mouse);
+	
 	void ChangeColor(XMFLOAT4 color);
 	void ChangeColor(float r, float g, float b, float a);
 	void ChangeAlpha(float alpha);
-	virtual bool MouseOnArea(MouseClass* mouse);
+
+	ModelClass* GetModel();
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
@@ -34,13 +37,16 @@ protected:
 
 	virtual bool InitializeModelGeneric(ID3D11Device* device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom);
 	virtual bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty = false);
+
 	virtual std::vector<LPCSTR> GetInputNames() final;
 	virtual std::vector<DXGI_FORMAT> GetInputFormats() final;
+	virtual void GetColor(XMFLOAT4 &color) final;
 
 protected:
 	ModelClass* m_model;
 	XMFLOAT4 m_uiColor = XMFLOAT4(1.0, 1.0, 1.0, 1.0);
 
 	ID3D11Buffer* m_appearanceBuffer;
+	ID3D11Buffer* m_positionBuffer;
 };
 #endif // !_UIBASE_H_

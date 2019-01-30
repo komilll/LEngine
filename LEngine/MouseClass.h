@@ -6,6 +6,7 @@
 #pragma comment(lib, "dxguid.lib")
 
 #include <dinput.h>
+#include "d3dclass.h"
 
 class MouseClass
 {
@@ -14,8 +15,7 @@ public:
 	MouseClass(const MouseClass&);
 	~MouseClass();
 
-public:
-	bool Initialize(HINSTANCE hInstance, HWND hwnd, int screenWidth, int screenHeight);
+	bool Initialize(D3DClass* d3d, HINSTANCE hInstance, HWND hwnd, int screenWidth, int screenHeight);
 	void Shutdown();
 	bool Frame();
 	bool ReadMouse();
@@ -28,6 +28,11 @@ public:
 	void SetLMBPressed(bool enable);
 	bool GetRMBPressed();
 	void SetRMBPressed(bool enable);
+	
+	D3DClass* GetD3D();
+
+public:
+	bool isInputConsumed = false;
 
 private:
 	IDirectInput8* m_directInput;
@@ -39,4 +44,6 @@ private:
 	float m_mouseX, m_mouseY;
 	float m_mouseMaxX, m_mouseMaxY;
 	float m_mouseSpeedSlowdown = 4.0f;
+
+	D3DClass* m_d3d;
 };

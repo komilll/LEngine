@@ -44,12 +44,6 @@ bool SystemClass::Initialize()
 	// Initialize the input object.
 	m_Input->Initialize();
 
-	m_Mouse = new MouseClass;
-	if (!m_Mouse)
-		return false;
-	if (!m_Mouse->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight))
-		return false;
-
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = new GraphicsClass;
 	if(!m_Graphics)
@@ -63,6 +57,12 @@ bool SystemClass::Initialize()
 	{
 		return false;
 	}
+
+	m_Mouse = new MouseClass;
+	if (!m_Mouse)
+		return false;
+	if (!m_Mouse->Initialize(m_Graphics->GetD3D(), m_hinstance, m_hwnd, screenWidth, screenHeight))
+		return false;
 
 	m_Graphics->SetMouseRef(m_Mouse);
 	

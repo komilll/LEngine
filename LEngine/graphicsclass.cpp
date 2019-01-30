@@ -132,6 +132,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//	return false;
 	//m_ColorShader->SetLightDirection(-1.0f, 0.0f, -1.0f);
 
+	m_mouse = new MouseClassContainer;
+
+	m_debugSlider = new UISlider;
+	if (!m_debugSlider->Initialize(m_D3D, -0.92f, -0.52f, 0.6f, 0.05f))
+		return false;
+	m_debugSlider->ChangeColor(226.0f/255.0f, 211.0f/255.0f, 90.0f/255.0f, 1.0f);
+
 	return true;
 }
 
@@ -231,13 +238,36 @@ void GraphicsClass::UpdateUI()
 	if (m_mouse == nullptr)
 		return;
 
-	if (m_debugTick->MouseOnArea(m_mouse))
-		PostQuitMessage(0);
+	if (m_mouse->GetMouse()->GetLMBPressed())
+	{
+		if (m_mouse->GetMouse()->isInputConsumed == true)
+			return;
+
+		if (m_debugTick->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_debugTick->ChangeTick();
+		}
+
+		if (m_debugSlider->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_debugSlider->ChangeSliderValue();
+		}
+	}
+	else
+		m_mouse->GetMouse()->isInputConsumed = false;
 }
 
 void GraphicsClass::SetMouseRef(MouseClass * mouse)
 {
-	m_mouse = mouse;
+	m_mouse->SetMouse(mouse);
+	if (m_mouse->GetModel() == nullptr)
+		m_mouse->InitializeMouse();
+}
+
+D3DClass * GraphicsClass::GetD3D()
+{
+	return m_D3D;
 }
 
 
@@ -265,22 +295,33 @@ bool GraphicsClass::Render()
 	// Render the model using the color shader.
 	m_specularShader->m_cameraPosition = m_Camera->GetPosition();
 	//m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
-	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
 
-	m_D3D->EnableAlphaBlending();
 	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
-	result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_D3D->EnableAlphaBlending();
+
+	result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if(!result)
 		return false;
 
-	result = m_debugTick->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	result = m_debugTick->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
+
+	result = m_debugSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
 	m_D3D->DisableAlphaBlending();
+	
+	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
+
+	//ALWAYS RENDER MOUSE AT THE VERY END
+	result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();

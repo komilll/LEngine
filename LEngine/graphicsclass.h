@@ -18,7 +18,8 @@
 #include "UIBackground.h"
 #include "UIButton.h"
 #include "UITick.h"
-#include "MouseClass.h"
+#include "MouseClassContainer.h"
+#include "UISlider.h"
 
 /////////////
 // GLOBALS //
@@ -53,6 +54,8 @@ public:
 	void UpdateUI();
 	void SetMouseRef(MouseClass* mouse);
 		
+	D3DClass* GetD3D();
+
 private:
 	bool Render();
 
@@ -66,7 +69,8 @@ private:
 
 	UIBackground* m_debugBackground;
 	UITick* m_debugTick;
-	MouseClass* m_mouse;
+	MouseClassContainer* m_mouse;
+	UISlider* m_debugSlider;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

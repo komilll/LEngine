@@ -75,6 +75,12 @@
     <ClInclude Include="MouseClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MouseClassContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UISlider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cameraclass.cpp">
@@ -123,6 +129,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MouseClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseClassContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UISlider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

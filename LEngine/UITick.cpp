@@ -26,8 +26,8 @@ bool UITick::Initialize(D3DClass * d3d, float positionX, float positionY, float 
 
 	m_leftMost = left - widthLeft;
 	m_rightMost = right + widthLeft;
-	m_topMost = top + widthTop;
-	m_bottomMost = bottom - widthTop;
+	m_topMost = top * 2.0f - size * 3.0f;
+	m_bottomMost = bottom * 2.0f - size * 3.0f;
 
 	return InitializeSquare(d3d->GetDevice(), positionX, positionY, size, m_tickState);
 }
@@ -42,8 +42,6 @@ bool UITick::MouseOnArea(MouseClass * mouse)
 {
 	float posX, posY;
 	mouse->GetMouseLocationScreenSpace(posX, posY);
-	posX = posX * 2.0f - 1.0f;
-	posY = posY * 2.0f - 1.0f;
 
 	return (posX >= m_leftMost && posX <= m_rightMost
 		&& posY >= m_bottomMost && posY <= m_topMost);

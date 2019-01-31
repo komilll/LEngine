@@ -3,6 +3,7 @@
 #define _UI_SLIDER_H_
 
 #include "UIBase.h"
+#include "TextEngine.h"
 
 class UISlider : public UIBase
 {
@@ -13,12 +14,22 @@ public:
 
 	///<summary> Create slider of given range </summary>
 	bool Initialize(D3DClass *d3d, float positionMinX, float positionMaxX, float positionY, float height);
-	void ChangeSliderValue();
+	void CreateTextArea(TextEngine::FontData* text);
+	void ChangeSliderValue(MouseClass * mouse);
+	bool IsChanging();
+	void StartUsing();
+	void EndUsing();
+
+private:
+	float clamp(float n, float lower, float upper);
 
 private:
 	ModelClass* m_modelSlider;
 	D3DClass* m_D3D;
+	TextEngine::FontData* m_valueText = nullptr;
+	
 	float m_sliderVal = 0;
+	bool m_isChanging = false;
 
 	float m_minX = 0, m_maxX = 0;
 	float m_minY = 0, m_maxY = 0;

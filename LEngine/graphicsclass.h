@@ -56,6 +56,8 @@ public:
 		
 	D3DClass* GetD3D();
 
+	TextEngine::FontData* AddText(float&& posX, float&& posY, std::string&& text, float&& scale = 1.0f, TextEngine::Align &&align = TextEngine::Align::LEFT, XMVECTOR&& color = DirectX::Colors::White);
+
 private:
 	bool Render();
 

@@ -109,8 +109,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_textEngine = new TextEngine;
 	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
-	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, L"Hello World", 0.5f, TextEngine::Align::CENTER);
-	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.75f, L"TEST TEST", 0.5f, TextEngine::Align::CENTER, Colors::ForestGreen);
+	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, "Hello World", 0.5f, TextEngine::Align::CENTER);
+	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.75f, "TEST TEST", 0.5f, TextEngine::Align::CENTER, Colors::ForestGreen);
 
 	//// Create the color shader object.
 	//m_ColorShader = new ColorShaderClass;
@@ -135,9 +135,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_mouse = new MouseClassContainer;
 
 	m_debugSlider = new UISlider;
-	if (!m_debugSlider->Initialize(m_D3D, -0.92f, -0.52f, 0.6f, 0.05f))
+	if (!m_debugSlider->Initialize(m_D3D, -0.82f, -0.52f, 0.6f, 0.05f))
 		return false;
 	m_debugSlider->ChangeColor(226.0f/255.0f, 211.0f/255.0f, 90.0f/255.0f, 1.0f);
+	m_debugSlider->CreateTextArea(AddText(-0.93f, 0.635f, "MORDO", 0.5f, TextEngine::Align::LEFT));
 
 	return true;
 }
@@ -240,6 +241,11 @@ void GraphicsClass::UpdateUI()
 
 	if (m_mouse->GetMouse()->GetLMBPressed())
 	{
+		if (m_debugSlider->IsChanging())
+		{
+			m_debugSlider->ChangeSliderValue(m_mouse->GetMouse());
+		}
+
 		if (m_mouse->GetMouse()->isInputConsumed == true)
 			return;
 
@@ -248,14 +254,19 @@ void GraphicsClass::UpdateUI()
 			m_mouse->GetMouse()->isInputConsumed = true;
 			m_debugTick->ChangeTick();
 		}
-
-		if (m_debugSlider->MouseOnArea(m_mouse->GetMouse()))
+		else if (m_debugSlider->MouseOnArea(m_mouse->GetMouse()))
 		{
-			m_debugSlider->ChangeSliderValue();
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_debugSlider->StartUsing();
+			m_debugSlider->ChangeSliderValue(m_mouse->GetMouse());
 		}
 	}
 	else
+	{
 		m_mouse->GetMouse()->isInputConsumed = false;
+		if (m_debugSlider->IsChanging())
+			m_debugSlider->EndUsing();
+	}
 }
 
 void GraphicsClass::SetMouseRef(MouseClass * mouse)
@@ -270,6 +281,10 @@ D3DClass * GraphicsClass::GetD3D()
 	return m_D3D;
 }
 
+TextEngine::FontData * GraphicsClass::AddText(float && posX, float && posY, std::string&& text, float && scale, TextEngine::Align && align, XMVECTOR && color)
+{
+	return m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, posX, posY, text, scale, align, color);
+}
 
 bool GraphicsClass::Render()
 {

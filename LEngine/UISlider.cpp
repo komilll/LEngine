@@ -47,8 +47,44 @@ bool UISlider::Initialize(D3DClass * d3d, float positionMinX, float positionMaxX
 	return InitializeModelGeneric(d3d->GetDevice(), ModelClass::ShapeSize::RECTANGLE, positionMinX, positionMaxX, positionY + height / 2, positionY - height / 2);
 }
 
-void UISlider::ChangeSliderValue()
+void UISlider::CreateTextArea(TextEngine::FontData * text)
 {
-	m_sliderVal = (m_maxX - m_mousePosX) / (m_maxX - m_minX);
-	m_modelSlider->SetPosition(m_mousePosX - m_minX, 0, 0);
+	m_valueText = text;
+}
+
+void UISlider::ChangeSliderValue(MouseClass * mouse)
+{
+	mouse->GetMouseLocationScreenSpace(m_mousePosX, m_mousePosY);
+
+	m_sliderVal = clamp(1.0f - (m_maxX - m_mousePosX) / (m_maxX - m_minX), 0.0f, 1.0f);
+	m_modelSlider->SetPosition(clamp(m_mousePosX - m_minX, 0, m_maxX - m_minX), 0, 0);
+	if (m_valueText != nullptr)
+	{
+		m_valueText->SetText(std::to_string(m_sliderVal));
+	}
+}
+
+bool UISlider::IsChanging()
+{
+	return m_isChanging;
+}
+
+void UISlider::StartUsing()
+{
+	m_isChanging = true;
+}
+
+void UISlider::EndUsing()
+{
+	m_isChanging = false;
+}
+
+float UISlider::clamp(float n, float lower, float upper)
+{
+	if (n > upper)
+		return upper;
+	else if (n < lower)
+		return lower;
+
+	return n;
 }

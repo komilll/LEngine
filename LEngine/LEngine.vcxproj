@@ -118,6 +118,8 @@
     <None Include="color.ps" />
     <None Include="color.vs" />
     <None Include="packages.config" />
+    <None Include="pbr_base.ps" />
+    <None Include="pbr_base.vs" />
     <None Include="uibase.ps" />
     <None Include="uibase.vs" />
   </ItemGroup>
@@ -131,6 +133,7 @@
     <ClInclude Include="modelClass.h" />
     <ClInclude Include="MouseClass.h" />
     <ClInclude Include="MouseClassContainer.h" />
+    <ClInclude Include="ShaderPBRClass.h" />
     <ClInclude Include="ShaderSpecularClass.h" />
     <ClInclude Include="systemclass.h" />
     <ClInclude Include="TextEngine.h" />
@@ -151,6 +154,7 @@
     <ClCompile Include="modelClass.cpp" />
     <ClCompile Include="MouseClass.cpp" />
     <ClCompile Include="MouseClassContainer.cpp" />
+    <ClCompile Include="ShaderPBRClass.cpp" />
     <ClCompile Include="ShaderSpecularClass.cpp" />
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="TextEngine.cpp" />

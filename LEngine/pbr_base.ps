@@ -1,0 +1,133 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: color.ps
+////////////////////////////////////////////////////////////////////////////////
+
+Texture2D shaderTexture[2];
+SamplerState SampleType;
+
+cbuffer LightingBuffer
+{
+	float3 direction;
+	float padding;
+};
+
+cbuffer PBRBuffer
+{
+	float roughness;
+	float metalness;
+	float2 paddingPBR;
+};
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex: TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
+	float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
+};
+
+float GeometrySchlickGGX(float NdotV, float k);
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+	float4 textureColor;
+	float4 normalMap;
+	float3 normalFromTexture;
+	float lightIntensity;
+	float3 reflectionVector;
+	float3 viewDir;
+	float specular;
+	float3 lightDir = normalize(direction);
+	float specularPower = 5.0;
+	float specularStrength = 0.5;
+	float4 color;
+
+	//PBR parameters
+	//float roughness = 0.1;
+	//float metalness = 0.0;
+	float3 albedo = float3(1.00, 0, 0);
+	//float3 F0 = float3(1.00, 0.71, 0.29);
+
+	textureColor = shaderTexture[0].Sample(SampleType, input.tex);
+	normalMap = shaderTexture[1].Sample(SampleType, input.tex);
+	
+	//From [0, 1] to [-1, 1]
+	normalMap = (normalMap * 2.0f) - 1.0f;
+
+	normalFromTexture = (normalMap.x * input.tangent) + (normalMap.y * input.binormal) + (normalMap.z * input.normal);
+	normalFromTexture = normalize(normalFromTexture);
+
+	lightIntensity = saturate(dot(normalFromTexture, lightDir));	
+
+	reflectionVector = normalize(-lightDir + 2 * input.normal * lightIntensity);
+	specular = pow(saturate(dot(reflectionVector, input.viewDirection)), specularPower) * specularStrength;
+	textureColor *= (lightIntensity + specular);
+
+	color = saturate(textureColor);
+
+	//NORMAL DISTRUBUTION FUNCTION
+	float3 half = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
+	float a2 = roughness * roughness;
+	float PI = 3.14159265359;
+	float NdotH = max(dot(input.normal, half), 0.0);
+	float denom = 1.0 + NdotH * NdotH * (a2 - 1.0);
+	denom = denom * denom;
+	denom = denom * PI;
+
+	float D = (a2) / denom;
+	//////////////////////////////
+
+	//GEOMETRY FUNCTION
+	float NdotV = max(dot(input.normal, input.viewDirection), 0.0);
+    float NdotL = max(dot(input.normal, lightDir), 0.0);
+	float k = (roughness + 1);
+	k = (k * k) / 8;
+    float ggx1 = GeometrySchlickGGX(NdotV, k);
+    float ggx2 = GeometrySchlickGGX(NdotL, k);
+
+	float G = ggx1 * ggx2;
+	///////////////////
+
+	//FRESNEL EQUATION
+	float3 F0 = float3(0.04, 0.04, 0.04);
+	F0 = lerp(F0, albedo, metalness);
+	float F = F0 + (1.0 - F0) * pow((1.0 - NdotV), 5);
+	/////////////////
+
+	//FINAL CALCULATIONS
+	float3 numerator = D * G * F;
+	float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+	specular = numerator / max(denominator, 0.001);
+
+	float3 kS = F;
+	float3 kD = float3(1.0, 1.0, 1.0) - kS;
+	kD *= 1.0 - metalness;
+
+	float3 Lo = (kD * albedo / PI + specular) * NdotL;
+
+	float3 ambient = 0.03 * albedo;
+	float3 tempColor = (ambient + Lo);
+	tempColor = tempColor / (tempColor + float3(1.0, 1.0, 1.0));
+	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+	float4 finalColor = float4(tempColor, 1.0);
+
+	return finalColor;
+	//return float4(specular, specular, specular, 1.0);
+	//return float4(1.0, 1.0, 1.0, 1.0);
+}
+
+float GeometrySchlickGGX(float NdotV, float k)
+{
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return nom / denom;
+}

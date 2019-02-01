@@ -19,6 +19,9 @@ public:
 	bool IsChanging();
 	void StartUsing();
 	void EndUsing();
+	//void SetEventOnChangeValue(std::function<void(float)> function);
+	std::function<void(float)> EventOnChangeValue;
+	//std::vector<std::function<void(float)>> EventsOnChangeValue;
 
 private:
 	float clamp(float n, float lower, float upper);
@@ -27,7 +30,7 @@ private:
 	ModelClass* m_modelSlider;
 	D3DClass* m_D3D;
 	TextEngine::FontData* m_valueText = nullptr;
-	
+
 	float m_sliderVal = 0;
 	bool m_isChanging = false;
 

@@ -61,6 +61,7 @@ void UISlider::ChangeSliderValue(MouseClass * mouse)
 	if (m_valueText != nullptr)
 	{
 		m_valueText->SetText(std::to_string(m_sliderVal));
+		EventOnChangeValue(m_sliderVal);
 	}
 }
 

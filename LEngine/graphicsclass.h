@@ -20,6 +20,7 @@
 #include "UITick.h"
 #include "MouseClassContainer.h"
 #include "UISlider.h"
+#include "ShaderPBRClass.h"
 
 /////////////
 // GLOBALS //
@@ -67,6 +68,7 @@ private:
 	ModelClass* m_Model;
 	ColorShaderClass* m_ColorShader;
 	ShaderSpecularClass* m_specularShader;
+	ShaderPBRClass* m_pbrShader;
 	TextEngine* m_textEngine;
 
 	UIBackground* m_debugBackground;

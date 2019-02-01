@@ -70,7 +70,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	if (!(m_specularShader = new ShaderSpecularClass))
+	if (!(m_pbrShader = new ShaderPBRClass))
 		return false;
 	
 	std::vector <LPCSTR> names;
@@ -87,15 +87,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	BaseShaderClass::vertexInputType input(names, formats);
 	
-	if (!m_specularShader->Initialize(m_D3D->GetDevice(), hwnd, L"color.vs", L"color.ps", input))
+	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_base.vs", L"pbr_base.ps", input))
 		return false;
 
-	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_specularShader->m_diffuseTexture, m_specularShader->m_diffuseTextureView))
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
 		return false;
-	if (!m_specularShader->LoadTexture(m_D3D->GetDevice(), L"Wood_normal.dds", m_specularShader->m_normalTexture, m_specularShader->m_normalTextureView))
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Wood_normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
 		return false;
 
-	m_specularShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
+	m_pbrShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
 
 
 	m_debugBackground = new UIBackground;
@@ -139,7 +139,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	m_debugSlider->ChangeColor(226.0f/255.0f, 211.0f/255.0f, 90.0f/255.0f, 1.0f);
 	m_debugSlider->CreateTextArea(AddText(-0.93f, 0.635f, "MORDO", 0.5f, TextEngine::Align::LEFT));
-
+	m_debugSlider->EventOnChangeValue = [=](float roughness) { m_pbrShader->SetRoughness(roughness); };
+	//m_debugSlider->EventsOnChangeValue.push_back([=](float metalness) { m_pbrShader->SetMetalness(metalness); });
 	return true;
 }
 
@@ -308,10 +309,10 @@ bool GraphicsClass::Render()
 	//worldMatrix = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
-	m_specularShader->m_cameraPosition = m_Camera->GetPosition();
+	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
 	//m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
 
-	result = m_specularShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 

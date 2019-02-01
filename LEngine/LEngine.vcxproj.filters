@@ -28,6 +28,12 @@
     <None Include="uibase.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="pbr_base.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="pbr_base.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="colorshaderclass.h">
@@ -79,6 +85,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UISlider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderPBRClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -135,6 +144,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UISlider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderPBRClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

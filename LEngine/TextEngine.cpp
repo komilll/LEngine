@@ -26,8 +26,10 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 	else if (align_ == Align::RIGHT)
 		data.origin = m_font->MeasureString(wstr.c_str());
 
+	data.SetIndex(m_data.size());
+	data.textEngineRef = this;
 	m_data.push_back(data);
-	return &m_data.at(m_data.size() - 1);
+	return &data;
 }
 
 void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWidth, float screenHeight)
@@ -46,4 +48,9 @@ void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWid
 		m_font->DrawString(spriteBatch.get(), wstr.c_str(), fontPos, m_data.at(i).color, 0.0f, m_data.at(i).origin, m_data.at(i).scale);
 	}
 	spriteBatch->End();
+}
+
+TextEngine::FontData * TextEngine::GetData(int index)
+{
+	return &m_data.at(index);
 }

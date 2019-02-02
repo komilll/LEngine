@@ -21,6 +21,7 @@
 #include "MouseClassContainer.h"
 #include "UISlider.h"
 #include "ShaderPBRClass.h"
+#include "UITexturePreview.h"
 
 /////////////
 // GLOBALS //
@@ -70,11 +71,13 @@ private:
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRClass* m_pbrShader;
 	TextEngine* m_textEngine;
+	UITexturePreview* m_texturePreview;
 
 	UIBackground* m_debugBackground;
 	UITick* m_debugTick;
 	MouseClassContainer* m_mouse;
-	UISlider* m_debugSlider;
+	UISlider* m_roughnessSlider;
+	UISlider* m_metalnessSlider;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

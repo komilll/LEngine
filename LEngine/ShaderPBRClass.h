@@ -11,7 +11,7 @@ private:
 	struct LightingBufferType
 	{
 		XMFLOAT3 direction;
-		float padding;
+		float strength;
 	};
 
 	struct CameraBufferType
@@ -27,15 +27,29 @@ private:
 		XMFLOAT2 padding;
 	};
 
+	struct ShaderTextureBufferType
+	{
+		int hasNormalMap;
+		int hasRoughnessMap;
+		int hasMetalnessMap;
+		int paddingShaderTextureBuffer;
+	};
+
 public:
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
 
+	//Texture resources
 	ID3D11Resource* m_diffuseTexture;
 	ID3D11ShaderResourceView* m_diffuseTextureView;
 	ID3D11Resource* m_normalTexture;
 	ID3D11ShaderResourceView* m_normalTextureView;
-	XMFLOAT3 m_lightDirection;
+	ID3D11Resource* m_roughnessTexture;
+	ID3D11ShaderResourceView* m_roughnessTextureView;
+	ID3D11Resource* m_metalnessTexture;
+	ID3D11ShaderResourceView* m_metalnessTextureView;
+
+	XMFLOAT4 m_lightDirection;
 	XMFLOAT3 m_cameraPosition;
 	float m_roughness = 0;
 	float m_metalness = 0;
@@ -48,6 +62,7 @@ private:
 	ID3D11Buffer* m_lightingBuffer;
 	ID3D11Buffer* m_cameraBuffer;
 	ID3D11Buffer* m_PBRBuffer;
+	ID3D11Buffer* m_ShaderTextureBuffer;
 };
 
 #endif // !_SHADERPBRCLASS_H_

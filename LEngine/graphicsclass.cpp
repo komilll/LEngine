@@ -90,12 +90,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_base.vs", L"pbr_base.ps", input))
 		return false;
 
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
 		return false;
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Wood_normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
+		return false;
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
+		return false;
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
 		return false;
 
-	m_pbrShader->m_lightDirection = XMFLOAT3(-1.0f, 0.0, -1.0f);
+	//Direction + strength
+	m_pbrShader->m_lightDirection = XMFLOAT4(-1.0f, 0.0, -1.0f, 1.5f);
 
 
 	m_debugBackground = new UIBackground;
@@ -134,13 +139,35 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_mouse = new MouseClassContainer;
 
-	m_debugSlider = new UISlider;
-	if (!m_debugSlider->Initialize(m_D3D, -0.82f, -0.52f, 0.6f, 0.05f))
+	//Roughness slider
+	m_roughnessSlider = new UISlider;
+	if (!m_roughnessSlider->Initialize(m_D3D, -0.73f, -0.52f, 0.6f, 0.05f))
 		return false;
-	m_debugSlider->ChangeColor(226.0f/255.0f, 211.0f/255.0f, 90.0f/255.0f, 1.0f);
-	m_debugSlider->CreateTextArea(AddText(-0.93f, 0.635f, "MORDO", 0.5f, TextEngine::Align::LEFT));
-	m_debugSlider->EventOnChangeValue = [=](float roughness) { m_pbrShader->SetRoughness(roughness); };
-	//m_debugSlider->EventsOnChangeValue.push_back([=](float metalness) { m_pbrShader->SetMetalness(metalness); });
+
+	AddText(-0.94f, 0.625f, "Roughness:", 0.35f);
+
+	m_roughnessSlider->ChangeColor(226.0f/255.0f, 211.0f/255.0f, 90.0f/255.0f, 1.0f);
+	m_roughnessSlider->CreateTextArea(AddText(-0.79f, 0.625f, "0.00", 0.35f, TextEngine::Align::LEFT));
+	m_roughnessSlider->EventOnChangeValue = [=](float roughness) { m_pbrShader->SetRoughness(roughness); };
+	
+	//Metalness slider
+	m_metalnessSlider = new UISlider;
+	if (!m_metalnessSlider->Initialize(m_D3D, -0.73f, -0.52f, 0.45f, 0.05f))
+		return false;
+	
+	AddText(-0.94f, 0.475f, "Metalness:", 0.35f);
+
+	m_metalnessSlider->ChangeColor(226.0f / 255.0f, 211.0f / 255.0f, 90.0f / 255.0f, 1.0f);
+	m_metalnessSlider->CreateTextArea(AddText(-0.79f, 0.475f, "0.00", 0.35f, TextEngine::Align::LEFT));
+	m_metalnessSlider->EventOnChangeValue = [=](float metalness) { m_pbrShader->SetMetalness(metalness); };
+
+	//Texture preview
+	m_texturePreview = new UITexturePreview;
+
+	AddText(-0.94f, 0.325f, "Roughness:", 0.35f);
+
+	m_texturePreview->Initialize(m_D3D, -0.58f, 0.255f, 0.1f);
+
 	return true;
 }
 
@@ -188,7 +215,7 @@ bool GraphicsClass::Frame()
 
 
 	// Render the graphics scene.
-	//m_rotationY += 0.01f;
+	m_rotationY += 0.01f;
 	if (m_rotationY >= 360.0f)
 		m_rotationY = 0.0f;
 	result = Render();
@@ -242,9 +269,13 @@ void GraphicsClass::UpdateUI()
 
 	if (m_mouse->GetMouse()->GetLMBPressed())
 	{
-		if (m_debugSlider->IsChanging())
+		if (m_roughnessSlider->IsChanging())
 		{
-			m_debugSlider->ChangeSliderValue(m_mouse->GetMouse());
+			m_roughnessSlider->ChangeSliderValue(m_mouse->GetMouse());
+		}
+		else if (m_metalnessSlider->IsChanging())
+		{
+			m_metalnessSlider->ChangeSliderValue(m_mouse->GetMouse());
 		}
 
 		if (m_mouse->GetMouse()->isInputConsumed == true)
@@ -255,18 +286,26 @@ void GraphicsClass::UpdateUI()
 			m_mouse->GetMouse()->isInputConsumed = true;
 			m_debugTick->ChangeTick();
 		}
-		else if (m_debugSlider->MouseOnArea(m_mouse->GetMouse()))
+		else if (m_roughnessSlider->MouseOnArea(m_mouse->GetMouse()))
 		{
 			m_mouse->GetMouse()->isInputConsumed = true;
-			m_debugSlider->StartUsing();
-			m_debugSlider->ChangeSliderValue(m_mouse->GetMouse());
+			m_roughnessSlider->StartUsing();
+			m_roughnessSlider->ChangeSliderValue(m_mouse->GetMouse());
+		}
+		else if (m_metalnessSlider->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_metalnessSlider->StartUsing();
+			m_metalnessSlider->ChangeSliderValue(m_mouse->GetMouse());
 		}
 	}
 	else
 	{
 		m_mouse->GetMouse()->isInputConsumed = false;
-		if (m_debugSlider->IsChanging())
-			m_debugSlider->EndUsing();
+		if (m_roughnessSlider->IsChanging())
+			m_roughnessSlider->EndUsing();
+		if (m_metalnessSlider->IsChanging())
+			m_metalnessSlider->EndUsing();
 	}
 }
 
@@ -326,12 +365,18 @@ bool GraphicsClass::Render()
 	if (!result)
 		return false;
 
-	result = m_debugSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	result = m_roughnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
+
+	result = m_metalnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
 	m_D3D->DisableAlphaBlending();
 	
+	m_texturePreview->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+
 	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
 
 	//ALWAYS RENDER MOUSE AT THE VERY END

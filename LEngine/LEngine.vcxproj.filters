@@ -34,6 +34,12 @@
     <None Include="pbr_base.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="uiTexturePreview.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="uiTexturePreview.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="colorshaderclass.h">
@@ -88,6 +94,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShaderPBRClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UITexturePreview.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -147,6 +156,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShaderPBRClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UITexturePreview.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

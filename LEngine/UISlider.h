@@ -14,7 +14,7 @@ public:
 
 	///<summary> Create slider of given range </summary>
 	bool Initialize(D3DClass *d3d, float positionMinX, float positionMaxX, float positionY, float height);
-	void CreateTextArea(TextEngine::FontData* text);
+	void CreateTextArea(TextEngine::FontData *text);
 	void ChangeSliderValue(MouseClass * mouse);
 	bool IsChanging();
 	void StartUsing();
@@ -29,7 +29,8 @@ private:
 private:
 	ModelClass* m_modelSlider;
 	D3DClass* m_D3D;
-	TextEngine::FontData* m_valueText = nullptr;
+	TextEngine* m_textEngine = nullptr;
+	int m_textIndex = -1;
 
 	float m_sliderVal = 0;
 	bool m_isChanging = false;

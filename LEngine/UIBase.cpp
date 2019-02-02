@@ -14,10 +14,10 @@ bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize
 	return true;
 }
 
-bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty)
+bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
 	m_model = new ModelClass;
-	if (!m_model->InitializeSquare(device, centerX, centerY, size, isEmpty))
+	if (!m_model->InitializeSquare(device, centerX, centerY, size, isEmpty, withTex))
 		return false;
 
 	return true;

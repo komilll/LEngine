@@ -122,6 +122,8 @@
     <None Include="pbr_base.vs" />
     <None Include="uibase.ps" />
     <None Include="uibase.vs" />
+    <None Include="uiTexturePreview.ps" />
+    <None Include="uiTexturePreview.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseShaderClass.h" />
@@ -141,6 +143,7 @@
     <ClInclude Include="UIBase.h" />
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="UISlider.h" />
+    <ClInclude Include="UITexturePreview.h" />
     <ClInclude Include="UITick.h" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +165,7 @@
     <ClCompile Include="UIBase.cpp" />
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="UISlider.cpp" />
+    <ClCompile Include="UITexturePreview.cpp" />
     <ClCompile Include="UITick.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

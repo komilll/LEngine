@@ -46,9 +46,9 @@ bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, 
 	return false;
 }
 
-bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty)
+bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
-	return CreateSquare(device, centerX, centerY, size, isEmpty);
+	return CreateSquare(device, centerX, centerY, size, isEmpty, withTex);
 }
 
 void ModelClass::Shutdown()
@@ -552,7 +552,7 @@ bool ModelClass::CreateTriangle(ID3D11Device * device, float left, float right, 
 	return true;
 }
 
-bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty)
+bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
 	VertexType* vertices;
 	unsigned long* indices;
@@ -581,6 +581,18 @@ bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float center
 		vertices[3].position = XMFLOAT3(left, top, 0.0f);  // Top left.
 		vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
 		vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+
+		if (withTex) //Create tex values for vertices
+		{
+			//First triangle	
+			vertices[0].tex = XMFLOAT2(0.0, 0.0);  // Top left.	
+			vertices[1].tex = XMFLOAT2(1.0, 1.0);  // Bottom right.
+			vertices[2].tex = XMFLOAT2(0.0, 1.0);  // Bottom left.
+			//Second triangle
+			vertices[3].tex = XMFLOAT2(0.0, 0.0);  // Top left.
+			vertices[4].tex = XMFLOAT2(1.0, 0.0);  // Top right.
+			vertices[5].tex = XMFLOAT2(1.0, 1.0);  // Bottom right.
+		}
 	}
 	else
 	{

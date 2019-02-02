@@ -33,7 +33,11 @@ bool ShaderPBRClass::CreateBufferAdditionals(ID3D11Device * &device)
 	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_PBRBuffer)))
 		return false;
 
-	m_buffers = { m_lightingBuffer, m_cameraBuffer, m_PBRBuffer };
+	tempBufferDesc.ByteWidth = sizeof(PBRBufferType);
+	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_ShaderTextureBuffer)))
+		return false;
+
+	m_buffers = { m_lightingBuffer, m_cameraBuffer, m_PBRBuffer, m_ShaderTextureBuffer };
 
 	return true;
 }
@@ -48,6 +52,7 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 	LightingBufferType* dataPtr2;
 	CameraBufferType* dataPtr3;
 	PBRBufferType* dataPtr4;
+	ShaderTextureBufferType* dataPtr5;
 	unsigned int bufferNumber;
 
 	/////// VERTEX BUFFERS ///////
@@ -71,8 +76,8 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 		return false;
 
 	dataPtr2 = (LightingBufferType*)mappedResource.pData;
-	dataPtr2->direction = m_lightDirection;
-	dataPtr2->padding = 0;
+	dataPtr2->direction = XMFLOAT3{ m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
+	dataPtr2->strength = m_lightDirection.w;
 
 	deviceContext->Unmap(m_lightingBuffer, 0);
 	bufferNumber = 0;
@@ -92,9 +97,26 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 	bufferNumber = 1;
 	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_PBRBuffer);
 
+	//Shader Texture Buffer
+	result = deviceContext->Map(m_ShaderTextureBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	dataPtr5 = (ShaderTextureBufferType*)mappedResource.pData;
+	dataPtr5->hasNormalMap = m_normalTextureView != nullptr;
+	dataPtr5->hasRoughnessMap = m_roughnessTextureView != nullptr;
+	dataPtr5->hasMetalnessMap = m_metalnessTextureView != nullptr;
+	dataPtr5->paddingShaderTextureBuffer = 0;
+
+	deviceContext->Unmap(m_ShaderTextureBuffer, 0);
+	bufferNumber = 2;
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_ShaderTextureBuffer);
+
 	/////// RESOURCES ///////
 	//Pixel shader resources
 	deviceContext->PSSetShaderResources(0, 1, &m_diffuseTextureView);
 	deviceContext->PSSetShaderResources(1, 1, &m_normalTextureView);
+	deviceContext->PSSetShaderResources(2, 1, &m_roughnessTextureView);
+	deviceContext->PSSetShaderResources(3, 1, &m_metalnessTextureView);
 	return true;
 }

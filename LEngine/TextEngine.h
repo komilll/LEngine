@@ -23,6 +23,7 @@ public:
 		float scale = 0;
 		std::string text = "";
 		XMVECTOR color = Colors::White;
+		TextEngine* textEngineRef;
 
 		void SetText(std::string newString)
 		{
@@ -33,6 +34,17 @@ public:
 					text = text.substr(0, i + 1 + 2);
 			}
 		}
+
+		int GetIndex()
+		{
+			return index;
+		}
+		void SetIndex(int index_)
+		{
+			index = index_;
+		}
+
+	private: int index = 0;
 	};
 
 public:
@@ -42,6 +54,7 @@ public:
 	FontData* WriteText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight, float posX, float posY, std::string text, float scale = 1.0f, 
 		Align align = Align::LEFT, XMVECTOR color = DirectX::Colors::White);
 	void RenderText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight);
+	TextEngine::FontData* GetData(int index);
 
 private:
 	std::unique_ptr<DirectX::SpriteFont> m_font;

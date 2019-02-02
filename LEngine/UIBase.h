@@ -36,7 +36,7 @@ protected:
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
 
 	virtual bool InitializeModelGeneric(ID3D11Device* device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom);
-	virtual bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty = false);
+	virtual bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty = false, bool withTex = false);
 
 	virtual std::vector<LPCSTR> GetInputNames() final;
 	virtual std::vector<DXGI_FORMAT> GetInputFormats() final;

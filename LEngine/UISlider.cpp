@@ -47,9 +47,16 @@ bool UISlider::Initialize(D3DClass * d3d, float positionMinX, float positionMaxX
 	return InitializeModelGeneric(d3d->GetDevice(), ModelClass::ShapeSize::RECTANGLE, positionMinX, positionMaxX, positionY + height / 2, positionY - height / 2);
 }
 
-void UISlider::CreateTextArea(TextEngine::FontData * text)
+void UISlider::CreateTextArea(TextEngine::FontData *text)
 {
-	m_valueText = text;
+	m_textEngine = text->textEngineRef;
+	m_textIndex = text->GetIndex();
+	//m_valueText->color = text.color;
+	//m_valueText->origin = text.origin;
+	//m_valueText->posX = text.posX;
+	//m_valueText->posY = text.posY;
+	//m_valueText->scale = text.scale;
+	//m_valueText->SetText(text.text);
 }
 
 void UISlider::ChangeSliderValue(MouseClass * mouse)
@@ -58,10 +65,11 @@ void UISlider::ChangeSliderValue(MouseClass * mouse)
 
 	m_sliderVal = clamp(1.0f - (m_maxX - m_mousePosX) / (m_maxX - m_minX), 0.0f, 1.0f);
 	m_modelSlider->SetPosition(clamp(m_mousePosX - m_minX, 0, m_maxX - m_minX), 0, 0);
-	if (m_valueText != nullptr)
+	if (m_textEngine != nullptr)
 	{
-		m_valueText->SetText(std::to_string(m_sliderVal));
-		EventOnChangeValue(m_sliderVal);
+		m_textEngine->GetData(m_textIndex)->SetText(std::to_string(m_sliderVal));
+		if (EventOnChangeValue)
+			EventOnChangeValue(m_sliderVal);
 	}
 }
 

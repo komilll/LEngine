@@ -71,10 +71,12 @@ private:
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRClass* m_pbrShader;
 	TextEngine* m_textEngine;
-	UITexturePreview* m_texturePreview;
+	UITexturePreview* m_texturePreviewRoughness;
+	UITexturePreview* m_texturePreviewMetalness;
+	UITexturePreview* m_texturePreviewNormal;
+	UITexturePreview* m_texturePreviewAlbedo;
 
 	UIBackground* m_debugBackground;
-	UITick* m_debugTick;
 	MouseClassContainer* m_mouse;
 	UISlider* m_roughnessSlider;
 	UISlider* m_metalnessSlider;

@@ -310,14 +310,24 @@ void BaseShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hw
 bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&texture, ID3D11ShaderResourceView *&textureView)
 {
 	if (texture != nullptr)
-		delete texture;
+		texture->Release();
 
 	if (textureView != nullptr)
-		delete textureView;
+		textureView->Release();
 
 	HRESULT result = CreateDDSTextureFromFile(device, filename, &texture, &textureView);
 	if (FAILED(result))
+	{
+		if (texture != nullptr)
+			texture->Release();
+		if (textureView != nullptr)
+			textureView->Release();
+
+		texture = nullptr;
+		textureView = nullptr;
+
 		return false;
+	}
 
 	return true;
 }

@@ -27,30 +27,24 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
 
+	//Save screen WIDTH x HEIGHT for internal usage
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
 
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
 	if(!m_D3D)
-	{
 		return false;
-	}
 
 	// Initialize the Direct3D object.
 	result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if(!result)
-	{
-		//MessageBox(hwnd, L"Could not initialize Direct3D.", L"Error", MB_OK);
 		return false;
-	}
 
 	// Create the camera object.
 	m_Camera = new CameraClass;
 	if(!m_Camera)
-	{
 		return false;
-	}
 
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
@@ -58,21 +52,21 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Create the model object.
 	m_Model = new ModelClass;
 	if(!m_Model)
-	{
 		return false;
-	}
 
-	// Initialize the model object.
+	//Initialize the model object.
 	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if(!result)
-	{
-		//MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
-	}
+
+	//Create mouse container
+	m_mouse = new MouseClassContainer;
 
 	if (!(m_pbrShader = new ShaderPBRClass))
 		return false;
 	
+#pragma region PBR Shader loading
+	//Create input format for vertex data
 	std::vector <LPCSTR> names;
 	names.push_back("position");
 	names.push_back("texcoord");
@@ -86,10 +80,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	BaseShaderClass::vertexInputType input(names, formats);
-	
+
 	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_base.vs", L"pbr_base.ps", input))
 		return false;
 
+	//Load textures for PBR shader
 	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
 		return false;
 	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
@@ -99,45 +94,21 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
 		return false;
 
-	//Direction + strength
+	//Direction + strength (w)
 	m_pbrShader->m_lightDirection = XMFLOAT4(-1.0f, 0.0, -1.0f, 1.5f);
+#pragma endregion
 
-
+#pragma region Creating UI
+	//Debug window background
 	m_debugBackground = new UIBackground;
-	if (!m_debugBackground->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -0.95f, -0.5f, 0.9f, -0.0f))
+	if (!m_debugBackground->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -0.95f, -0.5f, 0.9f, -0.8f))
 		return false;
 	m_debugBackground->ChangeColor(102.0f/255.0f, 163.0f/255.0f, 1.0f, 0.4f);
 
-	m_debugTick = new UITick;
-	if (!m_debugTick->Initialize(m_D3D, -0.9f, 0.85f, 0.03f))
-		return false;
-
+	//Create TextEngine which handles and render all text at once
 	m_textEngine = new TextEngine;
 	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
-	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, "Hello World", 0.5f, TextEngine::Align::CENTER);
-	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.75f, "TEST TEST", 0.5f, TextEngine::Align::CENTER, Colors::ForestGreen);
-
-	//// Create the color shader object.
-	//m_ColorShader = new ColorShaderClass;
-	//if(!m_ColorShader)
-	//{
-	//	return false;
-	//}
-
-	//// Initialize the color shader object.
-	//result = m_ColorShader->Initialize(m_D3D->GetDevice(), hwnd);
-	//if(!result)
-	//{
-	//	//MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
-	//	return false;
-	//}
-
-	//result = m_ColorShader->LoadTexture(m_D3D->GetDevice(), L"Wood.dds", m_ColorShader->m_texture, m_ColorShader->m_textureView);
-	//if (!result)
-	//	return false;
-	//m_ColorShader->SetLightDirection(-1.0f, 0.0f, -1.0f);
-
-	m_mouse = new MouseClassContainer;
+	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, "Debug Menu", 0.5f, TextEngine::Align::CENTER);
 
 	//Roughness slider
 	m_roughnessSlider = new UISlider;
@@ -161,12 +132,27 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_metalnessSlider->CreateTextArea(AddText(-0.79f, 0.475f, "0.00", 0.35f, TextEngine::Align::LEFT));
 	m_metalnessSlider->EventOnChangeValue = [=](float metalness) { m_pbrShader->SetMetalness(metalness); };
 
-	//Texture preview
-	m_texturePreview = new UITexturePreview;
-
+	//Texture preview - roughness
+	m_texturePreviewRoughness = new UITexturePreview;
+	m_texturePreviewRoughness->Initialize(m_D3D, -0.58f, 0.255f, 0.1f, m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView);
 	AddText(-0.94f, 0.325f, "Roughness:", 0.35f);
 
-	m_texturePreview->Initialize(m_D3D, -0.58f, 0.255f, 0.1f);
+	//Texture preview - metalness
+	m_texturePreviewMetalness = new UITexturePreview;
+	m_texturePreviewMetalness->Initialize(m_D3D, -0.58f, 0.000f, 0.1f, m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView);
+	AddText(-0.94f, 0.1f, "Metalness:", 0.35f);
+
+	//Texture preview - normal map
+	m_texturePreviewNormal = new UITexturePreview;
+	m_texturePreviewNormal->Initialize(m_D3D, -0.58f, -0.255f, 0.1f, m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView);
+	AddText(-0.94f, -0.125f, "Normal:", 0.35f);
+
+	//Texture preview - albedo
+	m_texturePreviewAlbedo = new UITexturePreview;
+	m_texturePreviewAlbedo->Initialize(m_D3D, -0.58f, -0.510f, 0.1f, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
+	AddText(-0.94f, -0.350f, "Albedo:", 0.35f);
+
+#pragma endregion
 
 	return true;
 }
@@ -281,12 +267,7 @@ void GraphicsClass::UpdateUI()
 		if (m_mouse->GetMouse()->isInputConsumed == true)
 			return;
 
-		if (m_debugTick->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_debugTick->ChangeTick();
-		}
-		else if (m_roughnessSlider->MouseOnArea(m_mouse->GetMouse()))
+		if (m_roughnessSlider->MouseOnArea(m_mouse->GetMouse()))
 		{
 			m_mouse->GetMouse()->isInputConsumed = true;
 			m_roughnessSlider->StartUsing();
@@ -297,6 +278,52 @@ void GraphicsClass::UpdateUI()
 			m_mouse->GetMouse()->isInputConsumed = true;
 			m_metalnessSlider->StartUsing();
 			m_metalnessSlider->ChangeSliderValue(m_mouse->GetMouse());
+		}
+		else if (m_texturePreviewRoughness->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewRoughness->TextureChooseWindow(*m_D3D->GetHWND());
+		}
+		else if (m_texturePreviewMetalness->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewMetalness->TextureChooseWindow(*m_D3D->GetHWND());
+		}
+		else if (m_texturePreviewNormal->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewNormal->TextureChooseWindow(*m_D3D->GetHWND());
+		}
+		else if (m_texturePreviewAlbedo->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewAlbedo->TextureChooseWindow(*m_D3D->GetHWND());
+		}
+	}
+	else if (m_mouse->GetMouse()->GetRMBPressed())
+	{
+		if (m_mouse->GetMouse()->isInputConsumed == true)
+			return;
+
+		if (m_texturePreviewRoughness->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewRoughness->DeleteTexture();
+		}
+		else if (m_texturePreviewMetalness->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewMetalness->DeleteTexture();
+		}
+		else if (m_texturePreviewNormal->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewNormal->DeleteTexture();
+		}
+		else if (m_texturePreviewAlbedo->MouseOnArea(m_mouse->GetMouse()))
+		{
+			m_mouse->GetMouse()->isInputConsumed = true;
+			m_texturePreviewAlbedo->DeleteTexture();
 		}
 	}
 	else
@@ -361,10 +388,6 @@ bool GraphicsClass::Render()
 	if(!result)
 		return false;
 
-	result = m_debugTick->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-
 	result = m_roughnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
@@ -375,7 +398,13 @@ bool GraphicsClass::Render()
 
 	m_D3D->DisableAlphaBlending();
 	
-	m_texturePreview->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	m_texturePreviewRoughness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+
+	m_texturePreviewMetalness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	
+	m_texturePreviewNormal->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+
+	m_texturePreviewAlbedo->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 
 	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
 

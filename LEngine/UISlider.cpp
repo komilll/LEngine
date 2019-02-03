@@ -51,12 +51,6 @@ void UISlider::CreateTextArea(TextEngine::FontData *text)
 {
 	m_textEngine = text->textEngineRef;
 	m_textIndex = text->GetIndex();
-	//m_valueText->color = text.color;
-	//m_valueText->origin = text.origin;
-	//m_valueText->posX = text.posX;
-	//m_valueText->posY = text.posY;
-	//m_valueText->scale = text.scale;
-	//m_valueText->SetText(text.text);
 }
 
 void UISlider::ChangeSliderValue(MouseClass * mouse)

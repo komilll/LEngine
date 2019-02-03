@@ -19,9 +19,7 @@ public:
 	bool IsChanging();
 	void StartUsing();
 	void EndUsing();
-	//void SetEventOnChangeValue(std::function<void(float)> function);
 	std::function<void(float)> EventOnChangeValue;
-	//std::vector<std::function<void(float)>> EventsOnChangeValue;
 
 private:
 	float clamp(float n, float lower, float upper);

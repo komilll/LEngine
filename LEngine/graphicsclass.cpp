@@ -154,6 +154,16 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 #pragma endregion
 
+	if (!(m_skyboxShader = new SkyboxShaderClass))
+		return false;
+	if (!m_skyboxShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"skybox.vs", L"skybox.ps", input))
+		return false;
+
+	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"skybox.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
+
+	m_skybox = new Skybox;
+	m_skybox->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND());
+
 	return true;
 }
 
@@ -371,7 +381,7 @@ bool GraphicsClass::Render()
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
-
+/*
 	//worldMatrix = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
 	// Render the model using the color shader.
@@ -407,12 +417,22 @@ bool GraphicsClass::Render()
 	m_texturePreviewAlbedo->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 
 	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
+*/
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
+
+	m_D3D->ChangeRasterizerCulling(D3D11_CULL_FRONT);
+	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+
+	m_Model->Render(m_D3D->GetDeviceContext());
+	m_skybox->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 	//ALWAYS RENDER MOUSE AT THE VERY END
-	result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
+	//result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
 
+	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 

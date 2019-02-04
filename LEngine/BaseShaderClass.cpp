@@ -315,6 +315,7 @@ bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename
 	if (textureView != nullptr)
 		textureView->Release();
 
+	
 	HRESULT result = CreateDDSTextureFromFile(device, filename, &texture, &textureView);
 	if (FAILED(result))
 	{

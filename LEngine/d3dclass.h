@@ -49,6 +49,10 @@ public:
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 
+	void ChangeRasterizerCulling(D3D11_CULL_MODE cullMode);
+
+	void ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFunc);
+
 private:
 	bool m_vsync_enabled;
 	int m_videoCardMemory;
@@ -58,11 +62,15 @@ private:
 	ID3D11DeviceContext* m_deviceContext;
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11Texture2D* m_depthStencilBuffer;
-	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
-	ID3D11RasterizerState* m_rasterState;
 	ID3D11BlendState* m_enableAlphaBlending;
 	ID3D11BlendState* m_disableAlphaBlending;
+
+	ID3D11RasterizerState* m_rasterState;
+	ID3D11RasterizerState* m_rasterStateSkybox;
+
+	ID3D11DepthStencilState* m_depthStencilState;
+	ID3D11DepthStencilState* m_depthStencilStateSkybox;
 
 	XMMATRIX m_projectionMatrix;
 	XMMATRIX m_worldMatrix;

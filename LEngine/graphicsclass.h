@@ -22,6 +22,8 @@
 #include "UISlider.h"
 #include "ShaderPBRClass.h"
 #include "UITexturePreview.h"
+#include "SkyboxShaderClass.h"
+#include "skybox.h"
 
 /////////////
 // GLOBALS //
@@ -70,6 +72,8 @@ private:
 	ColorShaderClass* m_ColorShader;
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRClass* m_pbrShader;
+	SkyboxShaderClass* m_skyboxShader;
+	Skybox* m_skybox;
 	TextEngine* m_textEngine;
 	UITexturePreview* m_texturePreviewRoughness;
 	UITexturePreview* m_texturePreviewMetalness;

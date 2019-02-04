@@ -45,6 +45,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	D3D11_RASTERIZER_DESC rasterDesc;
+	D3D11_RASTERIZER_DESC skyboxRasterDesc;
 	D3D11_BLEND_DESC blendStateDesc;
 	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
@@ -281,6 +282,13 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilStateSkybox);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Set the depth stencil state.
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
@@ -317,6 +325,24 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	// Create the rasterizer state from the description we just filled out.
 	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
 	if(FAILED(result))
+	{
+		return false;
+	}
+
+	skyboxRasterDesc.AntialiasedLineEnable = false;
+	skyboxRasterDesc.CullMode = D3D11_CULL_FRONT;
+	skyboxRasterDesc.DepthBias = 0;
+	skyboxRasterDesc.DepthBiasClamp = 0.0f;
+	skyboxRasterDesc.DepthClipEnable = true;
+	skyboxRasterDesc.FillMode = D3D11_FILL_SOLID;
+	skyboxRasterDesc.FrontCounterClockwise = false;
+	skyboxRasterDesc.MultisampleEnable = false;
+	skyboxRasterDesc.ScissorEnable = false;
+	skyboxRasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	// Create the rasterizer state from the description we just filled out.
+	result = m_device->CreateRasterizerState(&skyboxRasterDesc, &m_rasterStateSkybox);
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -554,4 +580,27 @@ void D3DClass::DisableAlphaBlending()
 
 	// Turn on the alpha blending.
 	m_deviceContext->OMSetBlendState(m_disableAlphaBlending, blendFactor, 0xffffffff);
+}
+
+void D3DClass::ChangeRasterizerCulling(D3D11_CULL_MODE cullMode)
+{
+	D3D11_RASTERIZER_DESC pDesc;
+	m_rasterState->GetDesc(&pDesc);
+	m_deviceContext->RSSetState(m_rasterState);
+
+	pDesc.CullMode = cullMode;
+	m_rasterState->Release();
+	m_device->CreateRasterizerState(&pDesc, &m_rasterStateSkybox);
+}
+
+void D3DClass::ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFunc)
+{
+	if (comparisionFunc == D3D11_COMPARISON_LESS)
+	{
+		m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
+	}
+	else if (comparisionFunc = D3D11_COMPARISON_LESS_EQUAL)
+	{
+		m_deviceContext->OMSetDepthStencilState(m_depthStencilStateSkybox, 1);
+	}
 }

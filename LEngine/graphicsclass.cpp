@@ -47,7 +47,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, 0.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -160,9 +160,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"skybox.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
-
-	m_skybox = new Skybox;
-	m_skybox->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND());
 
 	return true;
 }
@@ -380,7 +377,7 @@ bool GraphicsClass::Render()
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_D3D->GetDeviceContext());
+	//m_Model->Render(m_D3D->GetDeviceContext());
 /*
 	//worldMatrix = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
@@ -418,13 +415,15 @@ bool GraphicsClass::Render()
 
 	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
 */
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	XMMATRIX scaleMatrix = XMMatrixScaling(1.7f, 1.7f, 1.7f);
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, scaleMatrix);
 
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_FRONT);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
 	m_Model->Render(m_D3D->GetDeviceContext());
-	m_skybox->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 	//ALWAYS RENDER MOUSE AT THE VERY END
 	//result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);

@@ -47,7 +47,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, 0.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -3.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -95,7 +95,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Direction + strength (w)
-	m_pbrShader->m_lightDirection = XMFLOAT4(-1.0f, 0.0, -1.0f, 1.5f);
+	m_pbrShader->m_lightDirection = XMFLOAT4(-1.0f, 0.0, -1.0f, 1.2f);
 #pragma endregion
 
 #pragma region Creating UI
@@ -208,7 +208,7 @@ bool GraphicsClass::Frame()
 
 
 	// Render the graphics scene.
-	m_rotationY += 0.01f;
+	//m_rotationY += 0.01f;
 	if (m_rotationY >= 360.0f)
 		m_rotationY = 0.0f;
 	result = Render();
@@ -370,31 +370,39 @@ bool GraphicsClass::Render()
 
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
-
+	/*
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	//m_Model->Render(m_D3D->GetDeviceContext());
-/*
-	//worldMatrix = DirectX::XMMatrixScaling(0.2f, 0.2f, 0.2f);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_rotationY / 3.14f));
-	// Render the model using the color shader.
+	//RENDER MAIN SCENE MODEL
+	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+
+	m_Model->Render(m_D3D->GetDeviceContext());
 	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
-	//m_ColorShader->SetCameraPosition(m_Camera->GetPosition());
+	//XMVECTOR light_ = XMVector3Rotate(XMVECTOR{ -1.0f, 0.0, -1.0f, 0.0f }, XMVECTOR{ m_Camera->GetRotation().x / 3.14f, m_Camera->GetRotation().y / 3.14f, m_Camera->GetRotation().z / 3.14f, 0.0f });
+	//m_pbrShader->m_lightDirection = XMFLOAT4(light_.m128_f32[0], 0.0, light_.m128_f32[2], 1.2f);
+
+	m_D3D->GetWorldMatrix(worldMatrix);
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
 	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
+	m_D3D->GetWorldMatrix(worldMatrix);
+	//DRAW UI TRANSLUCENT OPTIONS
 	m_D3D->EnableAlphaBlending();
 
 	result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if(!result)
 		return false;
+	m_D3D->DisableAlphaBlending();
 
+	//DRAW UI OPAQUE OPTIONS
 	result = m_roughnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
@@ -402,22 +410,26 @@ bool GraphicsClass::Render()
 	result = m_metalnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
-
-	m_D3D->DisableAlphaBlending();
 	
+	//DRAW UI INPUT
 	m_texturePreviewRoughness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-
 	m_texturePreviewMetalness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	
 	m_texturePreviewNormal->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-
 	m_texturePreviewAlbedo->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 
 	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
-*/
+
+	//ALWAYS RENDER MOUSE AT THE VERY END
+	result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
+	*/
+	//DRAW SKYBOX
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	XMMATRIX scaleMatrix = XMMatrixScaling(1.7f, 1.7f, 1.7f);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, scaleMatrix);
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_FRONT);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
@@ -425,13 +437,7 @@ bool GraphicsClass::Render()
 	m_Model->Render(m_D3D->GetDeviceContext());
 	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
-	//ALWAYS RENDER MOUSE AT THE VERY END
-	//result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
 
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 

@@ -297,7 +297,7 @@ void SystemClass::HandleInput()
 	XMVECTOR cameraMovement{ 0, 0, 0 };
 	XMVECTOR cameraRotation{0, 0, 0};
 	float movementPerTick = 0.5f;
-	float rotatePerTick = 1.0f;
+	float rotatePerTick = 0.1f;
 
 	if (m_Input->IsKeyDown(VK_W))
 		m_Graphics->MoveCameraForward();

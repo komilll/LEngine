@@ -137,6 +137,7 @@
     <ClInclude Include="modelClass.h" />
     <ClInclude Include="MouseClass.h" />
     <ClInclude Include="MouseClassContainer.h" />
+    <ClInclude Include="RenderTextureClass.h" />
     <ClInclude Include="ShaderPBRClass.h" />
     <ClInclude Include="ShaderSpecularClass.h" />
     <ClInclude Include="skybox.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="modelClass.cpp" />
     <ClCompile Include="MouseClass.cpp" />
     <ClCompile Include="MouseClassContainer.cpp" />
+    <ClCompile Include="RenderTextureClass.cpp" />
     <ClCompile Include="ShaderPBRClass.cpp" />
     <ClCompile Include="ShaderSpecularClass.cpp" />
     <ClCompile Include="skybox.cpp" />

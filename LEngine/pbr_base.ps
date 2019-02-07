@@ -127,7 +127,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 	float4 finalColor = float4(tempColor, 1.0);
 
-	return finalColor * g_lightStrength * lightIntensity;
+	return finalColor * g_lightStrength;//* lightIntensity;
 }
 
 float GeometrySchlickGGX(float NdotV, float k)

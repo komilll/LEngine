@@ -37,8 +37,12 @@ PixelInputType ColorVertexShader(VertexInputType input)
 	output.position = input.position;
 	input.position.w = 1.0f;
 
-    output.positionSV = mul(input.position, worldMatrix).xyww;
-    output.positionSV = mul(output.positionSV, viewMatrix).xyww;
+	// Transform to world space.
+	float4 positionWorld = mul(input.position, worldMatrix);
+	positionWorld.w -= 0.6f;
+
+    //output.positionSV = mul(input.position, worldMatrix).xyww;
+    output.positionSV = mul(positionWorld, viewMatrix).xyww;
     output.positionSV = mul(output.positionSV, projectionMatrix).xyww;
 
     return output;

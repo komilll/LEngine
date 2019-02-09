@@ -106,6 +106,5 @@ protected:
 
 private:
 	ID3D11Buffer* m_matrixBuffer;
-
 };
 #endif

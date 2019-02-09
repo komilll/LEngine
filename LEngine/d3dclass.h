@@ -53,6 +53,14 @@ public:
 
 	void ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFunc);
 
+	ID3D11DepthStencilView* GetDepthStencilView();
+	void SetBackBufferRenderTarget();
+
+	void TurnZBufferOn();
+	void TurnZBufferOff();
+
+	void ResetViewport();
+
 private:
 	bool m_vsync_enabled;
 	int m_videoCardMemory;
@@ -72,9 +80,13 @@ private:
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilState* m_depthStencilStateSkybox;
 
+	ID3D11DepthStencilState* m_depthStencilStateZBufferOff;
+
 	XMMATRIX m_projectionMatrix;
 	XMMATRIX m_worldMatrix;
 	XMMATRIX m_orthoMatrix;
+
+	D3D11_VIEWPORT m_viewport;
 
 	HWND* m_hwnd;
 };

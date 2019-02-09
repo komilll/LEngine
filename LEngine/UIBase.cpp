@@ -5,10 +5,10 @@ UIBase::UIBase()
 	BaseShaderClass::BaseShaderClass();
 }
 
-bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom)
+bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool withTex)
 {
 	m_model = new ModelClass;
-	if (!m_model->Initialize(device, shape, left, right, top, bottom))
+	if (!m_model->Initialize(device, shape, left, right, top, bottom, withTex))
 		return false;
 
 	return true;

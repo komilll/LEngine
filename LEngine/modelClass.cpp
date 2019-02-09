@@ -29,14 +29,14 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 	return true;
 }
 
-bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom)
+bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex)
 {
 	m_position = XMFLOAT4(0, 0, 0, 0);
 
 	switch (shape)
 	{
 		case ModelClass::ShapeSize::RECTANGLE:
-			return CreateRectangle(device, left, right, top, bottom);
+			return CreateRectangle(device, left, right, top, bottom, withTex);
 		case ModelClass::ShapeSize::TRIANGLE:
 			return CreateTriangle(device, left, right, top, bottom);
 		default:
@@ -502,7 +502,7 @@ bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &
 }
 
 /////// SHAPES DRAWING ///////
-bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom)
+bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom, bool withTex)
 {
 	VertexType* vertices;
 	unsigned long* indices;
@@ -518,6 +518,18 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 	vertices[3].position = XMFLOAT3(left, top, 0.0f);  // Top left.
 	vertices[4].position = XMFLOAT3(right, top, 0.0f);  // Top right.
 	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
+
+	if (withTex) //Create tex values for vertices
+	{
+		//First triangle	
+		vertices[0].tex = XMFLOAT2(0.0, 0.0);  // Top left.	
+		vertices[1].tex = XMFLOAT2(1.0, 1.0);  // Bottom right.
+		vertices[2].tex = XMFLOAT2(0.0, 1.0);  // Bottom left.
+		//Second triangle
+		vertices[3].tex = XMFLOAT2(0.0, 0.0);  // Top left.
+		vertices[4].tex = XMFLOAT2(1.0, 0.0);  // Top right.
+		vertices[5].tex = XMFLOAT2(1.0, 1.0);  // Bottom right.
+	}
 
 	indices = new unsigned long[verticesCount];
 	for (int i = 0; i < verticesCount; i++)

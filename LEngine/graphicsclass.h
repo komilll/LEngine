@@ -23,6 +23,9 @@
 #include "ShaderPBRClass.h"
 #include "UITexturePreview.h"
 #include "SkyboxShaderClass.h"
+#include "RenderTextureClass.h"
+#include "UITexture.h"
+#include "BlurShaderClass.h"
 
 /////////////
 // GLOBALS //
@@ -63,6 +66,12 @@ public:
 
 private:
 	bool Render();
+	bool RenderSceneToTexture();
+	bool RenderScene();
+
+	bool DownsampleTexture();
+	bool UpscaleTexture();
+	bool BlurFilter(bool vertical); //Vertical = true; Horizontal = false
 
 private:
 	D3DClass* m_D3D;
@@ -82,6 +91,15 @@ private:
 	MouseClassContainer* m_mouse;
 	UISlider* m_roughnessSlider;
 	UISlider* m_metalnessSlider;
+
+	RenderTextureClass* m_renderTexture;
+	RenderTextureClass* m_renderTextureDownsampled;
+	RenderTextureClass* m_renderTextureUpscaled;
+	RenderTextureClass* m_renderTextureHorizontalBlur;
+	RenderTextureClass* m_renderTextureVerticalBlur;
+	UITexture* m_renderTexturePreview;
+	BlurShaderClass* m_blurShaderVertical;
+	BlurShaderClass* m_blurShaderHorizontal;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

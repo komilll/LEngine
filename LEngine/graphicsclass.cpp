@@ -161,6 +161,54 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"skybox.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
 
+#pragma region Blur textures
+	//RENDER SCENE TO TEXTURE
+	if (!(m_renderTexture = new RenderTextureClass))
+		return false;
+	if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
+		return false;
+
+	if (!(m_renderTexturePreview = new UITexture))
+		return false;
+	if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -2.0f, 0.f, 1.0f, -1.0f)))
+		return false;
+
+	m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
+
+	//Texture downsampled
+	if (!(m_renderTextureDownsampled = new RenderTextureClass))
+		return false;
+	if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
+		return false;
+
+	//Texture upscaled
+	if (!(m_renderTextureUpscaled = new RenderTextureClass))
+		return false;
+	if (!(m_renderTextureUpscaled->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
+		return false;
+
+	//Texture horizontal blur
+	if (!(m_renderTextureHorizontalBlur = new RenderTextureClass))
+		return false;
+	if (!(m_renderTextureHorizontalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
+		return false;
+
+	//Texture vertical blur
+	if (!(m_renderTextureVerticalBlur = new RenderTextureClass))
+		return false;
+	if (!(m_renderTextureVerticalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
+		return false;
+
+	//Blur shader - vertical and horizontal
+	m_blurShaderHorizontal = new BlurShaderClass;
+	if (!m_blurShaderHorizontal->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurHorizontal.vs", L"blurHorizontal.ps", input))
+		return false;
+
+	m_blurShaderVertical = new BlurShaderClass;
+	if (!m_blurShaderVertical->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurVertical.vs", L"blurVertical.ps", input))
+		return false;
+
+#pragma endregion
 	return true;
 }
 
@@ -368,14 +416,114 @@ bool GraphicsClass::Render()
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
+	if (!RenderSceneToTexture())
+		return false;
+
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
-	/*
-	// Get the world, view, and projection matrices from the camera and d3d objects.
+	
+	//result = RenderScene();
+	//if (!result)
+	//	return false;
+
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
+	DownsampleTexture();
+	BlurFilter(false);
+	BlurFilter(true);
+	UpscaleTexture();
+
+	result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
+	//m_D3D->TurnZBufferOn();
+	
+	// Get the world, view, and projection matrices from the camera and d3d objects.
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	////DRAW UI TRANSLUCENT OPTIONS
+	//m_D3D->EnableAlphaBlending();
+
+	//result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//if (!result)
+	//return false;
+	//m_D3D->DisableAlphaBlending();
+
+	////DRAW UI OPAQUE OPTIONS
+	//result = m_roughnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
+
+	//result = m_metalnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
+	//
+	////DRAW UI INPUT
+	//m_texturePreviewRoughness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//m_texturePreviewMetalness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//m_texturePreviewNormal->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//m_texturePreviewAlbedo->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+
+	//m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
+
+	////DRAW SKYBOX
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+
+	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	//m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+
+	//m_Model->Render(m_D3D->GetDeviceContext());
+	//m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+
+	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	//m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
+
+	////ALWAYS RENDER MOUSE AT THE VERY END
+	//m_D3D->TurnZBufferOff();
+
+	//result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
+	//m_D3D->TurnZBufferOn();
+
+	// Present the rendered scene to the screen.
+	m_D3D->EndScene();
+
+	return true;
+}
+
+bool GraphicsClass::RenderSceneToTexture()
+{
+	m_renderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_renderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
+
+	if (RenderScene() == false)
+		return false;
+
+	m_D3D->SetBackBufferRenderTarget();
+
+	return true;
+}
+
+bool GraphicsClass::RenderScene()
+{
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	bool result;
+
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
 	//RENDER MAIN SCENE MODEL
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
@@ -393,53 +541,126 @@ bool GraphicsClass::Render()
 	if (!result)
 		return false;
 
-	m_D3D->GetWorldMatrix(worldMatrix);
-	//DRAW UI TRANSLUCENT OPTIONS
-	m_D3D->EnableAlphaBlending();
+	return true;
+}
 
-	result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if(!result)
-		return false;
-	m_D3D->DisableAlphaBlending();
+bool GraphicsClass::DownsampleTexture()
+{
+	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
+	bool result;
 
-	//DRAW UI OPAQUE OPTIONS
-	result = m_roughnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
+	m_renderTextureDownsampled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_renderTextureDownsampled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	result = m_metalnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-	
-	//DRAW UI INPUT
-	m_texturePreviewRoughness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	m_texturePreviewMetalness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	m_texturePreviewNormal->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	m_texturePreviewAlbedo->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	m_Camera->Render();
 
-	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
-
-	//ALWAYS RENDER MOUSE AT THE VERY END
-	result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-	*/
-	//DRAW SKYBOX
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	m_renderTextureDownsampled->GetOrthoMatrix(orthoMatrix);
 
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_FRONT);
-	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+	m_D3D->TurnZBufferOff();
 
-	m_Model->Render(m_D3D->GetDeviceContext());
-	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
+	if (!result)
+		return false;
 
+	m_D3D->TurnZBufferOn();
 
-	// Present the rendered scene to the screen.
-	m_D3D->EndScene();
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
+
+	m_renderTexturePreview->BindTexture(m_renderTextureDownsampled->GetShaderResourceView());
+	return true;
+}
+
+bool GraphicsClass::UpscaleTexture()
+{
+	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
+	bool result;
+
+	m_renderTextureUpscaled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_renderTextureUpscaled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_Camera->Render();
+
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_renderTextureUpscaled->GetOrthoMatrix(orthoMatrix);
+
+	m_D3D->TurnZBufferOff();
+
+	result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
+	if (!result)
+		return false;
+
+	m_D3D->TurnZBufferOn();
+
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
+
+	m_renderTexturePreview->BindTexture(m_renderTextureUpscaled->GetShaderResourceView());
+	return true;
+}
+
+bool GraphicsClass::BlurFilter(bool vertical)
+{
+	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
+	bool result;
+
+	if (vertical == false) //HORIZONTAL - 1st
+	{
+		m_renderTextureHorizontalBlur->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_renderTextureHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		m_Camera->Render();
+
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_renderTextureHorizontalBlur->GetOrthoMatrix(orthoMatrix);
+
+		m_D3D->TurnZBufferOff();
+
+		m_blurShaderHorizontal->SetTextureSize(m_screenWidth / 2);
+		m_blurShaderHorizontal->SetTextureResourceView(m_renderTextureDownsampled->GetShaderResourceView());
+		m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
+		result = m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
+		if (!result)
+			return false;
+
+		m_D3D->TurnZBufferOn();
+
+		m_D3D->SetBackBufferRenderTarget();
+		m_D3D->ResetViewport();
+
+		m_renderTexturePreview->BindTexture(m_renderTextureHorizontalBlur->GetShaderResourceView());
+	}
+	else //VERTICAL - 2nd
+	{
+		m_renderTextureVerticalBlur->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_renderTextureVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		m_Camera->Render();
+
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_renderTextureVerticalBlur->GetOrthoMatrix(orthoMatrix);
+
+		m_D3D->TurnZBufferOff();
+
+		m_blurShaderVertical->SetTextureSize(m_screenHeight / 2);
+		m_blurShaderVertical->SetTextureResourceView(m_renderTexturePreview->GetShaderResourceView());
+		m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
+		result = m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
+		if (!result)
+			return false;
+
+		m_D3D->TurnZBufferOn();
+
+		m_D3D->SetBackBufferRenderTarget();
+		m_D3D->ResetViewport();
+
+		m_renderTexturePreview->BindTexture(m_renderTextureVerticalBlur->GetShaderResourceView());
+	}
 
 	return true;
 }

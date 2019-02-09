@@ -2,6 +2,9 @@
 
 RenderTextureClass::RenderTextureClass()
 {
+	m_texture2D = 0;
+	m_renderTargetView = 0;
+	m_shaderResourceView = 0;
 }
 
 bool RenderTextureClass::Initialize(ID3D11Device * device, int width, int height)
@@ -45,7 +48,16 @@ bool RenderTextureClass::Initialize(ID3D11Device * device, int width, int height
 	if (FAILED(result))
 		return false;
 
-	return false;
+	m_orthoMatrix = XMMatrixOrthographicLH((float)width, (float)height, 0.0f, 1.0f);
+
+	m_viewport.Width = (float)width;
+	m_viewport.Height = (float)height;
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+	m_viewport.TopLeftX = 0.0f;
+	m_viewport.TopLeftY = 0.0f;
+
+	return true;
 }
 
 void RenderTextureClass::Shutdown()
@@ -55,6 +67,8 @@ void RenderTextureClass::Shutdown()
 void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView)
 {
 	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, depthStencilView);
+
+	deviceContext->RSSetViewports(1, &m_viewport);
 }
 
 void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView, float red, float green, float blue, float alpha)
@@ -65,7 +79,17 @@ void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext * deviceContext, 
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
-ID3D11ShaderResourceView * RenderTextureClass::GetShaderResourceView()
+ID3D11ShaderResourceView *& RenderTextureClass::GetShaderResourceView()
 {
 	return m_shaderResourceView;
+}
+
+ID3D11Resource *& RenderTextureClass::GetShaderResource()
+{
+	return (ID3D11Resource*&)m_texture2D;
+}
+
+void RenderTextureClass::GetOrthoMatrix(XMMATRIX & orthoMatrix)
+{
+	orthoMatrix = m_orthoMatrix;
 }

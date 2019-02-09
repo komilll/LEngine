@@ -289,6 +289,14 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthStencilDesc.DepthEnable = false;
+	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilStateZBufferOff);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Set the depth stencil state.
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
@@ -351,15 +359,15 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_deviceContext->RSSetState(m_rasterState);
 	
 	// Setup the viewport for rendering.
-    viewport.Width = (float)screenWidth;
-    viewport.Height = (float)screenHeight;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    viewport.TopLeftX = 0.0f;
-    viewport.TopLeftY = 0.0f;
+	m_viewport.Width = (float)screenWidth;
+	m_viewport.Height = (float)screenHeight;
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+	m_viewport.TopLeftX = 0.0f;
+	m_viewport.TopLeftY = 0.0f;
 
 	// Create the viewport.
-    m_deviceContext->RSSetViewports(1, &viewport);
+    m_deviceContext->RSSetViewports(1, &m_viewport);
 
 	// Setup the projection matrix.
 	fieldOfView = (float)3.14f / 4.0f;
@@ -584,13 +592,14 @@ void D3DClass::DisableAlphaBlending()
 
 void D3DClass::ChangeRasterizerCulling(D3D11_CULL_MODE cullMode)
 {
-	D3D11_RASTERIZER_DESC pDesc;
-	m_rasterState->GetDesc(&pDesc);
-	m_deviceContext->RSSetState(m_rasterState);
-
-	pDesc.CullMode = cullMode;
-	m_rasterState->Release();
-	m_device->CreateRasterizerState(&pDesc, &m_rasterStateSkybox);
+	if (cullMode == D3D11_CULL_BACK)
+	{
+		m_deviceContext->RSSetState(m_rasterState);
+	}
+	else if (cullMode = D3D11_CULL_FRONT)
+	{
+		m_deviceContext->RSSetState(m_rasterStateSkybox);
+	}
 }
 
 void D3DClass::ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFunc)
@@ -603,4 +612,29 @@ void D3DClass::ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFun
 	{
 		m_deviceContext->OMSetDepthStencilState(m_depthStencilStateSkybox, 1);
 	}
+}
+
+ID3D11DepthStencilView * D3DClass::GetDepthStencilView()
+{
+	return m_depthStencilView;
+}
+
+void D3DClass::SetBackBufferRenderTarget()
+{
+	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView());
+}
+
+void D3DClass::TurnZBufferOn()
+{
+	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
+}
+
+void D3DClass::TurnZBufferOff()
+{
+	m_deviceContext->OMSetDepthStencilState(m_depthStencilStateZBufferOff, 1);
+}
+
+void D3DClass::ResetViewport()
+{
+	m_deviceContext->RSSetViewports(1, &m_viewport);
 }

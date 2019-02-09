@@ -115,6 +115,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="blurHorizontal.ps" />
+    <None Include="blurHorizontal.vs" />
+    <None Include="blurVertical.ps" />
+    <None Include="blurVertical.vs" />
     <None Include="color.ps" />
     <None Include="color.vs" />
     <None Include="packages.config" />
@@ -129,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseShaderClass.h" />
+    <ClInclude Include="BlurShaderClass.h" />
     <ClInclude Include="cameraclass.h" />
     <ClInclude Include="colorshaderclass.h" />
     <ClInclude Include="d3dclass.h" />
@@ -148,11 +153,13 @@
     <ClInclude Include="UIBase.h" />
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="UISlider.h" />
+    <ClInclude Include="UITexture.h" />
     <ClInclude Include="UITexturePreview.h" />
     <ClInclude Include="UITick.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseShaderClass.cpp" />
+    <ClCompile Include="BlurShaderClass.cpp" />
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="d3dclass.cpp" />
@@ -173,6 +180,7 @@
     <ClCompile Include="UIBase.cpp" />
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="UISlider.cpp" />
+    <ClCompile Include="UITexture.cpp" />
     <ClCompile Include="UITexturePreview.cpp" />
     <ClCompile Include="UITick.cpp" />
   </ItemGroup>

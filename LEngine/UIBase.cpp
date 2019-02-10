@@ -59,6 +59,7 @@ bool UIBase::Render(ID3D11DeviceContext * deviceContext, int indexCount, XMMATRI
 	if (!SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
+	indexCount = m_model->GetIndexCount();
 	RenderShader(deviceContext, indexCount);
 
 	return true;

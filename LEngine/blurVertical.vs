@@ -11,7 +11,7 @@ cbuffer MatrixBuffer
 cbuffer ScreenSizeBuffer
 {
     float screenSize;
-    float3 padding;
+    float3 paddingSizeBuffer;
 };
 
 //////////////
@@ -51,7 +51,7 @@ PixelInputType ColorVertexShader(VertexInputType input)
     input.position.w = 1.0f;
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = input.position + float4(1.0, 0.0, 0.0, 0.0);
+    output.position = input.position;// + float4(1.0, 0.0, 0.0, 0.0);
 
 	// Store the input color for the pixel shader to use.
     output.tex = input.tex;

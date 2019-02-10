@@ -58,6 +58,12 @@
     <None Include="blurHorizontal.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="textureShader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="textureShader.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="colorshaderclass.h">

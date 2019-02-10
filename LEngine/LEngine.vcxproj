@@ -126,6 +126,8 @@
     <None Include="pbr_base.vs" />
     <None Include="skybox.ps" />
     <None Include="skybox.vs" />
+    <None Include="textureShader.ps" />
+    <None Include="textureShader.vs" />
     <None Include="uibase.ps" />
     <None Include="uibase.vs" />
     <None Include="uiTexturePreview.ps" />

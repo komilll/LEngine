@@ -4,6 +4,7 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <DDSTextureLoader.h>
 using namespace DirectX;
 
 class RenderTextureClass
@@ -11,11 +12,12 @@ class RenderTextureClass
 public:
 	RenderTextureClass();
 
-	bool Initialize(ID3D11Device* device, int width, int height);
+	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight);
 	void Shutdown();
 
 	void SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView);
 	void ClearRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, float red, float green, float blue, float alpha);
+	bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView);
 	ID3D11ShaderResourceView*& GetShaderResourceView();
 	ID3D11Resource*& GetShaderResource();
 	void GetOrthoMatrix(XMMATRIX &orthoMatrix);

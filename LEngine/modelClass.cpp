@@ -650,6 +650,8 @@ bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float center
 	for (int i = 0; i < verticesCount; i++)
 		indices[i] = i;
 
+	m_indexCount = verticesCount;
+
 	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
 		return false;
 

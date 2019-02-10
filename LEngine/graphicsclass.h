@@ -34,7 +34,9 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
-
+const bool BLUR_BILINEAR = false;
+const bool ENABLE_DEBUG = false;
+const bool DRAW_SKYBOX = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
@@ -66,9 +68,12 @@ public:
 
 private:
 	bool Render();
-	bool RenderSceneToTexture();
 	bool RenderScene();
 
+	bool RenderDebugSettings();
+	bool RenderSkybox();
+	//BILINEAR SCREEN BLUR
+	bool RenderSceneToTexture();
 	bool DownsampleTexture();
 	bool UpscaleTexture();
 	bool BlurFilter(bool vertical); //Vertical = true; Horizontal = false

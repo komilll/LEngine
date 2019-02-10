@@ -129,12 +129,12 @@ void UITexturePreview::LoadNewTextureFromFile(wchar_t* textureFilename, bool onl
 
 void UITexturePreview::ReleaseExternalTextures()
 {
-	if (m_externalTexture != nullptr)
+	if (m_externalTexture != nullptr && *m_externalTexture != NULL)
 	{
 		(*m_externalTexture)->Release();
 		*m_externalTexture = nullptr;
 	}
-	if (m_externalTextureView != nullptr)
+	if (m_externalTextureView != nullptr && *m_externalTextureView != NULL)
 	{
 		(*m_externalTextureView)->Release();
 		*m_externalTextureView = nullptr;

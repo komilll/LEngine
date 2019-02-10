@@ -10,12 +10,13 @@ public:
 	///<summary> Initialize shape: Square </summary>
 	bool Initialize(D3DClass* d3d, float centerX, float centerY, float size, wchar_t* textureFilename = L"");
 	///<summary> Initialize shape: Rectangle/Triangle </summary>
-	bool Initialize(D3DClass* d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom);
+	bool Initialize(D3DClass* d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool squareToHeight = false);
 	void BindTexture(ID3D11ShaderResourceView *& textureView);
 
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
 	ModelClass* GetModel();
 	ID3D11ShaderResourceView*& GetShaderResourceView();
+	ID3D11Resource*& GetShaderResource();
 
 private:
 	ID3D11Resource* m_texture;

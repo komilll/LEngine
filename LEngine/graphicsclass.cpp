@@ -164,19 +164,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (BLUR_BILINEAR)
 	{
 #pragma region Blur bilinear screenspace
+		float textureWidth = screenHeight;
+		float textureHeight = screenHeight;
 		//RENDER SCENE TO TEXTURE
 		if (!(m_renderTexture = new RenderTextureClass))
 			return false;
 		if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
 			return false;
 
+		//m_renderTexture->LoadTexture(m_D3D->GetDevice(), L"seafloor.dds", m_renderTexture->GetShaderResource(), m_renderTexture->GetShaderResourceView());
+
 		if (!(m_renderTexturePreview = new UITexture))
 			return false;
 		if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
 			return false;
 
-		//m_renderTexturePreview->LoadTexture(m_D3D->GetDevice(), L"seafloor.dds", m_renderTexturePreview->GetShaderResource(), m_renderTexturePreview->GetShaderResourceView());
-		m_renderTexturePreview->BindTexture(m_renderTexturePreview->GetShaderResourceView());
+		m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
 
 		//Texture downsampled
 		if (!(m_renderTextureDownsampled = new RenderTextureClass))
@@ -214,20 +217,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 	else
 	{
-		return true;
-		float textureWidth = screenHeight;
-		float textureHeight = screenHeight;
+		float textureWidth = 256;
+		float textureHeight = 256;
 		//RENDER SCENE TO TEXTURE
 		if (!(m_renderTexture = new RenderTextureClass))
 			return false;
-		if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), 256, 256)))
+		if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), textureWidth, textureHeight)))
 			return false;
 
 		m_renderTexture->LoadTexture(m_D3D->GetDevice(), L"seafloor.dds", m_renderTexture->GetShaderResource(), m_renderTexture->GetShaderResourceView());
 
 		if (!(m_renderTexturePreview = new UITexture))
 			return false;
-		if (!(m_renderTexturePreview->Initialize(m_D3D, 0.0f, 0.0f, 0.8f)))
+		if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true)))
 			return false;
 
 		m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
@@ -235,32 +237,40 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		//Texture downsampled
 		if (!(m_renderTextureDownsampled = new RenderTextureClass))
 			return false;
-		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), 256, 256)))
+		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), textureWidth / 2, textureHeight / 2)))
 			return false;
 
-		XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-		bool result;
-
-		m_renderTextureDownsampled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		m_renderTextureDownsampled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		m_Camera->Render();
-
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_renderTextureDownsampled->GetOrthoMatrix(orthoMatrix);
-
-		m_D3D->TurnZBufferOff();
-
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, orthoMatrix);
-		if (!result)
+		//Texture upscaled
+		if (!(m_renderTextureUpscaled = new RenderTextureClass))
+			return false;
+		if (!(m_renderTextureUpscaled->Initialize(m_D3D->GetDevice(), textureWidth, textureHeight)))
 			return false;
 
-		m_D3D->TurnZBufferOn();
+		//Texture horizontal blur
+		if (!(m_renderTextureHorizontalBlur = new RenderTextureClass))
+			return false;
+		if (!(m_renderTextureHorizontalBlur->Initialize(m_D3D->GetDevice(), textureWidth / 2, textureHeight / 2)))
+			return false;
 
-		m_D3D->SetBackBufferRenderTarget();
-		m_D3D->ResetViewport();
-		m_renderTexturePreview->BindTexture(m_renderTextureDownsampled->GetShaderResourceView());
+		//Texture vertical blur
+		if (!(m_renderTextureVerticalBlur = new RenderTextureClass))
+			return false;
+		if (!(m_renderTextureVerticalBlur->Initialize(m_D3D->GetDevice(), textureWidth / 2, textureHeight / 2)))
+			return false;
+
+		//Blur shader - vertical and horizontal
+		m_blurShaderHorizontal = new BlurShaderClass;
+		if (!m_blurShaderHorizontal->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurHorizontal.vs", L"blurHorizontal.ps", input))
+			return false;
+
+		m_blurShaderVertical = new BlurShaderClass;
+		if (!m_blurShaderVertical->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurVertical.vs", L"blurVertical.ps", input))
+			return false;
+
+		//DownsampleTexture();
+		//BlurFilter(false);
+		//BlurFilter(true);
+		//UpscaleTexture();
 	}
 
 	return true;
@@ -486,19 +496,30 @@ bool GraphicsClass::Render()
 		BlurFilter(true);
 		UpscaleTexture();
 
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
 	}
 	else
 	{
-		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		//if (!result)
-		//	return false;
+		m_debug++;
 
-		result = RenderScene();
+		//if (m_debug == 300)
+		//	DownsampleTexture();
+		//else if (m_debug == 600)
+		//	BlurFilter(false);
+		//else if (m_debug == 900)
+		//	BlurFilter(true);
+		//else if (m_debug == 1200)
+		//	UpscaleTexture();
+
+		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
+
+		//result = RenderScene();
+		//if (!result)
+		//	return false;
 	}
 
 	if (ENABLE_DEBUG)
@@ -635,7 +656,7 @@ bool GraphicsClass::DownsampleTexture()
 	bool result;
 
 	m_renderTextureDownsampled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	m_renderTextureDownsampled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	m_renderTextureDownsampled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
 
 	m_Camera->Render();
 

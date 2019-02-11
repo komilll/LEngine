@@ -535,6 +535,8 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 	for (int i = 0; i < verticesCount; i++)
 		indices[i] = i;
 
+	m_indexCount = verticesCount;
+
 	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
 		return false;
 
@@ -557,6 +559,8 @@ bool ModelClass::CreateTriangle(ID3D11Device * device, float left, float right, 
 	indices = new unsigned long[verticesCount];
 	for (int i = 0; i < verticesCount; i++)
 		indices[i] = i;
+
+	m_indexCount = verticesCount;
 
 	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
 		return false;

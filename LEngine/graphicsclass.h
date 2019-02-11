@@ -109,6 +109,7 @@ private:
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;
 	int m_screenHeight = 0;
+	int m_debug = 0;
 };
 
 #endif

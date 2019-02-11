@@ -15,13 +15,13 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
-
 	textureDesc.Width = textureWidth;
 	textureDesc.Height = textureHeight;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	textureDesc.CPUAccessFlags = 0;
@@ -31,6 +31,7 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 	if (FAILED(result))
 		return false;
 
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
@@ -39,6 +40,7 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 	if (FAILED(result))
 		return false;
 
+	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
@@ -50,11 +52,11 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 
 	m_orthoMatrix = XMMatrixOrthographicLH((float)textureWidth, (float)textureHeight, 0.0f, 1.0f);
 
-	m_viewport.Width = (float)textureWidth;
+	m_viewport.Width = (float)textureWidth * 2.0f;
 	m_viewport.Height = (float)textureHeight;
 	m_viewport.MinDepth = 0.0f;
 	m_viewport.MaxDepth = 1.0f;
-	m_viewport.TopLeftX = 0;//width * 0.5f - textureWidth * 0.5f;
+	m_viewport.TopLeftX = -textureWidth/2;
 	m_viewport.TopLeftY = 0;
 
 	return true;

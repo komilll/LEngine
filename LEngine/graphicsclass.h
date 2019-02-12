@@ -26,6 +26,7 @@
 #include "RenderTextureClass.h"
 #include "UITexture.h"
 #include "BlurShaderClass.h"
+#include <ScreenGrab.h>
 
 /////////////
 // GLOBALS //
@@ -36,7 +37,7 @@ const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
-const bool DRAW_SKYBOX = false;
+const bool DRAW_SKYBOX = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
@@ -77,6 +78,8 @@ private:
 	bool DownsampleTexture();
 	bool UpscaleTexture();
 	bool BlurFilter(bool vertical); //Vertical = true; Horizontal = false
+	//IBL DIFFUSE CONVOLUTION
+	bool DownsampleSkybox();
 
 private:
 	D3DClass* m_D3D;
@@ -97,6 +100,7 @@ private:
 	UISlider* m_roughnessSlider;
 	UISlider* m_metalnessSlider;
 
+	//BILINEAR SCREEN BLUR
 	RenderTextureClass* m_renderTexture;
 	RenderTextureClass* m_renderTextureDownsampled;
 	RenderTextureClass* m_renderTextureUpscaled;
@@ -105,6 +109,8 @@ private:
 	UITexture* m_renderTexturePreview;
 	BlurShaderClass* m_blurShaderVertical;
 	BlurShaderClass* m_blurShaderHorizontal;
+
+	RenderTextureClass* m_skyboxDownsampled;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

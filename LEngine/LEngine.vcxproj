@@ -121,6 +121,8 @@
     <None Include="blurVertical.vs" />
     <None Include="color.ps" />
     <None Include="color.vs" />
+    <None Include="convolutionSkybox.ps" />
+    <None Include="convolutionSkybox.vs" />
     <None Include="packages.config" />
     <None Include="pbr_base.ps" />
     <None Include="pbr_base.vs" />

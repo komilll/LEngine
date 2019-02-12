@@ -235,41 +235,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
 
 		//Texture downsampled
+		if (!(m_skyboxDownsampled = new RenderTextureClass))
+			return false;
+		if (!(m_skyboxDownsampled->Initialize(m_D3D->GetDevice(), 64, 64, RenderTextureClass::Scaling::NONE)))
+			return false;
+
 		if (!(m_renderTextureDownsampled = new RenderTextureClass))
 			return false;
-		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), textureWidth / 2, textureHeight / 2)))
+		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), 64, 64, RenderTextureClass::Scaling::DOWNSCALE)))
 			return false;
 
-		//Texture upscaled
-		if (!(m_renderTextureUpscaled = new RenderTextureClass))
-			return false;
-		if (!(m_renderTextureUpscaled->Initialize(m_D3D->GetDevice(), textureWidth, textureHeight)))
-			return false;
-
-		//Texture horizontal blur
-		if (!(m_renderTextureHorizontalBlur = new RenderTextureClass))
-			return false;
-		if (!(m_renderTextureHorizontalBlur->Initialize(m_D3D->GetDevice(), textureWidth / 2, textureHeight / 2)))
-			return false;
-
-		//Texture vertical blur
-		if (!(m_renderTextureVerticalBlur = new RenderTextureClass))
-			return false;
-		if (!(m_renderTextureVerticalBlur->Initialize(m_D3D->GetDevice(), textureWidth / 2, textureHeight / 2)))
-			return false;
-
-		//Blur shader - vertical and horizontal
-		m_blurShaderHorizontal = new BlurShaderClass;
-		if (!m_blurShaderHorizontal->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurHorizontal.vs", L"blurHorizontal.ps", input))
-			return false;
-
-		m_blurShaderVertical = new BlurShaderClass;
-		if (!m_blurShaderVertical->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurVertical.vs", L"blurVertical.ps", input))
-			return false;
-
+		m_skyboxShader->CreateColorSkybox(m_D3D->GetDevice(), 256, 256);
+		//DownsampleSkybox();
 		//DownsampleTexture();
-		//BlurFilter(false);
-		//BlurFilter(true);
 		//UpscaleTexture();
 	}
 
@@ -502,24 +480,26 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		m_debug++;
+		////m_debug++;
 
 		//if (m_debug == 300)
 		//	DownsampleTexture();
+		////else if (m_debug == 600)
+		////	BlurFilter(false);
+		////else if (m_debug == 900)
+		////	BlurFilter(true);
 		//else if (m_debug == 600)
-		//	BlurFilter(false);
-		//else if (m_debug == 900)
-		//	BlurFilter(true);
-		//else if (m_debug == 1200)
 		//	UpscaleTexture();
+		//DownsampleSkybox();
+		//RenderSkybox();
 
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
-			return false;
-
-		//result = RenderScene();
+		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
 		//	return false;
+
+		result = RenderScene();
+		if (!result)
+			return false;
 	}
 
 	if (ENABLE_DEBUG)
@@ -767,6 +747,50 @@ bool GraphicsClass::BlurFilter(bool vertical)
 
 		m_renderTexturePreview->BindTexture(m_renderTextureVerticalBlur->GetShaderResourceView());
 	}
+
+	return true;
+}
+
+bool GraphicsClass::DownsampleSkybox()
+{
+	XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
+	XMVECTOR up[] = { XMVectorSet(0, 1, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, 0, -1, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, 1, 0, 0) };
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	bool result;
+
+	float color[4]{ 0, 0, 0, 1 };
+	m_renderTexturePreview->LoadTexture(m_D3D->GetDevice(), L"skybox.dds", m_renderTexturePreview->GetShaderResource(), m_renderTexturePreview->GetShaderResourceView());
+	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"skybox.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
+
+	m_D3D->TurnZBufferOff();
+	for (int i = 0; i < 6; i++)
+	{
+		m_D3D->GetDeviceContext()->OMSetRenderTargets(1, &m_skyboxDownsampled->GetShaderTargetView(i), 0);
+		m_skyboxDownsampled->SetViewport(m_D3D->GetDeviceContext());
+		m_D3D->GetDeviceContext()->ClearRenderTargetView(m_skyboxDownsampled->GetShaderTargetView(i), color);
+		//m_skyboxDownsampled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		//m_skyboxDownsampled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
+
+		XMVECTOR dir = XMVector3Rotate(tar[i], XMQuaternionIdentity());
+		XMMATRIX view = DirectX::XMMatrixLookToLH(XMLoadFloat3(&position), dir, up[i]);
+		viewMatrix = DirectX::XMMatrixTranspose(view);
+
+		XMMATRIX projection = DirectX::XMMatrixPerspectiveFovLH(0.5f * XM_PI, 1.0f, 0.1f, 100.0f);
+		projectionMatrix = DirectX::XMMatrixTranspose(projection);
+
+		m_Model->Render(m_D3D->GetDeviceContext());
+		result = m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		if (!result)
+			return false;
+	}
+	m_D3D->TurnZBufferOn();
+
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
+
+	SaveDDSTextureToFile(m_D3D->GetDeviceContext(), m_skyboxDownsampled->GetShaderResource(), L"test.dds");
+	//m_skyboxShader->m_skyboxTextureView = m_skyboxDownsampled->GetShaderResourceView();
 
 	return true;
 }

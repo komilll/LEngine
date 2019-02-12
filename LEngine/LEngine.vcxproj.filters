@@ -64,6 +64,12 @@
     <None Include="textureShader.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="convolutionSkybox.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="convolutionSkybox.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="colorshaderclass.h">

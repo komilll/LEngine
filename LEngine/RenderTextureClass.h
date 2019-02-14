@@ -5,7 +5,10 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <DDSTextureLoader.h>
+#include <WICTextureLoader.h>
+#include <string>
 using namespace DirectX;
+using namespace std;
 
 class RenderTextureClass
 {
@@ -23,7 +26,7 @@ public:
 	void SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView);
 	void ClearRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, float red, float green, float blue, float alpha);
 	void SetViewport(ID3D11DeviceContext * deviceContext);
-	bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView);
+	bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView, bool isDDS = true);
 	ID3D11ShaderResourceView*& GetShaderResourceView();
 	ID3D11RenderTargetView*& GetShaderTargetView(int skyboxIndex);
 	ID3D11Resource*& GetShaderResource();

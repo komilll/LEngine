@@ -70,6 +70,12 @@
     <None Include="convolutionSkybox.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="singleColor.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="singleColor.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="colorshaderclass.h">

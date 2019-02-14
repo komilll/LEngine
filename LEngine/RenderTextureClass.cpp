@@ -43,7 +43,7 @@ void RenderTextureClass::SetViewport(ID3D11DeviceContext * deviceContext)
 	deviceContext->RSSetViewports(1, &m_viewport);
 }
 
-bool RenderTextureClass::LoadTexture(ID3D11Device * device, const wchar_t * filename, ID3D11Resource *& m_texture, ID3D11ShaderResourceView *& m_textureView)
+bool RenderTextureClass::LoadTexture(ID3D11Device * device, const wchar_t * filename, ID3D11Resource *& m_texture, ID3D11ShaderResourceView *& m_textureView, bool isDDS)
 {
 	if (m_texture != nullptr)
 		m_texture->Release();
@@ -51,8 +51,12 @@ bool RenderTextureClass::LoadTexture(ID3D11Device * device, const wchar_t * file
 	if (m_textureView != nullptr)
 		m_textureView->Release();
 
+	HRESULT result = false;
+	if (isDDS)
+		result = CreateDDSTextureFromFile(device, filename, &m_texture, &m_textureView);
+	else
+		result = CreateWICTextureFromFile(device, filename, &m_texture, &m_textureView);
 
-	HRESULT result = CreateDDSTextureFromFile(device, filename, &m_texture, &m_textureView);
 	if (FAILED(result))
 	{
 		if (m_texture != nullptr)

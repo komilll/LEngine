@@ -46,24 +46,24 @@ bool SkyboxShaderClass::CreateColorSkybox(ID3D11Device* device, int width, int h
 	D3D11_BOX sourceRegion;
 
 	//Here i copy the mip map levels of the textures
-	//for (UINT x = 0; x < 6; x++)
-	//{
-	//	for (UINT mipLevel = 0; mipLevel < texArrayDesc.MipLevels; mipLevel++)
-	//	{
-	//		sourceRegion.left = 0;
-	//		sourceRegion.right = (texArrayDesc.Width >> mipLevel);
-	//		sourceRegion.top = 0;
-	//		sourceRegion.bottom = (texArrayDesc.Height >> mipLevel);
-	//		sourceRegion.front = 0;
-	//		sourceRegion.back = 1;
+	for (UINT x = 0; x < 6; x++)
+	{
+		for (UINT mipLevel = 0; mipLevel < texArrayDesc.MipLevels; mipLevel++)
+		{
+			sourceRegion.left = 0;
+			sourceRegion.right = (texArrayDesc.Width >> mipLevel);
+			sourceRegion.top = 0;
+			sourceRegion.bottom = (texArrayDesc.Height >> mipLevel);
+			sourceRegion.front = 0;
+			sourceRegion.back = 1;
 
-	//		//test for overflow
-	//		if (sourceRegion.bottom == 0 || sourceRegion.right == 0)
-	//			break;
+			//test for overflow
+			if (sourceRegion.bottom == 0 || sourceRegion.right == 0)
+				break;
 
-	//		deviceContext->CopySubresourceRegion(texArray, D3D11CalcSubresource(mipLevel, x, texArrayDesc.MipLevels), 0, 0, 0, srcTex[x], mipLevel, &sourceRegion);
-	//	}
-	//}
+			deviceContext->CopySubresourceRegion(texArray, D3D11CalcSubresource(mipLevel, x, texArrayDesc.MipLevels), 0, 0, 0, srcTex[x], mipLevel, &sourceRegion);
+		}
+	}
 
 	// Create a resource view to the texture array.
 	D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;

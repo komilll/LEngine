@@ -27,6 +27,9 @@
 #include "UITexture.h"
 #include "BlurShaderClass.h"
 #include <ScreenGrab.h>
+#include <iostream>
+#include <fstream>
+#include <WICTextureLoader.h>
 
 /////////////
 // GLOBALS //
@@ -38,6 +41,7 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
+const int CONVOLUTION_DIFFUSE_SIZE = 256;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
@@ -77,15 +81,18 @@ private:
 	bool RenderSceneToTexture();
 	bool DownsampleTexture();
 	bool UpscaleTexture();
-	bool BlurFilter(bool vertical); //Vertical = true; Horizontal = false
+	bool BlurFilterScreenSpace(bool vertical); //Vertical = true; Horizontal = false
 	//IBL DIFFUSE CONVOLUTION
 	bool DownsampleSkybox();
+	bool DownsampleSkyboxFace(const wchar_t* inputFilename, const wchar_t* outputFilename, bool isDDS);
+	bool BlurFilter(bool vertical, UITexture* srcTex, RenderTextureClass* dstTex, int width); //Vertical = true; Horizontal = false
+	bool BlurFilter(bool vertical, RenderTextureClass* srcTex, RenderTextureClass* dstTex, int width); //Vertical = true; Horizontal = false
+	bool BlurFilter(bool vertical, ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex, int width);
 
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
-	ColorShaderClass* m_ColorShader;
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRClass* m_pbrShader;
 	SkyboxShaderClass* m_skyboxShader;
@@ -111,6 +118,10 @@ private:
 	BlurShaderClass* m_blurShaderHorizontal;
 
 	RenderTextureClass* m_skyboxDownsampled;
+	RenderTextureClass* m_skyboxBlurHorizontal;
+	RenderTextureClass* m_skyboxBlurVertical;
+	BaseShaderClass* m_colorShader;
+	ModelClass* m_quadModel;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

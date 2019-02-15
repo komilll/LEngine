@@ -31,3 +31,7 @@
 *.out
 *.app
 LEngine/Skyboxes/cubemap.dds
+LEngine/Skyboxes/conv_cubemap.dds
+LEngine/Skyboxes/conv_cubemap.dds
+LEngine/Skyboxes/conv_cubemap.dds
+LEngine/Skyboxes/conv_cubemap.dds

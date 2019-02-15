@@ -10,7 +10,8 @@ SamplerState SampleType;
 //////////////
 struct PixelInputType
 {
-    float4 position : SV_POSITION;
+    float4 positionSV : SV_POSITION;
+    float4 position : POSITION;
 };
 
 static const float PI = 3.14159265359;
@@ -19,8 +20,8 @@ static const float PI = 3.14159265359;
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	//return shaderTexture.Sample(SampleType, input.position.xyz);
-	//return float4(1.0, 0.0, 0.0, 1.0);
+	const float PI = 3.14159265359f;
+
 	float3 normal = normalize(input.position.xyz);
 
 	float3 irradiance = float3(0.0f, 0.0f, 0.0f);
@@ -29,7 +30,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float3 right = cross(up, normal);
 	up = cross(normal, right);
 
-	float sampleDelta = 0.025f;
+	float sampleDelta = 0.25f;
 	float nrSamples = 0.0f;
 	for (float phi = 0.0f; phi < 2.0 * PI; phi += sampleDelta)
 	{
@@ -42,6 +43,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 			nrSamples++;
 		}
 	}
-	irradiance = PI * irradiance * (1 / nrSamples);
+	irradiance = PI * irradiance * (1.0f / nrSamples);
 	return float4(irradiance, 1.0f);
+	//return float4(1.0, 0.0, 1.0, 1.0);
+	//return float4(input.position.x, input.position.y, input.position.z, 1.0f);
 }

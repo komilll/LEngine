@@ -4,7 +4,6 @@
 #ifndef _GRAPHICSCLASS_H_
 #define _GRAPHICSCLASS_H_
 
-
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
@@ -30,6 +29,7 @@
 #include <iostream>
 #include <fstream>
 #include <WICTextureLoader.h>
+#include "ConvoluteShaderClass.h"
 
 /////////////
 // GLOBALS //
@@ -88,6 +88,7 @@ private:
 	bool BlurFilter(bool vertical, UITexture* srcTex, RenderTextureClass* dstTex, int width); //Vertical = true; Horizontal = false
 	bool BlurFilter(bool vertical, RenderTextureClass* srcTex, RenderTextureClass* dstTex, int width); //Vertical = true; Horizontal = false
 	bool BlurFilter(bool vertical, ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex, int width);
+	bool ConvoluteShader(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
 
 private:
 	D3DClass* m_D3D;
@@ -117,16 +118,18 @@ private:
 	BlurShaderClass* m_blurShaderVertical;
 	BlurShaderClass* m_blurShaderHorizontal;
 
+	//CONVOLUTION IBL DIFFUSE
 	RenderTextureClass* m_skyboxDownsampled;
 	RenderTextureClass* m_skyboxBlurHorizontal;
 	RenderTextureClass* m_skyboxBlurVertical;
 	BaseShaderClass* m_colorShader;
+	ConvoluteShaderClass* m_convoluteShader;
 	ModelClass* m_quadModel;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;
 	int m_screenHeight = 0;
-	int m_debug = 0;
+	int m_exitCount = 0;
 };
 
 #endif

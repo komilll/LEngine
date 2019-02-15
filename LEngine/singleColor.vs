@@ -23,7 +23,8 @@ struct VertexInputType
 
 struct PixelInputType
 {
-    float4 position : SV_POSITION;
+    float4 positionSV : SV_POSITION;
+    float4 position : POSITION;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

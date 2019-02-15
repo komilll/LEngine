@@ -240,16 +240,23 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	if (!(m_renderTexturePreview = new UITexture))
 		return false;
-	if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true)))
+	if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
 		return false;
 
 	//Texture downsampled
 	if (!(m_skyboxDownsampled = new RenderTextureClass))
 		return false;
-	if (!(m_skyboxDownsampled->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::DOWNSCALE)))
+	if (!(m_skyboxDownsampled->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
-	DownsampleSkybox();
+	if (!(m_convoluteShader = new ConvoluteShaderClass))
+		return false;
+	if (!(m_convoluteShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"convolutionSkybox.vs", L"convolutionSkybox.ps", input)))
+		return false;
+
+	m_convoluteShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_convoluteShader->m_resource, m_convoluteShader->m_resourceView);
+	//DownsampleSkybox();
+	ConvoluteShader(m_convoluteShader->m_resourceView, m_skyboxDownsampled);
 
 	return true;
 }
@@ -473,19 +480,6 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		////m_debug++;
-
-		//if (m_debug == 300)
-		//	DownsampleTexture();
-		////else if (m_debug == 600)
-		////	BlurFilter(false);
-		////else if (m_debug == 900)
-		////	BlurFilter(true);
-		//else if (m_debug == 600)
-		//	UpscaleTexture();
-		//DownsampleSkybox();
-		//RenderSkybox();
-
 		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
 		//	return false;
@@ -494,7 +488,10 @@ bool GraphicsClass::Render()
 		//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 		//m_Model->Render(m_D3D->GetDeviceContext());
 		//m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_exitCount++;
 
+		//if (m_exitCount == 60)
+		//	PostQuitMessage(0);
 		result = RenderScene();
 		if (!result)
 			return false;
@@ -763,21 +760,21 @@ bool GraphicsClass::DownsampleSkybox()
 	//Texture horizontal blur
 	if (!(m_skyboxBlurHorizontal = new RenderTextureClass))
 		return false;
-	if (!(m_skyboxBlurHorizontal->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::DOWNSCALE)))
+	if (!(m_skyboxBlurHorizontal->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	//Texture vertical blur
 	if (!(m_skyboxBlurVertical = new RenderTextureClass))
 		return false;
-	if (!(m_skyboxBlurVertical->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::DOWNSCALE)))
+	if (!(m_skyboxBlurVertical->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	DownsampleSkyboxFace(L"Skyboxes/posx.jpg", L"Skyboxes/conv_posx.dds", false);
-	DownsampleSkyboxFace(L"Skyboxes/posy.jpg", L"Skyboxes/conv_posy.dds", false);
-	DownsampleSkyboxFace(L"Skyboxes/posz.jpg", L"Skyboxes/conv_posz.dds", false);
-	DownsampleSkyboxFace(L"Skyboxes/negx.jpg", L"Skyboxes/conv_negx.dds", false);
-	DownsampleSkyboxFace(L"Skyboxes/negy.jpg", L"Skyboxes/conv_negy.dds", false);
-	DownsampleSkyboxFace(L"Skyboxes/negz.jpg", L"Skyboxes/conv_negz.dds", false);
+	//DownsampleSkyboxFace(L"Skyboxes/posy.jpg", L"Skyboxes/conv_posy.dds", false);
+	//DownsampleSkyboxFace(L"Skyboxes/posz.jpg", L"Skyboxes/conv_posz.dds", false);
+	//DownsampleSkyboxFace(L"Skyboxes/negx.jpg", L"Skyboxes/conv_negx.dds", false);
+	//DownsampleSkyboxFace(L"Skyboxes/negy.jpg", L"Skyboxes/conv_negy.dds", false);
+	//DownsampleSkyboxFace(L"Skyboxes/negz.jpg", L"Skyboxes/conv_negz.dds", false);
 
 	ifstream skyboxFile;
 	skyboxFile.open("Skyboxes/conv_cubemap.dds");
@@ -821,13 +818,14 @@ bool GraphicsClass::DownsampleSkyboxFace(const wchar_t * inputFilename, const wc
 	m_D3D->ResetViewport();
 
 	m_renderTexturePreview->BindTexture(m_skyboxDownsampled->GetShaderResourceView());
-
-	for (int i = 0; i < 5; i++)
-	{
-		BlurFilter(false, m_renderTexturePreview, m_skyboxBlurHorizontal, CONVOLUTION_DIFFUSE_SIZE);
-		BlurFilter(true, m_skyboxBlurHorizontal, m_skyboxBlurVertical, CONVOLUTION_DIFFUSE_SIZE);
-	}
-	SaveDDSTextureToFile(m_D3D->GetDeviceContext(), m_skyboxBlurVertical->GetShaderResource(), outputFilename);
+	ConvoluteShader(m_skyboxDownsampled->GetShaderResourceView(), m_skyboxDownsampled);
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	BlurFilter(false, m_renderTexturePreview, m_skyboxBlurHorizontal, CONVOLUTION_DIFFUSE_SIZE);
+	//	BlurFilter(true, m_skyboxBlurHorizontal, m_skyboxBlurVertical, CONVOLUTION_DIFFUSE_SIZE);
+	//}
+	
+	SaveDDSTextureToFile(m_D3D->GetDeviceContext(), m_skyboxDownsampled->GetShaderResource(), outputFilename);
 
 	return false;
 }
@@ -902,5 +900,49 @@ bool GraphicsClass::BlurFilter(bool vertical, ID3D11ShaderResourceView * srcTex,
 		m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
 	}
 
+	return true;
+}
+
+bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTextureClass * dstTex)
+{
+	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
+	bool result;
+
+	dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_Camera->Render();
+
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	dstTex->GetOrthoMatrix(orthoMatrix);
+
+	XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
+	XMVECTOR up[] = { XMVectorSet(0, 1, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, 0, -1, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, 1, 0, 0) };
+	int i = 0;
+
+	XMVECTOR dir = XMVector3Rotate(tar[i], XMQuaternionIdentity());
+	viewMatrix = DirectX::XMMatrixLookToLH(XMLoadFloat3(&position), dir, up[i]);
+
+	XMMATRIX P = DirectX::XMMatrixPerspectiveFovLH(0.5f * XM_PI, 1.0f, 0.1f, 100.0f);
+	orthoMatrix = DirectX::XMMatrixTranspose(P);
+
+
+	m_D3D->TurnZBufferOff();
+
+	//m_convoluteShader->SetTextureSize(width);
+	m_convoluteShader->SetTextureResourceView(srcTex);
+	m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
+	result = m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
+	if (!result)
+		return false;
+
+	m_D3D->TurnZBufferOn();
+
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
+
+	m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
 	return true;
 }

@@ -23,6 +23,7 @@ bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float center
 	return true;
 }
 
+//Use standarized input data; Need to be changed and upgraded
 std::vector<LPCSTR> UIBase::GetInputNames()
 {
 	std::vector <LPCSTR> names;
@@ -34,6 +35,7 @@ std::vector<LPCSTR> UIBase::GetInputNames()
 	return names;
 }
 
+//Use standarized input formats; Need to be changed and upgraded
 std::vector<DXGI_FORMAT> UIBase::GetInputFormats()
 {
 	std::vector <DXGI_FORMAT> formats;

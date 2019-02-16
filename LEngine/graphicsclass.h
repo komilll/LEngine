@@ -123,13 +123,29 @@ private:
 	RenderTextureClass* m_skyboxBlurHorizontal;
 	RenderTextureClass* m_skyboxBlurVertical;
 	BaseShaderClass* m_colorShader;
-	ConvoluteShaderClass* m_convoluteShader;
+	SkyboxShaderClass* m_convoluteShader;
 	ModelClass* m_quadModel;
+
+	//PREVIEW SKYBOX
+	RenderTextureClass* m_skyboxTextureLeft;
+	RenderTextureClass* m_skyboxTextureRight;
+	RenderTextureClass* m_skyboxTextureUp;
+	RenderTextureClass* m_skyboxTextureDown;
+	RenderTextureClass* m_skyboxTextureForward;
+	RenderTextureClass* m_skyboxTextureBack;
+
+	UITexture* m_skyboxPreviewLeft;
+	UITexture* m_skyboxPreviewRight;
+	UITexture* m_skyboxPreviewUp;
+	UITexture* m_skyboxPreviewDown;
+	UITexture* m_skyboxPreviewForward;
+	UITexture* m_skyboxPreviewBack;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;
 	int m_screenHeight = 0;
 	int m_exitCount = 0;
+	int m_convolutionFace = 0;
 };
 
 #endif

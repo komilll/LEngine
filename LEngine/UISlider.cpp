@@ -34,6 +34,7 @@ bool UISlider::Initialize(D3DClass * d3d, float positionMinX, float positionMaxX
 		return false;
 
 	m_D3D = d3d;
+	//Create area bounds for mouse
 	m_minX = positionMinX;
 	m_maxX = positionMaxX;
 	m_minY = positionY - height / 2 - k_sliderHeight;
@@ -57,6 +58,7 @@ void UISlider::ChangeSliderValue(MouseClass * mouse)
 {
 	mouse->GetMouseLocationScreenSpace(m_mousePosX, m_mousePosY);
 
+	//Prevent from going beyond horizontal bounds - clamp value and visuals
 	m_sliderVal = clamp(1.0f - (m_maxX - m_mousePosX) / (m_maxX - m_minX), 0.0f, 1.0f);
 	m_modelSlider->SetPosition(clamp(m_mousePosX - m_minX, 0, m_maxX - m_minX), 0, 0);
 	if (m_textEngine != nullptr)

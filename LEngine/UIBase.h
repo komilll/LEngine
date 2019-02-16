@@ -10,12 +10,13 @@
 constexpr WCHAR* UI_SHADER_VS = L"uibase.vs";
 constexpr WCHAR* UI_SHADER_PS = L"uibase.ps";
 
+///<summary>Class used for rendering objects on screenspace</summary>
 class UIBase : public BaseShaderClass
 {
 private:
-	struct AppearanceBuffer 
+	struct AppearanceBuffer
 	{
-		XMFLOAT4 color;
+		XMFLOAT4 color; //Tint of model
 	};
 
 public:

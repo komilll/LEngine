@@ -6,22 +6,23 @@ bool UITexturePreview::Initialize(D3DClass * d3d, float centerX, float centerY, 
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiTexturePreview.vs", L"uiTexturePreview.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
 
-	if (textureFilename == L"")
+	if (textureFilename == L"") //If no texture provided, use connected textures
 	{
 		if (m_externalTexture != nullptr && m_externalTextureView != nullptr)
 		{
 			m_texture = *m_externalTexture;
 			m_textureView = *m_externalTextureView;
 		}
-		else
+		else //Load "Empty Tex" image
 			LoadNewTextureFromFile(textureFilename, true);
 	}
-	else
+	else //Normally load texture from hard disc and connect to preview window
 	{
 		BaseShaderClass::LoadTexture(d3d->GetDevice(), textureFilename, m_texture, m_textureView);
 		LoadExternalTextures(textureFilename);
 	}
 
+	//Create area bounds for mouse to change texture
 	m_minX = centerX - size / 2.0f;
 	m_maxX = centerX + size / 2.0f;
 	m_minY = centerY - size / 2.0f;
@@ -94,6 +95,7 @@ void UITexturePreview::TextureChooseWindow(HWND hwnd)
 
 void UITexturePreview::DeleteTexture()
 {
+	//Load Empty Tex image and release connected textures
 	BaseShaderClass::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, m_texture, m_textureView);
 	ReleaseExternalTextures();
 }
@@ -115,6 +117,7 @@ bool UITexturePreview::MouseOnArea(MouseClass * mouse)
 
 void UITexturePreview::LoadNewTextureFromFile(wchar_t* textureFilename, bool onlyPreview)
 {
+	//Try to load new texture, if failed load "Empty Tex"; If last operation failed, critical error - leave immediately
 	if (!BaseShaderClass::LoadTexture(m_D3D->GetDevice(), textureFilename, m_texture, m_textureView))
 	{
 		if (!BaseShaderClass::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, m_texture, m_textureView))

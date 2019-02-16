@@ -16,7 +16,7 @@ bool UITexture::Initialize(D3DClass * d3d, float centerX, float centerY, float s
 
 bool UITexture::Initialize(D3DClass * d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool squareToHeight)
 {
-	if (squareToHeight)
+	if (squareToHeight) //Present as square
 	{
 		left *= 9.0f / 16.0f;
 		right *= 9.0f / 16.0f;

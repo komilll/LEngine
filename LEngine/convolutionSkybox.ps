@@ -5,6 +5,12 @@
 TextureCube shaderTexture;
 SamplerState SampleType;
 
+cbuffer UpVectorBuffer
+{
+	float3 g_upVectorVal;
+	float g_upVectorPadding;
+};
+
 //////////////
 // TYPEDEFS //
 //////////////
@@ -14,23 +20,21 @@ struct PixelInputType
     float4 position : POSITION;
 };
 
-static const float PI = 3.14159265359;
+static const float PI = 3.14159265359f;
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	const float PI = 3.14159265359f;
-
 	float3 normal = normalize(input.position.xyz);
 
 	float3 irradiance = float3(0.0f, 0.0f, 0.0f);
 	
-	float3 up = float3(0.0f, 1.0f, 0.0f);
+	float3 up = g_upVectorVal;
 	float3 right = cross(up, normal);
 	up = cross(normal, right);
 
-	float sampleDelta = 0.25f;
+	float sampleDelta = 0.025f;
 	float nrSamples = 0.0f;
 	for (float phi = 0.0f; phi < 2.0 * PI; phi += sampleDelta)
 	{

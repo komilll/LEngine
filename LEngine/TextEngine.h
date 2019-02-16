@@ -9,12 +9,18 @@
 #include <vector>
 #include "d3dclass.h"
 
+///////////////////////////////////////////////////////////////////
+// PROPABLY WILL BE REPLACED BY dxguid.lib (or slightly modified) //
+///////////////////////////////////////////////////////////////////
+
+///<summary>Collects all text data and render it once at the end of frame</summary>
 class TextEngine
 {
 public:
 	enum Align{ LEFT, RIGHT, CENTER };
 
 public:
+	//Represents data of single text input
 	struct FontData
 	{
 		DirectX::XMVECTOR origin{ 0.0, 0.0, 0.0, 0.0 };
@@ -53,7 +59,9 @@ public:
 	void Initialize(ID3D11Device* d3d, wchar_t const* fontPath);
 	FontData* WriteText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight, float posX, float posY, std::string text, float scale = 1.0f, 
 		Align align = Align::LEFT, XMVECTOR color = DirectX::Colors::White);
+	///<summary>Render all texts collected by TextEngine</summary>
 	void RenderText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight);
+	///<summary>Fetch single text data entry</summary>
 	TextEngine::FontData* GetData(int index);
 
 private:

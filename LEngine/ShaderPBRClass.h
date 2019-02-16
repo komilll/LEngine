@@ -7,7 +7,6 @@
 class ShaderPBRClass : public BaseShaderClass
 {
 private:
-
 	struct LightingBufferType
 	{
 		XMFLOAT3 direction;
@@ -36,6 +35,7 @@ private:
 	};
 
 public:
+	bool LoadIrradianceMap(ID3D11Device *device, const wchar_t* filename);
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
 
@@ -63,6 +63,9 @@ private:
 	ID3D11Buffer* m_cameraBuffer;
 	ID3D11Buffer* m_PBRBuffer;
 	ID3D11Buffer* m_ShaderTextureBuffer;
+
+	ID3D11Resource* m_irradianceMap;
+	ID3D11ShaderResourceView* m_irradianceMapView;
 };
 
 #endif // !_SHADERPBRCLASS_H_

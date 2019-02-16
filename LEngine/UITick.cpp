@@ -16,6 +16,7 @@ bool UITick::Initialize(D3DClass * d3d, float positionX, float positionY, float 
 	m_size = size;
 	m_tickState = false;
 
+	//Calculate area bounds for mouse
 	float left = positionX - size * 0.5f;
 	float right = positionX + size * 0.5f;
 	float top = positionY / 2 + size * 0.5f;

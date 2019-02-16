@@ -152,7 +152,6 @@
     <ClInclude Include="RenderTextureClass.h" />
     <ClInclude Include="ShaderPBRClass.h" />
     <ClInclude Include="ShaderSpecularClass.h" />
-    <ClInclude Include="skybox.h" />
     <ClInclude Include="SkyboxShaderClass.h" />
     <ClInclude Include="systemclass.h" />
     <ClInclude Include="TextEngine.h" />
@@ -180,7 +179,6 @@
     <ClCompile Include="RenderTextureClass.cpp" />
     <ClCompile Include="ShaderPBRClass.cpp" />
     <ClCompile Include="ShaderSpecularClass.cpp" />
-    <ClCompile Include="skybox.cpp" />
     <ClCompile Include="SkyboxShaderClass.cpp" />
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="TextEngine.cpp" />

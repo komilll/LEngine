@@ -15,6 +15,7 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 
 	std::wstring wstr = std::wstring(text_.begin(), text_.end());
 
+	//Measure new text length and change position based on aligments
 	data.posX = screenWidth * (0.5f + posX * 0.5f);
 	data.posY = screenHeight * (0.5f - posY * 0.5f);
 	data.text = text_;
@@ -26,6 +27,7 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 	else if (align_ == Align::RIGHT)
 		data.origin = m_font->MeasureString(wstr.c_str());
 
+	//Add to list from which text will be rendered; Store and use further only via index
 	data.SetIndex(m_data.size());
 	data.textEngineRef = this;
 	m_data.push_back(data);
@@ -38,6 +40,7 @@ void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWid
 	DirectX::XMVECTOR fontPos;
 
 	spriteBatch->Begin();
+	//Fetch data from list and render each text
 	for (int i = 0; i < m_data.size(); i++)
 	{
 		fontPos.m128_f32[0] = m_data.at(i).posX;

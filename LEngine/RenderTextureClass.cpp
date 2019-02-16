@@ -52,6 +52,7 @@ bool RenderTextureClass::LoadTexture(ID3D11Device * device, const wchar_t * file
 		m_textureView->Release();
 
 	HRESULT result = false;
+	//Import texture based on type - DDS or not
 	if (isDDS)
 		result = CreateDDSTextureFromFile(device, filename, &m_texture, &m_textureView);
 	else
@@ -145,8 +146,10 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 
 	if (scaling == DOWNSCALE)
 	{
-		m_viewport.Width = (float)textureWidth * 2.0f;
-		m_viewport.TopLeftX = -textureWidth / 2;
+		//m_viewport.Width = (float)textureWidth * 2.0f;
+		//m_viewport.TopLeftX = -textureWidth / 2;
+		m_viewport.Width = (float)textureWidth;
+		m_viewport.TopLeftX = 0;
 	}
 	else if (scaling == UPSCALE)
 	{

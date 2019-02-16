@@ -39,6 +39,7 @@ struct PixelInputType
 	float3 viewDirection : TEXCOORD1;
 	float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
+	float3 diffuseLookUp : TEXCOORD2;
 };
 
 
@@ -60,6 +61,8 @@ PixelInputType ColorVertexShader(VertexInputType input)
     
 	// Store the input color for the pixel shader to use.
     output.tex = input.tex;
+
+	output.diffuseLookUp = normalize(input.normal);
 
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);

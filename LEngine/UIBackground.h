@@ -5,6 +5,9 @@
 #include "UIBase.h"
 #include "d3dclass.h"
 
+////////////////////////////////////////////
+// PROPABLY WILL BE REPLACE BY dxguid.lib //
+////////////////////////////////////////////
 class UIBackground : public UIBase
 {
 public:

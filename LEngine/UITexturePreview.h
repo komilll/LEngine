@@ -13,8 +13,11 @@ class UITexturePreview : public UIBase
 public:
 	///<summary> Initialize shape: Square </summary>
 	bool Initialize(D3DClass* d3d, float centerX, float centerY, float size, wchar_t* textureFilename = L"");
+	///<summary> Initialize shape: Square; Feed chosen texture data </summary>
 	bool Initialize(D3DClass* d3d, float centerX, float centerY, float size, ID3D11Resource *&texture, ID3D11ShaderResourceView *&textureView, wchar_t* textureFilename = L"");
+	///<summary> Choose texture that will be updated after picking new file </summary>
 	void ConnectTextures(ID3D11Resource*& texture, ID3D11ShaderResourceView*& textureView);
+	///<summary> Pick new texture from Windows Explorer </summary>
 	void TextureChooseWindow(HWND owner);
 	void DeleteTexture();
 

@@ -6,6 +6,7 @@
 // GLOBALS //
 /////////////
 Texture2D shaderTexture[4];
+TextureCube irradianceMap;
 SamplerState SampleType;
 
 cbuffer LightingBuffer
@@ -40,6 +41,7 @@ struct PixelInputType
 	float3 viewDirection : TEXCOORD1;
 	float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
+	float3 diffuseLookUp : TEXCOORD2;
 };
 
 //////////////
@@ -52,16 +54,20 @@ float GetMetalness(float metalnessMap, float metalness);
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
 float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
-float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp);
+float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
+float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness);
+
+
+//////////////////
+// CONST VALUES //
+//////////////////
+static const float PI = 3.14159265359;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-//CONST VALUES
-	float PI = 3.14159265359;
-
 //Calculated values
 	float specular;
 	float3 normal;
@@ -115,19 +121,26 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 	specular = numerator / max(denominator, 0.001);
 
-	float3 kS = F;
+	float3 kS = FresnelSchlickRoughness(max(NdotV, 0.0), float3(0.04, 0.04, 0.04), roughness);
 	float3 kD = float3(1.0, 1.0, 1.0) - kS;
 	kD *= 1.0 - metalness;
 
 	float3 Lo = (kD * albedo / PI + specular) * NdotL;
 
+//DIFFUSE IRRADIANCE
+	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
+	float3 diffuse = irradiance * albedo;
 	float3 ambient = 0.03 * albedo;
+	//float3 ambient = (kD * diffuse);// * ao;
+
+//GAMMA CORRECTION
 	float3 tempColor = (ambient + Lo);
 	tempColor = tempColor / (tempColor + float3(1.0, 1.0, 1.0));
 	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 	float4 finalColor = float4(tempColor, 1.0);
 
 	return finalColor * g_lightStrength;//* lightIntensity;
+	//return float4(irradiance, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)
@@ -158,12 +171,17 @@ float GeometrySmithGGX(float roughness, float NdotV, float NdotL)
 	return ggx1 * ggx2;
 }
 
-float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp)
+float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp)
 {
 	F0 = lerp(F0, albedo, metalness);
 
 	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
 }
+
+float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness)
+{
+    return F0 + (max(float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness), F0) - F0) * pow(1.0 - NdotV, 5.0);
+}   
 
 ////////////////////////////////////////////////////////////////////////////////
 // GET TEXTURE PBR VALUES

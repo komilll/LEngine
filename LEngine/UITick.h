@@ -4,6 +4,9 @@
 
 #include "UIBase.h"
 
+////////////////////////////////////////////
+// PROPABLY WILL BE REPLACE BY dxguid.lib //
+////////////////////////////////////////////
 class UITick : public UIBase
 {
 public:
@@ -11,6 +14,7 @@ public:
 
 	///<summary> Create tick field (Square) with size and position </summary>
 	bool Initialize(D3DClass *d3d, float positionX, float positionY, float size);
+	///<summary> Tick or untick window </summary>
 	bool ChangeTick();
 
 	virtual bool MouseOnArea(MouseClass* mouse) override;

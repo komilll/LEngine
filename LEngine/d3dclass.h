@@ -40,12 +40,14 @@ public:
 	ID3D11DeviceContext* GetDeviceContext();
 	HWND* GetHWND();
 
+	//Get MVP matrices
 	void GetProjectionMatrix(XMMATRIX&);
 	void GetWorldMatrix(XMMATRIX&);
 	void GetOrthoMatrix(XMMATRIX&);
 
 	void GetVideoCardInfo(char*, int&);
 
+	//Enable/Disable alpha blending for translucent 
 	void EnableAlphaBlending();
 	void DisableAlphaBlending();
 

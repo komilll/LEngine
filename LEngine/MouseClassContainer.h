@@ -5,6 +5,7 @@
 #include "UIBase.h"
 #include "MouseClass.h"
 
+///<summary>Contains all info about mouse; used for rendering and passing data info</summary>
 class MouseClassContainer : public UIBase
 {
 public:

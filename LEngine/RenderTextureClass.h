@@ -23,9 +23,12 @@ public:
 	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling = NONE, bool skybox = false);
 	void Shutdown();
 
+	///<summary>Choose target to pass render info</summary>
 	void SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView);
+	///<summary>Clear target every time before usage!</summary>
 	void ClearRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, float red, float green, float blue, float alpha);
 	void SetViewport(ID3D11DeviceContext * deviceContext);
+	///<summary>Non-DDS textures require different loader - choose if your data is in DDS format</summary>
 	bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView, bool isDDS = true);
 	ID3D11ShaderResourceView*& GetShaderResourceView();
 	ID3D11RenderTargetView*& GetShaderTargetView(int skyboxIndex);

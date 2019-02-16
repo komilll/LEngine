@@ -5,6 +5,9 @@
 #include "UIBase.h"
 #include "TextEngine.h"
 
+////////////////////////////////////////////
+// PROPABLY WILL BE REPLACE BY dxguid.lib //
+////////////////////////////////////////////
 class UISlider : public UIBase
 {
 public:
@@ -14,7 +17,7 @@ public:
 
 	///<summary> Create slider of given range </summary>
 	bool Initialize(D3DClass *d3d, float positionMinX, float positionMaxX, float positionY, float height);
-	void CreateTextArea(TextEngine::FontData *text);
+	void CreateTextArea(TextEngine::FontData *text); //Add title near slider
 	void ChangeSliderValue(MouseClass * mouse);
 	bool IsChanging();
 	void StartUsing();
@@ -22,7 +25,7 @@ public:
 	std::function<void(float)> EventOnChangeValue;
 
 private:
-	float clamp(float n, float lower, float upper);
+	float clamp(float n, float lower, float upper); //Implementation of clamp function
 
 private:
 	ModelClass* m_modelSlider;

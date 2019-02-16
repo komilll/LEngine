@@ -1,5 +1,10 @@
 #include "ShaderPBRClass.h"
 
+bool ShaderPBRClass::LoadIrradianceMap(ID3D11Device *device, const wchar_t * filename)
+{
+	return LoadTexture(device, filename, m_irradianceMap, m_irradianceMapView);
+}
+
 void ShaderPBRClass::SetRoughness(float roughness)
 {
 	m_roughness = roughness;
@@ -118,5 +123,6 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 	deviceContext->PSSetShaderResources(1, 1, &m_normalTextureView);
 	deviceContext->PSSetShaderResources(2, 1, &m_roughnessTextureView);
 	deviceContext->PSSetShaderResources(3, 1, &m_metalnessTextureView);
+	deviceContext->PSSetShaderResources(4, 1, &m_irradianceMapView);
 	return true;
 }

@@ -76,155 +76,173 @@
     <None Include="singleColor.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shadowmap.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shadowmap.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="colorshaderclass.h">
+    <ClInclude Include="src\UITick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="modelClass.h">
+    <ClInclude Include="src\BlurShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cameraclass.h">
+    <ClInclude Include="src\cameraclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="systemclass.h">
+    <ClInclude Include="src\ConvoluteShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="d3dclass.h">
+    <ClInclude Include="src\d3dclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inputclass.h">
+    <ClInclude Include="src\graphicsclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphicsclass.h">
+    <ClInclude Include="src\inputclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BaseShaderClass.h">
+    <ClInclude Include="src\LightClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderSpecularClass.h">
+    <ClInclude Include="src\modelClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UIBase.h">
+    <ClInclude Include="src\MouseClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextEngine.h">
+    <ClInclude Include="src\MouseClassContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UIButton.h">
+    <ClInclude Include="src\RenderTextureClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UIBackground.h">
+    <ClInclude Include="src\ShaderPBRClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UITick.h">
+    <ClInclude Include="src\ShaderSpecularClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MouseClass.h">
+    <ClInclude Include="src\ShadowMapClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MouseClassContainer.h">
+    <ClInclude Include="src\SkyboxShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UISlider.h">
+    <ClInclude Include="src\systemclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderPBRClass.h">
+    <ClInclude Include="src\TextEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UITexturePreview.h">
+    <ClInclude Include="src\UIBackground.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SkyboxShaderClass.h">
+    <ClInclude Include="src\UIBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTextureClass.h">
+    <ClInclude Include="src\UIButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UITexture.h">
+    <ClInclude Include="src\UISlider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BlurShaderClass.h">
+    <ClInclude Include="src\UITexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConvoluteShaderClass.h">
+    <ClInclude Include="src\UITexturePreview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SingleColorClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cameraclass.cpp">
+    <ClCompile Include="src\UITick.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
+    <ClCompile Include="src\BlurShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="d3dclass.cpp">
+    <ClCompile Include="src\cameraclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphicsclass.cpp">
+    <ClCompile Include="src\ConvoluteShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="inputclass.cpp">
+    <ClCompile Include="src\d3dclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="modelClass.cpp">
+    <ClCompile Include="src\graphicsclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="systemclass.cpp">
+    <ClCompile Include="src\inputclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\LightClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BaseShaderClass.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderSpecularClass.cpp">
+    <ClCompile Include="src\modelClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIBase.cpp">
+    <ClCompile Include="src\MouseClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextEngine.cpp">
+    <ClCompile Include="src\MouseClassContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIButton.cpp">
+    <ClCompile Include="src\RenderTextureClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIBackground.cpp">
+    <ClCompile Include="src\ShaderPBRClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UITick.cpp">
+    <ClCompile Include="src\ShaderSpecularClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MouseClass.cpp">
+    <ClCompile Include="src\ShadowMapClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MouseClassContainer.cpp">
+    <ClCompile Include="src\SkyboxShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UISlider.cpp">
+    <ClCompile Include="src\systemclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderPBRClass.cpp">
+    <ClCompile Include="src\TextEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UITexturePreview.cpp">
+    <ClCompile Include="src\UIBackground.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SkyboxShaderClass.cpp">
+    <ClCompile Include="src\UIBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTextureClass.cpp">
+    <ClCompile Include="src\UIButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UITexture.cpp">
+    <ClCompile Include="src\UISlider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BlurShaderClass.cpp">
+    <ClCompile Include="src\UITexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConvoluteShaderClass.cpp">
+    <ClCompile Include="src\UITexturePreview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BaseShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SingleColorClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

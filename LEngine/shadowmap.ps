@@ -1,0 +1,31 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: shadowmap.ps
+////////////////////////////////////////////////////////////////////////////////
+
+Texture2D shaderTexture;
+SamplerState SampleType;
+
+/*cbuffer LightingBuffer
+{
+	float3 direction;
+	float padding;
+};*/
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+	float4 depthPosition : TEXCOORD0;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+	float depthValue = input.depthPosition.z / input.depthPosition.w;
+	//return float4(1.0, 1.0, 1.0, 1.0);
+	return float4(depthValue, depthValue, depthValue, 1.0);
+}

@@ -556,7 +556,7 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		CreateShadowMap(m_shadowMapTexture);
+		//CreateShadowMap(m_shadowMapTexture);
 
 		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
@@ -620,7 +620,7 @@ bool GraphicsClass::RenderScene()
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
 	m_groundQuadModel->Render(m_D3D->GetDeviceContext());
-	m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
+	//m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
 	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
@@ -1054,41 +1054,67 @@ bool GraphicsClass::CreateShadowMap(RenderTextureClass* targetTex)
 
 bool GraphicsClass::RenderDepthScene()
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	XMMATRIX worldMatrix, lightViewMatrix, lightProjectionMatrix, translateMatrix;
+	float posX, posY, posZ;
 	bool result;
 
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	//RENDER MAIN SCENE MODEL
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
-
-	m_Camera->SetPosition(-1.0f, 5.0f, 0.0f);
-	m_shadowMapShader->SetLightPosition(m_Camera->GetPosition());
-	m_Camera->Render();
+	//Set light position
+	m_directionalLight->SetLookAt(0, 0, 0);
+	m_directionalLight->SetPosition(-5, 10, 0);
+	m_shadowMapShader->SetLightPosition(m_directionalLight->GetPosition());
 	m_Model->Render(m_D3D->GetDeviceContext());
-	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
 
+	//Create matrices based on light position
 	m_D3D->GetWorldMatrix(worldMatrix);
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
-	result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_directionalLight->GenerateViewMatrix();
+	m_directionalLight->GenerateProjectionMatrix(SCREEN_DEPTH, SCREEN_NEAR);
+	m_directionalLight->GetViewMatrix(lightViewMatrix);
+	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
+
+	//Translate model position and save to worldMatrix
+	//XMFLOAT4 position = m_Model->GetPosition();
+	//worldMatrix = XMMatrixTranslation(position.x, position.y, position.z);
+
+	//Render sphere model
+	m_Model->Render(m_D3D->GetDeviceContext());
+	//m_shadowMapShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
+	result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	if (!result)
 		return false;
-
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_directionalLight->GetViewMatrix(viewMatrix);
-	m_directionalLight->GetProjectionMatrix(projectionMatrix);
-
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.5f, 0));
-	//m_groundQuadModel->Render(m_D3D->GetDeviceContext());
-	//result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
-
+	
 	return true;
 }
+
+
+//m_Camera->GetViewMatrix(viewMatrix);
+//m_D3D->GetWorldMatrix(worldMatrix);
+//m_D3D->GetProjectionMatrix(projectionMatrix);
+////RENDER MAIN SCENE MODEL
+//m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+//m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+//
+//m_Camera->SetPosition(-1.0f, 5.0f, 0.0f);
+//m_shadowMapShader->SetLightPosition(m_Camera->GetPosition());
+//m_Camera->Render();
+//m_Model->Render(m_D3D->GetDeviceContext());
+//m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
+//
+//m_D3D->GetWorldMatrix(worldMatrix);
+//m_Camera->GetViewMatrix(viewMatrix);
+//m_D3D->GetProjectionMatrix(projectionMatrix);
+////worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+////worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+//result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+//if (!result)
+//return false;
+//
+//m_D3D->GetWorldMatrix(worldMatrix);
+//m_directionalLight->GetViewMatrix(viewMatrix);
+//m_directionalLight->GetProjectionMatrix(projectionMatrix);
+//
+//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
+//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.5f, 0));
+////m_groundQuadModel->Render(m_D3D->GetDeviceContext());
+////result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+////if (!result)
+////	return false;

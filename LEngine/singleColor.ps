@@ -2,17 +2,12 @@
 // Filename: skybox.ps
 ////////////////////////////////////////////////////////////////////////////////
 
-Texture2D shadowMap;
-SamplerState SampleType;
-
 //////////////
 // TYPEDEFS //
 //////////////
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float4 lightViewPosition : TEXCOORD1;
-    float3 lightPos : TEXCOORD2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,23 +15,5 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	float2 tex;
-	float depthValue;
-	float lightDepthValue;
-	float4 color;
-
-	tex.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
-	tex.y = -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
-
-	depthValue = shadowMap.Sample(SampleType, tex).r;
-	lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
-
-	color = float4(1, 1, 1, 1);
-
-	if (lightDepthValue < depthValue)
-	{
-		color = float4(1.0, 0.0, 0.0, 1.0);
-	}
-
-	return color;
+	return float4(1.0, 1.0, 1.0, 1.0);
 }

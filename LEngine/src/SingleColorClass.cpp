@@ -14,23 +14,23 @@ void SingleColorClass::SetLightViewProjection(XMMATRIX & viewMatrix, XMMATRIX & 
 bool SingleColorClass::CreateBufferAdditionals(ID3D11Device *& device)
 {
 	BaseShaderClass::CreateBufferAdditionals(device);
-	D3D11_BUFFER_DESC tempBufferDesc;
+	//D3D11_BUFFER_DESC tempBufferDesc;
 
-	tempBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	tempBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	tempBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	tempBufferDesc.MiscFlags = 0;
-	tempBufferDesc.StructureByteStride = 0;
+	//tempBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	//tempBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//tempBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	//tempBufferDesc.MiscFlags = 0;
+	//tempBufferDesc.StructureByteStride = 0;
 
-	tempBufferDesc.ByteWidth = sizeof(LightBuffer);
-	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_lightBuffer)))
-		return false;
+	//tempBufferDesc.ByteWidth = sizeof(LightBuffer);
+	//if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_lightBuffer)))
+	//	return false;
 
-	tempBufferDesc.ByteWidth = sizeof(LightBuffer);
-	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_lightMatrixBuffer)))
-		return false;
+	//tempBufferDesc.ByteWidth = sizeof(LightBuffer);
+	//if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_lightMatrixBuffer)))
+	//	return false;
 
-	m_buffers = { m_lightBuffer, m_lightMatrixBuffer };
+	//m_buffers = { m_lightBuffer, m_lightMatrixBuffer };
 
 	return true;
 }
@@ -48,35 +48,35 @@ bool SingleColorClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, X
 
 	/////// VERTEX BUFFERS ///////
 	//Lighting buffer
-	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-		return false;
+	//result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	//if (FAILED(result))
+	//	return false;
 
-	dataPtr2 = (LightBuffer*)mappedResource.pData;
-	dataPtr2->lightPosition = m_lightPosition;
-	dataPtr2->padding = 0;
+	//dataPtr2 = (LightBuffer*)mappedResource.pData;
+	//dataPtr2->lightPosition = m_lightPosition;
+	//dataPtr2->padding = 0;
 
-	deviceContext->Unmap(m_lightBuffer, 0);
-	int bufferNumber = 1;
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	//deviceContext->Unmap(m_lightBuffer, 0);
+	//int bufferNumber = 1;
+	//deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
 
 	//Lighting matrix buffer
-	result = deviceContext->Map(m_lightMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-		return false;
+	//result = deviceContext->Map(m_lightMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	//if (FAILED(result))
+	//	return false;
 
-	dataPtr3 = (LightMatrixBuffer*)mappedResource.pData;
-	dataPtr3->viewMatrix = m_viewMatrix;
-	dataPtr3->projectionMatrix = m_projectionMatrix;
+	//dataPtr3 = (LightMatrixBuffer*)mappedResource.pData;
+	//dataPtr3->viewMatrix = m_viewMatrix;
+	//dataPtr3->projectionMatrix = m_projectionMatrix;
 
-	deviceContext->Unmap(m_lightMatrixBuffer, 0);
-	bufferNumber = 2;
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_lightMatrixBuffer);
+	//deviceContext->Unmap(m_lightMatrixBuffer, 0);
+	//bufferNumber = 2;
+	//deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_lightMatrixBuffer);
 
 	/////// PIXEL BUFFERS ///////
 	/////// --- EMPTY --- ///////
 
 	/////// RESOURCES ///////
-	deviceContext->PSSetShaderResources(0, 1, &m_shadowMapResourceView);
+	//deviceContext->PSSetShaderResources(0, 1, &m_shadowMapResourceView);
 	return true;
 }

@@ -12,18 +12,6 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-cbuffer LightMatrixBuffer
-{
-	matrix lightViewMatrix;
-	matrix lightProjectionMatrix;
-};
-
-cbuffer LightBuffer
-{
-	float3 g_lightPosition;
-	float g_lightBufferPadding;
-};
-
 //////////////
 // TYPEDEFS //
 //////////////
@@ -35,7 +23,7 @@ struct VertexInputType
 struct PixelInputType
 {
     float4 position : SV_POSITION;
-    float4 depthPosition : TEXCOORD0;
+    float4 depthPosition : TEXTURE0;
 };
 
 
@@ -45,7 +33,6 @@ struct PixelInputType
 PixelInputType ColorVertexShader(VertexInputType input)
 {
     PixelInputType output;
-	float4 worldPosition;
 
 	// Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;

@@ -54,5 +54,5 @@ void LightClass::GetViewMatrix(XMMATRIX & viewMatrix)
 
 void LightClass::GetProjectionMatrix(XMMATRIX & projectionMatrix)
 {
-	m_projectionMatrix = projectionMatrix;
+	projectionMatrix = m_projectionMatrix;
 }

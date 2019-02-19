@@ -9,14 +9,10 @@ class SingleColorClass : public BaseShaderClass
 private:
 	struct LightBuffer
 	{
+		XMMATRIX lightViewMatrix;
+		XMMATRIX lightProjectionMatrix;
 		XMFLOAT3 lightPosition;
 		float padding;
-	};
-
-	struct LightMatrixBuffer
-	{
-		XMMATRIX viewMatrix;
-		XMMATRIX projectionMatrix;
 	};
 
 public:
@@ -27,13 +23,13 @@ public:
 	void SetLightViewProjection(XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix);
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&) override;
+	virtual bool CreateSamplerState(ID3D11Device* device) override;
 
 private:
 	XMFLOAT3 m_lightPosition;
-	XMMATRIX m_viewMatrix, m_projectionMatrix;
+	XMMATRIX m_lightViewMatrix, m_lightProjectionMatrix;
 
 	ID3D11Buffer* m_lightBuffer;
-	ID3D11Buffer* m_lightMatrixBuffer;
 };
 
 #endif // !_SINGLECOLORCLASS_H_

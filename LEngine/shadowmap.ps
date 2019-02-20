@@ -23,5 +23,5 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	color = float4(depthValue, depthValue, depthValue, 1.0);
 
 	//return float4(1.0, 0.0, 0.0, 1.0);
-	return color;
+	return color;// * input.position / 2;
 }

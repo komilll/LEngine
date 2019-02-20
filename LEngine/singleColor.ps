@@ -23,18 +23,34 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 color = float4(0.0, 0.0, 0.0, 1.0);
 	float lightDepthValue;
-	float2 tex;
-	float depthValue;
 	float bias = 0.001f;
-	float4 textureColor = float4(0.5, 0.0, 0.0, 1.0);
-	float4 ambientColor = float4(0.1, 0.1, 0.1, 1.0);
+	float4 textureColor = float4(1.0, 1.0, 1.0, 1.0);
+	float4 ambientColor = float4(0.6, 0.6, 0.6, 1.0);
+	float2 tex;
 
-	color = ambientColor;
+	input.lightViewPosition.xyz /= input.lightViewPosition.w;
+
+	if (input.lightViewPosition.x < - 1.0f || input.lightViewPosition.x > 1.0f
+		|| input.lightViewPosition.y < 1.0f || input.lightViewPosition.y > 1.0f
+		|| input.lightViewPosition.z < 0.0f || input.lightViewPosition.z > 1.0f)
+	{
+		//return float4(1.0, .0, .0, 1.0);
+	}
 
 	tex.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
 	tex.y = -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
 
-	if((saturate(tex.x) == tex.x) && (saturate(tex.y) == tex.y))
+	float shadowMapDepth = shadowMap.Sample(SampleType, tex);
+
+	if (shadowMapDepth < input.lightViewPosition.z)
+	{
+		return float4(1.0, .0, .0, 1.0);
+	}
+
+	float NdotL = dot(normalize(input.normal), input.lightPos);
+	return ambientColor + NdotL * textureColor;
+
+	/*if((saturate(tex.x) == tex.x) && (saturate(tex.y) == tex.y))
 	{
 		depthValue = shadowMap.Sample(SampleType, tex).r;
 
@@ -50,10 +66,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 				color = saturate(color);
 			}
 		}
-	}
+	}*/
 	
 	//return float4(lightDepthValue, lightDepthValue, lightDepthValue, 1.0f);
 	//return float4(depthValue, depthValue, depthValue, 1.0f);
-	return float4(1.0, 1.0, 1.0, 1.0);
+	//return float4(1.0, 1.0, 1.0, 1.0);
 	//return color;
 }

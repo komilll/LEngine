@@ -218,7 +218,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f);
 
 	m_groundQuadModel = new ModelClass;
-	m_groundQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -10.0f, 10.0f, 10.0f, -10.0f);
+	m_groundQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -50.0f, 50.0f, 50.0f, -50.0f);
 
 	m_shadowQuadModel = new ModelClass;
 	m_shadowQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f);
@@ -233,11 +233,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_colorShader->SetLightPosition(m_directionalLight->GetPosition());
 	m_colorShader->SetLightViewProjection(tempMatrixView, tempMatrixProj);
 
+	m_singleColorShader = new SingleColorClass;
+	if (!m_singleColorShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"singleColorNoShadow.vs", L"singleColorNoShadow.ps", input))
+		return false;
+
+	m_singleColorShader->SetLightPosition(m_directionalLight->GetPosition());
+	m_singleColorShader->SetLightViewProjection(tempMatrixView, tempMatrixProj);
+
+
 	ifstream skyboxFile;
 	skyboxFile.open("Skyboxes/cubemap.dds");
 	if (skyboxFile.fail())
 	{
-		system("texassemble cube -w 2048 -h 2048 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.jpg Skyboxes/negx.jpg Skyboxes/posy.jpg Skyboxes/negy.jpg Skyboxes/posz.jpg Skyboxes/negz.jpg");
+		system("texassemble cube -w 2048 -h 2048 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.bmp Skyboxes/negx.bmp Skyboxes/posy.bmp Skyboxes/negy.bmp Skyboxes/posz.bmp Skyboxes/negz.bmp");
 		skyboxFile.open("Skyboxes/cubemap.dds");
 		if (skyboxFile.fail())
 			return true;
@@ -299,12 +307,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_skyboxTextureForward = new RenderTextureClass;
 	m_skyboxTextureBack = new RenderTextureClass;
 
-	m_skyboxTextureLeft->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/negx.jpg", m_skyboxTextureLeft->GetShaderResource(), m_skyboxTextureLeft->GetShaderResourceView(), false);
-	m_skyboxTextureRight->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/posx.jpg", m_skyboxTextureRight->GetShaderResource(), m_skyboxTextureRight->GetShaderResourceView(), false);
-	m_skyboxTextureUp->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/posy.jpg", m_skyboxTextureUp->GetShaderResource(), m_skyboxTextureUp->GetShaderResourceView(), false);
-	m_skyboxTextureDown->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/negy.jpg", m_skyboxTextureDown->GetShaderResource(), m_skyboxTextureDown->GetShaderResourceView(), false);
-	m_skyboxTextureForward->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/posz.jpg", m_skyboxTextureForward->GetShaderResource(), m_skyboxTextureForward->GetShaderResourceView(), false);
-	m_skyboxTextureBack->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/negz.jpg", m_skyboxTextureBack->GetShaderResource(), m_skyboxTextureBack->GetShaderResourceView(), false);
+	m_skyboxTextureLeft->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/negx.bmp", m_skyboxTextureLeft->GetShaderResource(), m_skyboxTextureLeft->GetShaderResourceView(), false);
+	m_skyboxTextureRight->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/posx.bmp", m_skyboxTextureRight->GetShaderResource(), m_skyboxTextureRight->GetShaderResourceView(), false);
+	m_skyboxTextureUp->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/posy.bmp", m_skyboxTextureUp->GetShaderResource(), m_skyboxTextureUp->GetShaderResourceView(), false);
+	m_skyboxTextureDown->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/negy.bmp", m_skyboxTextureDown->GetShaderResource(), m_skyboxTextureDown->GetShaderResourceView(), false);
+	m_skyboxTextureForward->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/posz.bmp", m_skyboxTextureForward->GetShaderResource(), m_skyboxTextureForward->GetShaderResourceView(), false);
+	m_skyboxTextureBack->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/negz.bmp", m_skyboxTextureBack->GetShaderResource(), m_skyboxTextureBack->GetShaderResourceView(), false);
 
 	//m_skyboxPreviewLeft->BindTexture(m_skyboxTextureLeft->GetShaderResourceView());
 	//m_skyboxPreviewRight->BindTexture(m_skyboxTextureRight->GetShaderResourceView());
@@ -557,24 +565,24 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		CreateShadowMap(m_shadowMapTexture);
+		//CreateShadowMap(m_shadowMapTexture);
 
 		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
 		//	return false;
 
 	//STANDARD SCENE RENDERING
-		result = RenderScene();
-		if (!result)
-			return false;
+		//result = RenderScene();
+		//if (!result)
+		//	return false;
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
-		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_quadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		//m_skyboxPreviewLeft->Render(m_D3D->GetDeviceContext(), m_quadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		//m_skyboxPreviewUp->Render(m_D3D->GetDeviceContext(), m_quadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		//m_skyboxPreviewDown->Render(m_D3D->GetDeviceContext(), m_quadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		//m_skyboxPreviewForward->Render(m_D3D->GetDeviceContext(), m_quadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		//m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_quadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_skyboxPreviewLeft->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_skyboxPreviewUp->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_skyboxPreviewDown->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_skyboxPreviewForward->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	}
 
 	if (ENABLE_DEBUG)
@@ -607,7 +615,8 @@ bool GraphicsClass::RenderScene()
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix;
 	bool result;
 
-	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
+	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -2.0f);
 	m_Camera->Render();
 
 	//RENDER MAIN SCENE MODEL
@@ -625,9 +634,9 @@ bool GraphicsClass::RenderScene()
 	m_directionalLight->GetViewMatrix(lightViewMatrix);
 	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
 	m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
-	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
+	//result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
 
 	m_Model->Render(m_D3D->GetDeviceContext());
 	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
@@ -642,28 +651,28 @@ bool GraphicsClass::RenderScene()
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	//if (!result)
 	//	return false;
-	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
+	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
 
-	for (int i = 0; i < 5; i++)
-	{
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-
-		worldMatrix = XMMatrixTranslation(i * 2.0f, 0.0f, 1.0f);
-		m_Model->Render(m_D3D->GetDeviceContext());
-		result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
-			return false;
-	}
-
-	//if (DRAW_SKYBOX)
+	//for (int i = 0; i < 5; i++)
 	//{
-	//	if (RenderSkybox() == false)
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//	worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
+	//	m_Model->Render(m_D3D->GetDeviceContext());
+	//	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//	if (!result)
 	//		return false;
 	//}
+
+	if (DRAW_SKYBOX)
+	{
+		if (RenderSkybox() == false)
+			return false;
+	}
 
 	return true;
 }
@@ -1017,8 +1026,9 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 	bool result;
 
 	XMFLOAT3 position = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 up[] = { XMFLOAT3(0, 1, 0), XMFLOAT3(0, 0, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, -1, 0), XMFLOAT3(0, 0, -1), XMFLOAT3(-1, 0, 0) };
-	wchar_t* filenames[] = { L"Skyboxes/conv_posx.dds", L"Skyboxes/conv_posy.dds" , L"Skyboxes/conv_posz.dds", L"Skyboxes/conv_negx.dds", L"Skyboxes/conv_negy.dds", L"Skyboxes/conv_negz.dds" };
+	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
+	XMFLOAT3 up[] = { XMFLOAT3{0, 1, 0}, XMFLOAT3{0, 0, 1}, XMFLOAT3{1, 0, 0}, XMFLOAT3{0, -1, 0}, XMFLOAT3{0, 0, -1}, XMFLOAT3{-1, 0, 0} };
+	wchar_t* filenames[] = { L"Skyboxes/conv_negy.dds", L"Skyboxes/conv_negz.dds" , L"Skyboxes/conv_negx.dds", L"Skyboxes/conv_posy.dds", L"Skyboxes/conv_posz.dds", L"Skyboxes/conv_posx.dds" };
 	for (int i = 0; i < 6; i++)
 	{
 		dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
@@ -1030,12 +1040,18 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
 		m_convoluteShader->SetUpVector(up[i]);
+		if (i > 3)
+			m_convoluteShader->SetRightVector(-1);
+		else
+			m_convoluteShader->SetRightVector(1);
+
+		//viewMatrix = DirectX::XMMatrixLookToLH(XMVECTOR{ 0.0f,0.0f,0.0f }, tar[i], XMVECTOR{ 0,1,0 });
 
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_groundQuadModel->Render(m_D3D->GetDeviceContext());
+		m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
@@ -1079,7 +1095,7 @@ bool GraphicsClass::RenderDepthScene()
 	//Set light position
 	m_directionalLight->SetLookAt(0, 0, 0);
 	//m_directionalLight->SetPosition(-20, 15, -5);
-	m_directionalLight->SetPosition(0, 5, -15);
+	m_directionalLight->SetPosition(0, 5, -5);
 	m_shadowMapShader->SetLightPosition(m_directionalLight->GetPosition());
 	m_Model->Render(m_D3D->GetDeviceContext());
 
@@ -1108,7 +1124,7 @@ bool GraphicsClass::RenderDepthScene()
 		m_directionalLight->GetViewMatrix(lightViewMatrix);
 		m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
 
-		worldMatrix = XMMatrixTranslation(i * 2.0f, 0.0f, 1.0f);
+		worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
 		m_Model->Render(m_D3D->GetDeviceContext());
 		result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 		if (!result)

@@ -130,6 +130,7 @@ private:
 	RenderTextureClass* m_skyboxBlurHorizontal;
 	RenderTextureClass* m_skyboxBlurVertical;
 	SingleColorClass* m_colorShader;
+	SingleColorClass* m_singleColorShader;
 	SkyboxShaderClass* m_convoluteShader;
 	ModelClass* m_convoluteQuadModel;
 

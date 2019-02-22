@@ -82,6 +82,8 @@
     <None Include="shadowmap.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="singleColorNoShadow.vs" />
+    <None Include="singleColorNoShadow.ps" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">

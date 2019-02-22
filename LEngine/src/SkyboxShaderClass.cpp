@@ -38,7 +38,7 @@ bool SkyboxShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 
 		dataPtr = (UpVectorBuffer*)mappedResource.pData;
 		dataPtr->upVector = m_upVector;
-		dataPtr->padding = 0;
+		dataPtr->rightVectorDirection = m_rightVectorDirection;
 
 		deviceContext->Unmap(m_upVectorBuffer, 0);
 		bufferNumber = 0;
@@ -59,4 +59,9 @@ void SkyboxShaderClass::SetType(SkyboxType type)
 void SkyboxShaderClass::SetUpVector(XMFLOAT3 vector)
 {
 	m_upVector = vector;
+}
+
+void SkyboxShaderClass::SetRightVector(float rightVectorSign)
+{
+	m_rightVectorDirection = rightVectorSign >= 0 ? 1 : -1;
 }

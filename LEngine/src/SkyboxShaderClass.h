@@ -11,7 +11,7 @@ private:
 	struct UpVectorBuffer
 	{
 		XMFLOAT3 upVector;
-		float padding;
+		float rightVectorDirection;
 	};
 
 public:
@@ -29,12 +29,14 @@ public:
 
 	void SetType(SkyboxType type);
 	void SetUpVector(XMFLOAT3 vector);
+	void SetRightVector(float rightVectorSign);
 
 private:
 	SkyboxType m_skyboxType;
 	
 	ID3D11Buffer* m_upVectorBuffer;
 	XMFLOAT3 m_upVector;
+	float m_rightVectorDirection;
 };
 
 

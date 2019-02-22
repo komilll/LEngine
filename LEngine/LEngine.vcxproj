@@ -130,6 +130,8 @@
     <None Include="shadowmap.vs" />
     <None Include="singleColor.ps" />
     <None Include="singleColor.vs" />
+    <None Include="singleColorNoShadow.ps" />
+    <None Include="singleColorNoShadow.vs" />
     <None Include="skybox.ps" />
     <None Include="skybox.vs" />
     <None Include="textureShader.ps" />

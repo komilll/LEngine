@@ -8,7 +8,7 @@ SamplerState SampleType;
 cbuffer UpVectorBuffer
 {
 	float3 g_upVectorVal;
-	float g_upVectorPadding;
+	float g_rightVectorDir;
 };
 
 //////////////
@@ -26,11 +26,20 @@ static const float PI = 3.14159265359f;
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	float3 normal = normalize(input.position.xyz);
+	float3 normal;
+	
+	[branch] if (g_upVectorVal.z == -1.0f)
+	{
+		normal = normalize(input.position.xyz);
+	}
+	else
+	{
+		normal = normalize(input.position.xyz - g_upVectorVal);
+	}
 
 	float3 irradiance = float3(0.0f, 0.0f, 0.0f);
 	
-	float3 up = g_upVectorVal;
+	float3 up = float3(0.0f, 1.0f, 0.0f);
 	float3 right = cross(up, normal);
 	up = cross(normal, right);
 
@@ -48,7 +57,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		}
 	}
 	irradiance = PI * irradiance * (1.0f / nrSamples);
-	return float4(irradiance, 1.0f);
+	//return float4(irradiance, 1.0f);
+	return shaderTexture.Sample(SampleType, normal);
 	//return float4(1.0, 0.0, 1.0, 1.0);
-	//return float4(input.position.x, input.position.y, input.position.z, 1.0f);
+	//return float4(g_upVectorVal, 1.0f);
 }

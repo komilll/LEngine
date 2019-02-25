@@ -24,7 +24,7 @@ struct VertexInputType
 struct PixelInputType
 {
     float4 positionSV : SV_POSITION;
-    float4 position : POSITION;
+    float4 position : TEXCOORD0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,8 +38,8 @@ PixelInputType ColorVertexShader(VertexInputType input)
 	input.position.w = 1.0f;
 
     output.positionSV = mul(input.position, worldMatrix).xyww;
-    output.positionSV = mul(output.positionSV, viewMatrix).xyww;
-    output.positionSV = mul(output.positionSV, projectionMatrix).xyww;
+    //output.positionSV = mul(output.positionSV, viewMatrix).xyww;
+    //output.positionSV = mul(output.positionSV, projectionMatrix).xyww;
 
     return output;
 }

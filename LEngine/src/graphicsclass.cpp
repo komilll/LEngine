@@ -297,8 +297,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_skyboxPreviewRight->Initialize(m_D3D, 0.081f, .0f, .33f, L"Skyboxes/conv_posx.dds");
 	m_skyboxPreviewUp->Initialize(m_D3D, -.25f, .6625f, .33f, L"Skyboxes/conv_posy.dds");
 	m_skyboxPreviewDown->Initialize(m_D3D, -.25f, -.6625f, .33f, L"Skyboxes/conv_negy.dds");
-	m_skyboxPreviewForward->Initialize(m_D3D, 0.411f, .0f, .33f, L"Skyboxes/conv_posz.dds");
-	m_skyboxPreviewBack->Initialize(m_D3D, -.25f, .0, .33f, L"Skyboxes/conv_negz.dds");
+	m_skyboxPreviewForward->Initialize(m_D3D, -0.25f, .0f, .33f, L"Skyboxes/conv_posz.dds");
+	m_skyboxPreviewBack->Initialize(m_D3D, 0.411f, .0, .33f, L"Skyboxes/conv_negz.dds");
 
 	m_skyboxTextureLeft = new RenderTextureClass;
 	m_skyboxTextureRight = new RenderTextureClass;
@@ -572,17 +572,17 @@ bool GraphicsClass::Render()
 		//	return false;
 
 	//STANDARD SCENE RENDERING
-		//result = RenderScene();
-		//if (!result)
-		//	return false;
+		result = RenderScene();
+		if (!result)
+			return false;
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
-		m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		m_skyboxPreviewLeft->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		m_skyboxPreviewUp->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		m_skyboxPreviewDown->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		m_skyboxPreviewForward->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//m_skyboxPreviewLeft->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//m_skyboxPreviewUp->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//m_skyboxPreviewDown->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//m_skyboxPreviewForward->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	}
 
 	if (ENABLE_DEBUG)
@@ -1040,18 +1040,12 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
 		m_convoluteShader->SetUpVector(up[i]);
-		if (i > 3)
-			m_convoluteShader->SetRightVector(-1);
-		else
-			m_convoluteShader->SetRightVector(1);
-
-		//viewMatrix = DirectX::XMMatrixLookToLH(XMVECTOR{ 0.0f,0.0f,0.0f }, tar[i], XMVECTOR{ 0,1,0 });
 
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
-		m_groundQuadModel->Render(m_D3D->GetDeviceContext());
-		m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);

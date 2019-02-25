@@ -28,14 +28,36 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float3 normal;
 	
+	[branch] if (g_upVectorVal.z == 1.0f)
+	{
+		input.position.z = -1.0f;
+	}
 	[branch] if (g_upVectorVal.z == -1.0f)
 	{
-		normal = normalize(input.position.xyz);
+		input.position.z = 1.0f;
 	}
-	else
+	[branch] if (g_upVectorVal.x == 1.0f)
 	{
-		normal = normalize(input.position.xyz - g_upVectorVal);
+		input.position.z = input.position.x;
+		input.position.x = -1.0f;
 	}
+	[branch] if (g_upVectorVal.x == -1.0f)
+	{
+		input.position.z = -input.position.x;
+		input.position.x = 1.0f;
+	}
+	[branch] if (g_upVectorVal.y == 1.0f)
+	{
+		input.position.z = -input.position.y;
+		input.position.y = -1.0f;
+	}
+	[branch] if (g_upVectorVal.y == -1.0f)
+	{
+		input.position.z = -input.position.y;
+		input.position.y = 1.0f;
+	}
+
+	normal = input.position.xyz;
 
 	float3 irradiance = float3(0.0f, 0.0f, 0.0f);
 	
@@ -57,8 +79,9 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		}
 	}
 	irradiance = PI * irradiance * (1.0f / nrSamples);
-	//return float4(irradiance, 1.0f);
-	return shaderTexture.Sample(SampleType, normal);
+	return float4(irradiance, 1.0f);
+	//return shaderTexture.Sample(SampleType, normal);
+	//return float4(float3(normal.y, normal.y, normal.y), 1.0);
 	//return float4(1.0, 0.0, 1.0, 1.0);
 	//return float4(g_upVectorVal, 1.0f);
 }

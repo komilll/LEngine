@@ -26,6 +26,7 @@ public:
 	ID3D11ShaderResourceView* m_skyboxTextureView;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&) override;
 	virtual bool CreateBufferAdditionals(ID3D11Device * &device) override;
+	virtual bool CreateSamplerState(ID3D11Device* device) override;
 
 	void SetType(SkyboxType type);
 	void SetUpVector(XMFLOAT3 vector);

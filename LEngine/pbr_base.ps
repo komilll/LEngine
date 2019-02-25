@@ -130,8 +130,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 //DIFFUSE IRRADIANCE
 	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
 	float3 diffuse = irradiance * albedo;
-	float3 ambient = 0.03 * albedo;
-	//float3 ambient = (kD * diffuse);// * ao;
+	//float3 ambient = 0.03 * albedo;
+	float3 ambient = (kD * diffuse);// * ao;
 
 //GAMMA CORRECTION
 	float3 tempColor = (ambient + Lo);
@@ -139,8 +139,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 	float4 finalColor = float4(tempColor, 1.0);
 
-	//return finalColor * g_lightStrength;//* lightIntensity;
-	return float4(irradiance, 1.0);
+	return finalColor * g_lightStrength;//* lightIntensity;
+	//return float4(irradiance, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)

@@ -285,7 +285,25 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_convoluteShader->SetUpVector(XMFLOAT3{ 0, 1, 0 });
 	//DownsampleSkybox();
 	ConvoluteShader(m_convoluteShader->m_skyboxTextureView, m_skyboxDownsampled);
+	
+	//Calculate specular IBL environment prefiltered map
+	if (!(m_environmentTextureMap = new RenderTextureClass))
+		return false;
+	if (!(m_environmentTextureMap->Initialize(m_D3D->GetDevice(), ENVIRONMENT_SPECULAR_SIZE, ENVIRONMENT_SPECULAR_SIZE, RenderTextureClass::Scaling::NONE)))
+		return false;
 
+	if (!(m_specularIBLShader = new SkyboxShaderClass))
+		return false;
+	if (!(m_specularIBLShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"environmentPrefilteredMap.vs", L"environmentPrefilteredMap.ps", input)))
+		return false;
+
+	m_specularIBLShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_specularIBLShader->m_skyboxTexture, m_specularIBLShader->m_skyboxTextureView);
+	m_specularIBLShader->SetType(SkyboxShaderClass::SkyboxType::CONV_DIFFUSE);
+	m_specularIBLShader->SetUpVector(XMFLOAT3{ 0, 1, 0 });
+
+	PrepareEnvironmentPrefilteredMap(m_specularIBLShader->m_skyboxTextureView, m_environmentTextureMap);
+
+	//Skybox texture previews
 	m_skyboxPreviewLeft = new UITexture;
 	m_skyboxPreviewRight = new UITexture;
 	m_skyboxPreviewUp = new UITexture;
@@ -338,7 +356,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 #pragma endregion
 
-	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/conv_cubemap.dds"))
+	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap.dds"))
 		return false;
 
 	//CreateShadowMap(m_shadowMapTexture);
@@ -731,8 +749,8 @@ bool GraphicsClass::RenderSkybox()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
@@ -1124,6 +1142,54 @@ bool GraphicsClass::RenderDepthScene()
 		if (!result)
 			return false;
 	}
+
+	return true;
+}
+
+bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * srcTex, RenderTextureClass * dstTex)
+{
+	ifstream skyboxFile;
+	skyboxFile.open("Skyboxes/enviro_cubemap.dds");
+	if (skyboxFile.fail() == false)
+		return true;
+
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	bool result;
+
+	XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
+	XMFLOAT3 up[] = { XMFLOAT3{ 0, 1, 0 }, XMFLOAT3{ 0, 0, 1 }, XMFLOAT3{ 1, 0, 0 }, XMFLOAT3{ 0, -1, 0 }, XMFLOAT3{ 0, 0, -1 }, XMFLOAT3{ -1, 0, 0 } };
+	wchar_t* filenames[] = { L"Skyboxes/enviro_negy.dds", L"Skyboxes/enviro_negz.dds" , L"Skyboxes/enviro_negx.dds", L"Skyboxes/enviro_posy.dds", L"Skyboxes/enviro_posz.dds", L"Skyboxes/enviro_posx.dds" };
+	for (int i = 0; i < 6; i++)
+	{
+		dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
+
+		m_Camera->Render();
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		m_specularIBLShader->SetUpVector(up[i]);
+
+		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		m_specularIBLShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+
+		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
+
+		m_D3D->SetBackBufferRenderTarget();
+		m_D3D->ResetViewport();
+
+		m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
+
+		SaveDDSTextureToFile(m_D3D->GetDeviceContext(), dstTex->GetShaderResource(), filenames[i]);
+	}
+
+	system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/enviro_cubemap.dds Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds");
 
 	return true;
 }

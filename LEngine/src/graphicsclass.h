@@ -44,6 +44,7 @@ const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
+const int ENVIRONMENT_SPECULAR_SIZE = 128;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
@@ -94,6 +95,8 @@ private:
 	//SHADOW MAPPING
 	bool CreateShadowMap(RenderTextureClass* targetTex);
 	bool RenderDepthScene();
+	//IBL SPECULAR
+	bool PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
 
 private:
 	D3DClass* m_D3D;
@@ -133,6 +136,10 @@ private:
 	SingleColorClass* m_singleColorShader;
 	SkyboxShaderClass* m_convoluteShader;
 	ModelClass* m_convoluteQuadModel;
+
+	//IBL SPECULAR SETTINGS
+	SkyboxShaderClass* m_specularIBLShader;
+	RenderTextureClass* m_environmentTextureMap;
 
 	//PREVIEW SKYBOX
 	RenderTextureClass* m_skyboxTextureLeft;

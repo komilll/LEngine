@@ -82,10 +82,18 @@
     <None Include="shadowmap.ps">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="singleColorNoShadow.vs" />
-    <None Include="singleColorNoShadow.ps" />
-    <None Include="environmentPrefilteredMap.ps" />
-    <None Include="environmentPrefilteredMap.vs" />
+    <None Include="singleColorNoShadow.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="singleColorNoShadow.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="environmentPrefilteredMap.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="environmentPrefilteredMap.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">

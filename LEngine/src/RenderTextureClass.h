@@ -22,10 +22,11 @@ public:
 
 	bool InitializeShadowMap(ID3D11Device* device, int textureWidth, int textureHeight);
 	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling = NONE, bool skybox = false);
+	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight, int mipLevels);
 	void Shutdown();
 
 	///<summary>Choose target to pass render info</summary>
-	void SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView);
+	void SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, bool withViewport = true);
 	///<summary>Clear target every time before usage!</summary>
 	void ClearRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, float red, float green, float blue, float alpha);
 	void SetViewport(ID3D11DeviceContext * deviceContext);

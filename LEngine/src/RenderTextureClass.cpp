@@ -70,16 +70,73 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 		return Initialize2DTexture(device, textureWidth, textureHeight, scaling);
 }
 
+bool RenderTextureClass::Initialize(ID3D11Device * device, int textureWidth, int textureHeight, int mipLevels)
+{
+	D3D11_TEXTURE2D_DESC textureDesc;
+	HRESULT result;
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
+	textureDesc.Width = textureWidth;
+	textureDesc.Height = textureHeight;
+	textureDesc.MipLevels = mipLevels;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+	result = device->CreateTexture2D(&textureDesc, NULL, &m_texture2D);
+	if (FAILED(result))
+		return false;
+
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+	renderTargetViewDesc.Texture2DArray.MipSlice = 0;
+	renderTargetViewDesc.Texture2DArray.ArraySize = 1;
+
+	result = device->CreateRenderTargetView(m_texture2D, &renderTargetViewDesc, &m_renderTargetView);
+	if (FAILED(result))
+		return false;
+
+	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = mipLevels;
+
+	result = device->CreateShaderResourceView(m_texture2D, &shaderResourceViewDesc, &m_shaderResourceView);
+	if (FAILED(result))
+		return false;
+
+	m_orthoMatrix = XMMatrixOrthographicLH((float)textureWidth, (float)textureHeight, 0.0f, 1.0f);
+
+	m_viewport.Height = (float)textureHeight;
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+	m_viewport.TopLeftY = 0;
+	m_viewport.Width = (float)textureWidth;
+	m_viewport.TopLeftX = 0;
+
+	return true;
+}
+
 void RenderTextureClass::Shutdown()
 {
 }
 
-void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView)
+void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView, bool withViewport)
 {
 	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, depthStencilView);
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	deviceContext->RSSetViewports(1, &m_viewport);
+	if (withViewport)
+		deviceContext->RSSetViewports(1, &m_viewport);
 }
 
 void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView, float red, float green, float blue, float alpha)

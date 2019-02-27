@@ -21,7 +21,7 @@ struct PixelInputType
 };
 
 static const float PI = 3.14159265359f;
-static const uint SAMPLE_COUNT = 1024u;
+static uint SAMPLE_COUNT = 1024u;
 
 float RadicalInverse_VdC(uint bits);
 float2 Hammersley(uint i, uint N);
@@ -35,6 +35,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	
 	[branch] if (g_upVectorVal.z == 1.0f)
 	{
+		input.position.x *= -1;
 		input.position.z = -1.0f;
 	}
 	[branch] if (g_upVectorVal.z == -1.0f)
@@ -63,6 +64,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	}
 
 	normal = input.position.xyz;
+	float roughness = max(g_roughness, 0.00f);
+	if (roughness < 0.05f)
+	{
+		SAMPLE_COUNT = 128u;
+	}
 
 	float3 N = normalize(normal);    
     float3 R = N;

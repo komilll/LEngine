@@ -356,7 +356,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 #pragma endregion
 
-	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap.dds"))
+	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/conv_cubemap.dds"))
 		return false;
 
 	//CreateShadowMap(m_shadowMapTexture);
@@ -590,9 +590,9 @@ bool GraphicsClass::Render()
 		//	return false;
 
 	//STANDARD SCENE RENDERING
-		result = RenderScene();
-		if (!result)
-			return false;
+		//result = RenderScene();
+		//if (!result)
+		//	return false;
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
 		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -1160,36 +1160,106 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
 	XMFLOAT3 up[] = { XMFLOAT3{ 0, 1, 0 }, XMFLOAT3{ 0, 0, 1 }, XMFLOAT3{ 1, 0, 0 }, XMFLOAT3{ 0, -1, 0 }, XMFLOAT3{ 0, 0, -1 }, XMFLOAT3{ -1, 0, 0 } };
 	wchar_t* filenames[] = { L"Skyboxes/enviro_negy.dds", L"Skyboxes/enviro_negz.dds" , L"Skyboxes/enviro_negx.dds", L"Skyboxes/enviro_posy.dds", L"Skyboxes/enviro_posz.dds", L"Skyboxes/enviro_posx.dds" };
-	for (int i = 0; i < 6; i++)
+	wchar_t* filenamesCubemap[] = { L"Skyboxes/enviro_cubemap_0.dds", L"Skyboxes/enviro_cubemap_1.dds" , L"Skyboxes/enviro_cubemap_2.dds", L"Skyboxes/enviro_cubemap_3.dds", L"Skyboxes/enviro_cubemap_4.dds" };
+
+	D3D11_TEXTURE2D_DESC textureDesc;
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+
+	ID3D11Texture2D *texture2D;
+	ID3D11RenderTargetView* renderTargetView;
+	ID3D11ShaderResourceView* shaderResourceView;
+
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+
+	float color[4]{ 1.0f, 0.0f, 0.0f, 1.0f };
+	////////////////////////////////////////////////////
+	///////////////////////////////////////////////////
+	//////////////////////////////////////////////////
+	for (int mip = 0; mip < 1; mip++)
 	{
-		dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
+		unsigned mipWidth = 256 * pow(0.5, mip);
+		unsigned mipHeight = 256 * pow(0.5, mip);
 
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+		textureDesc.Width = mipWidth;
+		textureDesc.Height = mipHeight;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Usage = D3D11_USAGE_DEFAULT;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = 0;
+		textureDesc.MiscFlags = 0;
+		result = m_D3D->GetDevice()->CreateTexture2D(&textureDesc, NULL, &texture2D);
+		if (FAILED(result))
+			return false;
 
-		m_specularIBLShader->SetUpVector(up[i]);
+		result = m_D3D->GetDevice()->CreateRenderTargetView(texture2D, &renderTargetViewDesc, &renderTargetView);
+		if (FAILED(result))
+			return false;
 
-		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+		result = m_D3D->GetDevice()->CreateShaderResourceView(texture2D, &shaderResourceViewDesc, &shaderResourceView);
+		if (FAILED(result))
+			return false;
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		m_specularIBLShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		D3D11_VIEWPORT envMapviewport;
+		envMapviewport.Width = mipWidth;
+		envMapviewport.Height = mipHeight;
+		envMapviewport.MinDepth = 0.0f;
+		envMapviewport.MaxDepth = 1.0f;
+		envMapviewport.TopLeftX = 0.0f;
+		envMapviewport.TopLeftY = 0.0f;
 
-		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
+		float roughness = (float)mip / (float)(5);
 
-		m_D3D->SetBackBufferRenderTarget();
-		m_D3D->ResetViewport();
+		m_D3D->GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, m_D3D->GetDepthStencilView());
+		m_D3D->GetDeviceContext()->ClearDepthStencilView(m_D3D->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_D3D->GetDeviceContext()->ClearRenderTargetView(renderTargetView, color);
 
-		m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
+		m_D3D->GetDeviceContext()->RSSetViewports(1, &envMapviewport);
 
-		SaveDDSTextureToFile(m_D3D->GetDeviceContext(), dstTex->GetShaderResource(), filenames[i]);
+		for (int i = 0; i < 6; i++)
+		{
+			m_Camera->Render();
+			m_Camera->GetViewMatrix(viewMatrix);
+			m_D3D->GetWorldMatrix(worldMatrix);
+			m_D3D->GetProjectionMatrix(projectionMatrix);
+
+			m_specularIBLShader->SetUpVector(up[i]);
+
+			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+			m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+
+			m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+			m_specularIBLShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+
+			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+			m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
+
+			SaveDDSTextureToFile(m_D3D->GetDeviceContext(), texture2D, filenames[i]);
+		}
+		string tmp = "texassemble cube -w ";
+		tmp += std::to_string(mipWidth);
+		tmp += " -h ";
+		tmp += std::to_string(mipWidth);
+		tmp += " -f R8G8B8A8_UNORM -o Skyboxes/enviro_cubemap.dds Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds";
+		system(tmp.c_str());
 	}
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
 
-	system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/enviro_cubemap.dds Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds");
+	//system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/enviro_cubemap.dds Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds");
 
 	return true;
 }

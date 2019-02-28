@@ -74,6 +74,24 @@ bool SkyboxShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 		bufferNumber = 0;
 		deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_upVectorBuffer);
 	}
+	else if (m_skyboxType == SkyboxType::ENVIRO)
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		UpVectorBuffer* dataPtr;
+		unsigned int bufferNumber;
+
+		HRESULT result = deviceContext->Map(m_upVectorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		if (FAILED(result))
+			return false;
+
+		dataPtr = (UpVectorBuffer*)mappedResource.pData;
+		dataPtr->upVector = m_upVector;
+		dataPtr->rightVectorDirection = m_roughness;
+
+		deviceContext->Unmap(m_upVectorBuffer, 0);
+		bufferNumber = 0;
+		deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_upVectorBuffer);
+	}
 
 	/////// RESOURCES ///////
 	//Pixel shader resources
@@ -94,4 +112,9 @@ void SkyboxShaderClass::SetUpVector(XMFLOAT3 vector)
 void SkyboxShaderClass::SetRightVector(float rightVectorSign)
 {
 	m_rightVectorDirection = rightVectorSign >= 0 ? 1 : -1;
+}
+
+void SkyboxShaderClass::SetRoughness(float roughness)
+{
+	m_roughness = roughness;
 }

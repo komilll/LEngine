@@ -94,6 +94,12 @@
     <None Include="environmentPrefilteredMap.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="SpecularLookupIBL.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="SpecularLookupIBL.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">

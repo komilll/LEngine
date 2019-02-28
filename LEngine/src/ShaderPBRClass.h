@@ -36,6 +36,9 @@ private:
 
 public:
 	bool LoadIrradianceMap(ID3D11Device *device, const wchar_t* filename);
+	bool LoadEnvironmentMap(ID3D11Device *device, const wchar_t* filename);
+	bool LoadBrdfLut(ID3D11Device *device, const wchar_t* filename);
+
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
 
@@ -48,6 +51,10 @@ public:
 	ID3D11ShaderResourceView* m_roughnessTextureView;
 	ID3D11Resource* m_metalnessTexture;
 	ID3D11ShaderResourceView* m_metalnessTextureView;
+	ID3D11Resource* m_environmentMapTexture;
+	ID3D11ShaderResourceView* m_environmentMapTextureView;
+	ID3D11Resource* m_brdfLut;
+	ID3D11ShaderResourceView* m_brdfLutView;
 
 	XMFLOAT4 m_lightDirection;
 	XMFLOAT3 m_cameraPosition;

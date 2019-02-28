@@ -136,6 +136,8 @@
     <None Include="singleColorNoShadow.vs" />
     <None Include="skybox.ps" />
     <None Include="skybox.vs" />
+    <None Include="SpecularLookupIBL.ps" />
+    <None Include="SpecularLookupIBL.vs" />
     <None Include="textureShader.ps" />
     <None Include="textureShader.vs" />
     <None Include="uibase.ps" />

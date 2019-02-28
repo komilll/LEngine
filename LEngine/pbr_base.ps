@@ -7,6 +7,8 @@
 /////////////
 Texture2D shaderTexture[4];
 TextureCube irradianceMap;
+Texture2D specularLUT;
+TextureCube environmentMap;
 SamplerState SampleType;
 
 cbuffer LightingBuffer
@@ -133,14 +135,20 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//float3 ambient = 0.03 * albedo;
 	float3 ambient = (kD * diffuse);// * ao;
 
+//SPECULAR IBL
+	float3 R = reflect(-input.viewDirection, input.normal);   
+	float3 prefilteredColor = environmentMap.Sample(SampleType, R);
+	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
+
 //GAMMA CORRECTION
 	float3 tempColor = (ambient + Lo);
 	tempColor = tempColor / (tempColor + float3(1.0, 1.0, 1.0));
 	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 	float4 finalColor = float4(tempColor, 1.0);
 
+	return float4(prefilteredColor, 1.0f);
 	//return finalColor * g_lightStrength;//* lightIntensity;
-	return float4(irradiance, 1.0);
+	//return float4(irradiance, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)

@@ -15,6 +15,16 @@ void ShaderPBRClass::SetMetalness(float metalness)
 	m_metalness = metalness;
 }
 
+bool ShaderPBRClass::LoadEnvironmentMap(ID3D11Device *device, const wchar_t * filename)
+{
+	return LoadTexture(device, filename, m_environmentMapTexture, m_environmentMapTextureView);
+}
+
+bool ShaderPBRClass::LoadBrdfLut(ID3D11Device *device, const wchar_t * filename)
+{
+	return LoadTexture(device, filename, m_brdfLut, m_brdfLutView);
+}
+
 bool ShaderPBRClass::CreateBufferAdditionals(ID3D11Device * &device)
 {
 	BaseShaderClass::CreateBufferAdditionals(device);
@@ -124,5 +134,7 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 	deviceContext->PSSetShaderResources(2, 1, &m_roughnessTextureView);
 	deviceContext->PSSetShaderResources(3, 1, &m_metalnessTextureView);
 	deviceContext->PSSetShaderResources(4, 1, &m_irradianceMapView);
+	deviceContext->PSSetShaderResources(5, 1, &m_brdfLutView);
+	deviceContext->PSSetShaderResources(6, 1, &m_environmentMapTextureView);
 	return true;
 }

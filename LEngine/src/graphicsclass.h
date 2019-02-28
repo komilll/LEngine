@@ -97,6 +97,7 @@ private:
 	bool RenderDepthScene();
 	//IBL SPECULAR
 	bool PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
+	bool PrepareLutBrdf(RenderTextureClass* dstTex);
 
 private:
 	D3DClass* m_D3D;
@@ -140,6 +141,8 @@ private:
 	//IBL SPECULAR SETTINGS
 	SkyboxShaderClass* m_specularIBLShader;
 	RenderTextureClass* m_environmentTextureMap;
+	RenderTextureClass* m_brdfLUT;
+	BaseShaderClass* m_brdfLutShader;
 
 	//PREVIEW SKYBOX
 	RenderTextureClass* m_skyboxTextureLeft;

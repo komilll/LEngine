@@ -18,7 +18,7 @@ public:
 	//Use different type for normal skybox
 	//and for irradiance/specular maps
 	enum SkyboxType{
-		NORMAL, CONV_DIFFUSE
+		NORMAL, CONV_DIFFUSE, ENVIRO
 	};
 
 public:
@@ -31,6 +31,7 @@ public:
 	void SetType(SkyboxType type);
 	void SetUpVector(XMFLOAT3 vector);
 	void SetRightVector(float rightVectorSign);
+	void SetRoughness(float roughness);
 
 private:
 	SkyboxType m_skyboxType;
@@ -38,6 +39,7 @@ private:
 	ID3D11Buffer* m_upVectorBuffer;
 	XMFLOAT3 m_upVector;
 	float m_rightVectorDirection;
+	float m_roughness;
 };
 
 

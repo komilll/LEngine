@@ -215,7 +215,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	m_convoluteQuadModel = new ModelClass;
-	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f);
+	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 
 	m_groundQuadModel = new ModelClass;
 	m_groundQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -50.0f, 50.0f, 50.0f, -50.0f);
@@ -292,15 +292,26 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!(m_environmentTextureMap->Initialize(m_D3D->GetDevice(), ENVIRONMENT_SPECULAR_SIZE, ENVIRONMENT_SPECULAR_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
+	if (!(m_brdfLUT = new RenderTextureClass))
+		return false;
+	if (!(m_brdfLUT->Initialize(m_D3D->GetDevice(), 512, 512, RenderTextureClass::Scaling::NONE)))
+		return false;
+	
 	if (!(m_specularIBLShader = new SkyboxShaderClass))
 		return false;
 	if (!(m_specularIBLShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"environmentPrefilteredMap.vs", L"environmentPrefilteredMap.ps", input)))
 		return false;
 
 	m_specularIBLShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_specularIBLShader->m_skyboxTexture, m_specularIBLShader->m_skyboxTextureView);
-	m_specularIBLShader->SetType(SkyboxShaderClass::SkyboxType::CONV_DIFFUSE);
+	m_specularIBLShader->SetType(SkyboxShaderClass::SkyboxType::ENVIRO);
 	m_specularIBLShader->SetUpVector(XMFLOAT3{ 0, 1, 0 });
 
+	if (!(m_brdfLutShader = new SkyboxShaderClass))
+		return false;
+	if (!(m_brdfLutShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"SpecularLookupIBL.vs", L"SpecularLookupIBL.ps", input)))
+		return false;
+
+	//PrepareLutBrdf(m_brdfLUT);
 	PrepareEnvironmentPrefilteredMap(m_specularIBLShader->m_skyboxTextureView, m_environmentTextureMap);
 
 	//Skybox texture previews
@@ -357,6 +368,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma endregion
 
 	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/conv_cubemap.dds"))
+		return false;
+	if (!m_pbrShader->LoadEnvironmentMap(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_0.dds"))
+		return false;
+	if (!m_pbrShader->LoadBrdfLut(m_D3D->GetDevice(), L"Skyboxes/LutBRDF.dds"))
 		return false;
 
 	//CreateShadowMap(m_shadowMapTexture);
@@ -590,9 +605,9 @@ bool GraphicsClass::Render()
 		//	return false;
 
 	//STANDARD SCENE RENDERING
-		//result = RenderScene();
-		//if (!result)
-		//	return false;
+		result = RenderScene();
+		if (!result)
+			return false;
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
 		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -1071,7 +1086,7 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 		m_D3D->SetBackBufferRenderTarget();
 		m_D3D->ResetViewport();
 
-		m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
+		//m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
 
 		SaveDDSTextureToFile(m_D3D->GetDeviceContext(), dstTex->GetShaderResource(), filenames[i]);
 	}
@@ -1089,7 +1104,7 @@ bool GraphicsClass::CreateShadowMap(RenderTextureClass* targetTex)
 	if (RenderDepthScene() == false)
 		return false;
 
-	m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
+	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
 
 	m_D3D->SetBackBufferRenderTarget();
 	m_D3D->ResetViewport();
@@ -1148,11 +1163,6 @@ bool GraphicsClass::RenderDepthScene()
 
 bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * srcTex, RenderTextureClass * dstTex)
 {
-	ifstream skyboxFile;
-	skyboxFile.open("Skyboxes/enviro_cubemap.dds");
-	if (skyboxFile.fail() == false)
-		return true;
-
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
@@ -1160,7 +1170,8 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
 	XMFLOAT3 up[] = { XMFLOAT3{ 0, 1, 0 }, XMFLOAT3{ 0, 0, 1 }, XMFLOAT3{ 1, 0, 0 }, XMFLOAT3{ 0, -1, 0 }, XMFLOAT3{ 0, 0, -1 }, XMFLOAT3{ -1, 0, 0 } };
 	wchar_t* filenames[] = { L"Skyboxes/enviro_negy.dds", L"Skyboxes/enviro_negz.dds" , L"Skyboxes/enviro_negx.dds", L"Skyboxes/enviro_posy.dds", L"Skyboxes/enviro_posz.dds", L"Skyboxes/enviro_posx.dds" };
-	wchar_t* filenamesCubemap[] = { L"Skyboxes/enviro_cubemap_0.dds", L"Skyboxes/enviro_cubemap_1.dds" , L"Skyboxes/enviro_cubemap_2.dds", L"Skyboxes/enviro_cubemap_3.dds", L"Skyboxes/enviro_cubemap_4.dds" };
+	string filenamesString[] = { "Skyboxes/enviro_negy.dds", "Skyboxes/enviro_negz.dds" , "Skyboxes/enviro_negx.dds", "Skyboxes/enviro_posy.dds", "Skyboxes/enviro_posz.dds", "Skyboxes/enviro_posx.dds" };
+	string filenamesCubemap[] = { "Skyboxes/enviro_cubemap_0.dds", "Skyboxes/enviro_cubemap_1.dds" , "Skyboxes/enviro_cubemap_2.dds", "Skyboxes/enviro_cubemap_3.dds", "Skyboxes/enviro_cubemap_4.dds" };
 
 	D3D11_TEXTURE2D_DESC textureDesc;
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
@@ -1180,11 +1191,20 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 
+	ifstream skyboxFile;
+	int size = sizeof(filenamesCubemap) / sizeof(filenamesCubemap[0]);
+	for (int i = 0; i < size; i++)
+	{
+		skyboxFile.open(filenamesCubemap[i].c_str());
+		if (skyboxFile.fail() == false)
+			return true;
+	}
+
 	float color[4]{ 1.0f, 0.0f, 0.0f, 1.0f };
 	////////////////////////////////////////////////////
 	///////////////////////////////////////////////////
 	//////////////////////////////////////////////////
-	for (int mip = 0; mip < 1; mip++)
+	for (int mip = 0; mip < 5; mip++)
 	{
 		unsigned mipWidth = 256 * pow(0.5, mip);
 		unsigned mipHeight = 256 * pow(0.5, mip);
@@ -1221,7 +1241,7 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 		envMapviewport.TopLeftX = 0.0f;
 		envMapviewport.TopLeftY = 0.0f;
 
-		float roughness = (float)mip / (float)(5);
+		float roughness = (float)mip / 5.0f;
 
 		m_D3D->GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, m_D3D->GetDepthStencilView());
 		m_D3D->GetDeviceContext()->ClearDepthStencilView(m_D3D->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -1237,6 +1257,7 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 			m_D3D->GetProjectionMatrix(projectionMatrix);
 
 			m_specularIBLShader->SetUpVector(up[i]);
+			m_specularIBLShader->SetRoughness(roughness);
 
 			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 			m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
@@ -1253,13 +1274,43 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 		tmp += std::to_string(mipWidth);
 		tmp += " -h ";
 		tmp += std::to_string(mipWidth);
-		tmp += " -f R8G8B8A8_UNORM -o Skyboxes/enviro_cubemap.dds Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds";
+		tmp += " -f R8G8B8A8_UNORM -o ";
+		tmp += filenamesCubemap[mip];
+		tmp += " Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds";
+		
 		system(tmp.c_str());
 	}
 	m_D3D->SetBackBufferRenderTarget();
 	m_D3D->ResetViewport();
 
-	//system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/enviro_cubemap.dds Skyboxes/enviro_posx.dds Skyboxes/enviro_negx.dds Skyboxes/enviro_posy.dds Skyboxes/enviro_negy.dds Skyboxes/enviro_posz.dds Skyboxes/enviro_negz.dds");
+	return true;
+}
+
+bool GraphicsClass::PrepareLutBrdf(RenderTextureClass * dstTex)
+{
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	bool result;
+
+	dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), true);
+	dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
+
+	m_Camera->SetPosition(0,0,0.f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//m_D3D->TurnZBufferOff();
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		m_brdfLutShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//m_D3D->TurnZBufferOn();
+
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
+
+	m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
+
+	SaveDDSTextureToFile(m_D3D->GetDeviceContext(), dstTex->GetShaderResource(), L"Skyboxes/LutBRDF.dds");
 
 	return true;
 }

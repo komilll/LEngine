@@ -115,30 +115,32 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 ///////////////////
 
 //FRESNEL EQUATION
-	float F = FresnelSchlick(float3(0.04, 0.04, 0.04), albedo, metalness, NdotV, 5.0);
+	float3 F0 = float3(0.04, 0.04, 0.04);
+	float F = FresnelSchlick(F0, albedo, metalness, NdotV, 5.0);
 /////////////////
+
+//SPECULAR IBL
+	float3 R = reflect(-input.viewDirection, input.normal);   
+	float3 prefilteredColor = environmentMap.Sample(SampleType, R);
+	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
+
+//DIFFUSE IRRADIANCE
+	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
+	float3 diffuse = irradiance * albedo;
+	//float3 ambient = 0.03 * albedo;
 
 //FINAL CALCULATIONS
 	float3 numerator = D * G * F;
 	float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 	specular = numerator / max(denominator, 0.001);
 
-	float3 kS = FresnelSchlickRoughness(max(NdotV, 0.0), float3(0.04, 0.04, 0.04), roughness);
+	float3 kS = FresnelSchlickRoughness(max(NdotV, 0.0), F0, roughness);
 	float3 kD = float3(1.0, 1.0, 1.0) - kS;
-	kD *= 1.0 - metalness;
+	kD *= (1.0 - metalness);
 
 	float3 Lo = (kD * albedo / PI + specular) * NdotL;
-
-//DIFFUSE IRRADIANCE
-	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
-	float3 diffuse = irradiance * albedo;
-	//float3 ambient = 0.03 * albedo;
-	float3 ambient = (kD * diffuse);// * ao;
-
-//SPECULAR IBL
-	float3 R = reflect(-input.viewDirection, input.normal);   
-	float3 prefilteredColor = environmentMap.Sample(SampleType, R);
-	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
+	specular = prefilteredColor * (F * enviroBRDF.x + enviroBRDF.y);
+	float3 ambient = (kD * diffuse + specular * roughness * 0.5f);// * ao;
 
 //GAMMA CORRECTION
 	float3 tempColor = (ambient + Lo);
@@ -146,9 +148,9 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 	float4 finalColor = float4(tempColor, 1.0);
 
-	return float4(prefilteredColor, 1.0f);
-	//return finalColor * g_lightStrength;//* lightIntensity;
-	//return float4(irradiance, 1.0);
+	//return float4(tempColor, 1.0f) * g_lightStrength;//*lightIntensity;
+	return finalColor * g_lightStrength;// * lightIntensity;
+	//return float4(R, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)

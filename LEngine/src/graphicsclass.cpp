@@ -649,7 +649,7 @@ bool GraphicsClass::RenderScene()
 	bool result;
 
 	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f);
-	m_Camera->SetPosition(0.0f, 0.0f, -2.0f);
+	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f);
 	m_Camera->Render();
 
 	//RENDER MAIN SCENE MODEL

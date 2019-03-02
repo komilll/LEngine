@@ -35,13 +35,21 @@ private:
 	};
 
 public:
+	bool LoadIrradianceMap(ID3D11ShaderResourceView *& shaderResourceView);
 	bool LoadIrradianceMap(ID3D11Device *device, const wchar_t* filename);
+
 	bool LoadEnvironmentMap(ID3D11Device *device, const wchar_t* filename);
+	bool LoadEnvironmentMap(ID3D11ShaderResourceView *& shaderResourceView);
+	bool AddEnvironmentMapLevel(ID3D11ShaderResourceView *& shaderResourceView);
+	bool AddEnvironmentMapLevel(ID3D11Device *device, const wchar_t* filename);
+	int GetEnvironmentMipLevels();
+
 	bool LoadBrdfLut(ID3D11Device *device, const wchar_t* filename);
 
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
 
+public:
 	//Texture resources
 	ID3D11Resource* m_diffuseTexture;
 	ID3D11ShaderResourceView* m_diffuseTextureView;
@@ -51,8 +59,6 @@ public:
 	ID3D11ShaderResourceView* m_roughnessTextureView;
 	ID3D11Resource* m_metalnessTexture;
 	ID3D11ShaderResourceView* m_metalnessTextureView;
-	ID3D11Resource* m_environmentMapTexture;
-	ID3D11ShaderResourceView* m_environmentMapTextureView;
 	ID3D11Resource* m_brdfLut;
 	ID3D11ShaderResourceView* m_brdfLutView;
 
@@ -73,6 +79,10 @@ private:
 
 	ID3D11Resource* m_irradianceMap;
 	ID3D11ShaderResourceView* m_irradianceMapView;
+	ID3D11Resource* m_environmentMapTexture;
+	ID3D11ShaderResourceView* m_environmentMapTextureView;
+
+	std::vector<ID3D11ShaderResourceView*> m_environmentMapViews;
 };
 
 #endif // !_SHADERPBRCLASS_H_

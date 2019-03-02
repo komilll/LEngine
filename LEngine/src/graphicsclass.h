@@ -41,7 +41,7 @@ const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 1.0f;
 const bool BLUR_BILINEAR = false;
-const bool ENABLE_DEBUG = false;
+const bool ENABLE_DEBUG = true;
 const bool DRAW_SKYBOX = true;
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -98,6 +98,7 @@ private:
 	//IBL SPECULAR
 	bool PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
 	bool PrepareLutBrdf(RenderTextureClass* dstTex);
+	bool CreateSingleEnvironmentMap();
 
 private:
 	D3DClass* m_D3D;

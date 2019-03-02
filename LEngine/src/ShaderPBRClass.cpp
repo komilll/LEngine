@@ -5,6 +5,12 @@ bool ShaderPBRClass::LoadIrradianceMap(ID3D11Device *device, const wchar_t * fil
 	return LoadTexture(device, filename, m_irradianceMap, m_irradianceMapView);
 }
 
+bool ShaderPBRClass::LoadIrradianceMap(ID3D11ShaderResourceView *& shaderResourceView)
+{
+	m_irradianceMapView = shaderResourceView;
+	return true;
+}
+
 void ShaderPBRClass::SetRoughness(float roughness)
 {
 	m_roughness = roughness;
@@ -18,6 +24,32 @@ void ShaderPBRClass::SetMetalness(float metalness)
 bool ShaderPBRClass::LoadEnvironmentMap(ID3D11Device *device, const wchar_t * filename)
 {
 	return LoadTexture(device, filename, m_environmentMapTexture, m_environmentMapTextureView);
+}
+
+bool ShaderPBRClass::LoadEnvironmentMap(ID3D11ShaderResourceView *& shaderResourceView)
+{
+	m_environmentMapTextureView = shaderResourceView;
+	return true;
+}
+
+bool ShaderPBRClass::AddEnvironmentMapLevel(ID3D11ShaderResourceView *& shaderResourceView)
+{
+	m_environmentMapViews.push_back(shaderResourceView);
+	return true;
+}
+
+bool ShaderPBRClass::AddEnvironmentMapLevel(ID3D11Device * device, const wchar_t * filename)
+{
+	m_environmentMapViews.push_back(nullptr);
+	if (!LoadTexture(device, filename, m_environmentMapTexture, m_environmentMapViews.at(m_environmentMapViews.size() - 1)))
+		return false;
+	//m_environmentMapViews.push_back(m_environmentMapTextureView);
+	return true;
+}
+
+int ShaderPBRClass::GetEnvironmentMipLevels()
+{
+	return m_environmentMapViews.size();
 }
 
 bool ShaderPBRClass::LoadBrdfLut(ID3D11Device *device, const wchar_t * filename)
@@ -129,12 +161,14 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 
 	/////// RESOURCES ///////
 	//Pixel shader resources
-	deviceContext->PSSetShaderResources(0, 1, &m_diffuseTextureView);
-	deviceContext->PSSetShaderResources(1, 1, &m_normalTextureView);
-	deviceContext->PSSetShaderResources(2, 1, &m_roughnessTextureView);
-	deviceContext->PSSetShaderResources(3, 1, &m_metalnessTextureView);
-	deviceContext->PSSetShaderResources(4, 1, &m_irradianceMapView);
-	deviceContext->PSSetShaderResources(5, 1, &m_brdfLutView);
-	deviceContext->PSSetShaderResources(6, 1, &m_environmentMapTextureView);
+	bufferNumber = 0;
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_diffuseTextureView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_normalTextureView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_roughnessTextureView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_metalnessTextureView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_irradianceMapView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_brdfLutView);
+	for (int i = 0; i < m_environmentMapViews.size(); i++)
+		deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_environmentMapViews[i]);
 	return true;
 }

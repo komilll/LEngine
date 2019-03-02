@@ -8,7 +8,7 @@
 Texture2D shaderTexture[4];
 TextureCube irradianceMap;
 Texture2D specularLUT;
-TextureCube environmentMap;
+TextureCube environmentMap[5];
 SamplerState SampleType;
 
 cbuffer LightingBuffer
@@ -21,7 +21,8 @@ cbuffer PBRBuffer
 {
 	float g_roughness;
 	float g_metalness;
-	float2 g_paddingPBR;
+	float g_roughnessLOD;
+	float g_paddingPBR;
 };
 
 cbuffer ShaderTextureBuffer
@@ -59,6 +60,7 @@ float NormalDistributionFunction(float3 halfV, float roughness, float PI, float 
 float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
 float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness);
 
+float3 GetPrefilteredColor(float roughness, float3 R);
 
 //////////////////
 // CONST VALUES //
@@ -119,9 +121,9 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float F = FresnelSchlick(F0, albedo, metalness, NdotV, 5.0);
 /////////////////
 
-//SPECULAR IBL
-	float3 R = reflect(-input.viewDirection, input.normal);   
-	float3 prefilteredColor = environmentMap.Sample(SampleType, R);
+//SPECULAR IBL	
+	float3 R = reflect(-input.viewDirection, input.normal);
+	float3 prefilteredColor = GetPrefilteredColor(roughness, R);
 	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
 
 //DIFFUSE IRRADIANCE
@@ -139,8 +141,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	kD *= (1.0 - metalness);
 
 	float3 Lo = (kD * albedo / PI + specular) * NdotL;
-	specular = prefilteredColor * (F * enviroBRDF.x + enviroBRDF.y);
-	float3 ambient = (kD * diffuse + specular * roughness * 0.5f);// * ao;
+	specular =  prefilteredColor * (kS * enviroBRDF.x + enviroBRDF.y);
+	float3 ambient = (kD * diffuse + specular);// * ao;
 
 //GAMMA CORRECTION
 	float3 tempColor = (ambient + Lo);
@@ -148,9 +150,9 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 	float4 finalColor = float4(tempColor, 1.0);
 
-	//return float4(tempColor, 1.0f) * g_lightStrength;//*lightIntensity;
+	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
 	return finalColor * g_lightStrength;// * lightIntensity;
-	//return float4(R, 1.0);
+	//return float4(irradiance, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)
@@ -232,4 +234,22 @@ float GetMetalness(float metalnessMap, float metalness)
 	{
 		return metalness;
 	}
+}
+////////////////////////////////////////////////////////////
+// OTHER CALCULATIONS
+////////////////////////////////////////////////////////////
+float3 GetPrefilteredColor(float roughness, float3 R)
+{
+	float3 color_0 = environmentMap[0].Sample(SampleType, R);
+	float3 color_1 = environmentMap[1].Sample(SampleType, R);
+	float3 color_2 = environmentMap[2].Sample(SampleType, R);
+	float3 color_3 = environmentMap[3].Sample(SampleType, R);
+	float3 color_4 = environmentMap[4].Sample(SampleType, R);
+
+	float3 colors[5] = {color_0, color_1, color_2, color_3, color_4};
+	int index = clamp(roughness * 5, 0, 4);
+	float lerpVal = (roughness - index * 0.2f) / ((index + 1) * 0.2f - index * 0.2f);
+	lerpVal = clamp(lerpVal, 0.0f, 1.0f);
+
+	return lerp(colors[index], colors[clamp(index + 1, 0, 4)], lerpVal);
 }

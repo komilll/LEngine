@@ -65,7 +65,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	normal = input.position.xyz;
 	float roughness = max(g_roughness, 0.00f);
-	if (roughness < 0.05f)
+	[branch] if (roughness < 0.05f)
 	{
 		SAMPLE_COUNT = 128u;
 	}
@@ -80,7 +80,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	for(uint i = 0u; i < SAMPLE_COUNT; ++i)
     {
         float2 Xi = Hammersley(i, SAMPLE_COUNT);
-        float3 H  = ImportanceSampleGGX(Xi, N, 0.1f);
+        float3 H  = ImportanceSampleGGX(Xi, N, roughness);
         float3 L  = normalize(2.0f * dot(V, H) * H - V);
 
         float NdotL = max(dot(N, L), 0.0);

@@ -108,6 +108,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float NdotV = max(dot(normal, input.viewDirection), 0.0);
 	float NdotL = max(dot(normal, lightDir), 0.0);
 
+//GAMMA CORRECTION
+	albedo = albedo / (albedo + float3(1.0, 1.0, 1.0));
+	albedo = pow(albedo, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+
 //NORMAL DISTRUBUTION FUNCTION
 	float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
 //////////////////////////////
@@ -119,6 +123,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 //FRESNEL EQUATION
 	float3 F0 = float3(0.04, 0.04, 0.04);
 	float F = FresnelSchlick(F0, albedo, metalness, NdotV, 5.0);
+	F0 = lerp(F0, albedo, metalness);
 /////////////////
 
 //SPECULAR IBL	
@@ -140,19 +145,18 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float3 kD = float3(1.0, 1.0, 1.0) - kS;
 	kD *= (1.0 - metalness);
 
+	float3 tint = float3(1.0, 0.0, 0.0);
+	//albedo *= lerp(float3(1.0, 1.0, 1.0), tint, metalness);
+
 	float3 Lo = (kD * albedo / PI + specular) * NdotL;
 	specular =  prefilteredColor * (kS * enviroBRDF.x + enviroBRDF.y);
 	float3 ambient = (kD * diffuse + specular);// * ao;
 
-//GAMMA CORRECTION
-	float3 tempColor = (ambient + Lo);
-	tempColor = tempColor / (tempColor + float3(1.0, 1.0, 1.0));
-	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
-	float4 finalColor = float4(tempColor, 1.0);
+	float4 finalColor = float4(ambient + Lo, 1.0);
 
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
 	return finalColor * g_lightStrength;// * lightIntensity;
-	//return float4(irradiance, 1.0);
+	//return float4(ambient, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)

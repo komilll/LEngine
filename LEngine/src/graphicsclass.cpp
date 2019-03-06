@@ -46,7 +46,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -2.0f);
+	m_Camera->SetPosition(0.0f, 5.0f, -15.0f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -383,7 +383,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_pbrShader->LoadBrdfLut(m_D3D->GetDevice(), L"Skyboxes/LutBRDF.dds"))
 		return false;
 
-	//CreateShadowMap(m_shadowMapTexture);
+	CreateShadowMap(m_shadowMapTexture);
 
 	return true;
 }
@@ -607,7 +607,7 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		//CreateShadowMap(m_shadowMapTexture);
+		CreateShadowMap(m_shadowMapTexture);
 
 		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
@@ -676,9 +676,9 @@ bool GraphicsClass::RenderScene()
 	m_directionalLight->GetViewMatrix(lightViewMatrix);
 	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
 	m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
-	//result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
+	result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
 
 	m_Model->Render(m_D3D->GetDeviceContext());
 	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
@@ -688,27 +688,27 @@ bool GraphicsClass::RenderScene()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	//if (!result)
 	//	return false;
-	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
+	//result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
 
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+	for (int i = 0; i < 5; i++)
+	{
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	//	worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
-	//	m_Model->Render(m_D3D->GetDeviceContext());
-	//	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//	if (!result)
-	//		return false;
-	//}
+		worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
+		m_Model->Render(m_D3D->GetDeviceContext());
+		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		if (!result)
+			return false;
+	}
 
 	if (DRAW_SKYBOX)
 	{
@@ -770,6 +770,10 @@ bool GraphicsClass::RenderSkybox()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	//DRAW SKYBOX
+	XMFLOAT3 tmp = m_Camera->GetPosition();
+	m_Camera->SetPosition(0.0f, 0.0f, 0.0f);
+	m_Camera->Render();
+	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
@@ -1131,7 +1135,7 @@ bool GraphicsClass::RenderDepthScene()
 	//Set light position
 	m_directionalLight->SetLookAt(0, 0, 0);
 	//m_directionalLight->SetPosition(-20, 15, -5);
-	m_directionalLight->SetPosition(0, 5, -5);
+	m_directionalLight->SetPosition(5, 10, -5);
 	m_shadowMapShader->SetLightPosition(m_directionalLight->GetPosition());
 	m_Model->Render(m_D3D->GetDeviceContext());
 

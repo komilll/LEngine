@@ -80,7 +80,7 @@ void CameraClass::Render()
 	XMVECTOR camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	XMVECTOR camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
-	XMVECTOR target{ 0,0,1,0 };
+	XMVECTOR target{ 0,0,0,0 };
 
 	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	pitch = m_rotationX * 0.0174532925f;
@@ -89,34 +89,28 @@ void CameraClass::Render()
 
 	// Create the rotation matrix from the yaw, pitch, and roll values.
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-	//target = XMVector3TransformCoord(forward, rotationMatrix);
-	//target = XMVector3Normalize(target);
+	target = XMVector3TransformCoord(forward, rotationMatrix);
+	target = XMVector3Normalize(target);
 
-	//XMMATRIX YrotationMatrix;
-	//YrotationMatrix = XMMatrixRotationY(yaw);
+	XMMATRIX YrotationMatrix;
+	YrotationMatrix = XMMatrixRotationY(yaw);
 
-	//camRight = XMVector3TransformCoord(right, YrotationMatrix);
-	//camForward = XMVector3TransformCoord(forward, YrotationMatrix);
+	camRight = XMVector3TransformCoord(right, YrotationMatrix);
+	camForward = XMVector3TransformCoord(forward, YrotationMatrix);
 
-	target = XMVector3TransformCoord(target, rotationMatrix);
-	up = XMVector3TransformCoord(up, rotationMatrix);
+	target = { m_positionX + target.m128_f32[0] , m_positionY + target.m128_f32[1], m_positionZ + target.m128_f32[2], 0.0f };
 
-	//target = { m_positionX + target.m128_f32[0] , m_positionY + target.m128_f32[1], m_positionZ + target.m128_f32[2], 0.0f };
-
-	target = position + target;
 	m_viewMatrix = XMMatrixLookAtLH(position, target, up);
-	m_viewMatrix = XMMatrixLookAtLH(XMVECTOR{ m_positionX, m_positionY, m_positionZ, 0.0f }, XMVECTOR{ 0, 0, 1, 0 }, XMVECTOR{ 0, 1, 0, 0.0f });
 
-	//XMVECTOR addPos = camRight * m_storedLeftRight + camForward * m_storedBackForward;
-	//m_positionX += addPos.m128_f32[0];
-	//m_positionY += addPos.m128_f32[1];
-	//m_positionZ += addPos.m128_f32[2];
-	//m_positionY += m_storedUpDown;
+	XMVECTOR addPos = camRight * m_storedLeftRight + camForward * m_storedBackForward;
+	m_positionX += addPos.m128_f32[0];
+	m_positionY += addPos.m128_f32[1];
+	m_positionZ += addPos.m128_f32[2];
+	m_positionY += m_storedUpDown;
 
-	//m_storedLeftRight = 0;
-	//m_storedBackForward = 0;
-	//m_storedUpDown = 0;
-
+	m_storedLeftRight = 0;
+	m_storedBackForward = 0;
+	m_storedUpDown = 0;
 	return;
 }
 

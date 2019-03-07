@@ -67,7 +67,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//SCENE LIGHTING
 	m_directionalLight = new LightClass;
 	m_directionalLight->SetLookAt(0, 0, 0);
-	m_directionalLight->SetPosition(-5, 10, 0);
+	m_directionalLight->SetPosition(0, 1, -10);
 	m_directionalLight->GenerateViewMatrix();
 	m_directionalLight->GenerateProjectionMatrix(SCREEN_DEPTH, SCREEN_NEAR);
 
@@ -607,7 +607,7 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		CreateShadowMap(m_shadowMapTexture);
+		//CreateShadowMap(m_shadowMapTexture);
 
 		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
@@ -673,10 +673,12 @@ bool GraphicsClass::RenderScene()
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
 	m_groundQuadModel->Render(m_D3D->GetDeviceContext());
 	m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
+	m_directionalLight->GenerateViewMatrix();
+	m_directionalLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_DEPTH);
 	m_directionalLight->GetViewMatrix(lightViewMatrix);
 	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
 	m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
-	result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
@@ -1112,7 +1114,7 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 bool GraphicsClass::CreateShadowMap(RenderTextureClass* targetTex)
 {
 	targetTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	targetTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	targetTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 1.0f, 1.0f, 1.0f);
 
 	if (RenderDepthScene() == false)
 		return false;
@@ -1135,7 +1137,7 @@ bool GraphicsClass::RenderDepthScene()
 	//Set light position
 	m_directionalLight->SetLookAt(0, 0, 0);
 	//m_directionalLight->SetPosition(-20, 15, -5);
-	m_directionalLight->SetPosition(5, 10, -5);
+	//m_directionalLight->SetPosition(5, 10, -5);
 	m_shadowMapShader->SetLightPosition(m_directionalLight->GetPosition());
 	m_Model->Render(m_D3D->GetDeviceContext());
 

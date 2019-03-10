@@ -125,9 +125,13 @@
     <None Include="convolutionSkybox.vs" />
     <None Include="environmentPrefilteredMap.ps" />
     <None Include="environmentPrefilteredMap.vs" />
+    <None Include="normalGBuffer.ps" />
+    <None Include="normalGBuffer.vs" />
     <None Include="packages.config" />
     <None Include="pbr_base.ps" />
     <None Include="pbr_base.vs" />
+    <None Include="positionGBuffer.ps" />
+    <None Include="positionGBuffer.vs" />
     <None Include="shadowmap.ps" />
     <None Include="shadowmap.vs" />
     <None Include="singleColor.ps" />
@@ -138,6 +142,10 @@
     <None Include="skybox.vs" />
     <None Include="SpecularLookupIBL.ps" />
     <None Include="SpecularLookupIBL.vs" />
+    <None Include="ssaoNoise.ps" />
+    <None Include="ssaoNoise.vs" />
+    <None Include="ssaoShader.ps" />
+    <None Include="ssaoShader.vs" />
     <None Include="textureShader.ps" />
     <None Include="textureShader.vs" />
     <None Include="uibase.ps" />
@@ -151,6 +159,7 @@
     <ClInclude Include="src\cameraclass.h" />
     <ClInclude Include="src\ConvoluteShaderClass.h" />
     <ClInclude Include="src\d3dclass.h" />
+    <ClInclude Include="src\GBufferShader.h" />
     <ClInclude Include="src\graphicsclass.h" />
     <ClInclude Include="src\inputclass.h" />
     <ClInclude Include="src\LightClass.h" />
@@ -179,6 +188,7 @@
     <ClCompile Include="src\cameraclass.cpp" />
     <ClCompile Include="src\ConvoluteShaderClass.cpp" />
     <ClCompile Include="src\d3dclass.cpp" />
+    <ClCompile Include="src\GBufferShader.cpp" />
     <ClCompile Include="src\graphicsclass.cpp" />
     <ClCompile Include="src\inputclass.cpp" />
     <ClCompile Include="src\LightClass.cpp" />

@@ -32,19 +32,24 @@
 #include "ShadowMapClass.h"
 #include "LightClass.h"
 #include "SingleColorClass.h"
+#include "GBufferShader.h"
+#include <random>
 
 /////////////
 // GLOBALS //
 /////////////
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
-const float SCREEN_DEPTH = 100.0f;
-const float SCREEN_NEAR = 1.0f;
+const float SCREEN_DEPTH = 1000.0f;
+const float SCREEN_NEAR = 0.01f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = false;
+
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
+const int SSAO_KERNEL_SIZE = 64;
+const int SSAO_NOISE_SIZE = 16;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
@@ -99,6 +104,16 @@ private:
 	bool PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
 	bool PrepareLutBrdf(RenderTextureClass* dstTex);
 	bool CreateSingleEnvironmentMap();
+	//SSAO
+	bool RenderGBufferPosition(RenderTextureClass *targetTex);
+	bool RenderGBufferNormal(RenderTextureClass *targetTex);
+	bool RenderGBufferAlbedo(RenderTextureClass *targetTex);
+	bool RenderSSAONoiseTexture(RenderTextureClass *targetTex);
+	bool RenderSSAOTexture(RenderTextureClass *targetTex);
+
+	///// HELPER FUNCTIONS /////
+	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
+	static float lerp(float a, float b, float val);
 
 private:
 	D3DClass* m_D3D;
@@ -165,6 +180,15 @@ private:
 	RenderTextureClass* m_shadowMapTexture;
 	ModelClass* m_shadowQuadModel;
 	ModelClass* m_groundQuadModel;
+
+	//SSAO
+	GBufferShader* m_GBufferShader;
+	RenderTextureClass* m_positionBuffer;
+	RenderTextureClass* m_normalBuffer;
+	RenderTextureClass* m_albedoBuffer;
+	RenderTextureClass* m_ssaoNoiseTexture;
+	RenderTextureClass* m_ssaoTexture;
+	XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
 	
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

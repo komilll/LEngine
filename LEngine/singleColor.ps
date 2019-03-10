@@ -35,7 +35,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tex.x = input.lightViewPosition.x / 2.0f + 0.5f;
 	tex.y = -input.lightViewPosition.y / 2.0f + 0.5f;
 	
-	depthValue = shadowMap.Sample(SampleType, tex).r;
+	return depthValue = shadowMap.Sample(SampleType, tex).r;
 	color = float4(depthValue, depthValue, depthValue, 1.0f);
 	
 	lightDepthValue = input.lightViewPosition.z;// / input.lightViewPosition.w;

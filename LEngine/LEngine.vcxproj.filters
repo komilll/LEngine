@@ -100,6 +100,30 @@
     <None Include="SpecularLookupIBL.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="positionGBuffer.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="positionGBuffer.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="normalGBuffer.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="normalGBuffer.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ssaoNoise.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ssaoNoise.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ssaoShader.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ssaoShader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">
@@ -178,6 +202,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\SingleColorClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GBufferShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -261,6 +288,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SingleColorClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GBufferShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

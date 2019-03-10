@@ -89,8 +89,8 @@ void CameraClass::Render()
 
 	// Create the rotation matrix from the yaw, pitch, and roll values.
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-	//target = XMVector3TransformCoord(forward, rotationMatrix);
-	//target = XMVector3Normalize(target);
+	/*target = XMVector3TransformCoord(forward, rotationMatrix);
+	target = XMVector3Normalize(target);*/
 
 	XMMATRIX YrotationMatrix;
 	YrotationMatrix = XMMatrixRotationY(yaw);

@@ -29,33 +29,34 @@ const float bias = 0.025f;
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	float3 position = textures[0].Sample(SampleType, input.tex); 
-	float3 normal = normalize(textures[1].Sample(SampleType, input.tex)); 
-	float3 randomVector = normalize(textures[2].Sample(SampleType, input.tex * noiseScale));
+	float3 position = textures[0].Sample(SampleType, input.tex).xyz; 
+	float3 normal = normalize(textures[1].Sample(SampleType, input.tex).rgb); 
+	float3 randomVector = float3(textures[2].Sample(SampleType, input.tex * 100.0f).xy, 0.0f);
+	//float3 randomVector = normalize(textures[2].Sample(SampleType, input.tex * noiseScale).xyz);
 
 	float3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
 	float3 bitangent = cross(normal, tangent);
 	float3x3 TBN = {tangent, bitangent, normal};
 
+	float3 sample = float3(0.0f, 0.0f, 0.0f);
+	float4 offset = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float occlusion = 0.0f;
+
 	for (int i = 0; i < 64; i++)
 	{
-		float3 sample = mul(TBN, g_kernelValue[i]); //From tangent to view-space
+		sample = mul(TBN, g_kernelValue[i]);
 		sample = position + sample * radius;
 
-		float4 offset = float4(sample, 1.0f);
+		offset = float4(sample, 1.0f);
 		offset = mul(input.projection, offset);
 		offset.xyz /= offset.w;
 		offset.xyz = offset.xyz * 0.5f + 0.5f;
-
+		
 		float sampleDepth = textures[0].Sample(SampleType, offset.xy).z;
-
-		float rangeCheck = smoothstep(0.0f, 1.0f, radius / abs(position.z - sampleDepth));
-		occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0) * rangeCheck;
+		occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0);
 	}
-	occlusion = 1.0 - (occlusion / 64.0f);
-	//occlusion = 1.0f - occlusion;
-	//return float4(sampleDepth, sampleDepth, sampleDepth, 1.0f);
-	//return float4(occlusion, occlusion, occlusion, 1.0f);
-	return float4(normal, 1.0f);
+	occlusion = 1.0f - (occlusion / 64.0f);
+	
+	float4 color = float4(tangent.x, tangent.y, tangent.z, 1.0f);
+	return color;
 }

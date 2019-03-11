@@ -189,6 +189,7 @@ private:
 	RenderTextureClass* m_ssaoNoiseTexture;
 	RenderTextureClass* m_ssaoTexture;
 	XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
+	XMFLOAT2 m_ssaoNoise[16];
 	
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

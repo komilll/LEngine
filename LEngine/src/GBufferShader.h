@@ -41,6 +41,7 @@ public:
 
 	void ChangeTextureType(BufferType newType);
 	void SetKernelValues(XMFLOAT3 kernelVal[64]);
+	void SetNoiseValues(XMFLOAT2 noiseVal[16]);
 
 	void LoadPositionTexture(ID3D11ShaderResourceView* view);
 	void LoadNormalTexture(ID3D11ShaderResourceView* view);
@@ -51,7 +52,8 @@ public:
 
 private:
 	BufferType m_bufferType;
-	XMFLOAT3 kernelValues[64];
+	XMFLOAT3 m_kernelValues[64];
+	XMFLOAT2 m_noiseValues[16];
 
 	ID3D11ShaderResourceView* m_positionView;
 	ID3D11ShaderResourceView* m_normalView;

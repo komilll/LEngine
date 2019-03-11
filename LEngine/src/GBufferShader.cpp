@@ -8,7 +8,13 @@ void GBufferShader::ChangeTextureType(BufferType newType)
 void GBufferShader::SetKernelValues(XMFLOAT3 kernelVal[64])
 {
 	for (int i = 0; i < 64; i++)
-		kernelValues[i] = kernelVal[i];
+		m_kernelValues[i] = kernelVal[i];
+}
+
+void GBufferShader::SetNoiseValues(XMFLOAT2 noiseVal[16])
+{
+	for (int i = 0; i < 16; i++)
+		m_noiseValues[i] = noiseVal[i];
 }
 
 void GBufferShader::LoadPositionTexture(ID3D11ShaderResourceView * view)
@@ -117,7 +123,7 @@ bool GBufferShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMM
 
 			ssaoBuffer = (SSAOBuffer*)mappedResource.pData;
 			for (int i = 0; i < 64; i++)
-				ssaoBuffer->kernelValues[i] = kernelValues[i];
+				ssaoBuffer->kernelValues[i] = m_kernelValues[i];
 
 			deviceContext->Unmap(m_ssaoBuffer, 0);
 			deviceContext->PSSetConstantBuffers(0, 1, &m_ssaoBuffer);

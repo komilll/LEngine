@@ -418,16 +418,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		tmpSample.z = randomFloats(generator);
 
 		//Normalize vector3
-		float denom = tmpSample.x + tmpSample.y + tmpSample.z;
-		tmpSample.x /= denom;
-		tmpSample.y /= denom;
-		tmpSample.z /= denom;
+		XMVECTOR tmpVector;
+		tmpVector.m128_f32[0] = tmpSample.x;
+		tmpVector.m128_f32[1] = tmpSample.y;
+		tmpVector.m128_f32[2] = tmpSample.z;
+
+		tmpVector = XMVector3Normalize(tmpVector);
+		
+		tmpSample.x = tmpVector.m128_f32[0];
+		tmpSample.y = tmpVector.m128_f32[1];
+		tmpSample.z = tmpVector.m128_f32[2];
 
 		//Multiply by random value all coordinates of vector3
-		float randomMultiply = randomFloats(generator);
-		tmpSample.x *= randomMultiply;
-		tmpSample.y *= randomMultiply;
-		tmpSample.z *= randomMultiply;
+		//float randomMultiply = randomFloats(generator);
+		//tmpSample.x *= randomMultiply;
+		//tmpSample.y *= randomMultiply;
+		//tmpSample.z *= randomMultiply;
 
 		//Scale samples so they are more aligned to middle of hemisphere
 		float scale = float(i) / 64.0f;
@@ -438,6 +444,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 		//Pass value to array
 		m_ssaoKernel[i] = tmpSample;
+	}
+
+	XMFLOAT2 tmpNoise;
+	for (int i = 0; i < 16; i++)
+	{
+		tmpNoise.x = randomFloats(generator);
+		tmpNoise.y = randomFloats(generator);
+		m_ssaoNoise[i] = tmpNoise;
 	}
 
 	//Create SSAO noise texture
@@ -459,6 +473,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_ssaoNoiseTexture->LoadTexture(m_D3D->GetDevice(), L"ssaoNoise.dds", m_ssaoNoiseTexture->GetShaderResource(), m_ssaoNoiseTexture->GetShaderResourceView()))
 		return false;
 	m_GBufferShader->SetKernelValues(m_ssaoKernel);
+	m_GBufferShader->SetNoiseValues(m_ssaoNoise);
 	m_GBufferShader->LoadPositionTexture(m_positionBuffer->GetShaderResourceView());
 	m_GBufferShader->LoadNormalTexture(m_normalBuffer->GetShaderResourceView());
 	m_GBufferShader->LoadNoiseTexture(m_ssaoNoiseTexture->GetShaderResourceView());

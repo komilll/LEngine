@@ -40,8 +40,8 @@
 /////////////
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
-const float SCREEN_DEPTH = 1000.0f;
-const float SCREEN_NEAR = 0.01f;
+const float SCREEN_DEPTH = 100.0f;
+const float SCREEN_NEAR = 2.0f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = false;

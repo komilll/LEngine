@@ -31,7 +31,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float3 position = textures[0].Sample(SampleType, input.tex).xyz; 
 	float3 normal = normalize(textures[1].Sample(SampleType, input.tex).rgb); 
-	float3 randomVector = float3(textures[2].Sample(SampleType, input.tex * 100.0f).xy, 0.0f);
+	float3 randomVector = normalize(float3(textures[2].Sample(SampleType, input.tex * 100.0f).xy, 0.0f));
 	//float3 randomVector = normalize(textures[2].Sample(SampleType, input.tex * noiseScale).xyz);
 
 	float3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
@@ -57,6 +57,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	}
 	occlusion = 1.0f - (occlusion / 64.0f);
 	
-	float4 color = float4(tangent.x, tangent.y, tangent.z, 1.0f);
-	return color;
+	//float4 color = float4(position.x, position.y, position.z, 1.0f);
+	//return color;
+	return float4(occlusion, occlusion, occlusion, 1.0f);
 }

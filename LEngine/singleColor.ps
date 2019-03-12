@@ -21,27 +21,27 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	float4 color = float4(0.0, 0.0, 0.0, 1.0);
-	float depthValue;
-	float lightDepthValue;
-	float bias = 0.001f;
-	float4 textureColor = float4(1.0, 1.0, 1.0, 1.0);
-	float4 ambientColor = float4(1.0, 0.0, 1.0, 1.0);
-	float2 tex;
-	float lightIntensity = 0.0f;
+    float4 color = float4(0.0, 0.0, 0.0, 1.0);
+    float depthValue;
+    float lightDepthValue;
+    float bias = 0.001f;
+    float4 textureColor = float4(1.0, 1.0, 1.0, 1.0);
+    float4 ambientColor = float4(1.0, 0.0, 1.0, 1.0);
+    float2 tex;
+    float lightIntensity = 0.0f;
 
-	input.lightViewPosition.xyz /= input.lightViewPosition.w;
+    input.lightViewPosition.xyz /= input.lightViewPosition.w;
 
-	tex.x = input.lightViewPosition.x / 2.0f + 0.5f;
-	tex.y = -input.lightViewPosition.y / 2.0f + 0.5f;
-	
-	return depthValue = shadowMap.Sample(SampleType, tex).r;
-	color = float4(depthValue, depthValue, depthValue, 1.0f);
-	
-	lightDepthValue = input.lightViewPosition.z;// / input.lightViewPosition.w;
-	lightDepthValue = lightDepthValue - bias;
-	if(lightDepthValue < depthValue)
-	{
+    tex.x = input.lightViewPosition.x / 2.0f + 0.5f;
+    tex.y = input.lightViewPosition.y / 2.0f + 0.5f;
+
+    depthValue = shadowMap.Sample(SampleType, tex).r;
+    color = float4(depthValue, depthValue, depthValue, 1.0f);
+
+    lightDepthValue = input.lightViewPosition.z;// / input.lightViewPosition.w;
+    lightDepthValue = lightDepthValue - bias;
+    if(lightDepthValue < depthValue)
+    {
         lightIntensity = saturate(dot(input.normal, input.lightPos));
 
         if(lightIntensity > 0.0f)
@@ -52,6 +52,6 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
             // Saturate the final light color.
             color = saturate(color);
         }
-	}
-	return color;
+    }
+    return color;
 }

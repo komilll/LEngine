@@ -56,9 +56,11 @@ PixelInputType ColorVertexShader(VertexInputType input)
     output.position = mul(output.position, projectionMatrix);
 
 	//Calculate object seen by light
-	output.lightViewPosition = mul(input.position, worldMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, g_lightViewMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, g_lightProjectionMatrix);
+	matrix lightViewProj = mul(g_lightProjectionMatrix, g_lightViewMatrix);
+
+	output.lightViewPosition = mul(input.position, lightViewProj);
+	//output.lightViewPosition = mul(output.lightViewPosition, g_lightViewMatrix);
+	//output.lightViewPosition = mul(output.lightViewPosition, g_lightProjectionMatrix);
 
 	//Calculate light-object vector
 	output.lightPos = g_lightPosition.xyz - worldPosition.xyz;

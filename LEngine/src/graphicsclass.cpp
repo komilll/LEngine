@@ -46,8 +46,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f);
-	m_Camera->SetPosition(0.0f, 5.0f, -15.0f);
+	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
+	m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
+	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -68,7 +69,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//SCENE LIGHTING
 	m_directionalLight = new LightClass;
 	m_directionalLight->SetLookAt(0, 0, 0);
-	m_directionalLight->SetPosition(0, 1, -10);
+	m_directionalLight->SetPosition(0, 10, -5);
 	m_directionalLight->GenerateViewMatrix();
 	m_directionalLight->GenerateProjectionMatrix(SCREEN_DEPTH, SCREEN_NEAR);
 
@@ -831,7 +832,7 @@ bool GraphicsClass::RenderScene()
 	//m_Camera->GetViewMatrix(viewMatrix);
 	//m_D3D->GetWorldMatrix(worldMatrix);
 	//m_D3D->GetProjectionMatrix(projectionMatrix);
-	////worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
+	//////worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -915,7 +916,7 @@ bool GraphicsClass::RenderSkybox()
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	//DRAW SKYBOX
 	XMFLOAT3 tmp = m_Camera->GetPosition();
-	m_Camera->SetPosition(0.0f, 0.0f, 0.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, 0.01f);
 	m_Camera->Render();
 	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
 	m_Camera->GetViewMatrix(viewMatrix);

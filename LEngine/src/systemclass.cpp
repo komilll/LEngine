@@ -296,21 +296,21 @@ void SystemClass::HandleInput()
 {
 	XMVECTOR cameraMovement{ 0, 0, 0 };
 	XMVECTOR cameraRotation{0, 0, 0};
-	float movementPerTick = 0.5f;
-	float rotatePerTick = 0.1f;
+	float movementPerTick = 0.3f;
+	float rotatePerTick = 0.5f;
 
 	if (m_Input->IsKeyDown(VK_W))
-		m_Graphics->MoveCameraForward();
+		m_Graphics->MoveCameraForward(movementPerTick);
 	if (m_Input->IsKeyDown(VK_S))
-		m_Graphics->MoveCameraBackward();
+		m_Graphics->MoveCameraBackward(movementPerTick);
 	if (m_Input->IsKeyDown(VK_A))
-		m_Graphics->MoveCameraLeft();
+		m_Graphics->MoveCameraLeft(movementPerTick);
 	if (m_Input->IsKeyDown(VK_D))
-		m_Graphics->MoveCameraRight();
+		m_Graphics->MoveCameraRight(movementPerTick);
 	if (m_Input->IsKeyDown(VK_E))
-		m_Graphics->MoveCameraUp();
+		m_Graphics->MoveCameraUp(movementPerTick);
 	if (m_Input->IsKeyDown(VK_Q))
-		m_Graphics->MoveCameraDown();
+		m_Graphics->MoveCameraDown(movementPerTick);
 
 	if (m_Input->IsKeyDown(VK_RIGHT))
 		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, rotatePerTick, 0 });

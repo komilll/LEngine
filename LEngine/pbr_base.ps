@@ -11,10 +11,11 @@ Texture2D specularLUT;
 TextureCube environmentMap[5];
 SamplerState SampleType;
 
+#define NUM_LIGHTS 2
 cbuffer LightingBuffer
 {
-	float3 g_direction;
-	float g_lightStrength;
+	float3 g_direction[NUM_LIGHTS];
+	float g_lightStrength[NUM_LIGHTS];
 };
 
 cbuffer PBRBuffer
@@ -76,7 +77,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float specular;
 	float3 normal;
 	float lightIntensity;
-	float3 lightDir = normalize(g_direction);
+	float3 lightDir;
 	float4 normalMap;
 	float roughnessMap;
 	float metalnessMap;
@@ -99,18 +100,45 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	roughness = GetRoughness(roughnessMap, g_roughness);
 	metalness = GetMetalness(metalnessMap, g_metalness);
 
-//Light intensity - currently used, may be disabled in future[?]
-	lightIntensity = saturate(dot(normal, lightDir));	
-	
-//Helper values
-	float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
-	float NdotH = max(dot(normal, halfV), 0.0);
-	float NdotV = max(dot(normal, input.viewDirection), 0.0);
-	float NdotL = max(dot(normal, lightDir), 0.0);
-
 //GAMMA CORRECTION
 	albedo = albedo / (albedo + float3(1.0, 1.0, 1.0));
 	albedo = pow(albedo, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+
+//Helper values
+	float NdotV = max(dot(normal, input.viewDirection), 0.0);
+//SPECULAR IBL	
+	float3 R = reflect(-input.viewDirection, input.normal);
+	float3 prefilteredColor = GetPrefilteredColor(roughness, R);
+	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
+
+//FRESNEL EQUATION
+	float3 F0 = float3(0.04, 0.04, 0.04);
+	float F = FresnelSchlick(F0, albedo, metalness, NdotV, 5.0);
+	F0 = lerp(F0, albedo, metalness);
+	
+//DIFFUSE IRRADIANCE
+	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
+	float3 diffuse = irradiance * albedo;
+	//float3 ambient = 0.03 * albedo;
+
+	float3 kS = FresnelSchlickRoughness(max(NdotV, 0.0), F0, roughness);
+	float3 kD = float3(1.0, 1.0, 1.0) - kS;
+	kD *= (1.0 - metalness);
+
+	specular =  prefilteredColor * (kS * enviroBRDF.x + enviroBRDF.y);
+	float3 ambient = (kD * diffuse + specular);// * ao;
+
+/////////////////
+float4 finalColor = float4(ambient, 1.0f);
+//Light intensity - currently used, may be disabled in future[?]
+for (int i = 0; i < NUM_LIGHTS; i++)
+{
+	lightDir = normalize(g_direction[i]);
+	lightIntensity = saturate(dot(normal, lightDir));	
+
+	float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
+	float NdotH = max(dot(normal, halfV), 0.0);
+	float NdotL = max(dot(normal, lightDir), 0.0);
 
 //NORMAL DISTRUBUTION FUNCTION
 	float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
@@ -120,42 +148,22 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float G = GeometrySmithGGX(roughness, NdotV, NdotL);
 ///////////////////
 
-//FRESNEL EQUATION
-	float3 F0 = float3(0.04, 0.04, 0.04);
-	float F = FresnelSchlick(F0, albedo, metalness, NdotV, 5.0);
-	F0 = lerp(F0, albedo, metalness);
-/////////////////
-
-//SPECULAR IBL	
-	float3 R = reflect(-input.viewDirection, input.normal);
-	float3 prefilteredColor = GetPrefilteredColor(roughness, R);
-	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
-
-//DIFFUSE IRRADIANCE
-	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
-	float3 diffuse = irradiance * albedo;
-	//float3 ambient = 0.03 * albedo;
-
 //FINAL CALCULATIONS
 	float3 numerator = D * G * F;
 	float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 	specular = numerator / max(denominator, 0.001);
 
-	float3 kS = FresnelSchlickRoughness(max(NdotV, 0.0), F0, roughness);
-	float3 kD = float3(1.0, 1.0, 1.0) - kS;
-	kD *= (1.0 - metalness);
-
 	float3 tint = float3(1.0, 0.0, 0.0);
 	//albedo *= lerp(float3(1.0, 1.0, 1.0), tint, metalness);
 
 	float3 Lo = (kD * albedo / PI + specular) * NdotL;
-	specular =  prefilteredColor * (kS * enviroBRDF.x + enviroBRDF.y);
-	float3 ambient = (kD * diffuse + specular);// * ao;
 
-	float4 finalColor = float4(ambient + Lo, 1.0);
-
+	//finalColor += float4(ambient + Lo, 1.0f);
+	finalColor += float4(Lo, 1.0f);
+}
+	
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
-	return finalColor * g_lightStrength;// * lightIntensity;
+	return saturate(finalColor);// * lightIntensity;
 	//return float4(ambient, 1.0);
 }
 

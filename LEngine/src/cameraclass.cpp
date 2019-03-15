@@ -89,8 +89,8 @@ void CameraClass::Render()
 
 	// Create the rotation matrix from the yaw, pitch, and roll values.
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-	//target = XMVector3TransformCoord(forward, rotationMatrix);
-	//target = XMVector3Normalize(target);
+	target = XMVector3TransformCoord(forward, rotationMatrix);
+	target = XMVector3Normalize(target);
 
 	XMMATRIX YrotationMatrix;
 	YrotationMatrix = XMMatrixRotationY(yaw);
@@ -98,7 +98,7 @@ void CameraClass::Render()
 	camRight = XMVector3TransformCoord(right, YrotationMatrix);
 	camForward = XMVector3TransformCoord(forward, YrotationMatrix);
 
-	//target = { m_positionX + target.m128_f32[0] , m_positionY + target.m128_f32[1], m_positionZ + target.m128_f32[2], 0.0f };
+	target = { m_positionX + target.m128_f32[0] , m_positionY + target.m128_f32[1], m_positionZ + target.m128_f32[2], 0.0f };
 	m_viewMatrix = XMMatrixLookAtLH(position, target, up);
 
 	XMVECTOR addPos = camRight * m_storedLeftRight + camForward * m_storedBackForward;

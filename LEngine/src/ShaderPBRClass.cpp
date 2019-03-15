@@ -57,6 +57,16 @@ bool ShaderPBRClass::LoadBrdfLut(ID3D11Device *device, const wchar_t * filename)
 	return LoadTexture(device, filename, m_brdfLut, m_brdfLutView);
 }
 
+void ShaderPBRClass::AddLights(XMFLOAT4 directionStrength)
+{
+	m_lightDirection.push_back(directionStrength);
+}
+
+void ShaderPBRClass::AddLights(XMFLOAT3 direction, float strength)
+{
+	m_lightDirection.push_back(XMFLOAT4{ direction.x, direction.y, direction.z, strength });
+}
+
 bool ShaderPBRClass::CreateBufferAdditionals(ID3D11Device * &device)
 {
 	BaseShaderClass::CreateBufferAdditionals(device);
@@ -123,8 +133,11 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 		return false;
 
 	dataPtr2 = (LightingBufferType*)mappedResource.pData;
-	dataPtr2->direction = XMFLOAT3{ m_lightDirection.x, m_lightDirection.y, m_lightDirection.z };
-	dataPtr2->strength = m_lightDirection.w;
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		dataPtr2->direction[i] = XMFLOAT3{ m_lightDirection.at(i).x, m_lightDirection.at(i).y, m_lightDirection.at(i).z };
+		dataPtr2->strength[i] = m_lightDirection.at(i).w;
+	}
 
 	deviceContext->Unmap(m_lightingBuffer, 0);
 	bufferNumber = 0;

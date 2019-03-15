@@ -41,9 +41,9 @@
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 100.0f;
-const float SCREEN_NEAR = 2.0f;
+const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
-const bool ENABLE_DEBUG = false;
+const bool ENABLE_DEBUG = true;
 const bool DRAW_SKYBOX = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
@@ -64,12 +64,12 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
-	void MoveCameraForward();
-	void MoveCameraBackward();
-	void MoveCameraLeft();
-	void MoveCameraRight();
-	void MoveCameraUp();
-	void MoveCameraDown();
+	void MoveCameraForward(float val);
+	void MoveCameraBackward(float val);
+	void MoveCameraLeft(float val);
+	void MoveCameraRight(float val);
+	void MoveCameraUp(float val);
+	void MoveCameraDown(float val);
 	void RotateCamera(XMVECTOR rotation);
 
 	void UpdateUI();

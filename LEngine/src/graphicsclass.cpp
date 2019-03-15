@@ -47,8 +47,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Set the initial position of the camera.
 	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
-	m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
-	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
+	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
+	m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -103,7 +103,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Direction + strength (w)
-	m_pbrShader->m_lightDirection = XMFLOAT4(-1.0f, 0.0, -1.0f, 1.2f);
+	m_pbrShader->AddLights(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.2f));
+	m_pbrShader->AddLights(XMFLOAT4(0.0f, 0.0f, -1.0f, 2.5f));
 #pragma endregion
 
 #pragma region Creating UI
@@ -540,34 +541,34 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
-void GraphicsClass::MoveCameraForward()
+void GraphicsClass::MoveCameraForward(float val)
 {
-	m_Camera->AddPosition(0, 0.5f, 0);
+	m_Camera->AddPosition(0, val, 0);
 }
 
-void GraphicsClass::MoveCameraBackward()
+void GraphicsClass::MoveCameraBackward(float val)
 {
-	m_Camera->AddPosition(0, -0.5f, 0);
+	m_Camera->AddPosition(0, -val, 0);
 }
 
-void GraphicsClass::MoveCameraLeft()
+void GraphicsClass::MoveCameraLeft(float val)
 {
-	m_Camera->AddPosition(-0.5f, 0, 0);
+	m_Camera->AddPosition(-val, 0, 0);
 }
 
-void GraphicsClass::MoveCameraRight()
+void GraphicsClass::MoveCameraRight(float val)
 {
-	m_Camera->AddPosition(0.5f, 0, 0);
+	m_Camera->AddPosition(val, 0, 0);
 }
 
-void GraphicsClass::MoveCameraUp()
+void GraphicsClass::MoveCameraUp(float val)
 {
-	m_Camera->AddPosition(0, 0, 0.5f);
+	m_Camera->AddPosition(0, 0, val);
 }
 
-void GraphicsClass::MoveCameraDown()
+void GraphicsClass::MoveCameraDown(float val)
 {
-	m_Camera->AddPosition(0, 0, -0.5f);
+	m_Camera->AddPosition(0, 0, -val);
 }
 
 void GraphicsClass::RotateCamera(XMVECTOR rotation)
@@ -811,49 +812,49 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
-	m_groundQuadModel->Render(m_D3D->GetDeviceContext());
-	m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
-	m_directionalLight->GenerateViewMatrix();
-	m_directionalLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_DEPTH);
-	m_directionalLight->GetViewMatrix(lightViewMatrix);
-	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
-	m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
-	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
+	//m_groundQuadModel->Render(m_D3D->GetDeviceContext());
+	//m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
+	//m_directionalLight->GenerateViewMatrix();
+	//m_directionalLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_DEPTH);
+	//m_directionalLight->GetViewMatrix(lightViewMatrix);
+	//m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
+	//m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
+	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
 
-	//m_Model->Render(m_D3D->GetDeviceContext());
-	//m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
+	m_Model->Render(m_D3D->GetDeviceContext());
+	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
 	////XMVECTOR light_ = XMVector3Rotate(XMVECTOR{ -1.0f, 0.0, -1.0f, 0.0f }, XMVECTOR{ m_Camera->GetRotation().x / 3.14f, m_Camera->GetRotation().y / 3.14f, m_Camera->GetRotation().z / 3.14f, 0.0f });
-	////m_pbrShader->m_lightDirection = XMFLOAT4(light_.m128_f32[0], 0.0, light_.m128_f32[2], 1.2f);
+	//m_pbrShader->m_lightDirection = XMFLOAT4(light_.m128_f32[0], 0.0, light_.m128_f32[2], 1.2f);
 
-	//m_Camera->GetViewMatrix(viewMatrix);
-	//m_D3D->GetWorldMatrix(worldMatrix);
-	//m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
 	//////worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	//if (!result)
 	//	return false;
-	//result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
+	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
 
-	for (int i = 0; i < 5; i++)
-	{
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
-		m_Model->Render(m_D3D->GetDeviceContext());
-		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
-			return false;
-	}
+	//	worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
+	//	m_Model->Render(m_D3D->GetDeviceContext());
+	//	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//	if (!result)
+	//		return false;
+	//}
 
 	if (DRAW_SKYBOX)
 	{

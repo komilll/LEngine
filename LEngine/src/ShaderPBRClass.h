@@ -7,10 +7,11 @@
 class ShaderPBRClass : public BaseShaderClass
 {
 private:
+	static const int NUM_LIGHTS = 2;
 	struct LightingBufferType
 	{
-		XMFLOAT3 direction;
-		float strength;
+		XMFLOAT3 direction[NUM_LIGHTS];
+		float strength[NUM_LIGHTS];
 	};
 
 	struct CameraBufferType
@@ -46,6 +47,9 @@ public:
 
 	bool LoadBrdfLut(ID3D11Device *device, const wchar_t* filename);
 
+	void AddLights(XMFLOAT4 directionStrength);
+	void AddLights(XMFLOAT3 direction, float strength);
+
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
 
@@ -62,7 +66,6 @@ public:
 	ID3D11Resource* m_brdfLut;
 	ID3D11ShaderResourceView* m_brdfLutView;
 
-	XMFLOAT4 m_lightDirection;
 	XMFLOAT3 m_cameraPosition;
 	float m_roughness = 0;
 	float m_metalness = 0;
@@ -72,6 +75,8 @@ protected:
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&) override;
 
 private:
+	std::vector<XMFLOAT4> m_lightDirection;
+
 	ID3D11Buffer* m_lightingBuffer;
 	ID3D11Buffer* m_cameraBuffer;
 	ID3D11Buffer* m_PBRBuffer;

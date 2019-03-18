@@ -7,11 +7,15 @@
 class ShaderPBRClass : public BaseShaderClass
 {
 private:
-	static const int NUM_LIGHTS = 2;
+	static const int NUM_LIGHTS_DIRECTIONAL = 1;
+	static const int NUM_LIGHTS_POINT = 1;
 	struct LightingBufferType
 	{
-		XMFLOAT3 direction[NUM_LIGHTS];
-		float strength[NUM_LIGHTS];
+		XMFLOAT4 directional_directionStregth[NUM_LIGHTS_DIRECTIONAL];
+		XMFLOAT4 directional_color[NUM_LIGHTS_DIRECTIONAL];
+		XMFLOAT4 point_positionWithRadius[NUM_LIGHTS_POINT];
+		XMFLOAT4 point_colorWithStrength[NUM_LIGHTS_POINT];
+		//float strength[NUM_LIGHTS];
 	};
 
 	struct CameraBufferType
@@ -32,7 +36,19 @@ private:
 		int hasNormalMap;
 		int hasRoughnessMap;
 		int hasMetalnessMap;
-		int paddingShaderTextureBuffer;
+		int hasAlbedoMap;
+	};
+
+	struct DirectionalLight 
+	{
+		XMFLOAT4 direction;
+		XMFLOAT4 color;
+	};
+
+	struct PointLight
+	{
+		XMFLOAT4 positionWithRadius;
+		XMFLOAT4 colorWithStrength;
 	};
 
 public:
@@ -47,8 +63,15 @@ public:
 
 	bool LoadBrdfLut(ID3D11Device *device, const wchar_t* filename);
 
-	void AddLights(XMFLOAT4 directionStrength);
-	void AddLights(XMFLOAT3 direction, float strength);
+	void AddDirectionalLight(XMFLOAT4 directionStrength, XMFLOAT3 color);
+	void AddDirectionalLight(XMFLOAT4 directionStrength, float red, float green, float blue);
+	void AddDirectionalLight(XMFLOAT3 direction, float strength, float red, float green, float blue);
+
+	void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength);
+	void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength);
+	void AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength);
+	void AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength);
+	void AddPointLight(XMFLOAT3 position, float radius, XMFLOAT3 color, float colorStrength);
 
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
@@ -75,7 +98,8 @@ protected:
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&) override;
 
 private:
-	std::vector<XMFLOAT4> m_lightDirection;
+	std::vector<DirectionalLight> m_directionalLight;
+	std::vector<PointLight> m_pointLight;
 
 	ID3D11Buffer* m_lightingBuffer;
 	ID3D11Buffer* m_cameraBuffer;

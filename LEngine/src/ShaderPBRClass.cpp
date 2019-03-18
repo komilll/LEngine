@@ -57,14 +57,68 @@ bool ShaderPBRClass::LoadBrdfLut(ID3D11Device *device, const wchar_t * filename)
 	return LoadTexture(device, filename, m_brdfLut, m_brdfLutView);
 }
 
-void ShaderPBRClass::AddLights(XMFLOAT4 directionStrength)
+void ShaderPBRClass::AddDirectionalLight(XMFLOAT4 directionStrength, XMFLOAT3 color)
 {
-	m_lightDirection.push_back(directionStrength);
+	DirectionalLight light;
+	light.direction = directionStrength;
+	light.color = XMFLOAT4{ color.x, color.y, color.z, 0.0f };
+	m_directionalLight.push_back(light);
 }
 
-void ShaderPBRClass::AddLights(XMFLOAT3 direction, float strength)
+void ShaderPBRClass::AddDirectionalLight(XMFLOAT4 directionStrength, float red, float green, float blue)
 {
-	m_lightDirection.push_back(XMFLOAT4{ direction.x, direction.y, direction.z, strength });
+	DirectionalLight light;
+	light.direction = directionStrength;
+	light.color = XMFLOAT4{ red, green, blue, 0.0f };
+	m_directionalLight.push_back(light);
+}
+
+void ShaderPBRClass::AddDirectionalLight(XMFLOAT3 direction, float strength, float red, float green, float blue)
+{
+	DirectionalLight light;
+	light.direction = XMFLOAT4{ direction.x, direction.y, direction.z, strength };
+	light.color = XMFLOAT4{ red, green, blue, 0.0f };
+	m_directionalLight.push_back(light);
+}
+
+void ShaderPBRClass::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength)
+{
+	PointLight light;
+	light.positionWithRadius = positionWithRadius;
+	light.colorWithStrength = colorWithStrength;
+	m_pointLight.push_back(light);
+}
+
+void ShaderPBRClass::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength)
+{
+	PointLight light;
+	light.positionWithRadius = positionWithRadius;
+	light.colorWithStrength = XMFLOAT4{ color.x, color.y, color.z, colorStrength };
+	m_pointLight.push_back(light);
+}
+
+void ShaderPBRClass::AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength)
+{
+	PointLight light;
+	light.positionWithRadius = positionWithRadius;
+	light.colorWithStrength = XMFLOAT4{ red, green, blue, colorStrength };
+	m_pointLight.push_back(light);
+}
+
+void ShaderPBRClass::AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength)
+{
+	PointLight light;
+	light.positionWithRadius = XMFLOAT4{ position.x, position.y, position.z, radius };
+	light.colorWithStrength = XMFLOAT4{ red, green, blue, colorStrength };
+	m_pointLight.push_back(light);
+}
+
+void ShaderPBRClass::AddPointLight(XMFLOAT3 position, float radius, XMFLOAT3 color, float colorStrength)
+{
+	PointLight light;
+	light.positionWithRadius = XMFLOAT4{ position.x, position.y, position.z, radius };
+	light.colorWithStrength = XMFLOAT4{ color.x, color.y, color.z, colorStrength };
+	m_pointLight.push_back(light);
 }
 
 bool ShaderPBRClass::CreateBufferAdditionals(ID3D11Device * &device)
@@ -133,10 +187,17 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 		return false;
 
 	dataPtr2 = (LightingBufferType*)mappedResource.pData;
-	for (int i = 0; i < NUM_LIGHTS; i++)
+	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++)
 	{
-		dataPtr2->direction[i] = XMFLOAT3{ m_lightDirection.at(i).x, m_lightDirection.at(i).y, m_lightDirection.at(i).z };
-		dataPtr2->strength[i] = m_lightDirection.at(i).w;
+		dataPtr2->directional_directionStregth[i] = m_directionalLight.at(i).direction;
+		dataPtr2->directional_color[i] = m_directionalLight.at(i).color;
+		//dataPtr2->strength[i] = m_lightDirection.at(i).w;
+	}
+	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
+	{
+		dataPtr2->point_positionWithRadius[i] = m_pointLight.at(i).positionWithRadius;
+		//dataPtr2->point_colorWithStrength[i] = XMFLOAT4{ 1, 0, 0, 2 };
+		dataPtr2->point_colorWithStrength[i] = m_pointLight.at(i).colorWithStrength;
 	}
 
 	deviceContext->Unmap(m_lightingBuffer, 0);
@@ -166,7 +227,7 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 	dataPtr5->hasNormalMap = m_normalTextureView != nullptr;
 	dataPtr5->hasRoughnessMap = m_roughnessTextureView != nullptr;
 	dataPtr5->hasMetalnessMap = m_metalnessTextureView != nullptr;
-	dataPtr5->paddingShaderTextureBuffer = 0;
+	dataPtr5->hasAlbedoMap = m_diffuseTextureView != nullptr;
 
 	deviceContext->Unmap(m_ShaderTextureBuffer, 0);
 	bufferNumber = 2;

@@ -103,8 +103,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Direction + strength (w)
-	m_pbrShader->AddLights(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.2f));
-	m_pbrShader->AddLights(XMFLOAT4(0.0f, 0.0f, -1.0f, 2.5f));
+	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 1.0f), 1.0f, 1.0f, 1.0f);
+
+	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 10.0f), 1.0f, 0.0f, 0.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT4(-11.0f, -1.0f, 0.0f, 2.5f), 0.0f, 1.0f, 0.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT4(-2.76f, 4.5f, 5.0f, 5.0f), 0.0f, 0.0f, 1.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT4(1.0f, 5.0f, 0.0f, 0.5f), 1.0f, 1.0f, 1.0f);
+
+	m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 0.0f, -5.0f }, 10.0f, 1.0f, 0.0f, 0.0f, 2.0f);
+	m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 0.0f, 5.0f }, 10.0f, 0.0f, 1.0f, 0.0f, 2.0f);
+	m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 5.0f, 0.0f}, 10.0f, 0.0f, 0.0f, 1.0f, 2.0f);
+	m_pbrShader->AddPointLight(XMFLOAT3{ 5.0f , 0.0f, 0.0f}, 10.0f, 1.0f, 1.0f, 1.0f, 2.0f);
 #pragma endregion
 
 #pragma region Creating UI

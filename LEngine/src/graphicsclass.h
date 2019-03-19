@@ -43,7 +43,7 @@ const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
-const bool ENABLE_DEBUG = true;
+const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;

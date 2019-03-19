@@ -12,14 +12,15 @@ TextureCube environmentMap[5];
 SamplerState SampleType;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
-#define NUM_LIGHTS_POINT 1
+#define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer
 {
 	float4 g_directionalLightDirectionStrength[NUM_LIGHTS_DIRECTIONAL];
 	float4 g_directionalLightColor[NUM_LIGHTS_DIRECTIONAL];
-
+#if NUM_LIGHTS_POINT > 0
 	float4 g_pointLightPositionWithRadius[NUM_LIGHTS_POINT];
 	float4 g_pointLightColorWithStrength[NUM_LIGHTS_POINT];
+#endif
 };
 
 cbuffer PBRBuffer
@@ -179,19 +180,37 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 //MULTIPLE POINT LIGHT PASS
 	accumulatedLightStrength = 0.0f;
+	float4 pointLight;
+#if NUM_LIGHTS_POINT > 0
 	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
 		accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
 
 	for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
 	{
 		float distance = length(input.position.z - g_pointLightPositionWithRadius[i].z);
-		//float distance = 10.0f;
-		lightIntensity = 1.0f / (POINT_LIGHT_CONSTANT + POINT_LIGHT_LINEAR * distance + POINT_LIGHT_QUADRATIC * distance * distance);
-		//lightIntensity = 1.0f / ( POINT_LIGHT_LINEAR * distance);
+		lightDir = normalize(input.position.z - g_pointLightPositionWithRadius[i].z);		
+		lightIntensity = 1.0f / (POINT_LIGHT_CONSTANT + POINT_LIGHT_LINEAR * distance + POINT_LIGHT_QUADRATIC * distance * distance);		
 
-		float3 Lo = distance * lightIntensity * g_pointLightColorWithStrength[i].w * g_pointLightColorWithStrength[i].xyz;
-		finalColor = float4(Lo, 1.0f);
+	//Calculate multiple dot products
+		float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
+		float NdotH = max(dot(normal, halfV), 0.0);
+		float NdotL = max(dot(normal, lightDir), 0.0);
+
+	//NORMAL DISTRUBUTION FUNCTION
+		float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
+	//GEOMETRY FUNCTION
+		float G = GeometrySmithGGX(roughness, NdotV, NdotL);
+
+	//FINAL CALCULATIONS
+		float3 numerator = D * G * F;
+		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+		specular = numerator / max(denominator, 0.001);
+
+		float3 Lo = NdotL * lightIntensity * g_pointLightColorWithStrength[i].w * g_pointLightColorWithStrength[i].xyz;
+		finalColor += float4(Lo, 1.0f);
 	}
+	//finalColor += normalize(pointLight);
+#endif
 	
 	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
 	//return saturate(finalColor);// * lightIntensity;

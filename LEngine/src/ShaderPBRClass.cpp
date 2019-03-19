@@ -193,12 +193,14 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 		dataPtr2->directional_color[i] = m_directionalLight.at(i).color;
 		//dataPtr2->strength[i] = m_lightDirection.at(i).w;
 	}
+#if NUM_LIGHTS_POINT > 0
 	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
 	{
 		dataPtr2->point_positionWithRadius[i] = m_pointLight.at(i).positionWithRadius;
 		//dataPtr2->point_colorWithStrength[i] = XMFLOAT4{ 1, 0, 0, 2 };
 		dataPtr2->point_colorWithStrength[i] = m_pointLight.at(i).colorWithStrength;
 	}
+#endif
 
 	deviceContext->Unmap(m_lightingBuffer, 0);
 	bufferNumber = 0;

@@ -161,6 +161,14 @@
     <ClInclude Include="src\d3dclass.h" />
     <ClInclude Include="src\GBufferShader.h" />
     <ClInclude Include="src\graphicsclass.h" />
+    <ClInclude Include="src\imgui\imconfig.h" />
+    <ClInclude Include="src\imgui\imgui.h" />
+    <ClInclude Include="src\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="src\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="src\imgui\imgui_internal.h" />
+    <ClInclude Include="src\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\inputclass.h" />
     <ClInclude Include="src\LightClass.h" />
     <ClInclude Include="src\modelClass.h" />
@@ -190,6 +198,11 @@
     <ClCompile Include="src\d3dclass.cpp" />
     <ClCompile Include="src\GBufferShader.cpp" />
     <ClCompile Include="src\graphicsclass.cpp" />
+    <ClCompile Include="src\imgui\imgui.cpp" />
+    <ClCompile Include="src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\inputclass.cpp" />
     <ClCompile Include="src\LightClass.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -214,14 +227,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\directxtk_desktop_2015.2018.11.20.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2018.11.20.1\build\native\directxtk_desktop_2015.targets')" />
     <Import Project="..\packages\directxtex_desktop_2015.2019.2.7.1\build\native\directxtex_desktop_2015.targets" Condition="Exists('..\packages\directxtex_desktop_2015.2019.2.7.1\build\native\directxtex_desktop_2015.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2018.11.20.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2018.11.20.1\build\native\directxtk_desktop_2015.targets'))" />
     <Error Condition="!Exists('..\packages\directxtex_desktop_2015.2019.2.7.1\build\native\directxtex_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_2015.2019.2.7.1\build\native\directxtex_desktop_2015.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.2.7.1\build\native\directxtk_desktop_2015.targets'))" />
   </Target>
 </Project>

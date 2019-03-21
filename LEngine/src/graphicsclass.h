@@ -7,6 +7,9 @@
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
 #include "d3dclass.h"
 #include "cameraclass.h"
 #include "modelclass.h"
@@ -45,6 +48,7 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = false;
+const bool ENABLE_GUI = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -82,6 +86,7 @@ public:
 private:
 	bool Render();
 	bool RenderScene();
+	bool RenderGUI();
 
 	bool RenderDebugSettings();
 	bool RenderSkybox();

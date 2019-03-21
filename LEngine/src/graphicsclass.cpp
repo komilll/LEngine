@@ -56,7 +56,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "happy1.obj");
 	if(!result)
 		return false;
 
@@ -65,6 +65,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	if (!(m_pbrShader = new ShaderPBRClass))
 		return false;
+
+	//INITIALIZE ImGUI
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplDX11_Init(m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	ImGui::StyleColorsDark();
 
 	//SCENE LIGHTING
 	m_directionalLight = new LightClass;
@@ -783,6 +791,11 @@ bool GraphicsClass::Render()
 	{
 		RenderDebugSettings();
 	}
+
+	if (ENABLE_GUI)
+	{
+		RenderGUI();
+	}
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 
@@ -843,8 +856,8 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	//if (!result)
 	//	return false;
@@ -870,6 +883,21 @@ bool GraphicsClass::RenderScene()
 		if (RenderSkybox() == false)
 			return false;
 	}
+
+	return true;
+}
+
+bool GraphicsClass::RenderGUI()
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("BaseWindow");
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	return true;
 }

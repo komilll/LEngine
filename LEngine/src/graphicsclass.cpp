@@ -46,9 +46,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
+	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
 	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
-	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
+	m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -56,7 +56,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "happy1.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if(!result)
 		return false;
 
@@ -595,6 +595,8 @@ void GraphicsClass::RotateCamera(XMVECTOR rotation)
 
 void GraphicsClass::UpdateUI()
 {
+	return;
+
 	if (m_mouse == nullptr)
 		return;
 
@@ -683,9 +685,18 @@ void GraphicsClass::UpdateUI()
 
 void GraphicsClass::SetMouseRef(MouseClass * mouse)
 {
+	ShowCursor(true);
 	m_mouse->SetMouse(mouse);
 	if (m_mouse->GetModel() == nullptr)
 		m_mouse->InitializeMouse();
+}
+
+MouseClass* GraphicsClass::GetMouse()
+{
+	if (m_mouse == nullptr)
+		return nullptr;
+
+	return m_mouse->GetMouse();
 }
 
 D3DClass * GraphicsClass::GetD3D()
@@ -730,53 +741,53 @@ bool GraphicsClass::Render()
 	{
 		//CreateShadowMap(m_shadowMapTexture);
 
-		std::vector <LPCSTR> names;
-		names.push_back("position");
-		names.push_back("texcoord");
-		names.push_back("normal");
-		names.push_back("tangent");
-		names.push_back("binormal");
-		std::vector <DXGI_FORMAT> formats;
-		formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
-		formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		BaseShaderClass::vertexInputType input(names, formats);
+		//std::vector <LPCSTR> names;
+		//names.push_back("position");
+		//names.push_back("texcoord");
+		//names.push_back("normal");
+		//names.push_back("tangent");
+		//names.push_back("binormal");
+		//std::vector <DXGI_FORMAT> formats;
+		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+		//formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
+		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+		//BaseShaderClass::vertexInputType input(names, formats);
 
-		m_GBufferShader->ChangeTextureType(GBufferShader::BufferType::POSITION);
-		if (!m_GBufferShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"positionGBuffer.vs", L"positionGBuffer.ps", input))
-			return false;
-		if (!RenderGBufferPosition(m_positionBuffer))
-			return false;
-
-		m_GBufferShader->ChangeTextureType(GBufferShader::BufferType::NORMAL);
-		if (!m_GBufferShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"normalGBuffer.vs", L"normalGBuffer.ps", input))
-			return false;
-		if (!RenderGBufferNormal(m_normalBuffer))
-			return false;
-
-		m_GBufferShader->LoadPositionTexture(m_positionBuffer->GetShaderResourceView());
-		m_GBufferShader->LoadNormalTexture(m_normalBuffer->GetShaderResourceView());
-
-		m_GBufferShader->ChangeTextureType(GBufferShader::BufferType::SSAO);
-		if (!m_GBufferShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"ssaoShader.vs", L"ssaoShader.ps", input))
-			return false;
-		//if (!RenderSSAOTexture(m_ssaoTexture))
+		//m_GBufferShader->ChangeTextureType(GBufferShader::BufferType::POSITION);
+		//if (!m_GBufferShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"positionGBuffer.vs", L"positionGBuffer.ps", input))
+		//	return false;
+		//if (!RenderGBufferPosition(m_positionBuffer))
 		//	return false;
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		result = m_GBufferShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
-			return false;
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
-			return false;
+		//m_GBufferShader->ChangeTextureType(GBufferShader::BufferType::NORMAL);
+		//if (!m_GBufferShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"normalGBuffer.vs", L"normalGBuffer.ps", input))
+		//	return false;
+		//if (!RenderGBufferNormal(m_normalBuffer))
+		//	return false;
 
-	//STANDARD SCENE RENDERING
-		//result = RenderScene();
+		//m_GBufferShader->LoadPositionTexture(m_positionBuffer->GetShaderResourceView());
+		//m_GBufferShader->LoadNormalTexture(m_normalBuffer->GetShaderResourceView());
+
+		//m_GBufferShader->ChangeTextureType(GBufferShader::BufferType::SSAO);
+		//if (!m_GBufferShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"ssaoShader.vs", L"ssaoShader.ps", input))
+		//	return false;
+		////if (!RenderSSAOTexture(m_ssaoTexture))
+		////	return false;
+
+		//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		//result = m_GBufferShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		//if (!result)
 		//	return false;
+		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+		//if (!result)
+		//	return false;
+
+	//STANDARD SCENE RENDERING
+		result = RenderScene();
+		if (!result)
+			return false;
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
 		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -855,7 +866,7 @@ bool GraphicsClass::RenderScene()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -894,6 +905,27 @@ bool GraphicsClass::RenderGUI()
 	ImGui::NewFrame();
 
 	ImGui::Begin("BaseWindow");
+	
+	ImGui::SliderFloat("Roughness", &m_pbrShader->m_roughness, 0.0f, 1.0f, "%.2f");
+	ImGui::SliderFloat("Metalness", &m_pbrShader->m_metalness, 0.0f, 1.0f, "%.2f");
+	
+	ImGui::Spacing();
+
+	ImGui::Text("Roughness map:");
+	if (ImGui::ImageButton(m_pbrShader->m_roughnessTextureView, ImVec2{ 64, 64 }))
+	{
+
+	}
+
+	ImGui::Text("Metalness map:");
+	ImGui::ImageButton(m_pbrShader->m_metalnessTextureView, ImVec2{ 64, 64 });
+
+	ImGui::Text("Normal map:");
+	ImGui::ImageButton(m_pbrShader->m_normalTextureView, ImVec2{ 64, 64 });
+
+	ImGui::Text("Albedo map:");
+	ImGui::ImageButton(m_pbrShader->m_diffuseTextureView, ImVec2{ 64, 64 });
+
 	ImGui::End();
 
 	ImGui::Render();

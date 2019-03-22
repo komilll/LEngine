@@ -19,6 +19,7 @@ public:
 	void ConnectTextures(ID3D11Resource*& texture, ID3D11ShaderResourceView*& textureView);
 	///<summary> Pick new texture from Windows Explorer </summary>
 	void TextureChooseWindow(HWND owner);
+	static void TextureChooseWindow(HWND hwnd, ID3D11ShaderResourceView *& textureView);
 	void DeleteTexture();
 
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;

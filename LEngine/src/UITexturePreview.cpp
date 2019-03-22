@@ -48,6 +48,52 @@ void UITexturePreview::ConnectTextures(ID3D11Resource *& texture, ID3D11ShaderRe
 	m_externalTextureView = &textureView;
 }
 
+//Static method
+void UITexturePreview::TextureChooseWindow(HWND hwnd, ID3D11ShaderResourceView *& textureView)
+{
+	PWSTR pszFilePath;
+	wchar_t* wFilePath = 0;
+	IFileOpenDialog *pFileOpen;
+	const COMDLG_FILTERSPEC rgSpec[] = { L"DDS (DirectDraw Surface)", L"*.dds" };
+	// Create the FileOpenDialog object.
+	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+		IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+
+	if (SUCCEEDED(hr))
+		hr = pFileOpen->SetFileTypes(1, rgSpec);
+
+	if (SUCCEEDED(hr))
+	{
+		// Show the Open dialog box.
+		hr = pFileOpen->Show(NULL);
+
+		// Get the file name from the dialog box.
+		if (SUCCEEDED(hr))
+		{
+			IShellItem *pItem;
+			hr = pFileOpen->GetResult(&pItem);
+			if (SUCCEEDED(hr))
+			{
+				hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+				// Display the file name to the user.
+				if (SUCCEEDED(hr))
+				{
+					wFilePath = pszFilePath;
+					//LoadNewTextureFromFile(wFilePath);
+					CoTaskMemFree(pszFilePath);
+
+				}
+				pItem->Release();
+			}
+		}
+		pFileOpen->Release();
+	}
+
+	//Do not call - because it will disallow using open dialog again
+	//CoUninitialize();
+}
+
 void UITexturePreview::TextureChooseWindow(HWND hwnd)
 {
 	PWSTR pszFilePath;
@@ -79,7 +125,7 @@ void UITexturePreview::TextureChooseWindow(HWND hwnd)
 				if (SUCCEEDED(hr))
 				{
 					wFilePath = pszFilePath;
-					LoadNewTextureFromFile(wFilePath);
+					//LoadNewTextureFromFile(wFilePath);
 					CoTaskMemFree(pszFilePath);
 
 				}

@@ -148,6 +148,7 @@ bool SystemClass::Frame()
 	{
 		if (!m_Mouse->Frame())
 			return false;
+		m_lmbPressed = m_Mouse->GetLMBPressed();
 	}
 
 	m_Graphics->UpdateUI();
@@ -156,8 +157,17 @@ bool SystemClass::Frame()
 }
 
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
+	if (ImGui::GetCurrentContext() == NULL)
+	{
+		ImGui::CreateContext();
+	}
+
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, umsg, wparam, lparam))
+		return true;
+
 	switch(umsg)
 	{
 		// Check if a key has been pressed on the keyboard.

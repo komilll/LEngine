@@ -48,7 +48,7 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = false;
-const bool ENABLE_GUI = false;
+const bool ENABLE_GUI = true;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -78,6 +78,7 @@ public:
 
 	void UpdateUI();
 	void SetMouseRef(MouseClass* mouse);
+	MouseClass* GetMouse();
 		
 	D3DClass* GetD3D();
 

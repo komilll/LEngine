@@ -88,6 +88,7 @@ private:
 	InputClass* m_Input;
 	MouseClass* m_Mouse;
 	GraphicsClass* m_Graphics;
+	bool m_lmbPressed = false;
 };
 
 

@@ -255,6 +255,11 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
         return 0;
 
     ImGuiIO& io = ImGui::GetIO();
+	if (msg == WM_KEYDOWN && (wParam == 16 || wParam == 17)) //Left CTRL
+		msg = WM_LBUTTONDOWN;
+	else if (msg == WM_KEYUP && (wParam == 16 || wParam == 17))
+		msg = WM_LBUTTONUP;
+
     switch (msg)
     {
     case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:

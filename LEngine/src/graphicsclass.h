@@ -55,6 +55,8 @@ const int ENVIRONMENT_SPECULAR_SIZE = 128;
 const int SSAO_KERNEL_SIZE = 64;
 const int SSAO_NOISE_SIZE = 16;
 
+const int MAX_TEXTURE_INPUT = 4;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +118,8 @@ private:
 	bool RenderGBufferAlbedo(RenderTextureClass *targetTex);
 	bool RenderSSAONoiseTexture(RenderTextureClass *targetTex);
 	bool RenderSSAOTexture(RenderTextureClass *targetTex);
+	//ImGUI
+	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
 
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
@@ -133,6 +137,7 @@ private:
 	UITexturePreview* m_texturePreviewMetalness;
 	UITexturePreview* m_texturePreviewNormal;
 	UITexturePreview* m_texturePreviewAlbedo;
+	ID3D11ShaderResourceView* m_emptyTexView[MAX_TEXTURE_INPUT];
 
 	UIBackground* m_debugBackground;
 	MouseClassContainer* m_mouse;
@@ -197,6 +202,9 @@ private:
 	XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
 	XMFLOAT2 m_ssaoNoise[16];
 	
+	//ImGUI
+	int m_internalTextureViewIndex = -1;
+
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;
 	int m_screenHeight = 0;

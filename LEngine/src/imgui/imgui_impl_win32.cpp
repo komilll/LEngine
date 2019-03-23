@@ -257,8 +257,13 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     ImGuiIO& io = ImGui::GetIO();
 	if (msg == WM_KEYDOWN && (wParam == 16 || wParam == 17)) //Left CTRL
 		msg = WM_LBUTTONDOWN;
-	else if (msg == WM_KEYUP && (wParam == 16 || wParam == 17))
+	else if (msg == WM_KEYUP && (wParam == 16 || wParam == 17)) //Left SHIFT
 		msg = WM_LBUTTONUP;
+
+	//if (msg == WM_KEYDOWN && wParam == 32) //Space - simulate (Right Mouse Button)
+	//	msg = WM_RBUTTONDOWN;
+	//else if (msg == WM_KEYUP && wParam == 32) //Space - simulate (Right Mouse Button)
+	//	msg = WM_RBUTTONUP;
 
     switch (msg)
     {

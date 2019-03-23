@@ -178,6 +178,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_texturePreviewAlbedo->Initialize(m_D3D, -0.58f, -0.510f, 0.1f, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
 	AddText(-0.94f, -0.350f, "Albedo:", 0.35f);
 
+	ID3D11Resource* tmp = nullptr;
+	for (int i = 0; i < MAX_TEXTURE_INPUT; i++)
+	{
+		m_emptyTexView[i] = nullptr;
+		UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, m_emptyTexView[i]);
+	}
+
 #pragma endregion
 
 	if (BLUR_BILINEAR)
@@ -268,7 +275,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		system("texassemble cube -w 2048 -h 2048 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.bmp Skyboxes/negx.bmp Skyboxes/posy.bmp Skyboxes/negy.bmp Skyboxes/posz.bmp Skyboxes/negz.bmp");
 		skyboxFile.open("Skyboxes/cubemap.dds");
 		if (skyboxFile.fail())
-			return true;
+		{
+			system("texassemble cube -w 2048 -h 2048 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.jpg Skyboxes/negx.jpg Skyboxes/posy.jpg Skyboxes/negy.jpg Skyboxes/posz.jpg Skyboxes/negz.jpg");
+			skyboxFile.open("Skyboxes/cubemap.dds");
+			if (skyboxFile.fail())
+				return true;
+		}
 	}
 	//LOAD SKYBOX
 	if (!(m_skyboxShader = new SkyboxShaderClass))
@@ -906,26 +918,72 @@ bool GraphicsClass::RenderGUI()
 
 	ImGui::Begin("BaseWindow");
 	
+	//Sliders - roughness/metalness in case of empty texture maps
 	ImGui::SliderFloat("Roughness", &m_pbrShader->m_roughness, 0.0f, 1.0f, "%.2f");
 	ImGui::SliderFloat("Metalness", &m_pbrShader->m_metalness, 0.0f, 1.0f, "%.2f");
-	
+	//Color picker - in case of empty albedo
+	ImGui::ColorPicker3("Tint", m_pbrShader->m_tint);
+
+	ImGui::Spacing();
+	ImGui::Spacing();
 	ImGui::Spacing();
 
-	ImGui::Text("Roughness map:");
-	if (ImGui::ImageButton(m_pbrShader->m_roughnessTextureView, ImVec2{ 64, 64 }))
-	{
+	m_internalTextureViewIndex = 0;
 
-	}
+	//Roughness map input
+	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
+	RenderTextureViewImGui(m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView, "Metalness map:");
+	RenderTextureViewImGui(m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView, "Normal map:");
+	RenderTextureViewImGui(m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView, "Albedo map:");
 
-	ImGui::Text("Metalness map:");
-	ImGui::ImageButton(m_pbrShader->m_metalnessTextureView, ImVec2{ 64, 64 });
+	//ImGui::Text("Roughness map:");
+	//if (ImGui::ImageButton(m_pbrShader->m_roughnessTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_roughnessTextureView, ImVec2{ 64, 64 }))
+	//{
+	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("X", ImVec2{ 16, 16 }))
+	//{
+	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView);
+	//}
 
-	ImGui::Text("Normal map:");
-	ImGui::ImageButton(m_pbrShader->m_normalTextureView, ImVec2{ 64, 64 });
+	//////Metalness map input
+	////ImGui::Text("Metalness map:");
+	//if (ImGui::ImageButton(m_pbrShader->m_metalnessTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_metalnessTextureView, ImVec2{ 64, 64 }))
+	//{
+	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("X ", ImVec2{ 16, 16 }))
+	//{
+	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView);
+	//}
 
-	ImGui::Text("Albedo map:");
-	ImGui::ImageButton(m_pbrShader->m_diffuseTextureView, ImVec2{ 64, 64 });
+	////Normal map input
+	//ImGui::Text("Normal map:");
+	//if (ImGui::ImageButton(m_pbrShader->m_normalTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_normalTextureView, ImVec2{ 64, 64 }))
+	//{
+	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("X  ", ImVec2{ 16, 16 }))
+	//{
+	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView);
+	//}
+	//
+	////Albedo map input
+	//ImGui::Text("Albedo map:");
+	//if (ImGui::ImageButton(m_pbrShader->m_diffuseTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_diffuseTextureView, ImVec2{ 64, 64 }))
+	//{
+	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("X", ImVec2{ 16, 16 }))
+	//{
+	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
+	//}
 
+	//Finish ImGui and render
 	ImGui::End();
 
 	ImGui::Render();
@@ -1770,6 +1828,27 @@ bool GraphicsClass::RenderSSAOTexture(RenderTextureClass * targetTex)
 	m_D3D->ResetViewport();
 
 	return true;
+}
+
+void GraphicsClass::RenderTextureViewImGui(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char* label)
+{
+	ImGui::Text(label);
+	if (ImGui::ImageButton(resourceView == nullptr ? m_emptyTexView[m_internalTextureViewIndex] : resourceView, ImVec2{ 64, 64 }))
+	{
+		UITexturePreview::TextureChooseWindow(m_D3D, resource, resourceView);
+	}
+	ImGui::SameLine();
+	std::string buttonText = "X";
+	for (int i = 0; i < m_internalTextureViewIndex; i++)
+	{
+		buttonText += ' ';
+	}
+	if (ImGui::Button(buttonText.c_str(), ImVec2{ 16, 16 }))
+	{
+		UITexturePreview::DeletePassedTexture(m_D3D, resource, resourceView);
+	}
+
+	m_internalTextureViewIndex++;
 }
 
 float GraphicsClass::lerp(float a, float b, float val)

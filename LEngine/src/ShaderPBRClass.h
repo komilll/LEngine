@@ -31,6 +31,7 @@ private:
 		float roughness;
 		float metalness;
 		XMFLOAT2 padding;
+		XMFLOAT4 albedoTint;
 	};
 
 	struct ShaderTextureBufferType
@@ -94,6 +95,7 @@ public:
 	XMFLOAT3 m_cameraPosition;
 	float m_roughness = 0;
 	float m_metalness = 0;
+	float m_tint[3] = { 1,1,1 };
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;

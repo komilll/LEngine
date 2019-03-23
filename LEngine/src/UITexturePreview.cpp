@@ -49,7 +49,7 @@ void UITexturePreview::ConnectTextures(ID3D11Resource *& texture, ID3D11ShaderRe
 }
 
 //Static method
-void UITexturePreview::TextureChooseWindow(HWND hwnd, ID3D11ShaderResourceView *& textureView)
+void UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 {
 	PWSTR pszFilePath;
 	wchar_t* wFilePath = 0;
@@ -80,9 +80,19 @@ void UITexturePreview::TextureChooseWindow(HWND hwnd, ID3D11ShaderResourceView *
 				if (SUCCEEDED(hr))
 				{
 					wFilePath = pszFilePath;
-					//LoadNewTextureFromFile(wFilePath);
-					CoTaskMemFree(pszFilePath);
+					//LoadNewTextureFromFile(wFilePath); -- INLINED
+					if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, texture, textureView))
+					{
+						if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), EMPTY_TEX, texture, textureView))
+						{
+							MessageBox(*d3d->GetHWND(), "UITexturePreview -> Loading texture error", "Texture Loading Error", MB_OK);
+							PostQuitMessage(0);
+						}
+					}
+					//if (onlyPreview == false)
+					//	BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, *m_externalTexture, *m_externalTextureView);
 
+					CoTaskMemFree(pszFilePath);
 				}
 				pItem->Release();
 			}
@@ -92,6 +102,25 @@ void UITexturePreview::TextureChooseWindow(HWND hwnd, ID3D11ShaderResourceView *
 
 	//Do not call - because it will disallow using open dialog again
 	//CoUninitialize();
+}
+
+void UITexturePreview::DeletePassedTexture(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
+{
+	if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), EMPTY_TEX, texture, textureView)) 
+		return; //Failed to load texture
+	
+	//Checking null pointer is unnecessary - if loading texture passed, texture and textureView aren't empty for sure
+
+	//if (texture != nullptr)
+	{
+		texture->Release();
+		texture = nullptr;
+	}
+	//else if (textureView != nullptr)
+	{
+		textureView->Release();
+		textureView = nullptr;
+	}
 }
 
 void UITexturePreview::TextureChooseWindow(HWND hwnd)
@@ -125,7 +154,7 @@ void UITexturePreview::TextureChooseWindow(HWND hwnd)
 				if (SUCCEEDED(hr))
 				{
 					wFilePath = pszFilePath;
-					//LoadNewTextureFromFile(wFilePath);
+					LoadNewTextureFromFile(wFilePath);
 					CoTaskMemFree(pszFilePath);
 
 				}

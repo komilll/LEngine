@@ -48,7 +48,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	}
 	[branch] if (g_upVectorVal.y == 1.0f)
 	{
-		input.position.z = -input.position.y;
+		input.position.z = input.position.y;
 		input.position.y = -1.0f;
 	}
 	[branch] if (g_upVectorVal.y == -1.0f)

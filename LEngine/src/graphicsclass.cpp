@@ -46,17 +46,25 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
+	m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
 	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
-	m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
+	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
 	
 	// Create the model object.
 	m_Model = new ModelClass;
 	if(!m_Model)
 		return false;
 
+	m_skyboxModel = new ModelClass;
+	if (!m_skyboxModel)
+		return false;
+
 	//Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
+	result = m_skyboxModel->Initialize(m_D3D->GetDevice(), "sphere.obj");
+	if (!result)
+		return false;
+
+	result = m_Model->Initialize(m_D3D->GetDevice(), "happy1.obj");
 	if(!result)
 		return false;
 
@@ -101,27 +109,35 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Load textures for PBR shader
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
-		return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
+	//	return false;
 	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
 		return false;
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
-		return false;
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
-		return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
+	//	return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
+	//	return false;
+
+	m_pbrShader->SetRoughness(0.32f);
+	m_pbrShader->SetMetalness(1.0f);
 
 	//Direction + strength (w)
 	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 5.0f, 8.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
-	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 10.0f), 1.0f, 0.0f, 0.0f);
-	m_pbrShader->AddDirectionalLight(XMFLOAT4(-11.0f, -1.0f, 0.0f, 2.5f), 0.0f, 1.0f, 0.0f);
-	m_pbrShader->AddDirectionalLight(XMFLOAT4(-2.76f, 4.5f, 5.0f, 5.0f), 0.0f, 0.0f, 1.0f);
-	m_pbrShader->AddDirectionalLight(XMFLOAT4(1.0f, 5.0f, 0.0f, 0.5f), 1.0f, 1.0f, 1.0f);
+	//m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 10.0f), 1.0f, 0.0f, 0.0f);
+	//m_pbrShader->AddDirectionalLight(XMFLOAT4(-11.0f, -1.0f, 0.0f, 2.5f), 0.0f, 1.0f, 0.0f);
+	//m_pbrShader->AddDirectionalLight(XMFLOAT4(-2.76f, 4.5f, 5.0f, 5.0f), 0.0f, 0.0f, 1.0f);
+	//m_pbrShader->AddDirectionalLight(XMFLOAT4(1.0f, 5.0f, 0.0f, 0.5f), 1.0f, 1.0f, 1.0f);
 
-	m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 0.0f, -5.0f }, 10.0f, 1.0f, 0.0f, 0.0f, 0.7f);
-	m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 15.0f, 5.0f }, 10.0f, 0.0f, 1.0f, 0.0f, 0.4f);
-	m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 5.0f, -10.0f}, 10.0f, 0.0f, 0.0f, 1.0f, 1.5f);
-	m_pbrShader->AddPointLight(XMFLOAT3{ 5.0f , 0.0f, 12.0f}, 10.0f, 1.0f, 1.0f, 1.0f, 0.4f);
+	//m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 0.0f, -5.0f }, 10.0f, 1.0f, 0.0f, 0.0f, 0.7f);
+	//m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 15.0f, 5.0f }, 10.0f, 0.0f, 1.0f, 0.0f, 0.4f);
+	//m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 5.0f, -10.0f}, 10.0f, 0.0f, 0.0f, 1.0f, 1.5f);
+	//m_pbrShader->AddPointLight(XMFLOAT3{ 5.0f , 0.0f, 12.0f}, 10.0f, 1.0f, 1.0f, 1.0f, 0.4f);
+	
+	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 0.0f, -1.0f }, 0.4f, 1.0f, 0.0f, 0.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 2.0f, 6.0f }, 0.7f, 0.0f, 1.0f, 0.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 10.f, 3.0f}, 1.25f, 0.0f, 0.0f, 1.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 5.0f , -3.0f, 0.0f}, 1.0f, 1.0f, 1.0f, 0.4f);
 #pragma endregion
 
 #pragma region Creating UI
@@ -272,14 +288,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	skyboxFile.open("Skyboxes/cubemap.dds");
 	if (skyboxFile.fail())
 	{
-		system("texassemble cube -w 2048 -h 2048 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.bmp Skyboxes/negx.bmp Skyboxes/posy.bmp Skyboxes/negy.bmp Skyboxes/posz.bmp Skyboxes/negz.bmp");
+		system("texassemble cube -w 512 -h 512 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.bmp Skyboxes/negx.bmp Skyboxes/posy.bmp Skyboxes/negy.bmp Skyboxes/posz.bmp Skyboxes/negz.bmp");
 		skyboxFile.open("Skyboxes/cubemap.dds");
 		if (skyboxFile.fail())
 		{
-			system("texassemble cube -w 2048 -h 2048 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.jpg Skyboxes/negx.jpg Skyboxes/posy.jpg Skyboxes/negy.jpg Skyboxes/posz.jpg Skyboxes/negz.jpg");
+			system("texassemble cube -w 512 -h 512 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.jpg Skyboxes/negx.jpg Skyboxes/posy.jpg Skyboxes/negy.jpg Skyboxes/posz.jpg Skyboxes/negz.jpg");
 			skyboxFile.open("Skyboxes/cubemap.dds");
 			if (skyboxFile.fail())
-				return true;
+				return false;
 		}
 	}
 	//LOAD SKYBOX
@@ -288,6 +304,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_skyboxShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"skybox.vs", L"skybox.ps", input))
 		return false;
 
+	skyboxFile.close();
 	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
 	
 	//RENDER SCENE TO TEXTURE
@@ -878,12 +895,27 @@ bool GraphicsClass::RenderScene()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	m_Camera->SetRotation(-1.25f, 91.0f, 0);
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	//if (!result)
 	//	return false;
+	//for (float x = 0; x < 6; x++)
+	//{
+	//	for (float y = 0; y < 6; y++)
+	//	{
+	//		worldMatrix = XMMatrixIdentity();
+	//		worldMatrix = XMMatrixTranslation(x * 1.25f, y * 1.25f, 0.0f);
+	//		m_pbrShader->SetRoughness(x / 6.0f);
+	//		m_pbrShader->SetMetalness(y / 6.0f);
+	//		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//		if (!result)
+	//			return false;
+	//	}
+	//}
+
 	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
@@ -1056,8 +1088,8 @@ bool GraphicsClass::RenderSkybox()
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
-	m_Model->Render(m_D3D->GetDeviceContext());
-	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_skyboxModel->Render(m_D3D->GetDeviceContext());
+	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_skyboxModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
@@ -1214,8 +1246,9 @@ bool GraphicsClass::DownsampleSkybox()
 		system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/conv_cubemap.dds Skyboxes/conv_posx.dds Skyboxes/conv_negx.dds Skyboxes/conv_posy.dds Skyboxes/conv_negy.dds Skyboxes/conv_posz.dds Skyboxes/conv_negz.dds");
 		skyboxFile.open("Skyboxes/conv_cubemap.dds");
 		if (skyboxFile.fail())
-			return true;
+			return false;
 	}
+	skyboxFile.close();
 
 	return true;
 }
@@ -1339,7 +1372,10 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 	ifstream skyboxFile;
 	skyboxFile.open("Skyboxes/conv_cubemap.dds");
 	if (skyboxFile.fail() == false)
+	{
+		skyboxFile.close();
 		return true;
+	}
 
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
@@ -1483,7 +1519,10 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 	{
 		skyboxFile.open(filenamesCubemap[i].c_str());
 		if (skyboxFile.fail() == false)
+		{
+			skyboxFile.close();
 			return true;
+		}
 	}
 
 	float color[4]{ 1.0f, 0.0f, 0.0f, 1.0f };
@@ -1626,7 +1665,10 @@ bool GraphicsClass::CreateSingleEnvironmentMap()
 	{
 		skyboxFile.open(filenamesCubemap[i].c_str());
 		if (skyboxFile.fail() == false)
+		{
+			skyboxFile.close();
 			return true;
+		}
 	}
 
 	float color[4]{ 1.0f, 0.0f, 0.0f, 1.0f };

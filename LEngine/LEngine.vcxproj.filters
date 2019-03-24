@@ -37,9 +37,6 @@
     <None Include="pbr_base.vs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="pbr_base.ps">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="uiTexturePreview.ps">
       <Filter>Resource Files</Filter>
     </None>
@@ -128,6 +125,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ssaoShader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="pbr_base.ps">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

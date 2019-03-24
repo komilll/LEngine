@@ -7,13 +7,15 @@
 class ShaderPBRClass : public BaseShaderClass
 {
 private:
-	static const int NUM_LIGHTS_DIRECTIONAL = 1;
+	static const int NUM_LIGHTS_DIRECTIONAL = 5;
 	static const int NUM_LIGHTS_POINT = 0;
+	//#define USE_POINT_LIGHTS
+
 	struct LightingBufferType
 	{
 		XMFLOAT4 directional_directionStregth[NUM_LIGHTS_DIRECTIONAL];
 		XMFLOAT4 directional_color[NUM_LIGHTS_DIRECTIONAL];
-#if NUM_LIGHTS_POINT > 0
+#ifdef USE_POINT_LIGHTS
 		XMFLOAT4 point_positionWithRadius[NUM_LIGHTS_POINT];
 		XMFLOAT4 point_colorWithStrength[NUM_LIGHTS_POINT];
 #endif

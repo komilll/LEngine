@@ -47,8 +47,8 @@ const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
-const bool DRAW_SKYBOX = false;
-const bool ENABLE_GUI = true;
+const bool DRAW_SKYBOX = true;
+const bool ENABLE_GUI = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -129,6 +129,7 @@ private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
+	ModelClass* m_skyboxModel;
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRClass* m_pbrShader;
 	SkyboxShaderClass* m_skyboxShader;

@@ -31,6 +31,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	[branch] if (g_upVectorVal.z == 1.0f)
 	{
 		input.position.z = -1.0f;
+		input.position.x *= -1;
 	}
 	[branch] if (g_upVectorVal.z == -1.0f)
 	{

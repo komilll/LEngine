@@ -47,7 +47,7 @@ const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
-const bool DRAW_SKYBOX = true;
+const bool DRAW_SKYBOX = false;
 const bool ENABLE_GUI = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
@@ -106,7 +106,7 @@ private:
 	bool BlurFilter(bool vertical, ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex, int width);
 	bool ConvoluteShader(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
 	//SHADOW MAPPING
-	bool CreateShadowMap(RenderTextureClass* targetTex);
+	bool CreateShadowMap(RenderTextureClass*& targetTex);
 	bool RenderDepthScene();
 	//IBL SPECULAR
 	bool PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
@@ -129,6 +129,7 @@ private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
+	ModelClass* m_cubeModel;
 	ModelClass* m_skyboxModel;
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRClass* m_pbrShader;

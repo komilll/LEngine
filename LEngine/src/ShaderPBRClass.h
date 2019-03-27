@@ -7,7 +7,7 @@
 class ShaderPBRClass : public BaseShaderClass
 {
 private:
-	static const int NUM_LIGHTS_DIRECTIONAL = 5;
+	static const int NUM_LIGHTS_DIRECTIONAL = 1;
 	static const int NUM_LIGHTS_POINT = 0;
 	//#define USE_POINT_LIGHTS
 

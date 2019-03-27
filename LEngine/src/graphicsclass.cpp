@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "graphicsclass.h"
 
-
 GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
@@ -46,8 +45,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
-	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
+	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
+	m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
 	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
 	
 	// Create the model object.
@@ -59,13 +58,21 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_skyboxModel)
 		return false;
 
+	m_cubeModel = new ModelClass;
+	if (!m_cubeModel)
+		return false;
+
 	//Initialize the model object.
 	result = m_skyboxModel->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if (!result)
 		return false;
 
-	result = m_Model->Initialize(m_D3D->GetDevice(), "happy1.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if(!result)
+		return false;
+
+	result = m_cubeModel->Initialize(m_D3D->GetDevice(), "cube.obj");
+	if (!result)
 		return false;
 
 	//Create mouse container
@@ -109,20 +116,20 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Load textures for PBR shader
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
-	//	return false;
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
+		return false;
 	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
 		return false;
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
-	//	return false;
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
-	//	return false;
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
+		return false;
+	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
+		return false;
 
-	m_pbrShader->SetRoughness(0.32f);
-	m_pbrShader->SetMetalness(1.0f);
+	//m_pbrShader->SetRoughness(0.32f);
+	//m_pbrShader->SetMetalness(1.0f);
 
 	//Direction + strength (w)
-	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 5.0f, 8.0f, 1.0f), 1.0f, 1.0f, 1.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 10.0f, -5.0f, 1.0f), 1.0f, 1.0f, 1.0f);
 
 	//m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 10.0f), 1.0f, 0.0f, 0.0f);
 	//m_pbrShader->AddDirectionalLight(XMFLOAT4(-11.0f, -1.0f, 0.0f, 2.5f), 0.0f, 1.0f, 0.0f);
@@ -768,7 +775,7 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		//CreateShadowMap(m_shadowMapTexture);
+		CreateShadowMap(m_shadowMapTexture);
 
 		//std::vector <LPCSTR> names;
 		//names.push_back("position");
@@ -874,18 +881,18 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
-	//m_groundQuadModel->Render(m_D3D->GetDeviceContext());
-	//m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
-	//m_directionalLight->GenerateViewMatrix();
-	//m_directionalLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_DEPTH);
-	//m_directionalLight->GetViewMatrix(lightViewMatrix);
-	//m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
-	//m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
-	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
+	m_groundQuadModel->Render(m_D3D->GetDeviceContext());
+	m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
+	m_directionalLight->GenerateViewMatrix();
+	m_directionalLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_DEPTH);
+	m_directionalLight->GetViewMatrix(lightViewMatrix);
+	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
+	m_colorShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
+	result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if (!result)
+		return false;
 
 	m_Model->Render(m_D3D->GetDeviceContext());
 	m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
@@ -899,6 +906,8 @@ bool GraphicsClass::RenderScene()
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+
+	//METALNESS / ROUGHNESS presentation
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	//if (!result)
 	//	return false;
@@ -916,22 +925,28 @@ bool GraphicsClass::RenderScene()
 	//	}
 	//}
 
-	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
+	//result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//if (!result)
+	//	return false;
 
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+	worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
+	m_cubeModel->Render(m_D3D->GetDeviceContext());
+	m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
-	//	worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
-	//	m_Model->Render(m_D3D->GetDeviceContext());
-	//	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//	if (!result)
-	//		return false;
-	//}
+	//SHADOWMAPPING presentation
+	for (int i = 0; i < 5; i++)
+	{
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
+		m_Model->Render(m_D3D->GetDeviceContext());
+		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		if (!result)
+			return false;
+	}
 
 	if (DRAW_SKYBOX)
 	{
@@ -1418,7 +1433,7 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 	return true;
 }
 
-bool GraphicsClass::CreateShadowMap(RenderTextureClass* targetTex)
+bool GraphicsClass::CreateShadowMap(RenderTextureClass*& targetTex)
 {
 	targetTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 	targetTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 1.0f, 1.0f, 1.0f);
@@ -1426,10 +1441,11 @@ bool GraphicsClass::CreateShadowMap(RenderTextureClass* targetTex)
 	if (RenderDepthScene() == false)
 		return false;
 
-	m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
+	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
 
 	m_D3D->SetBackBufferRenderTarget();
 	m_D3D->ResetViewport();
+	m_D3D->BeginScene(0, 0, 0, 1);
 
 	return true;
 }
@@ -1465,6 +1481,11 @@ bool GraphicsClass::RenderDepthScene()
 	//result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 	//if (!result)
 	//	return false;
+
+	worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
+	m_cubeModel->Render(m_D3D->GetDeviceContext());
+	m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
 
 	for (int i = 0; i < 5; i++)
 	{

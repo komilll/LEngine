@@ -36,6 +36,7 @@ struct PixelInputType
 	float4 lightViewPosition : TEXCOORD0;
 	float3 lightPos : TEXCOORD1;
 	float3 normal : NORMAL;
+	float4 positionWorld : TEXCOORD2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +59,9 @@ PixelInputType ColorVertexShader(VertexInputType input)
 	//Calculate object seen by light
 	matrix lightViewProj = mul(g_lightProjectionMatrix, g_lightViewMatrix);
 
+	output.positionWorld = mul(input.position, worldMatrix);
+	output.positionWorld = mul(output.positionWorld, lightViewProj);
+
 	output.lightViewPosition = mul(input.position, lightViewProj);
 	//output.lightViewPosition = mul(output.lightViewPosition, g_lightViewMatrix);
 	//output.lightViewPosition = mul(output.lightViewPosition, g_lightProjectionMatrix);
@@ -65,6 +69,6 @@ PixelInputType ColorVertexShader(VertexInputType input)
 	//Calculate light-object vector
 	output.lightPos = g_lightPosition.xyz - worldPosition.xyz;
 	output.lightPos = normalize(output.lightPos);
-
+	
     return output;
 }

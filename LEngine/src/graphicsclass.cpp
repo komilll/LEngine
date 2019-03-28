@@ -902,7 +902,7 @@ bool GraphicsClass::RenderScene()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_Camera->SetRotation(-1.25f, 91.0f, 0);
+	//m_Camera->SetRotation(-1.25f, 91.0f, 0);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
@@ -929,10 +929,10 @@ bool GraphicsClass::RenderScene()
 	//if (!result)
 	//	return false;
 
-	worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
-	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
-	m_cubeModel->Render(m_D3D->GetDeviceContext());
-	m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -2.0f);
+	//worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
+	//m_cubeModel->Render(m_D3D->GetDeviceContext());
+	//m_colorShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 	//SHADOWMAPPING presentation
 	for (int i = 0; i < 5; i++)
@@ -943,7 +943,8 @@ bool GraphicsClass::RenderScene()
 
 		worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
 		m_Model->Render(m_D3D->GetDeviceContext());
-		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		m_colorShader->m_shadowMapResourceView = m_shadowMapTexture->GetShaderResourceView();
+		result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
 	}

@@ -18,7 +18,14 @@ struct PixelInputType
 {
     float4 positionSV : SV_POSITION;
     float2 tex : TEXCOORD0;
-	float4x4 projection : TEXCOORD1;
+	float4 projection_1 : TEXCOORD1;
+	float4 projection_2 : TEXCOORD2;
+	float4 projection_3 : TEXCOORD3;
+	float4 projection_4 : TEXCOORD4;
+	float4 view_1 : TEXCOORD5;
+	float4 view_2 : TEXCOORD6;
+	float4 view_3 : TEXCOORD7;
+	float4 view_4 : TEXCOORD8;
 };
 
 const float2 noiseScale = float2(1280.0f / 4.0f, 720.0f / 4.0f);
@@ -42,13 +49,17 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float4 offset = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float occlusion = 0.0f;
 
+	float4x4 projection = {input.projection_1, input.projection_2, input.projection_3, input.projection_4};
+	float4x4 view = {input.view_1, input.view_2, input.view_3, input.view_4}; 
+
 	for (int i = 0; i < 64; i++)
+	//int i = 36;
 	{
 		sample = mul(g_kernelValue[i], TBN);
 		sample = position + sample * radius;
 
 		offset = float4(sample, 1.0f);
-		offset = mul(input.projection, offset);
+		offset = mul(view, offset);
 		offset.xyz /= offset.w;
 		offset.xyz = offset.xyz * 0.5f + 0.5f;
 		
@@ -61,4 +72,6 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//return color;
 	//return float4(bitangent, 1.0f);
 	return float4(occlusion, occlusion, occlusion, 1.0f);
+	//return offset;
+	//return float4(sampleDepth, sampleDepth, sampleDepth, 1.0f);
 }

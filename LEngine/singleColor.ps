@@ -27,7 +27,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
     float lightDepthValue;
     float bias = 0.001f;
     float4 textureColor = float4(1.0, 1.0, 1.0, 1.0);
-    float4 ambientColor = float4(0.0, 0.0, 0.0, 1.0);
+    float4 ambientColor = float4(0, 0, 0, 1.0);
     float2 tex;
     float lightIntensity = 0.0f;
 	float modelDepthValue;
@@ -61,10 +61,34 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
         }
     }
 	float shadow = lightDepthValue > depthValue ? 1.0f : 0.0f;
-	
+
 	//return float4(shadow, shadow, shadow, 1.0f);
 	//return float4(lightDepthValue, lightDepthValue, lightDepthValue, 1.0f);
-	return float4(modelDepthValue, modelDepthValue, modelDepthValue, 1.0f);
+	//return float4(lightInverted, lightInverted, lightInverted, 1.0f);
+	//return float4(modelDepthValue, modelDepthValue, modelDepthValue, 1.0f);
 	//return float4(input.lightViewPosition.xyz, 1.0f);
 	//return input.positionWorld;
+	//color = color + float4(0.3, 0.3, 0.3, 0.0);
+	return color;
+
+	/*
+	float2 tex;
+	input.lightViewPosition.xyz /= input.lightViewPosition.w;
+
+    tex.x = input.lightViewPosition.x / 2.0f + 0.5f;
+    tex.y = -input.lightViewPosition.y / 2.0f + 0.5f;
+
+	float shadow = shadowMap.Sample(SampleType, tex).r;
+	float depth = input.position.z;
+
+	input.positionWorld.xyz /= input.positionWorld.w;
+	tex.x = input.positionWorld.x / 2.0f + 0.5f;
+    tex.y = -input.positionWorld.y / 2.0f + 0.5f;
+	float modelDepthValue = shadowMap.Sample(SampleType, tex).r;
+
+	shadow = (depth > shadow) ? 0.55f : 1.0f;
+	//shadow = (depth < shadow && modelDepthValue < shadow) ? 0.55f : 1.0f;
+
+	return float4(shadow, shadow, shadow, 1.0f);
+	*/
 }

@@ -134,6 +134,8 @@
     <None Include="pbr_base.vs" />
     <None Include="positionGBuffer.ps" />
     <None Include="positionGBuffer.vs" />
+    <None Include="postprocess.ps" />
+    <None Include="postprocess.vs" />
     <None Include="shadowmap.ps" />
     <None Include="shadowmap.vs" />
     <None Include="singleColor.ps" />
@@ -156,6 +158,7 @@
     <None Include="uiTexturePreview.vs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PostProcessShader.h" />
     <ClInclude Include="src\BaseShaderClass.h" />
     <ClInclude Include="src\BlurShaderClass.h" />
     <ClInclude Include="src\cameraclass.h" />

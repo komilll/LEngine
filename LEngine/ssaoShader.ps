@@ -38,12 +38,14 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float3 position = textures[0].Sample(SampleType, input.tex).xyz; 
 	float3 normal = normalize(textures[1].Sample(SampleType, input.tex).rgb); 
-	float3 randomVector = normalize(float3(textures[2].Sample(SampleType, input.tex * noiseScale).xy, 0.0f));
+	//input.tex *= 320.0f;
+	float3 randomVector = normalize(float3(textures[2].Sample(SampleType, input.tex).xy, 0.0f));
 	//float3 randomVector = normalize(textures[2].Sample(SampleType, input.tex * noiseScale).xyz);
 
 	float3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
 	float3 bitangent = cross(tangent, normal);
-	float3x3 TBN = {tangent, bitangent, normal};
+	//float3x3 TBN = {tangent, bitangent, normal};
+	float3x3 TBN = {normal, bitangent, tangent};
 
 	float3 sample = float3(0.0f, 0.0f, 0.0f);
 	float4 offset = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -52,11 +54,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float4x4 projection = {input.projection_1, input.projection_2, input.projection_3, input.projection_4};
 	float4x4 view = {input.view_1, input.view_2, input.view_3, input.view_4}; 
 
-	for (int i = 0; i < 64; i++)
-	//int i = 36;
+	for (int i = 0; i < 10; i++)
+	//int i = 0;
 	{
-		sample = mul(g_kernelValue[i], TBN);
-		sample = position + sample * radius;
+		sample = mul(TBN, g_kernelValue[i]);
+		sample = position + sample * 0.5f;
 
 		offset = float4(sample, 1.0f);
 		offset = mul(view, offset);
@@ -64,14 +66,19 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		offset.xyz = offset.xyz * 0.5f + 0.5f;
 		
 		float sampleDepth = textures[0].Sample(SampleType, offset.xy).z;
-		occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0);
+		//occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0);
+		occlusion += (sample.z - sampleDepth);
 	}
-	occlusion = 1.0f - (occlusion / 64.0f);
-	
+	//occlusion = 1.0f - (occlusion / 64.0f);
+	occlusion = saturate(occlusion);
+	occlusion = 1.0f - occlusion;
+
 	//float4 color = float4(position.x, position.y, position.z, 1.0f);
 	//return color;
-	//return float4(bitangent, 1.0f);
+	//return float4(tangent, 1.0f);
 	return float4(occlusion, occlusion, occlusion, 1.0f);
+	//return float4(sample, 1.0f);
 	//return offset;
+	//return float4(g_kernelValue[i], 1.0f);
 	//return float4(sampleDepth, sampleDepth, sampleDepth, 1.0f);
 }

@@ -37,6 +37,7 @@
 #include "SingleColorClass.h"
 #include "GBufferShader.h"
 #include <random>
+#include "PostProcessShader.h"
 
 /////////////
 // GLOBALS //
@@ -120,6 +121,9 @@ private:
 	bool RenderSSAOTexture(RenderTextureClass *targetTex);
 	//ImGUI
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
+	//Applying post-processes
+	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap);
+
 
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
@@ -206,6 +210,9 @@ private:
 	
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
+
+	//POST-PROCESS STACK
+	PostProcessShader* m_postProcessShader;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

@@ -130,6 +130,12 @@
     <None Include="pbr_base.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="postprocess.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="postprocess.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">
@@ -236,6 +242,9 @@
     </ClInclude>
     <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>Header Files\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcessShader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -541,11 +541,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 #pragma endregion
 
-	//m_postProcessShader = new PostProcessShader;
-	//if (!m_postProcessShader)
-	//	return false;
-	//if (!m_postProcessShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"postprocess.vs", L"postprocess.ps", input))
-	//	return false;
+	m_postProcessShader = new PostProcessShader;
+	if (!m_postProcessShader)
+		return false;
+	if (!m_postProcessShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"postprocess.vs", L"postprocess.ps", input))
+		return false;
 
 	return true;
 }
@@ -915,7 +915,7 @@ bool GraphicsClass::RenderScene()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_Camera->SetRotation(-1.25f, 91.0f, 0);
+	m_Camera->SetRotation(-0.5f, 91.0f, 0);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
@@ -1946,16 +1946,15 @@ bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap)
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	//if (m_renderTexture != nullptr && m_renderTexture->GetShaderResourceView() != nullptr)
-	//	m_postProcessShader->SetScreenBuffer(m_renderTexture->GetShaderResourceView());
-	//if (m_ssaoTexture != nullptr && m_ssaoTexture->GetShaderResourceView() != nullptr)
-	//	m_postProcessShader->SetSSAOBuffer(m_ssaoTexture->GetShaderResourceView());
+	if (m_renderTexture != nullptr && m_renderTexture->GetShaderResourceView() != nullptr)
+		m_postProcessShader->SetScreenBuffer(m_renderTexture->GetShaderResourceView());
+	if (m_ssaoTexture != nullptr && m_ssaoTexture->GetShaderResourceView() != nullptr)
+		m_postProcessShader->SetSSAOBuffer(m_ssaoTexture->GetShaderResourceView());
 
-	//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	//m_renderTexturePreview->GetShaderResourceView();
+	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	//return m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);	
-	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	return true;
+	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 }
 
 float GraphicsClass::lerp(float a, float b, float val)

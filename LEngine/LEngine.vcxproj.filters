@@ -347,5 +347,8 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp">
       <Filter>Resource Files\IMGUI</Filter>
     </ClCompile>
+    <ClCompile Include="src\PostProcessShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

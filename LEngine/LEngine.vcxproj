@@ -214,6 +214,7 @@
     <ClCompile Include="src\modelClass.cpp" />
     <ClCompile Include="src\MouseClass.cpp" />
     <ClCompile Include="src\MouseClassContainer.cpp" />
+    <ClCompile Include="src\PostProcessShader.cpp" />
     <ClCompile Include="src\RenderTextureClass.cpp" />
     <ClCompile Include="src\ShaderPBRClass.cpp" />
     <ClCompile Include="src\ShaderSpecularClass.cpp" />

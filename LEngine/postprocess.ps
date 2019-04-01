@@ -31,5 +31,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		finalColor *= ao;
 	}
 
+	//float ao = ssaoTexture.Sample(SampleType, input.tex);
+	//return float4(ao, ao, ao, 1.0f);
 	return finalColor;
 }

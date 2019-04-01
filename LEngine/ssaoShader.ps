@@ -44,8 +44,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	float3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
 	float3 bitangent = cross(tangent, normal);
-	//float3x3 TBN = {tangent, bitangent, normal};
-	float3x3 TBN = {normal, bitangent, tangent};
+	float3x3 TBN = {tangent, bitangent, normal};
+	//float3x3 TBN = {normal, bitangent, tangent};
 
 	float3 sample = float3(0.0f, 0.0f, 0.0f);
 	float4 offset = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -54,7 +54,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float4x4 projection = {input.projection_1, input.projection_2, input.projection_3, input.projection_4};
 	float4x4 view = {input.view_1, input.view_2, input.view_3, input.view_4}; 
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 30; i++)
 	//int i = 0;
 	{
 		sample = mul(TBN, g_kernelValue[i]);
@@ -66,12 +66,13 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		offset.xyz = offset.xyz * 0.5f + 0.5f;
 		
 		float sampleDepth = textures[0].Sample(SampleType, offset.xy).z;
-		//occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0);
-		occlusion += (sample.z - sampleDepth);
+		occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0);
+		//occlusion += (sample.z - sampleDepth + bias);
 	}
+	//occlusion = saturate(occlusion);
 	//occlusion = 1.0f - (occlusion / 64.0f);
-	occlusion = saturate(occlusion);
-	occlusion = 1.0f - occlusion;
+	//occlusion /= 8.0f;
+	occlusion = 1.0f - occlusion / 10.0f;
 
 	//float4 color = float4(position.x, position.y, position.z, 1.0f);
 	//return color;

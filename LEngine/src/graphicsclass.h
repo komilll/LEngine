@@ -49,7 +49,7 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = false;
-const bool ENABLE_GUI = false;
+const bool ENABLE_GUI = true;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -114,6 +114,7 @@ private:
 	bool PrepareLutBrdf(RenderTextureClass* dstTex);
 	bool CreateSingleEnvironmentMap();
 	//SSAO
+	bool RenderGBufferMain(GBufferShader *& gBuffer, RenderTextureClass *targetTex);
 	bool RenderGBufferPosition(RenderTextureClass *targetTex);
 	bool RenderGBufferNormal(RenderTextureClass *targetTex);
 	bool RenderGBufferAlbedo(RenderTextureClass *targetTex);
@@ -200,6 +201,9 @@ private:
 
 	//SSAO
 	GBufferShader* m_GBufferShader;
+	//GBufferShader* m_GBufferShaderPosition;
+	//GBufferShader* m_GBufferShaderNormal;
+	//GBufferShader* m_GBufferShaderSSAO;
 	RenderTextureClass* m_positionBuffer;
 	RenderTextureClass* m_normalBuffer;
 	RenderTextureClass* m_albedoBuffer;

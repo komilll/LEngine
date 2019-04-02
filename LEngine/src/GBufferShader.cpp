@@ -17,6 +17,16 @@ void GBufferShader::SetNoiseValues(XMFLOAT2 noiseVal[16])
 		m_noiseValues[i] = noiseVal[i];
 }
 
+void GBufferShader::SetRadiusSize(float radiusSize)
+{
+	m_radiusSize = radiusSize;
+}
+
+float *GBufferShader::GetRadiusSizeRef()
+{
+	return &m_radiusSize;
+}
+
 void GBufferShader::LoadPositionTexture(ID3D11ShaderResourceView * view)
 {
 	m_positionView = view;
@@ -68,11 +78,13 @@ bool GBufferShader::CreateBufferAdditionals(ID3D11Device *& device)
 			m_buffers = { m_ssaoNoiseBuffer };
 			break;
 		case GBufferShader::BufferType::SSAO:
-			tempBufferDesc.ByteWidth = sizeof(SSAOBuffer);
-			if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_ssaoBuffer)))
-				return false;
-
+			if (m_ssaoBuffer == nullptr)
+			{
+				tempBufferDesc.ByteWidth = sizeof(SSAOBuffer);
+				if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_ssaoBuffer)))
+					return false;
 			m_buffers = { m_ssaoBuffer };
+			}
 			break;
 	}
 
@@ -122,6 +134,10 @@ bool GBufferShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMM
 				return false;
 
 			ssaoBuffer = (SSAOBuffer*)mappedResource.pData;
+			ssaoBuffer->radiusSize = m_radiusSize;
+			ssaoBuffer->bias = m_bias;
+			ssaoBuffer->padding_2 = 0;
+			ssaoBuffer->padding_3 = 0;
 			for (int i = 0; i < 64; i++)
 				ssaoBuffer->kernelValues[i] = m_kernelValues[i];
 

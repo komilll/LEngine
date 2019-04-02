@@ -32,6 +32,10 @@ private:
 
 	struct SSAOBuffer
 	{
+		float radiusSize;
+		float bias;
+		float padding_2;
+		float padding_3;
 		XMFLOAT3 kernelValues[64];
 	};
 
@@ -42,6 +46,8 @@ public:
 	void ChangeTextureType(BufferType newType);
 	void SetKernelValues(XMFLOAT3 kernelVal[64]);
 	void SetNoiseValues(XMFLOAT2 noiseVal[16]);
+	void SetRadiusSize(float radiusSize);
+	float* GetRadiusSizeRef();
 
 	void LoadPositionTexture(ID3D11ShaderResourceView* view);
 	void LoadNormalTexture(ID3D11ShaderResourceView* view);
@@ -49,6 +55,10 @@ public:
 
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
+
+public:
+	float m_radiusSize;
+	float m_bias;
 
 private:
 	BufferType m_bufferType;
@@ -62,7 +72,7 @@ private:
 	ID3D11Buffer* m_positionBuffer;
 	ID3D11Buffer* m_normalBuffer;
 	ID3D11Buffer* m_ssaoNoiseBuffer;
-	ID3D11Buffer* m_ssaoBuffer;
+	ID3D11Buffer* m_ssaoBuffer = nullptr;
 };
 
 #endif // !_GBUFFERSHADER_H_

@@ -915,7 +915,7 @@ bool GraphicsClass::RenderScene()
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_Camera->SetRotation(-0.5f, 91.0f, 0);
+	//m_Camera->SetRotation(-0.5f, 91.0f, 0);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
@@ -994,6 +994,9 @@ bool GraphicsClass::RenderGUI()
 	ImGui::SliderFloat("Metalness", &m_pbrShader->m_metalness, 0.0f, 1.0f, "%.2f");
 	//Color picker - in case of empty albedo
 	ImGui::ColorPicker3("Tint", m_pbrShader->m_tint);
+	//SSAO radius/bias slider
+	ImGui::SliderFloat("SSAO Radius", &m_GBufferShader->m_radiusSize, 0.0f, 5.0f, "%.2f");
+	ImGui::SliderFloat("SSAO Bias", &m_GBufferShader->m_bias, 0.0f, 0.1f, "%.3f");
 
 	ImGui::Spacing();
 	ImGui::Spacing();
@@ -1953,9 +1956,9 @@ bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap)
 
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	//m_renderTexturePreview->BindTexture(m_ssaoTexture->GetShaderResourceView());
-	//return m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);	
-	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	m_renderTexturePreview->BindTexture(m_ssaoTexture->GetShaderResourceView());
+	return m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 }
 
 float GraphicsClass::lerp(float a, float b, float val)

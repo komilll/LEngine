@@ -53,6 +53,7 @@ public:
 	void LoadNormalTexture(ID3D11ShaderResourceView* view);
 	void LoadNoiseTexture(ID3D11ShaderResourceView* view);
 
+	bool Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput, BufferType type);
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
 

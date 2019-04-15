@@ -115,11 +115,11 @@ private:
 	bool CreateSingleEnvironmentMap();
 	//SSAO
 	bool RenderGBufferMain(GBufferShader *& gBuffer, RenderTextureClass *targetTex);
-	bool RenderGBufferPosition(RenderTextureClass *targetTex);
-	bool RenderGBufferNormal(RenderTextureClass *targetTex);
-	bool RenderGBufferAlbedo(RenderTextureClass *targetTex);
-	bool RenderSSAONoiseTexture(RenderTextureClass *targetTex);
-	bool RenderSSAOTexture(RenderTextureClass *targetTex);
+	bool RenderGBufferPosition(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
+	bool RenderGBufferNormal(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
+	bool RenderGBufferAlbedo(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
+	bool RenderSSAONoiseTexture(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
+	bool RenderSSAOTexture(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
 	//ImGUI
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
 	//Applying post-processes
@@ -200,10 +200,10 @@ private:
 	ModelClass* m_groundQuadModel;
 
 	//SSAO
-	GBufferShader* m_GBufferShader;
-	//GBufferShader* m_GBufferShaderPosition;
-	//GBufferShader* m_GBufferShaderNormal;
-	//GBufferShader* m_GBufferShaderSSAO;
+	//GBufferShader* m_GBufferShader;
+	GBufferShader* m_GBufferShaderPosition;
+	GBufferShader* m_GBufferShaderNormal;
+	GBufferShader* m_GBufferShaderSSAO;
 	RenderTextureClass* m_positionBuffer;
 	RenderTextureClass* m_normalBuffer;
 	RenderTextureClass* m_albedoBuffer;
@@ -217,6 +217,11 @@ private:
 
 	//POST-PROCESS STACK
 	PostProcessShader* m_postProcessShader;
+
+	//////////////////////////////
+	// Post-process using flags //
+	//////////////////////////////
+	bool m_postprocessSSAO = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

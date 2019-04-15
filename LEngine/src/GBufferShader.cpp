@@ -42,6 +42,12 @@ void GBufferShader::LoadNoiseTexture(ID3D11ShaderResourceView * view)
 	m_noiseView = view;
 }
 
+bool GBufferShader::Initialize(ID3D11Device * device, HWND hwnd, WCHAR * vsFilename, WCHAR * psFilename, vertexInputType vertexInput, BufferType type)
+{
+	ChangeTextureType(type);
+	return BaseShaderClass::Initialize(device, hwnd, vsFilename, psFilename, vertexInput);
+}
+
 bool GBufferShader::CreateBufferAdditionals(ID3D11Device *& device)
 {
 	BaseShaderClass::CreateBufferAdditionals(device);

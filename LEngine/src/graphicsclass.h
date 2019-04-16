@@ -123,7 +123,7 @@ private:
 	//ImGUI
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
 	//Applying post-processes
-	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap);
+	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
 
 
 	///// HELPER FUNCTIONS /////
@@ -155,6 +155,7 @@ private:
 
 	//BILINEAR SCREEN BLUR
 	RenderTextureClass* m_renderTexture;
+	RenderTextureClass* m_renderTextureMainScene;
 	RenderTextureClass* m_renderTextureDownsampled;
 	RenderTextureClass* m_renderTextureUpscaled;
 	RenderTextureClass* m_renderTextureHorizontalBlur;
@@ -211,6 +212,11 @@ private:
 	RenderTextureClass* m_ssaoTexture;
 	XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
 	XMFLOAT2 m_ssaoNoise[16];
+
+	//BLOOM
+	BaseShaderClass* m_bloomShader;
+	RenderTextureClass* m_bloomHorizontalBlur;
+	RenderTextureClass* m_bloomVerticalBlur;
 	
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
@@ -221,7 +227,8 @@ private:
 	//////////////////////////////
 	// Post-process using flags //
 	//////////////////////////////
-	bool m_postprocessSSAO = false;
+	bool m_postprocessSSAO = true;
+	bool m_postprocessBloom = true;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

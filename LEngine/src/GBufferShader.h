@@ -58,8 +58,8 @@ public:
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
 
 public:
-	float m_radiusSize;
-	float m_bias;
+	float m_radiusSize = 1.0f;
+	float m_bias = 0.03f;
 
 private:
 	BufferType m_bufferType;

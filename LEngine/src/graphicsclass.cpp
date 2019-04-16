@@ -255,6 +255,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 			return false;
 #pragma endregion
 	}
+	if (!(m_renderTextureMainScene = new RenderTextureClass))
+		return false;
+	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
+		return false;
+
 	//Blur shader - vertical and horizontal
 	m_blurShaderHorizontal = new BlurShaderClass;
 	if (!m_blurShaderHorizontal->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurHorizontal.vs", L"blurHorizontal.ps", input))
@@ -559,6 +564,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_postProcessShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"postprocess.vs", L"postprocess.ps", input))
 		return false;
 
+#pragma region BLOOM
+	m_bloomShader = new BaseShaderClass;
+	if (!m_bloomShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"bloomRange.vs", L"bloomRange.ps", input))
+		return false;
+#pragma endregion
+
+
 	return true;
 }
 
@@ -799,44 +811,6 @@ bool GraphicsClass::Render()
 	{
 		//CreateShadowMap(m_shadowMapTexture);
 
-		//std::vector <LPCSTR> names;
-		//names.push_back("position");
-		//names.push_back("texcoord");
-		//names.push_back("normal");
-		//names.push_back("tangent");
-		//names.push_back("binormal");
-		//std::vector <DXGI_FORMAT> formats;
-		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		//formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
-		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-		//BaseShaderClass::vertexInputType input(names, formats);
-		
-		//if (m_positionBuffer->GetShaderResourceView() != nullptr)
-		//{
-		//	delete m_positionBuffer->GetShaderResourceView();
-		//	m_positionBuffer->GetShaderResourceView() = nullptr;
-		//	delete m_positionBuffer->GetShaderResource();
-		//	m_positionBuffer->GetShaderResource() = nullptr;
-		//}
-
-		//if (m_normalBuffer->GetShaderResourceView() != nullptr)
-		//{
-		//	delete m_normalBuffer->GetShaderResourceView();
-		//	m_normalBuffer->GetShaderResourceView() = nullptr;
-		//	delete m_normalBuffer->GetShaderResource();
-		//	m_normalBuffer->GetShaderResource() = nullptr;
-		//}
-
-		//if (m_ssaoTexture->GetShaderResourceView() != nullptr)
-		//{
-		//	delete m_ssaoTexture->GetShaderResourceView();
-		//	m_ssaoTexture->GetShaderResourceView() = nullptr;
-		//	delete m_ssaoTexture->GetShaderResource();
-		//	m_ssaoTexture->GetShaderResource() = nullptr;
-		//}
-
 		if (m_postprocessSSAO)
 		{
 			if (!RenderGBufferPosition(m_positionBuffer, m_GBufferShaderPosition))
@@ -851,16 +825,7 @@ bool GraphicsClass::Render()
 			if (!RenderSSAOTexture(m_ssaoTexture, m_GBufferShaderSSAO))
 				return false;
 		}
-		//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		//result = m_GBufferShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		//if (!result)
-		//	return false;
-
 		m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-
-		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		//if (!result)
-		//	return false;
 
 	//STANDARD SCENE RENDERING
 		result = RenderScene();
@@ -969,12 +934,10 @@ bool GraphicsClass::RenderScene()
 
 	if (m_postprocessSSAO)
 	{
-		m_renderTexture->Initialize(m_D3D->GetDevice(), 1280, 720);
-		m_renderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		m_renderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
+		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);	
 	}
+
 	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
@@ -982,9 +945,11 @@ bool GraphicsClass::RenderScene()
 	if (m_postprocessSSAO)
 	{
 		m_D3D->SetBackBufferRenderTarget();
-
-		ApplySSAO(m_ssaoTexture->GetShaderResourceView());
+		ApplySSAO(m_ssaoTexture->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
 	}
+
+	//m_D3D->GetDeviceContext()->CopyResource(m_renderTextureMainScene->GetShaderResource(), m_bloomShader->LoadTexture(m_D3D->GetDevice(), nullptr, )
+
 	//worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
 	//worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
 	//m_cubeModel->Render(m_D3D->GetDeviceContext());
@@ -1028,8 +993,8 @@ bool GraphicsClass::RenderGUI()
 	//Color picker - in case of empty albedo
 	ImGui::ColorPicker3("Tint", m_pbrShader->m_tint);
 	//SSAO radius/bias slider
-	ImGui::SliderFloat("SSAO Radius", &m_GBufferShaderSSAO->m_radiusSize, 0.0f, 5.0f, "%.2f");
-	ImGui::SliderFloat("SSAO Bias", &m_GBufferShaderSSAO->m_bias, 0.0f, 0.1f, "%.3f");
+		//ImGui::SliderFloat("SSAO Radius", &m_GBufferShaderSSAO->m_radiusSize, 0.0f, 5.0f, "%.2f");
+		//ImGui::SliderFloat("SSAO Bias", &m_GBufferShaderSSAO->m_bias, 0.0f, 0.1f, "%.3f");
 
 	ImGui::Spacing();
 	ImGui::Spacing();
@@ -1039,6 +1004,7 @@ bool GraphicsClass::RenderGUI()
 
 	//Post-process stack bools
 	ImGui::Checkbox("Use SSAO", &m_postprocessSSAO);
+	ImGui::Checkbox("Use Bloom", &m_postprocessBloom);
 
 	//Roughness map input
 	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
@@ -1979,7 +1945,7 @@ void GraphicsClass::RenderTextureViewImGui(ID3D11Resource *& resource, ID3D11Sha
 	m_internalTextureViewIndex++;
 }
 
-bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap)
+bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	m_Camera->Render();
@@ -1987,16 +1953,16 @@ bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap)
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	if (m_renderTexture != nullptr && m_renderTexture->GetShaderResourceView() != nullptr)
-		m_postProcessShader->SetScreenBuffer(m_renderTexture->GetShaderResourceView());
+	if (mainFrameBuffer != nullptr && mainFrameBuffer!= nullptr)
+		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
 	if (m_ssaoTexture != nullptr && m_ssaoTexture->GetShaderResourceView() != nullptr)
 		m_postProcessShader->SetSSAOBuffer(m_ssaoTexture->GetShaderResourceView());
 
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	m_renderTexturePreview->BindTexture(m_ssaoTexture->GetShaderResourceView());
-	return m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//m_renderTexturePreview->BindTexture(m_ssaoTexture->GetShaderResourceView());
+	//return m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 }
 
 float GraphicsClass::lerp(float a, float b, float val)

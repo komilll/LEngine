@@ -80,6 +80,7 @@ public:
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&);
 	static bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView);
+	static bool LoadTexture(ID3D11Device * device, const ID3D11Resource *&inTexture, const ID3D11ShaderResourceView *&inTextureView, ID3D11Resource *&outTexture, ID3D11ShaderResourceView *&outTextureView);
 	void AddSampler(bool isVectorSampler, UINT startSlot, UINT numSapmlers, ID3D11SamplerState* &samplerStates);
 
 protected:

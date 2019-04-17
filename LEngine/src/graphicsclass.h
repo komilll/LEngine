@@ -36,6 +36,7 @@
 #include "LightClass.h"
 #include "SingleColorClass.h"
 #include "GBufferShader.h"
+#include "BloomShaderClass.h"
 #include <random>
 #include "PostProcessShader.h"
 
@@ -210,11 +211,12 @@ private:
 	RenderTextureClass* m_albedoBuffer;
 	RenderTextureClass* m_ssaoNoiseTexture;
 	RenderTextureClass* m_ssaoTexture;
+	RenderTextureClass* m_postSSAOTexture;
 	XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
 	XMFLOAT2 m_ssaoNoise[16];
 
 	//BLOOM
-	BaseShaderClass* m_bloomShader;
+	BloomShaderClass* m_bloomShader;
 	RenderTextureClass* m_bloomHorizontalBlur;
 	RenderTextureClass* m_bloomVerticalBlur;
 	
@@ -228,7 +230,7 @@ private:
 	// Post-process using flags //
 	//////////////////////////////
 	bool m_postprocessSSAO = true;
-	bool m_postprocessBloom = true;
+	bool m_postprocessBloom = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

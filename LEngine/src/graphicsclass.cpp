@@ -541,6 +541,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	//m_ssaoTexture->GetShaderResourceView() = nullptr;
 
+	m_postSSAOTexture = new RenderTextureClass;
+	if (!m_postSSAOTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight))
+		return false;
+
 	m_ssaoNoiseTexture = new RenderTextureClass;
 	m_ssaoNoiseTexture->Initialize(m_D3D->GetDevice(), SSAO_NOISE_SIZE, SSAO_NOISE_SIZE);
 	if (!m_ssaoNoiseTexture->LoadTexture(m_D3D->GetDevice(), L"ssaoNoise.dds", m_ssaoNoiseTexture->GetShaderResource(), m_ssaoNoiseTexture->GetShaderResourceView()))
@@ -565,7 +569,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 #pragma region BLOOM
-	m_bloomShader = new BaseShaderClass;
+	m_bloomShader = new BloomShaderClass;
 	if (!m_bloomShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"bloomRange.vs", L"bloomRange.ps", input))
 		return false;
 #pragma endregion
@@ -932,20 +936,58 @@ bool GraphicsClass::RenderScene()
 	//	}
 	//}
 
-	if (m_postprocessSSAO)
-	{
-		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);	
-	}
+	m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);	
 
 	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
 
+	m_D3D->SetBackBufferRenderTarget();
+
 	if (m_postprocessSSAO)
 	{
-		m_D3D->SetBackBufferRenderTarget();
+		if (m_postprocessBloom)
+		{
+			m_postSSAOTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+			m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		}
+
 		ApplySSAO(m_ssaoTexture->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
+
+		m_D3D->SetBackBufferRenderTarget();
+	}
+
+	if (m_postprocessBloom)
+	{
+		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+
+		m_Camera->Render();
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		if (m_postprocessSSAO)
+			m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
+		else
+			m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
+
+		m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	}
+	
+	if (!m_postprocessSSAO && !m_postprocessBloom)
+	{
+		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+
+		m_Camera->Render();
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
+		m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	}
 
 	//m_D3D->GetDeviceContext()->CopyResource(m_renderTextureMainScene->GetShaderResource(), m_bloomShader->LoadTexture(m_D3D->GetDevice(), nullptr, )
@@ -974,6 +1016,13 @@ bool GraphicsClass::RenderScene()
 	{
 		if (RenderSkybox() == false)
 			return false;
+	}
+
+	if (m_postprocessBloom)
+	{
+		//Clear to make sure there is no pointer to local variable which outlives scope
+		m_bloomShader->m_bloomTexture = nullptr;
+		m_bloomShader->m_bloomTextureView = nullptr;
 	}
 
 	return true;

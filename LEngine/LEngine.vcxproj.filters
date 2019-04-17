@@ -136,6 +136,12 @@
     <None Include="postprocess.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="bloomRange.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="bloomRange.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">
@@ -246,6 +252,9 @@
     <ClInclude Include="PostProcessShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\BloomShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -348,6 +357,9 @@
       <Filter>Resource Files\IMGUI</Filter>
     </ClCompile>
     <ClCompile Include="src\PostProcessShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BloomShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

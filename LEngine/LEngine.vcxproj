@@ -117,6 +117,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="bloomRange.ps" />
+    <None Include="bloomRange.vs" />
     <None Include="blurHorizontal.ps" />
     <None Include="blurHorizontal.vs" />
     <None Include="blurVertical.ps" />
@@ -160,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="PostProcessShader.h" />
     <ClInclude Include="src\BaseShaderClass.h" />
+    <ClInclude Include="src\BloomShaderClass.h" />
     <ClInclude Include="src\BlurShaderClass.h" />
     <ClInclude Include="src\cameraclass.h" />
     <ClInclude Include="src\ConvoluteShaderClass.h" />
@@ -197,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseShaderClass.cpp" />
+    <ClCompile Include="src\BloomShaderClass.cpp" />
     <ClCompile Include="src\BlurShaderClass.cpp" />
     <ClCompile Include="src\cameraclass.cpp" />
     <ClCompile Include="src\ConvoluteShaderClass.cpp" />

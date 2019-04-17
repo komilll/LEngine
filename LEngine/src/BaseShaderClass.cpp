@@ -315,16 +315,22 @@ bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename
 	return true;
 }
 
-bool BaseShaderClass::LoadTexture(ID3D11Device * device, const ID3D11Resource *& inTexture, const ID3D11ShaderResourceView *& inTextureView, ID3D11Resource *& outTexture, ID3D11ShaderResourceView *& outTextureView)
+bool BaseShaderClass::LoadTexture(ID3D11Device* device, const ID3D11Resource *& inTexture, ID3D11Resource *& outTexture, ID3D11ShaderResourceView *& outTextureView)
 {
 	//Make sure to avoid data leaking by releasing resource before creating new textures
 	if (outTexture != nullptr)
 		outTexture->Release();
 
-	if (outTexture != nullptr)
-		outTexture->Release();
+	if (outTextureView != nullptr)
+		outTextureView->Release();
 
-	return true;
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+	shaderResourceViewDesc.TextureCube.MipLevels = 1;
+
+	return device->CreateShaderResourceView(const_cast<ID3D11Resource*>(inTexture), &shaderResourceViewDesc, &outTextureView);
 }
 
 void BaseShaderClass::AddSampler(bool isVectorResource, UINT startSlot, UINT numSapmlers, ID3D11SamplerState *& samplerStates)

@@ -1,13 +1,31 @@
 #include "BlurShaderClass.h"
 
+BlurShaderClass::BlurShaderClass()
+{
+	BaseShaderClass::BaseShaderClass();
+
+	for (int i = 0; i < NUMBER_OF_WEIGHTS; ++i)
+	{
+		m_weights[i] = 1;
+	}
+}
+
 void BlurShaderClass::SetTextureSize(float size)
 {
 	m_size = size;
 }
 
-void BlurShaderClass::SetTextureResourceView(ID3D11ShaderResourceView *& shaderResource)
+void BlurShaderClass::SetTextureResourceView(ID3D11ShaderResourceView * shaderResource)
 {
 	m_shaderResource = shaderResource;
+}
+
+void BlurShaderClass::SetWeights(float weights[NUMBER_OF_WEIGHTS])
+{
+	for (int i = 0; i < NUMBER_OF_WEIGHTS; ++i)
+	{
+		m_weights[i] = weights[i];
+	}
 }
 
 bool BlurShaderClass::CreateBufferAdditionals(ID3D11Device *& device)
@@ -25,7 +43,11 @@ bool BlurShaderClass::CreateBufferAdditionals(ID3D11Device *& device)
 	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_screenSizeBuffer)))
 		return false;
 
-	m_buffers = { m_screenSizeBuffer };
+	tempBufferDesc.ByteWidth = sizeof(BlurWeightsBuffer);
+	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_weightsBuffer)))
+		return false;
+
+	m_buffers = { m_screenSizeBuffer, m_weightsBuffer };
 
 	return true;
 }
@@ -38,6 +60,7 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	ScreenSizeBuffer* dataPtr2;
+	BlurWeightsBuffer* dataPtr3;
 	unsigned int bufferNumber;
 
 	/////// VERTEX BUFFERS ///////
@@ -53,6 +76,18 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 	deviceContext->Unmap(m_screenSizeBuffer, 0);
 	bufferNumber = 1;
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_screenSizeBuffer);
+
+	/////// PIXEL BUFFERS ///////
+	result = deviceContext->Map(m_weightsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	dataPtr3 = (BlurWeightsBuffer*)mappedResource.pData;
+	dataPtr3->weights = XMFLOAT4{ m_weights[0], m_weights[1], m_weights[2], m_weights[3] };
+	dataPtr3->lastWeightAndpadding = XMFLOAT4{ m_weights[4], -1, -1, -1 };
+
+	deviceContext->Unmap(m_weightsBuffer, 0);
+	deviceContext->PSSetConstantBuffers(0, 1, &m_weightsBuffer);
 
 	/////// RESOURCES ///////
 	//Pixel shader resources

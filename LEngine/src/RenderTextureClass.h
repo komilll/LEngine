@@ -33,6 +33,7 @@ public:
 	///<summary>Non-DDS textures require different loader - choose if your data is in DDS format</summary>
 	bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView, bool isDDS = true);
 	ID3D11ShaderResourceView*& GetShaderResourceView();
+	ID3D11ShaderResourceView* GetShaderResourceViewCopy() const;
 	ID3D11RenderTargetView*& GetShaderTargetView(int skyboxIndex);
 	ID3D11Resource*& GetShaderResource();
 	void GetOrthoMatrix(XMMATRIX &orthoMatrix);

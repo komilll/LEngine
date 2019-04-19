@@ -188,6 +188,11 @@ ID3D11ShaderResourceView *& RenderTextureClass::GetShaderResourceView()
 	return m_shaderResourceView;
 }
 
+ID3D11ShaderResourceView * RenderTextureClass::GetShaderResourceViewCopy() const
+{
+	return m_shaderResourceView;
+}
+
 ID3D11RenderTargetView *& RenderTextureClass::GetShaderTargetView(int skyboxIndex)
 {
 	return m_renderTargetViewSkybox[skyboxIndex];

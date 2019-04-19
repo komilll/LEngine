@@ -10,6 +10,11 @@ void PostProcessShader::SetSSAOBuffer(ID3D11ShaderResourceView *&ssaoBuffer)
 	m_ssaoBufferView = ssaoBuffer;
 }
 
+void PostProcessShader::SetBloomBuffer(ID3D11ShaderResourceView *& bloomBuffer)
+{
+	m_bloomBufferView = bloomBuffer;
+}
+
 bool PostProcessShader::CreateBufferAdditionals(ID3D11Device *& device)
 {
 	BaseShaderClass::CreateBufferAdditionals(device);
@@ -50,7 +55,8 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 
 	dataPtr2 = (TextureBufferType*)mappedResource.pData;
 	dataPtr2->hasSSAO = m_ssaoBufferView != nullptr;
-	dataPtr2->padding = XMFLOAT3{ 0,0,0 };
+	dataPtr2->hasBloom = m_bloomBufferView != nullptr;
+	dataPtr2->padding = XMFLOAT2{ 0,0 };
 
 	deviceContext->Unmap(m_textureBuffer, 0);
 	bufferNumber = 0;
@@ -61,5 +67,6 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	bufferNumber = 0;
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_screenBufferView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_ssaoBufferView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_bloomBufferView);
 	return true;
 }

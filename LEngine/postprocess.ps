@@ -4,6 +4,7 @@
 
 Texture2D screenTexture;
 Texture2D ssaoTexture;
+Texture2D bloomTexture;
 SamplerState SampleType;
 
 struct PixelInputType
@@ -15,7 +16,8 @@ struct PixelInputType
 cbuffer TextureBuffer
 {
 	int g_hasSSAO;
-	float3 g_paddingTextureBuffer;
+	int g_hasBloom;
+	float2 g_paddingTextureBuffer;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,8 +32,12 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float ao = ssaoTexture.Sample(SampleType, input.tex);
 		finalColor *= ao;
 	}
+	[branch] if (g_hasBloom)
+	{
+		float4 bloom = bloomTexture.Sample(SampleType, input.tex);
+		finalColor += bloom;
+		//finalColor.xyz = pow(finalColor.xyz, float3(1.0f / 2.2f)); //gamma correction
+	}
 
-	//float ao = ssaoTexture.Sample(SampleType, input.tex);
-	//return float4(ao, ao, ao, 1.0f);
 	return finalColor;
 }

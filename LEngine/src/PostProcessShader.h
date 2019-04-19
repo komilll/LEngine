@@ -10,12 +10,14 @@ private:
 	struct TextureBufferType
 	{
 		int hasSSAO;
-		XMFLOAT3 padding;
+		int hasBloom;
+		XMFLOAT2 padding;
 	};
 
 public:
 	void SetScreenBuffer(ID3D11ShaderResourceView *&screenBuffer);
 	void SetSSAOBuffer(ID3D11ShaderResourceView *&ssaoBuffer);
+	void SetBloomBuffer(ID3D11ShaderResourceView *&bloomBuffer);
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
@@ -26,6 +28,9 @@ private:
 	ID3D11ShaderResourceView* m_screenBufferView;
 	ID3D11Resource* m_ssaoBuffer;
 	ID3D11ShaderResourceView* m_ssaoBufferView;
+	ID3D11Resource* m_bloomBuffer;
+	ID3D11ShaderResourceView* m_bloomBufferView;
+
 
 	ID3D11Buffer* m_textureBuffer;
 };

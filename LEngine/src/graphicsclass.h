@@ -64,6 +64,14 @@ const int MAX_TEXTURE_INPUT = 4;
 ////////////////////////////////////////////////////////////////////////////////
 class GraphicsClass
 {
+private:
+	struct BloomSettings
+	{
+		//float weights[5] = { 0.481f, 0.417f, 0.272f, 0.08f, 0.0f };
+		float weights[5] = { 1.0f, 0.9f, 0.55f, 0.18f, 0.1f };
+		XMFLOAT3 intensity = { 0,0,0 };
+	};
+
 public:
 	GraphicsClass();
 	GraphicsClass(const GraphicsClass&);
@@ -100,6 +108,8 @@ private:
 	bool DownsampleTexture();
 	bool UpscaleTexture();
 	bool BlurFilterScreenSpace(bool vertical); //Vertical = true; Horizontal = false
+	bool BlurFilterScreenSpace(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
+	bool BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
 	//IBL DIFFUSE CONVOLUTION
 	bool DownsampleSkybox();
 	bool DownsampleSkyboxFace(const wchar_t* inputFilename, const wchar_t* outputFilename, bool isDDS);
@@ -125,7 +135,7 @@ private:
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
 	//Applying post-processes
 	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
-
+	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
@@ -217,9 +227,11 @@ private:
 
 	//BLOOM
 	BloomShaderClass* m_bloomShader;
+	RenderTextureClass* m_bloomHelperTexture;
 	RenderTextureClass* m_bloomHorizontalBlur;
 	RenderTextureClass* m_bloomVerticalBlur;
-	
+	BloomSettings m_bloomSettings;
+
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
 

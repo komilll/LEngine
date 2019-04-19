@@ -19,6 +19,12 @@ struct PixelInputType
     float2 texCoord9 : TEXCOORD9;
 };
 
+cbuffer WeightBuffer
+{
+	float4 g_weight;
+	float4 g_Weight5AndPaddings;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,11 +35,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
     float4 color;
 
     // Create the weights that each neighbor pixel will contribute to the blur.
-    weight0 = 1.0f;
-    weight1 = 0.9f;
-    weight2 = 0.55f;
-    weight3 = 0.18f;
-    weight4 = 0.1f;
+    weight0 = g_weight.x;
+    weight1 = g_weight.y;
+    weight2 = g_weight.z;
+    weight3 = g_weight.w;
+    weight4 = g_Weight5AndPaddings.x;
 
     // Create a normalized value to average the weights out a bit.
     normalization = (weight0 + 2.0f * (weight1 + weight2 + weight3 + weight4));

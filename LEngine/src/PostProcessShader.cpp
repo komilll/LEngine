@@ -15,6 +15,16 @@ void PostProcessShader::SetBloomBuffer(ID3D11ShaderResourceView *& bloomBuffer)
 	m_bloomBufferView = bloomBuffer;
 }
 
+void PostProcessShader::ResetSSAO()
+{
+	m_ssaoBufferView = nullptr;
+}
+
+void PostProcessShader::ResetBloom()
+{
+	m_bloomBufferView = nullptr;
+}
+
 bool PostProcessShader::CreateBufferAdditionals(ID3D11Device *& device)
 {
 	BaseShaderClass::CreateBufferAdditionals(device);

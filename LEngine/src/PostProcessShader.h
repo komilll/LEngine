@@ -19,6 +19,9 @@ public:
 	void SetSSAOBuffer(ID3D11ShaderResourceView *&ssaoBuffer);
 	void SetBloomBuffer(ID3D11ShaderResourceView *&bloomBuffer);
 
+	void ResetSSAO();
+	void ResetBloom();
+
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&) override;

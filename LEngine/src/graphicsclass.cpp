@@ -578,11 +578,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	m_bloomHorizontalBlur = new RenderTextureClass;
-	if (!m_bloomHorizontalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth / 2, m_screenHeight / 2))
+	if (!m_bloomHorizontalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
 		return false;
 
 	m_bloomVerticalBlur = new RenderTextureClass;
-	if (!m_bloomVerticalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth / 2, m_screenHeight / 2))
+	if (!m_bloomVerticalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
 		return false;
 #pragma endregion
 
@@ -957,6 +957,11 @@ bool GraphicsClass::RenderScene()
 
 	m_D3D->SetBackBufferRenderTarget();
 
+	if (!m_postprocessSSAO)
+		m_postProcessShader->ResetSSAO();
+	if (!m_postprocessBloom)
+		m_postProcessShader->ResetBloom();
+
 	if (m_postprocessSSAO)
 	{
 		if (m_postprocessBloom)
@@ -980,6 +985,7 @@ bool GraphicsClass::RenderScene()
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
+		m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
 		if (m_postprocessSSAO)
 			m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
 		else
@@ -999,18 +1005,25 @@ bool GraphicsClass::RenderScene()
 
 		BlurFilterScreenSpace(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
 		BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+		for (int i = 0; i < 10; i++)
+		{
+			BlurFilterScreenSpace(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
+			BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+		}
 
 		//{
-		//	m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		//	m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		//	m_bloomFinalFrame->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		//	m_bloomFinalFrame->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		//}
-		//ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
-		//m_D3D->SetBackBufferRenderTarget();
+		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
 
-		m_renderTexturePreview->BindTexture(m_bloomVerticalBlur->GetShaderResourceView());
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
-			return false;
+		//m_renderTexturePreview->BindTexture(m_bloomVerticalBlur->GetShaderResourceView());
+		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+		//if (!result)
+		//	return false;
+
+		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	
 	if (!m_postprocessSSAO && !m_postprocessBloom)
@@ -1023,8 +1036,10 @@ bool GraphicsClass::RenderScene()
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
-		m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+		if (!result)
+			return false;
 	}
 
 
@@ -1089,6 +1104,7 @@ bool GraphicsClass::RenderGUI()
 	ImGui::SliderFloat("Bloom weight 2", &m_bloomSettings.weights[2], 0.0f, 1.0f, "%.5f");
 	ImGui::SliderFloat("Bloom weight 3", &m_bloomSettings.weights[3], 0.0f, 1.0f, "%.5f");
 	ImGui::SliderFloat("Bloom weight 4", &m_bloomSettings.weights[4], 0.0f, 1.0f, "%.5f");
+	ImGui::ColorPicker3("Bloom intensity", m_bloomSettings.intensity);
 
 	ImGui::Spacing();
 	ImGui::Spacing();
@@ -2143,7 +2159,8 @@ bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture, ID3D11Sh
 
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	worldMatrix = worldMatrix * 0;
+	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 }
 
 float GraphicsClass::lerp(float a, float b, float val)

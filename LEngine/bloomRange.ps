@@ -11,6 +11,12 @@ struct PixelInputType
     float2 tex: TEXCOORD0;
 };
 
+cbuffer BloomIntensity
+{
+	float3 g_bloomIntensity;
+	float g_paddingBloomIntesity;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +24,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 finalColor = textureBloom.Sample(SampleType, input.tex);
 
-	float brightness = dot(finalColor.rgb, float3(0.2126, 0.7152, 0.0722));
+	//float3(0.2126, 0.7152, 0.0722)
+	float brightness = dot(finalColor.rgb, g_bloomIntensity);
 
 	[branch] if(brightness > 1.0f)
 		return finalColor;

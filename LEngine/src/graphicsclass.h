@@ -68,8 +68,9 @@ private:
 	struct BloomSettings
 	{
 		//float weights[5] = { 0.481f, 0.417f, 0.272f, 0.08f, 0.0f };
-		float weights[5] = { 1.0f, 0.9f, 0.55f, 0.18f, 0.1f };
-		XMFLOAT3 intensity = { 0,0,0 };
+		//float weights[5] = { 1.0f, 0.9f, 0.55f, 0.18f, 0.1f };
+		float weights[5] = { 0.5f, 0.1456f, 0.11538f, 0.10714f, 0.06319f };
+		float intensity[3] = { 0.2126f, 0.7152f, 0.0722f };
 	};
 
 public:

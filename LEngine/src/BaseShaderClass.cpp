@@ -288,7 +288,7 @@ void BaseShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hw
 	return;
 }
 
-bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&texture, ID3D11ShaderResourceView *&textureView)
+bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&texture, ID3D11ShaderResourceView *&textureView, bool isDDS)
 {
 	//Make sure to avoid data leaking by releasing resource before creating new textures
 	if (texture != nullptr)
@@ -297,8 +297,12 @@ bool BaseShaderClass::LoadTexture(ID3D11Device * device, const wchar_t* filename
 	if (textureView != nullptr)
 		textureView->Release();
 
-	
-	HRESULT result = CreateDDSTextureFromFile(device, filename, &texture, &textureView);
+	HRESULT result;
+	if (isDDS)
+		result = CreateDDSTextureFromFile(device, filename, &texture, &textureView);
+	else
+		result = CreateWICTextureFromFile(device, filename, &texture, &textureView);
+
 	if (FAILED(result))
 	{
 		if (texture != nullptr)

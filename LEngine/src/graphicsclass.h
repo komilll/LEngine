@@ -39,6 +39,7 @@
 #include "BloomShaderClass.h"
 #include <random>
 #include "PostProcessShader.h"
+#include "VignetteShader.h"
 
 /////////////
 // GLOBALS //
@@ -49,7 +50,7 @@ const float SCREEN_DEPTH = 100.0f;
 const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
-const bool DRAW_SKYBOX = false;
+const bool DRAW_SKYBOX = true;
 const bool ENABLE_GUI = true;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
@@ -233,6 +234,9 @@ private:
 	RenderTextureClass* m_bloomVerticalBlur;
 	BloomSettings m_bloomSettings;
 
+	//VIGNETTE
+	VignetteShader* m_vignetteShader;
+
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
 
@@ -244,6 +248,7 @@ private:
 	//////////////////////////////
 	bool m_postprocessSSAO = true;
 	bool m_postprocessBloom = false;
+	bool m_postprocessVignette = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

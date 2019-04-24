@@ -197,6 +197,7 @@
     <ClInclude Include="src\UITexture.h" />
     <ClInclude Include="src\UITexturePreview.h" />
     <ClInclude Include="src\UITick.h" />
+    <ClInclude Include="src\VignetteShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseShaderClass.cpp" />
@@ -234,6 +235,7 @@
     <ClCompile Include="src\UITexture.cpp" />
     <ClCompile Include="src\UITexturePreview.cpp" />
     <ClCompile Include="src\UITick.cpp" />
+    <ClCompile Include="src\VignetteShader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

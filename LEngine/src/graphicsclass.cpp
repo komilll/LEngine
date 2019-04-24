@@ -586,6 +586,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 #pragma endregion
 
+#pragma region VIGNETTE
+	m_vignetteShader = new VignetteShader;
+	if (!m_vignetteShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"textureShader.vs", L"textureShader.ps", input))
+		return false;
+
+	if (!BaseShaderClass::LoadTexture(m_D3D->GetDevice(), L"Vignette.png", m_vignetteShader->m_vignetteResource, m_vignetteShader->m_vignetteResourceView, false))
+		return false;
+#pragma endregion
+
 
 	return true;
 }
@@ -949,8 +958,14 @@ bool GraphicsClass::RenderScene()
 	//}
 
 	m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);	
+	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
+	if (DRAW_SKYBOX)
+	{
+		if (RenderSkybox() == false)
+			return false;
+	}
+	m_Model->Render(m_D3D->GetDeviceContext());
 	result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;
@@ -971,7 +986,7 @@ bool GraphicsClass::RenderScene()
 		}
 
 		ApplySSAO(m_ssaoTexture->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
-
+		
 		m_D3D->SetBackBufferRenderTarget();
 	}
 
@@ -1011,24 +1026,15 @@ bool GraphicsClass::RenderScene()
 			BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
 		}
 
-		//{
-		//	m_bloomFinalFrame->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		//	m_bloomFinalFrame->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		//}
 		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
-
-		//m_renderTexturePreview->BindTexture(m_bloomVerticalBlur->GetShaderResourceView());
-		//result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		//if (!result)
-		//	return false;
 
 		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
-	
+
 	if (!m_postprocessSSAO && !m_postprocessBloom)
 	{
-		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
 		m_Camera->Render();
@@ -1041,7 +1047,41 @@ bool GraphicsClass::RenderScene()
 		if (!result)
 			return false;
 	}
+	//else if (m_postprocessSSAO && !m_postprocessBloom)
+	//{
+	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
+	//	m_Camera->Render();
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//	m_renderTexturePreview->BindTexture(m_postSSAOTexture->GetShaderResourceView());
+	//	result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+	//	if (!result)
+	//		return false;
+	//}
+	
+	if (m_postprocessVignette)
+	{
+		m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		m_Camera->Render();
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+
+		m_D3D->EnableAlphaBlending();
+
+		m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
+		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+		if (!result)
+			return false;
+
+		m_D3D->DisableAlphaBlending();
+	}
 
 	//m_D3D->GetDeviceContext()->CopyResource(m_renderTextureMainScene->GetShaderResource(), m_bloomShader->LoadTexture(m_D3D->GetDevice(), nullptr, )
 
@@ -1064,12 +1104,6 @@ bool GraphicsClass::RenderScene()
 	//	if (!result)
 	//		return false;
 	//}
-
-	if (DRAW_SKYBOX)
-	{
-		if (RenderSkybox() == false)
-			return false;
-	}
 
 	if (m_postprocessBloom)
 	{
@@ -1115,6 +1149,7 @@ bool GraphicsClass::RenderGUI()
 	//Post-process stack bools
 	ImGui::Checkbox("Use SSAO", &m_postprocessSSAO);
 	ImGui::Checkbox("Use Bloom", &m_postprocessBloom);
+	ImGui::Checkbox("Use Vignette", &m_postprocessVignette);
 
 	//Roughness map input
 	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
@@ -2132,16 +2167,15 @@ bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderRe
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	if (mainFrameBuffer != nullptr && mainFrameBuffer!= nullptr)
+	if (mainFrameBuffer != nullptr)
 		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
-	if (m_ssaoTexture != nullptr && m_ssaoTexture->GetShaderResourceView() != nullptr)
-		m_postProcessShader->SetSSAOBuffer(m_ssaoTexture->GetShaderResourceView());
+	if (ssaoMap != nullptr)
+		m_postProcessShader->SetSSAOBuffer(ssaoMap);
 
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	//m_renderTexturePreview->BindTexture(m_ssaoTexture->GetShaderResourceView());
-	//return m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	worldMatrix = worldMatrix * 0;
+	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 }
 
 bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture, ID3D11ShaderResourceView * mainFrameBuffer)

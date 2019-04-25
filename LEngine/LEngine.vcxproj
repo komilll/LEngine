@@ -129,6 +129,8 @@
     <None Include="convolutionSkybox.vs" />
     <None Include="environmentPrefilteredMap.ps" />
     <None Include="environmentPrefilteredMap.vs" />
+    <None Include="lutShader.ps" />
+    <None Include="lutShader.vs" />
     <None Include="normalGBuffer.ps" />
     <None Include="normalGBuffer.vs" />
     <None Include="packages.config" />
@@ -179,6 +181,7 @@
     <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\inputclass.h" />
     <ClInclude Include="src\LightClass.h" />
+    <ClInclude Include="src\LUTShader.h" />
     <ClInclude Include="src\modelClass.h" />
     <ClInclude Include="src\MouseClass.h" />
     <ClInclude Include="src\MouseClassContainer.h" />
@@ -215,6 +218,7 @@
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\inputclass.cpp" />
     <ClCompile Include="src\LightClass.cpp" />
+    <ClCompile Include="src\LUTShader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\modelClass.cpp" />
     <ClCompile Include="src\MouseClass.cpp" />

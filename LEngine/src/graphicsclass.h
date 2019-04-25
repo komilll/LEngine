@@ -40,6 +40,7 @@
 #include <random>
 #include "PostProcessShader.h"
 #include "VignetteShader.h"
+#include "LUTShader.h"
 
 /////////////
 // GLOBALS //
@@ -237,6 +238,9 @@ private:
 	//VIGNETTE
 	VignetteShader* m_vignetteShader;
 
+	//LUT
+	LUTShader* m_lutShader;
+
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
 
@@ -249,6 +253,7 @@ private:
 	bool m_postprocessSSAO = true;
 	bool m_postprocessBloom = false;
 	bool m_postprocessVignette = false;
+	bool m_postprocessLUT = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

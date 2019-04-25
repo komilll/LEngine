@@ -595,10 +595,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 #pragma endregion
 
+#pragma region LUT
+	m_lutShader = new LUTShader;
+	if (!m_lutShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"lutShader.vs", L"lutShader.ps", input))
+		return false;
+	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_test.png", false);
+#pragma endregion
 
 	return true;
 }
-
 
 void GraphicsClass::Shutdown()
 {
@@ -628,7 +633,6 @@ void GraphicsClass::Shutdown()
 
 	return;
 }
-
 
 bool GraphicsClass::Frame()
 {
@@ -1047,21 +1051,28 @@ bool GraphicsClass::RenderScene()
 		if (!result)
 			return false;
 	}
-	//else if (m_postprocessSSAO && !m_postprocessBloom)
-	//{
-	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-	//	m_Camera->Render();
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	//	m_renderTexturePreview->BindTexture(m_postSSAOTexture->GetShaderResourceView());
-	//	result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-	//	if (!result)
-	//		return false;
-	//}
 	
+	if (m_postprocessLUT)
+	{
+		if (m_postprocessBloom)
+		{
+
+		}
+		else if (m_postprocessSSAO)
+		{
+			m_lutShader->m_screenResourceView = m_ssaoTexture->GetShaderResourceView();
+			m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		}
+		else
+		{
+			m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+			m_lutShader->m_screenResourceView = m_renderTextureMainScene->GetShaderResourceView();
+		}
+
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		m_lutShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	}
+
 	if (m_postprocessVignette)
 	{
 		m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -1082,8 +1093,6 @@ bool GraphicsClass::RenderScene()
 
 		m_D3D->DisableAlphaBlending();
 	}
-
-	//m_D3D->GetDeviceContext()->CopyResource(m_renderTextureMainScene->GetShaderResource(), m_bloomShader->LoadTexture(m_D3D->GetDevice(), nullptr, )
 
 	//worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
 	//worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
@@ -1150,7 +1159,8 @@ bool GraphicsClass::RenderGUI()
 	ImGui::Checkbox("Use SSAO", &m_postprocessSSAO);
 	ImGui::Checkbox("Use Bloom", &m_postprocessBloom);
 	ImGui::Checkbox("Use Vignette", &m_postprocessVignette);
-
+	ImGui::Checkbox("Use LUT", &m_postprocessLUT);
+	
 	//Roughness map input
 	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
 	RenderTextureViewImGui(m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView, "Metalness map:");

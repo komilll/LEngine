@@ -1,0 +1,32 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: lutShader.ps
+////////////////////////////////////////////////////////////////////////////////
+
+Texture2D shaderTexture;
+Texture2D lutTexture;
+SamplerState SampleType;
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex: TEXCOORD0;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+	float4 color = shaderTexture.Sample(SampleType, input.tex);
+	float2 tex;
+
+	tex.x = color.r * 0.0625f; //RED
+	tex.y = color.g; //GREEN
+	tex.x += (floor(color.b * 16.0f)) * 0.0625f; //BLUE
+
+	//return float4(1.0f, 0.0f, 0.0f, 1.0f);
+	return lutTexture.Sample(SampleType, tex);
+}

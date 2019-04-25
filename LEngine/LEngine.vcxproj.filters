@@ -142,6 +142,12 @@
     <None Include="bloomRange.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="lutShader.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="lutShader.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">
@@ -258,6 +264,9 @@
     <ClInclude Include="src\VignetteShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\LUTShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -366,6 +375,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\VignetteShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LUTShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

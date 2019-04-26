@@ -5,6 +5,7 @@
 Texture2D screenTexture;
 Texture2D ssaoTexture;
 Texture2D bloomTexture;
+Texture2D lutTexture;
 SamplerState SampleType;
 
 struct PixelInputType
@@ -15,9 +16,10 @@ struct PixelInputType
 
 cbuffer TextureBuffer
 {
-	int g_hasSSAO;
-	int g_hasBloom;
-	float2 g_paddingTextureBuffer;
+	float g_hasSSAO;
+	float g_hasBloom;
+	float g_hasLUT;
+	int g_paddingTextureBuffer;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,17 +29,31 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 finalColor = screenTexture.Sample(SampleType, input.tex);
 
-	[branch] if(g_hasSSAO)
+	//AMBIENT OCCLUSION
+	[branch] if (g_hasSSAO > 0)
 	{
 		float ao = ssaoTexture.Sample(SampleType, input.tex);
 		finalColor *= ao;
 	}
-	[branch] if (g_hasBloom)
+	
+	//LUT
+	[branch] if (g_hasLUT > 0)
 	{
-		float4 bloom = bloomTexture.Sample(SampleType, input.tex);
-		finalColor += bloom;
-		//finalColor.xyz = pow(finalColor.xyz, float3(1.0f / 2.2f)); //gamma correction
+		float4 lut = finalColor;
+		float2 lutTex;
+
+		lutTex.x = lut.r * 0.0625f; //RED
+		lutTex.y = lut.g; //GREEN
+		lutTex.x += (floor(lut.b * 16.0f)) * 0.0625f; //BLUE
+
+		finalColor = lutTexture.Sample(SampleType, lutTex);
+		//finalColor = float4(0.0f, saturate(lutTex.y), 0.0f, 1.0f);
 	}
+
+	//BLOOM
+	float4 bloom = bloomTexture.Sample(SampleType, input.tex);
+	finalColor += (bloom * g_hasBloom);
+	//finalColor.xyz = pow(finalColor.xyz, float3(1.0f / 2.2f)); //gamma correction
 
 	return finalColor;
 }

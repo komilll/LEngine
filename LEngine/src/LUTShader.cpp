@@ -26,3 +26,8 @@ void LUTShader::SetLUT(ID3D11Device* device, const wchar_t * filename, bool isDD
 {
 	BaseShaderClass::LoadTexture(device, filename, m_lut, m_lutView, isDDS);
 }
+
+ID3D11ShaderResourceView * LUTShader::GetLUT()
+{
+	return m_lutView;
+}

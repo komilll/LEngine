@@ -10,6 +10,7 @@ class LUTShader : public BaseShaderClass
 {
 public:
 	void SetLUT(ID3D11Device* device, const wchar_t* filename, bool isDDS = false);
+	ID3D11ShaderResourceView* GetLUT();
 
 protected:
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) override;

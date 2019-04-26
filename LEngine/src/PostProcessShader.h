@@ -9,18 +9,21 @@ class PostProcessShader : public BaseShaderClass
 private:
 	struct TextureBufferType
 	{
-		int hasSSAO;
-		int hasBloom;
-		XMFLOAT2 padding;
+		float hasSSAO;
+		float hasBloom;
+		float hasLUT;
+		int padding;
 	};
 
 public:
 	void SetScreenBuffer(ID3D11ShaderResourceView *&screenBuffer);
 	void SetSSAOBuffer(ID3D11ShaderResourceView *&ssaoBuffer);
 	void SetBloomBuffer(ID3D11ShaderResourceView *&bloomBuffer);
+	void SetLUTBuffer(ID3D11ShaderResourceView *&lutBuffer);
 
 	void ResetSSAO();
 	void ResetBloom();
+	void ResetLUT();
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
@@ -33,7 +36,8 @@ private:
 	ID3D11ShaderResourceView* m_ssaoBufferView;
 	ID3D11Resource* m_bloomBuffer;
 	ID3D11ShaderResourceView* m_bloomBufferView;
-
+	ID3D11Resource* m_lutBuffer;
+	ID3D11ShaderResourceView* m_lutBufferView;
 
 	ID3D11Buffer* m_textureBuffer;
 };

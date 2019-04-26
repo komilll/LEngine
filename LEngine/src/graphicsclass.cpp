@@ -599,7 +599,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_lutShader = new LUTShader;
 	if (!m_lutShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"lutShader.vs", L"lutShader.ps", input))
 		return false;
-	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_test.png", false);
+	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
 
 	return true;
@@ -980,6 +980,8 @@ bool GraphicsClass::RenderScene()
 		m_postProcessShader->ResetSSAO();
 	if (!m_postprocessBloom)
 		m_postProcessShader->ResetBloom();
+	if (!m_postprocessLUT)
+		m_postProcessShader->ResetLUT();
 
 	if (m_postprocessSSAO)
 	{
@@ -1031,12 +1033,9 @@ bool GraphicsClass::RenderScene()
 		}
 
 		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
-
-		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	if (!m_postprocessSSAO && !m_postprocessBloom)
+	if (!m_postprocessSSAO && !m_postprocessBloom && !m_postprocessLUT)
 	{
 		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
@@ -1054,24 +1053,28 @@ bool GraphicsClass::RenderScene()
 	
 	if (m_postprocessLUT)
 	{
-		if (m_postprocessBloom)
-		{
+		ApplyLUT(m_lutShader->GetLUT(), m_renderTextureMainScene->GetShaderResourceView());
 
-		}
-		else if (m_postprocessSSAO)
-		{
-			m_lutShader->m_screenResourceView = m_ssaoTexture->GetShaderResourceView();
-			m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		}
-		else
-		{
-			m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-			m_lutShader->m_screenResourceView = m_renderTextureMainScene->GetShaderResourceView();
-		}
+		//if (m_postprocessBloom)
+		//{
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		m_lutShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+		//}
+		//else if (m_postprocessSSAO)
+		//{
+		//	m_lutShader->m_screenResourceView = m_ssaoTexture->GetShaderResourceView();
+		//	m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		//}
+		//else
+		//{
+		//	m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		//	m_lutShader->m_screenResourceView = m_renderTextureMainScene->GetShaderResourceView();
+		//}
+
+		//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		//m_lutShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	}
+	m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
 	if (m_postprocessVignette)
 	{
@@ -2200,6 +2203,25 @@ bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture, ID3D11Sh
 		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
 	if (bloomTexture != nullptr)
 		m_postProcessShader->SetBloomBuffer(bloomTexture);
+
+	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	worldMatrix = worldMatrix * 0;
+	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+}
+
+bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+{
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	if (mainFrameBuffer != nullptr)
+		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
+	if (lutTexture != nullptr)
+		m_postProcessShader->SetLUTBuffer(lutTexture);
 
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());

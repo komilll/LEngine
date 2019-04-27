@@ -75,6 +75,13 @@ private:
 		float intensity[3] = { 0.2126f, 0.7152f, 0.0722f };
 	};
 
+	struct ChromaticAberrationOffset
+	{
+		float red{ 0.00364f };
+		float green{ -0.00159f };
+		float blue{ 0.00682f };
+	};
+
 public:
 	GraphicsClass();
 	GraphicsClass(const GraphicsClass&);
@@ -140,6 +147,7 @@ private:
 	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
 	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyLUT(ID3D11ShaderResourceView* lutTexture, ID3D11ShaderResourceView* mainFrameBuffer);
+	bool ApplyChromaticAberration(ID3D11ShaderResourceView* chromaticAberrationTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
@@ -242,6 +250,10 @@ private:
 	//LUT
 	LUTShader* m_lutShader;
 
+	//CHROMATIC ABERRATION
+	ChromaticAberrationOffset m_chromaticOffset;
+	float m_chromaticIntensity{ 0.585f };
+
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
 
@@ -255,6 +267,7 @@ private:
 	bool m_postprocessBloom = false;
 	bool m_postprocessVignette = false;
 	bool m_postprocessLUT = false;
+	bool m_postprocessChromaticAberration = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

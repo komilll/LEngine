@@ -982,6 +982,9 @@ bool GraphicsClass::RenderScene()
 		m_postProcessShader->ResetBloom();
 	if (!m_postprocessLUT)
 		m_postProcessShader->ResetLUT();
+	if (!m_postprocessChromaticAberration)
+		m_postProcessShader->UseChromaticAberration(false);
+
 
 	if (m_postprocessSSAO)
 	{
@@ -1054,25 +1057,15 @@ bool GraphicsClass::RenderScene()
 	if (m_postprocessLUT)
 	{
 		ApplyLUT(m_lutShader->GetLUT(), m_renderTextureMainScene->GetShaderResourceView());
-
-		//if (m_postprocessBloom)
-		//{
-
-		//}
-		//else if (m_postprocessSSAO)
-		//{
-		//	m_lutShader->m_screenResourceView = m_ssaoTexture->GetShaderResourceView();
-		//	m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		//}
-		//else
-		//{
-		//	m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		//	m_lutShader->m_screenResourceView = m_renderTextureMainScene->GetShaderResourceView();
-		//}
-
-		//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		//m_lutShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 	}
+
+	if (m_postprocessChromaticAberration)
+	{		
+		ApplyChromaticAberration(nullptr, m_renderTextureMainScene->GetShaderResourceView());
+		m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
+		m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
+	}
+
 	m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -1152,6 +1145,12 @@ bool GraphicsClass::RenderGUI()
 	ImGui::SliderFloat("Bloom weight 4", &m_bloomSettings.weights[4], 0.0f, 1.0f, "%.5f");
 	ImGui::ColorPicker3("Bloom intensity", m_bloomSettings.intensity);
 
+	//CHROMATIC ABERRATION settings
+	ImGui::SliderFloat("Chromatic red offset", &m_chromaticOffset.red, -0.01f, 0.01f, "%.5f");
+	ImGui::SliderFloat("Chromatic green offset", &m_chromaticOffset.green, -0.01f, 0.01f, "%.5f");
+	ImGui::SliderFloat("Chromatic blue offset", &m_chromaticOffset.blue, -0.01f, 0.01f, "%.5f");
+	ImGui::SliderFloat("Chromatic intensity", &m_chromaticIntensity, 0.001f, 2.0f, "%.3f");
+
 	ImGui::Spacing();
 	ImGui::Spacing();
 	ImGui::Spacing();
@@ -1163,6 +1162,7 @@ bool GraphicsClass::RenderGUI()
 	ImGui::Checkbox("Use Bloom", &m_postprocessBloom);
 	ImGui::Checkbox("Use Vignette", &m_postprocessVignette);
 	ImGui::Checkbox("Use LUT", &m_postprocessLUT);
+	ImGui::Checkbox("Use Chromatic Aberration", &m_postprocessChromaticAberration);
 	
 	//Roughness map input
 	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
@@ -2227,6 +2227,27 @@ bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture, ID3D11Shader
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	worldMatrix = worldMatrix * 0;
 	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+}
+
+bool GraphicsClass::ApplyChromaticAberration(ID3D11ShaderResourceView * chromaticAberrationTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+{
+	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	//m_Camera->Render();
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//if (mainFrameBuffer != nullptr)
+	//	m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
+	//if (chromaticAberrationTexture != nullptr)
+	//	m_postProcessShader->SetLUTBuffer(lutTexture);
+
+	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//worldMatrix = worldMatrix * 0;
+	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_postProcessShader->UseChromaticAberration(true);
+	return true;
 }
 
 float GraphicsClass::lerp(float a, float b, float val)

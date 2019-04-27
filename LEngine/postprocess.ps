@@ -6,6 +6,7 @@ Texture2D screenTexture;
 Texture2D ssaoTexture;
 Texture2D bloomTexture;
 Texture2D lutTexture;
+Texture2D chromaticTexture;
 SamplerState SampleType;
 
 struct PixelInputType
@@ -19,7 +20,15 @@ cbuffer TextureBuffer
 	float g_hasSSAO;
 	float g_hasBloom;
 	float g_hasLUT;
-	int g_paddingTextureBuffer;
+	float g_hasChromaticAberration;
+};
+
+cbuffer ChromaticAberrationOffsets
+{
+	float g_rOffset;
+	float g_gOffset;
+	float g_bOffset;
+	float g_intensity;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +63,21 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float4 bloom = bloomTexture.Sample(SampleType, input.tex);
 	finalColor += (bloom * g_hasBloom);
 	//finalColor.xyz = pow(finalColor.xyz, float3(1.0f / 2.2f)); //gamma correction
+
+	//CHROMATIC ABERRATION
+	[branch] if (g_hasChromaticAberration > 0)
+	{
+		float rValue = screenTexture.Sample(SampleType, input.tex - g_rOffset).r;
+		float gValue = screenTexture.Sample(SampleType, input.tex - g_gOffset).g;
+		float bValue = screenTexture.Sample(SampleType, input.tex - g_bOffset).b;
+
+		float4 chromatic = float4(rValue, gValue, bValue, 1.0f) - screenTexture.Sample(SampleType, input.tex);
+		float intensity = chromaticTexture.Sample(SampleType, input.tex).r * g_intensity;
+		chromatic *= intensity;
+		finalColor += chromatic;
+		//finalColor = chromatic;
+		//finalColor = float4(rValue, gValue, bValue, 1.0f);
+	}
 
 	return finalColor;
 }

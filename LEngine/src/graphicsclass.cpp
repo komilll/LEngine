@@ -984,7 +984,8 @@ bool GraphicsClass::RenderScene()
 		m_postProcessShader->ResetLUT();
 	if (!m_postprocessChromaticAberration)
 		m_postProcessShader->UseChromaticAberration(false);
-
+	if (!m_postprocessGrain)
+		m_postProcessShader->UseGrain(false);
 
 	if (m_postprocessSSAO)
 	{
@@ -1064,6 +1065,12 @@ bool GraphicsClass::RenderScene()
 		ApplyChromaticAberration(nullptr, m_renderTextureMainScene->GetShaderResourceView());
 		m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
 		m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
+	}
+	
+	if (m_postprocessGrain)
+	{
+		ApplyGrain(nullptr, m_renderTextureMainScene->GetShaderResourceView());
+		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, m_grainSettings.hasColor);
 	}
 
 	m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -1145,11 +1152,22 @@ bool GraphicsClass::RenderGUI()
 	ImGui::SliderFloat("Bloom weight 4", &m_bloomSettings.weights[4], 0.0f, 1.0f, "%.5f");
 	ImGui::ColorPicker3("Bloom intensity", m_bloomSettings.intensity);
 
+	ImGui::Spacing();
+
 	//CHROMATIC ABERRATION settings
 	ImGui::SliderFloat("Chromatic red offset", &m_chromaticOffset.red, -0.01f, 0.01f, "%.5f");
 	ImGui::SliderFloat("Chromatic green offset", &m_chromaticOffset.green, -0.01f, 0.01f, "%.5f");
 	ImGui::SliderFloat("Chromatic blue offset", &m_chromaticOffset.blue, -0.01f, 0.01f, "%.5f");
 	ImGui::SliderFloat("Chromatic intensity", &m_chromaticIntensity, 0.001f, 2.0f, "%.3f");
+
+	ImGui::Spacing();
+
+	//GRAIN settings
+	ImGui::SliderFloat("Grain intensity", &m_grainSettings.intensity, 0.0f, 1.0f, "%.2f");
+	ImGui::SliderFloat("Grain size", &m_grainSettings.size, 0.01f, 10.0f, "%.2f");
+	//ImGui::BeginCombo("Grain type", "TEST");
+	//ImGui::EndCombo();
+	ImGui::Checkbox("Grain has color", &m_grainSettings.hasColor);
 
 	ImGui::Spacing();
 	ImGui::Spacing();
@@ -1163,59 +1181,13 @@ bool GraphicsClass::RenderGUI()
 	ImGui::Checkbox("Use Vignette", &m_postprocessVignette);
 	ImGui::Checkbox("Use LUT", &m_postprocessLUT);
 	ImGui::Checkbox("Use Chromatic Aberration", &m_postprocessChromaticAberration);
+	ImGui::Checkbox("Use Grain", &m_postprocessGrain);
 	
 	//Roughness map input
 	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
 	RenderTextureViewImGui(m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView, "Metalness map:");
 	RenderTextureViewImGui(m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView, "Normal map:");
 	RenderTextureViewImGui(m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView, "Albedo map:");
-
-	//ImGui::Text("Roughness map:");
-	//if (ImGui::ImageButton(m_pbrShader->m_roughnessTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_roughnessTextureView, ImVec2{ 64, 64 }))
-	//{
-	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView);
-	//}
-	//ImGui::SameLine();
-	//if (ImGui::Button("X", ImVec2{ 16, 16 }))
-	//{
-	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView);
-	//}
-
-	//////Metalness map input
-	////ImGui::Text("Metalness map:");
-	//if (ImGui::ImageButton(m_pbrShader->m_metalnessTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_metalnessTextureView, ImVec2{ 64, 64 }))
-	//{
-	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView);
-	//}
-	//ImGui::SameLine();
-	//if (ImGui::Button("X ", ImVec2{ 16, 16 }))
-	//{
-	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView);
-	//}
-
-	////Normal map input
-	//ImGui::Text("Normal map:");
-	//if (ImGui::ImageButton(m_pbrShader->m_normalTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_normalTextureView, ImVec2{ 64, 64 }))
-	//{
-	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView);
-	//}
-	//ImGui::SameLine();
-	//if (ImGui::Button("X  ", ImVec2{ 16, 16 }))
-	//{
-	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView);
-	//}
-	//
-	////Albedo map input
-	//ImGui::Text("Albedo map:");
-	//if (ImGui::ImageButton(m_pbrShader->m_diffuseTextureView == nullptr ? m_emptyTexView : m_pbrShader->m_diffuseTextureView, ImVec2{ 64, 64 }))
-	//{
-	//	UITexturePreview::TextureChooseWindow(m_D3D, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
-	//}
-	//ImGui::SameLine();
-	//if (ImGui::Button("X", ImVec2{ 16, 16 }))
-	//{
-	//	UITexturePreview::DeletePassedTexture(m_D3D, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
-	//}
 
 	//Finish ImGui and render
 	ImGui::End();
@@ -2231,22 +2203,13 @@ bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture, ID3D11Shader
 
 bool GraphicsClass::ApplyChromaticAberration(ID3D11ShaderResourceView * chromaticAberrationTexture, ID3D11ShaderResourceView * mainFrameBuffer)
 {
-	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	//m_Camera->Render();
-	//m_Camera->GetViewMatrix(viewMatrix);
-	//m_D3D->GetWorldMatrix(worldMatrix);
-	//m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	//if (mainFrameBuffer != nullptr)
-	//	m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
-	//if (chromaticAberrationTexture != nullptr)
-	//	m_postProcessShader->SetLUTBuffer(lutTexture);
-
-	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	//worldMatrix = worldMatrix * 0;
-	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	m_postProcessShader->UseChromaticAberration(true);
+	return true;
+}
+
+bool GraphicsClass::ApplyGrain(ID3D11ShaderResourceView * grainTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+{
+	m_postProcessShader->UseGrain(true);
 	return true;
 }
 

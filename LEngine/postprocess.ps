@@ -2,11 +2,13 @@
 // Filename: postprocess.ps
 ////////////////////////////////////////////////////////////////////////////////
 
-Texture2D screenTexture;
-Texture2D ssaoTexture;
-Texture2D bloomTexture;
-Texture2D lutTexture;
-Texture2D chromaticTexture;
+Texture2D screenTexture : register(t0);
+Texture2D ssaoTexture : register(t1);
+Texture2D bloomTexture : register(t2);
+Texture2D lutTexture : register(t3);
+Texture2D chromaticTexture : register(t4);
+Texture2D whiteNoise : register(t5);
+Texture2D perlinNoise : register(t6);
 SamplerState SampleType;
 
 struct PixelInputType
@@ -21,6 +23,9 @@ cbuffer TextureBuffer
 	float g_hasBloom;
 	float g_hasLUT;
 	float g_hasChromaticAberration;
+	float g_hasGrain;
+
+	float3 g_textureBufferPadding;
 };
 
 cbuffer ChromaticAberrationOffsets
@@ -28,9 +33,19 @@ cbuffer ChromaticAberrationOffsets
 	float g_rOffset;
 	float g_gOffset;
 	float g_bOffset;
-	float g_intensity;
+	float g_chromaticIntensity;
 };
 
+cbuffer GrainSettings
+{
+	float g_grainSize;
+	float g_grainIntensity;
+	float g_grainWithColor;
+	int g_grainType;
+};
+
+float luma(float3 color);
+float luma(float4 color);
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,12 +87,77 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float bValue = screenTexture.Sample(SampleType, input.tex - g_bOffset).b;
 
 		float4 chromatic = float4(rValue, gValue, bValue, 1.0f) - screenTexture.Sample(SampleType, input.tex);
-		float intensity = chromaticTexture.Sample(SampleType, input.tex).r * g_intensity;
+		float intensity = chromaticTexture.Sample(SampleType, input.tex).r * g_chromaticIntensity;
 		chromatic *= intensity;
 		finalColor += chromatic;
 		//finalColor = chromatic;
 		//finalColor = float4(rValue, gValue, bValue, 1.0f);
 	}
 
+	//GRAIN
+	[branch] if (g_hasGrain > 0)
+	{
+	//Desaturation
+		float luminance = luma(finalColor.rgb);
+		float4 desaturated = float4(luminance, luminance, luminance, 1.0f);
+
+	//Calculate hash method
+		float hash = ((input.tex.x + input.tex.y) * 300.0f) % 1.9f;
+		hash = abs(hash);
+
+	//Calculate perlin noise
+		//float4 perlinNoiseColor = perlinNoise.Sample(SampleType, input.tex * g_grainSize * saturate(hash)).r;
+		float4 perlinNoiseColor = perlinNoise.Sample(SampleType, input.tex * g_grainIntensity);
+
+	//Calculate white noise
+		float4 whiteNoiseColor = whiteNoise.Sample(SampleType, input.tex * g_grainSize);
+
+	//Fix color
+		//[branch] if (tempColor.r < 0.5f)
+		{
+
+		}
+
+	//Use pixels on correct hashes
+		//[branch] if (hash < g_grainIntensity)
+		{
+		/*
+			[branch] if (perlinNoiseColor.r > 0.3f)
+			{
+				perlinNoiseColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+			}
+			else
+			{
+				perlinNoiseColor = clamp(0.4f, 0.75f, perlinNoiseColor.r);
+			}
+		*/
+			//finalColor *= perlinNoiseColor.r;
+			//float noiseColor = perlinNoiseColor.r;
+			//finalColor = desaturated;
+
+			float noiseColor = whiteNoiseColor.r;
+			//noiseColor += g_grainIntensity;
+			[branch] if (noiseColor < 0.5f)
+			{
+				noiseColor = clamp(noiseColor, g_grainIntensity, 1.0f);
+				noiseColor = 0.0f;
+				finalColor *= noiseColor;
+			}
+
+			//finalColor.r = lerp(noiseColor, finalColor.r, noiseColor);
+			//finalColor.g = lerp(noiseColor, finalColor.g, noiseColor);
+			//finalColor.b = lerp(noiseColor, finalColor.b, noiseColor);
+		}
+	}
 	return finalColor;
+}
+
+float luma(float3 color)
+{
+	return dot(color, float3(0.299, 0.587, 0.114));
+}
+
+float luma(float4 color) 
+{
+	return dot(color.rgb, float3(0.299, 0.587, 0.114));
 }

@@ -67,6 +67,11 @@ const int MAX_TEXTURE_INPUT = 4;
 class GraphicsClass
 {
 private:
+	enum GrainType
+	{
+		Small, SmallWhite, Unregular, UnregularWhite
+	};
+
 	struct BloomSettings
 	{
 		//float weights[5] = { 0.481f, 0.417f, 0.272f, 0.08f, 0.0f };
@@ -80,6 +85,14 @@ private:
 		float red{ 0.00364f };
 		float green{ -0.00159f };
 		float blue{ 0.00682f };
+	};
+
+	struct GrainSettings
+	{
+		float intensity{ 0.43f };
+		float size{ 5.0f };
+		bool hasColor{ false };
+		GrainType type{ GrainType::Small };
 	};
 
 public:
@@ -148,6 +161,7 @@ private:
 	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyLUT(ID3D11ShaderResourceView* lutTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyChromaticAberration(ID3D11ShaderResourceView* chromaticAberrationTexture, ID3D11ShaderResourceView* mainFrameBuffer);
+	bool ApplyGrain(ID3D11ShaderResourceView* grainTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
@@ -254,6 +268,9 @@ private:
 	ChromaticAberrationOffset m_chromaticOffset;
 	float m_chromaticIntensity{ 0.585f };
 
+	//GRAIN
+	GrainSettings m_grainSettings;
+
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
 
@@ -268,6 +285,7 @@ private:
 	bool m_postprocessVignette = false;
 	bool m_postprocessLUT = false;
 	bool m_postprocessChromaticAberration = false;
+	bool m_postprocessGrain = true;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

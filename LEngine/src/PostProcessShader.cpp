@@ -44,6 +44,35 @@ void PostProcessShader::SetChromaticAberrationIntensity(float intensity)
 	m_chromaticAberrationIntensity = intensity;
 }
 
+void PostProcessShader::UseGrain(bool setActive)
+{
+	m_useGrain = setActive;
+}
+
+void PostProcessShader::SetNoise(ID3D11ShaderResourceView *& whiteNoise, ID3D11ShaderResourceView *& perlinNoise)
+{
+	SetWhiteNoise(whiteNoise);
+	SetPerlinNoise(perlinNoise);
+}
+
+void PostProcessShader::SetWhiteNoise(ID3D11ShaderResourceView *& whiteNoise)
+{
+	m_whiteNoiseBufferView = whiteNoise;
+}
+
+void PostProcessShader::SetPerlinNoise(ID3D11ShaderResourceView *& perlinNoise)
+{
+	m_perlinNoiseBufferView = perlinNoise;
+}
+
+void PostProcessShader::SetGrainSettings(float intensity, float size, int type, bool hasColor)
+{
+	m_grainIntensity = intensity;
+	m_grainSize = size;
+	m_type = type;
+	m_hasGrainColor = hasColor;
+}
+
 void PostProcessShader::ResetSSAO()
 {
 	m_ssaoBufferView = nullptr;
@@ -78,12 +107,22 @@ bool PostProcessShader::CreateBufferAdditionals(ID3D11Device *& device)
 	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_chromaticBuffer)))
 		return false;
 
-	m_buffers = { m_textureBuffer, m_chromaticBuffer };
+	tempBufferDesc.ByteWidth = sizeof(GrainSettings);
+	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_grainBuffer)))
+		return false;
+
+	m_buffers = { m_textureBuffer, m_chromaticBuffer, m_grainBuffer };
 
 	//Used as constructor method
 	if (m_chromaticAberrationTextureView == nullptr)
 	{
 		BaseShaderClass::LoadTexture(device, L"RadialGradient.png", m_chromaticAberrationTexture, m_chromaticAberrationTextureView, false);
+	}
+
+	if (m_whiteNoiseBufferView == nullptr && m_perlinNoiseBufferView == nullptr)
+	{
+		LoadTexture(device, L"perlinNoise.png", m_perlinNoiseBuffer, m_perlinNoiseBufferView, false);
+		LoadTexture(device, L"WhiteNoiseDitheringBlurred.png", m_whiteNoiseBuffer, m_whiteNoiseBufferView, false);
 	}
 
 	return true;
@@ -98,6 +137,7 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	TextureBufferType* dataPtr2;
 	ChromaticAberrationBuffer* dataPtr3;
+	GrainSettings* dataPtr4;
 	unsigned int bufferNumber;
 
 	/////// VERTEX BUFFERS ///////
@@ -113,6 +153,8 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	dataPtr2->hasBloom = m_bloomBufferView != nullptr;
 	dataPtr2->hasLUT = m_lutBufferView != nullptr;
 	dataPtr2->hasChromaticAberration = (float)m_chromaticAberration;
+	dataPtr2->hasGrain = (float)m_useGrain;
+	dataPtr2->padding = XMFLOAT3{ 0,0,0 };
 
 	deviceContext->Unmap(m_textureBuffer, 0);
 	bufferNumber = 0;
@@ -130,7 +172,21 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	dataPtr3->intensity = m_chromaticAberrationIntensity;
 
 	deviceContext->Unmap(m_chromaticBuffer, 0);
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_chromaticBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_chromaticBuffer);
+
+	//Grain buffer
+	result = deviceContext->Map(m_grainBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	dataPtr4 = (GrainSettings*)mappedResource.pData;
+	dataPtr4->intensity = m_grainIntensity;
+	dataPtr4->size = m_grainSize;
+	dataPtr4->hasColor = m_hasGrainColor;
+	dataPtr4->type = m_type;
+
+	deviceContext->Unmap(m_grainBuffer, 0);
+	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_grainBuffer);
 	/////// RESOURCES ///////
 	//Pixel shader resources
 	bufferNumber = 0;
@@ -139,5 +195,7 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_bloomBufferView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_lutBufferView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_chromaticAberrationTextureView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_whiteNoiseBufferView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_perlinNoiseBufferView);
 	return true;
 }

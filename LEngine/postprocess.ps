@@ -8,7 +8,7 @@ Texture2D bloomTexture : register(t2);
 Texture2D lutTexture : register(t3);
 Texture2D chromaticTexture : register(t4);
 Texture2D whiteNoise : register(t5);
-Texture2D perlinNoise : register(t6);
+Texture2D whiteNoiseSmall : register(t6);
 SamplerState SampleType;
 
 struct PixelInputType
@@ -46,6 +46,7 @@ cbuffer GrainSettings
 
 float luma(float3 color);
 float luma(float4 color);
+float4 CalculateGrain(float4 color, float2 tex);
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,57 +98,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//GRAIN
 	[branch] if (g_hasGrain > 0)
 	{
-	//Desaturation
-		float luminance = luma(finalColor.rgb);
-		float4 desaturated = float4(luminance, luminance, luminance, 1.0f);
-
-	//Calculate hash method
-		float hash = ((input.tex.x + input.tex.y) * 300.0f) % 1.9f;
-		hash = abs(hash);
-
-	//Calculate perlin noise
-		//float4 perlinNoiseColor = perlinNoise.Sample(SampleType, input.tex * g_grainSize * saturate(hash)).r;
-		float4 perlinNoiseColor = perlinNoise.Sample(SampleType, input.tex * g_grainIntensity);
-
-	//Calculate white noise
-		float4 whiteNoiseColor = whiteNoise.Sample(SampleType, input.tex * g_grainSize);
-
-	//Fix color
-		//[branch] if (tempColor.r < 0.5f)
-		{
-
-		}
-
-	//Use pixels on correct hashes
-		//[branch] if (hash < g_grainIntensity)
-		{
-		/*
-			[branch] if (perlinNoiseColor.r > 0.3f)
-			{
-				perlinNoiseColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-			}
-			else
-			{
-				perlinNoiseColor = clamp(0.4f, 0.75f, perlinNoiseColor.r);
-			}
-		*/
-			//finalColor *= perlinNoiseColor.r;
-			//float noiseColor = perlinNoiseColor.r;
-			//finalColor = desaturated;
-
-			float noiseColor = whiteNoiseColor.r;
-			//noiseColor += g_grainIntensity;
-			[branch] if (noiseColor < 0.5f)
-			{
-				noiseColor = clamp(noiseColor, g_grainIntensity, 1.0f);
-				noiseColor = 0.0f;
-				finalColor *= noiseColor;
-			}
-
-			//finalColor.r = lerp(noiseColor, finalColor.r, noiseColor);
-			//finalColor.g = lerp(noiseColor, finalColor.g, noiseColor);
-			//finalColor.b = lerp(noiseColor, finalColor.b, noiseColor);
-		}
+		finalColor = CalculateGrain(finalColor, input.tex);
 	}
 	return finalColor;
 }
@@ -160,4 +111,58 @@ float luma(float3 color)
 float luma(float4 color) 
 {
 	return dot(color.rgb, float3(0.299, 0.587, 0.114));
+}
+
+float4 CalculateGrain(float4 color, float2 tex)
+{
+	float4 finalColor = color;
+
+//Desaturation
+	float luminance = luma(finalColor.rgb);
+	float4 desaturated = float4(luminance, luminance, luminance, 1.0f);
+
+//Calculate perlin noise
+	float4 whiteNoiseSmallColor = whiteNoiseSmall.Sample(SampleType, tex * g_grainSize);
+
+//Calculate white noise
+	float4 whiteNoiseColor = whiteNoise.Sample(SampleType, tex * g_grainSize);
+
+//Fix color
+	//[branch] if (tempColor.r < 0.5f)
+	{
+
+	}
+
+//Use pixels on correct hashes
+
+	[branch] if (g_grainType == 0) //Small
+	{
+		float noiseColor = saturate(whiteNoiseSmallColor.r * whiteNoiseColor.r * g_grainIntensity);
+		
+		finalColor.r = lerp(finalColor.r, noiseColor, noiseColor);
+		finalColor.g = lerp(finalColor.g, noiseColor, noiseColor);
+		finalColor.b = lerp(finalColor.b, noiseColor, noiseColor);
+	}
+	else if (g_grainType == 1) //Unregular
+	{
+		float noiseColor = whiteNoiseColor.r;
+		[branch] if (noiseColor < 0.44f + g_grainIntensity * 0.08f)
+		{
+			noiseColor = saturate(0.7f - g_grainIntensity * 0.5f);
+			finalColor *= noiseColor;
+		}
+	}
+	else if (g_grainType == 2) //Unregular white
+	{
+		float noiseColor = whiteNoiseColor.r;
+		[branch] if (noiseColor < 0.44f + g_grainIntensity * 0.08f)
+		{
+			noiseColor *= (1.0f - (tex.x + tex.y) % noiseColor);
+			finalColor.r = lerp(finalColor.r, noiseColor, noiseColor);
+			finalColor.g = lerp(finalColor.g, noiseColor, noiseColor);
+			finalColor.b = lerp(finalColor.b, noiseColor, noiseColor);
+		}
+	}
+
+	return finalColor;
 }

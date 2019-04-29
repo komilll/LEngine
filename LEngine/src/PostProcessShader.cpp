@@ -121,7 +121,7 @@ bool PostProcessShader::CreateBufferAdditionals(ID3D11Device *& device)
 
 	if (m_whiteNoiseBufferView == nullptr && m_perlinNoiseBufferView == nullptr)
 	{
-		LoadTexture(device, L"perlinNoise.png", m_perlinNoiseBuffer, m_perlinNoiseBufferView, false);
+		LoadTexture(device, L"whiteNoise.jpg", m_perlinNoiseBuffer, m_perlinNoiseBufferView, false);
 		LoadTexture(device, L"WhiteNoiseDitheringBlurred.png", m_whiteNoiseBuffer, m_whiteNoiseBufferView, false);
 	}
 

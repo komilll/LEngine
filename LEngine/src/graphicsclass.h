@@ -61,15 +61,22 @@ const int SSAO_NOISE_SIZE = 16;
 
 const int MAX_TEXTURE_INPUT = 4;
 
+static const char* GrainTypeArray[] = { "Small", "Unregular", "Unregular white" };
+static const char* CURRENT_GRAIN_TYPE = GrainTypeArray[0];
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
 ////////////////////////////////////////////////////////////////////////////////
 class GraphicsClass
 {
 private:
-	enum GrainType
+	enum class GrainType : int
 	{
-		Small, SmallWhite, Unregular, UnregularWhite
+		Small = 0,
+		Unregular = 1,
+		UnregularWhite = 2,
+
+		Count = 3
 	};
 
 	struct BloomSettings
@@ -89,8 +96,8 @@ private:
 
 	struct GrainSettings
 	{
-		float intensity{ 0.43f };
-		float size{ 5.0f };
+		float intensity{ 0.11f };
+		float size{ 6.83f };
 		bool hasColor{ false };
 		GrainType type{ GrainType::Small };
 	};

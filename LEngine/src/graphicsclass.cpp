@@ -1070,7 +1070,7 @@ bool GraphicsClass::RenderScene()
 	if (m_postprocessGrain)
 	{
 		ApplyGrain(nullptr, m_renderTextureMainScene->GetShaderResourceView());
-		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, m_grainSettings.hasColor);
+		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
 	}
 
 	m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -1165,8 +1165,26 @@ bool GraphicsClass::RenderGUI()
 	//GRAIN settings
 	ImGui::SliderFloat("Grain intensity", &m_grainSettings.intensity, 0.0f, 1.0f, "%.2f");
 	ImGui::SliderFloat("Grain size", &m_grainSettings.size, 0.01f, 10.0f, "%.2f");
-	//ImGui::BeginCombo("Grain type", "TEST");
-	//ImGui::EndCombo();
+
+	if (ImGui::BeginCombo("Grain type", CURRENT_GRAIN_TYPE))
+	{
+		constexpr int count = (int)GrainType::Count;
+		for (int i = 0; i < count; ++i)
+		{
+			bool isSelected = (i == (int)m_grainSettings.type);
+			if (ImGui::Selectable(GrainTypeArray[i], isSelected))
+			{
+				CURRENT_GRAIN_TYPE = GrainTypeArray[i];
+				m_grainSettings.type = (GrainType)i;
+			}
+			if (isSelected)
+			{
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+
+		ImGui::EndCombo();
+	}
 	ImGui::Checkbox("Grain has color", &m_grainSettings.hasColor);
 
 	ImGui::Spacing();

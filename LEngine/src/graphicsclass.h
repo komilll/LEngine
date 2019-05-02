@@ -41,6 +41,7 @@
 #include "PostProcessShader.h"
 #include "VignetteShader.h"
 #include "LUTShader.h"
+#include "UIShaderEditorBlock.h"
 
 /////////////
 // GLOBALS //
@@ -238,6 +239,9 @@ private:
 	UITexture* m_skyboxPreviewForward;
 	UITexture* m_skyboxPreviewBack;
 
+	//Material editor
+	UIShaderEditorBlock* m_shaderBlock;
+
 	//SHADOW MAP
 	ShadowMapClass* m_shadowMapShader;
 	RenderTextureClass* m_shadowMapTexture;
@@ -292,7 +296,7 @@ private:
 	bool m_postprocessVignette = false;
 	bool m_postprocessLUT = false;
 	bool m_postprocessChromaticAberration = false;
-	bool m_postprocessGrain = true;
+	bool m_postprocessGrain = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;
@@ -300,5 +304,4 @@ private:
 	int m_exitCount = 0;
 	int m_convolutionFace = 0;
 };
-
 #endif

@@ -25,6 +25,15 @@ using namespace DirectX;
 ////////////////////////////////////////////////////////////////////////////////
 class D3DClass
 {
+private:
+	struct WindowSize
+	{
+		float x{ 0 };
+		float y{ 0 };
+
+		WindowSize(float X, float Y) : x(X), y(Y) { }
+	};
+
 public:
 	D3DClass();
 	D3DClass(const D3DClass&);
@@ -63,6 +72,8 @@ public:
 
 	void ResetViewport();
 
+	WindowSize GetWindowSize();
+
 private:
 	bool m_vsync_enabled;
 	int m_videoCardMemory;
@@ -91,6 +102,9 @@ private:
 	D3D11_VIEWPORT m_viewport;
 
 	HWND* m_hwnd;
+
+	int m_windowSizeX;
+	int m_windowSizeY;
 };
 
 #endif

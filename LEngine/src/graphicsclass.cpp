@@ -602,6 +602,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
 
+#pragma region Material Editor
+	m_shaderBlock = new UIShaderEditorBlock;
+	if (!m_shaderBlock->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -0.4f, 0.4f, 1.0f, 0.3f))
+		return false;
+	m_shaderBlock->ChangeColor(0.2f, 0.2f, 0.2f, 0.8f);
+	//m_shaderBlock->Move(0.2f, -0.5f);
+#pragma endregion
+
+
 	return true;
 }
 
@@ -694,6 +703,23 @@ void GraphicsClass::RotateCamera(XMVECTOR rotation)
 
 void GraphicsClass::UpdateUI()
 {
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	m_D3D->EnableAlphaBlending();
+	if (m_shaderBlock)
+	{
+		m_shaderBlock->Render(m_D3D->GetDeviceContext());
+		if (m_shaderBlock->MouseOnArea(m_mouse->GetMouse()))
+		{
+			PostQuitMessage(0);
+		}
+	}
+	m_D3D->DisableAlphaBlending();
+
 	return;
 
 	if (m_mouse == nullptr)
@@ -860,6 +886,8 @@ bool GraphicsClass::Render()
 		result = RenderScene();
 		if (!result)
 			return false;
+
+		UpdateUI();
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
 		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);

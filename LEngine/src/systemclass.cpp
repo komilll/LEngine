@@ -26,7 +26,6 @@ bool SystemClass::Initialize()
 	int screenWidth, screenHeight;
 	bool result;
 
-
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
 	screenWidth = 0;
 	screenHeight = 0;
@@ -252,8 +251,8 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	else
 	{
 		// If windowed then set it to 1280x720 resolution.
-		screenWidth  = 1280;
-		screenHeight = 720;
+		screenWidth  = m_windowSizeX;
+		screenHeight = m_windowSizeY;
 
 		// Place the window in the middle of the screen.
 		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth)  / 2;
@@ -333,7 +332,6 @@ void SystemClass::HandleInput()
 
 	m_Graphics->RotateCamera(cameraRotation);
 }
-
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {

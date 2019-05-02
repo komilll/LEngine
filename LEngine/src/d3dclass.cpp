@@ -50,6 +50,9 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
 
+	m_windowSizeX = screenWidth;
+	m_windowSizeY = screenHeight;
+
 	m_hwnd = &hwnd;
 
 	// Store the vsync setting.
@@ -637,4 +640,9 @@ void D3DClass::TurnZBufferOff()
 void D3DClass::ResetViewport()
 {
 	m_deviceContext->RSSetViewports(1, &m_viewport);
+}
+
+D3DClass::WindowSize D3DClass::GetWindowSize()
+{
+	return D3DClass::WindowSize(m_windowSizeX, m_windowSizeY);
 }

@@ -267,6 +267,9 @@
     <ClInclude Include="src\LUTShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\UIShaderEditorBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -378,6 +381,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LUTShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UIShaderEditorBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

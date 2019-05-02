@@ -196,6 +196,7 @@
     <ClInclude Include="src\UIBackground.h" />
     <ClInclude Include="src\UIBase.h" />
     <ClInclude Include="src\UIButton.h" />
+    <ClInclude Include="src\UIShaderEditorBlock.h" />
     <ClInclude Include="src\UISlider.h" />
     <ClInclude Include="src\UITexture.h" />
     <ClInclude Include="src\UITexturePreview.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="src\UIBackground.cpp" />
     <ClCompile Include="src\UIBase.cpp" />
     <ClCompile Include="src\UIButton.cpp" />
+    <ClCompile Include="src\UIShaderEditorBlock.cpp" />
     <ClCompile Include="src\UISlider.cpp" />
     <ClCompile Include="src\UITexture.cpp" />
     <ClCompile Include="src\UITexturePreview.cpp" />

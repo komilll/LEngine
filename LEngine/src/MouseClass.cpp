@@ -55,6 +55,11 @@ bool MouseClass::Initialize(D3DClass* d3d, HINSTANCE hInstance, HWND hwnd, int s
 		return false;
 	}
 
+	m_lastMousePoint = CalculateMousePosition();
+
+	m_frameMovement.x = 0;
+	m_frameMovement.y = 0;
+
 	return true;
 }
 
@@ -84,6 +89,8 @@ bool MouseClass::Frame()
 	}
 
 	ProcessInput();
+
+	CalculateMouseMovement();
 
 	return true;
 }
@@ -159,9 +166,94 @@ void MouseClass::SetRMBPressed(bool enable)
 	m_mouseState.rgbButtons[1] = enable;
 }
 
+POINT MouseClass::CurrentMouseLocation()
+{
+	return m_lastMousePoint;
+}
+
+std::pair<float, float> MouseClass::MouseFrameMovement()
+{
+	POINT p = m_frameMovement;
+	float mouseX{ 0 };
+	float mouseY{ 0 };
+
+	//Calculate mouse X
+	mouseX = (float)p.x / (float)GetD3D()->GetWindowSize().x;
+	//mouseX = mouseX * 2.0f - 1.0f;
+	if (mouseX > 1.0f)
+		mouseX = 1.0f;
+	else if (mouseX < -1.0f)
+		mouseX = -1.0f;
+
+	//Calculate mouse Y
+	mouseY = (float)p.y / (float)GetD3D()->GetWindowSize().y;
+	//mouseY = mouseY * 2.0f - 1.0f;
+	if (mouseY > 1.0f)
+		mouseY = 1.0f;
+	else if (mouseY < -1.0f)
+		mouseY = -1.0f;
+
+	mouseY *= -1.0f;
+
+	return std::pair<float, float>{ mouseX, mouseY };
+}
+
 D3DClass * MouseClass::GetD3D()
 {
 	return m_d3d;
+}
+
+void MouseClass::CalculateMouseMovement()
+{
+	POINT currentMousePos = CalculateMousePosition();
+	m_frameMovement = { currentMousePos.x - m_lastMousePoint.x, currentMousePos.y - m_lastMousePoint.y };
+	m_lastMousePoint = currentMousePos;
+}
+
+POINT MouseClass::CalculateMousePosition()
+{
+	POINT p;
+	if (!GetCursorPos(&p))
+	{
+		return{ 0,0 };
+	}
+
+	//float mouseX{ 0 };
+	//float mouseY{ 0 };
+	RECT desktop;
+	HWND hwnd = ::GetDesktopWindow();
+
+	::GetWindowRect(hwnd, &desktop);
+	//Calculate mouse X
+	p.x -= (desktop.right - GetD3D()->GetWindowSize().x) * 0.5f;
+	if (p.x > GetD3D()->GetWindowSize().x)
+		p.x = GetD3D()->GetWindowSize().x;
+	else if (p.x < 0.0f)
+		p.x = 0.0f;
+
+	//mouseX = (float)p.x / (float)GetD3D()->GetWindowSize().x;
+	//mouseX = mouseX * 2.0f - 1.0f;
+	//if (mouseX > 1.0f)
+	//	mouseX = 1.0f;
+	//else if (mouseX < -1.0f)
+	//	mouseX = -1.0f;
+
+	//Calculate mouse Y
+	p.y -= (desktop.bottom - GetD3D()->GetWindowSize().y) * 0.5f;
+	if (p.y > GetD3D()->GetWindowSize().y)
+		p.y = GetD3D()->GetWindowSize().y;
+	else if (p.y < 0.0f)
+		p.y = 0.0f;
+	//mouseY = (float)p.y / (float)GetD3D()->GetWindowSize().y;
+	//mouseY = mouseY * 2.0f - 1.0f;
+	//if (mouseY > 1.0f)
+	//	mouseY = 1.0f;
+	//else if (mouseY < -1.0f)
+	//	mouseY = -1.0f;
+
+	//mouseY *= -1.0f;
+
+	return p;
 }
 
 void MouseClass::SetLMBPressed(bool enable)

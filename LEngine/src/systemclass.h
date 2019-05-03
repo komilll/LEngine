@@ -89,10 +89,12 @@ private:
 	MouseClass* m_Mouse;
 	GraphicsClass* m_Graphics;
 	bool m_lmbPressed = false;
+	bool m_changeToMaterialEditorPressed = false;
 
 private:
 	static const int m_windowSizeX = 1280;
 	static const int m_windowSizeY = 720;
+
 };
 
 

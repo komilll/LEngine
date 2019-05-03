@@ -139,9 +139,20 @@ bool SystemClass::Frame()
 	if(m_Input->IsKeyDown(VK_ESCAPE))
 		return false;
 
+	if (m_Input->IsKeyDown(VK_TAB))
+	{
+		if (m_changeToMaterialEditorPressed == false)
+		{
+			m_changeToMaterialEditorPressed = true;
+			m_Graphics->ChangeRenderWindow();
+		}
+	}
+	else
+	{
+		m_changeToMaterialEditorPressed = false;
+	}
+
 	HandleInput();
-	if (m_Graphics->Frame() == false)
-		return false;
 
 	if (m_Mouse)
 	{
@@ -149,6 +160,9 @@ bool SystemClass::Frame()
 			return false;
 		m_lmbPressed = m_Mouse->GetLMBPressed();
 	}
+
+	if (m_Graphics->Frame() == false)
+		return false;
 
 	m_Graphics->UpdateUI();
 

@@ -713,9 +713,21 @@ void GraphicsClass::UpdateUI()
 	if (m_shaderBlock)
 	{
 		m_shaderBlock->Render(m_D3D->GetDeviceContext());
-		if (m_shaderBlock->MouseOnArea(m_mouse->GetMouse()))
+		if (m_shaderBlock->IsDragging())
 		{
-			PostQuitMessage(0);
+			std::pair<float, float> mouseMov = m_mouse->GetMouse()->MouseFrameMovement();
+			m_shaderBlock->Move(mouseMov.first, mouseMov.second);
+			if (m_mouse->GetMouse()->GetLMBPressed() == false)
+			{
+				m_shaderBlock->StopDragging();
+			}
+		}
+		else if (m_shaderBlock->MouseOnArea(m_mouse->GetMouse()))
+		{
+			if (m_mouse->GetMouse()->GetLMBPressed())
+			{
+				m_shaderBlock->StartDragging();
+			}
 		}
 	}
 	m_D3D->DisableAlphaBlending();
@@ -834,6 +846,11 @@ TextEngine::FontData * GraphicsClass::AddText(float && posX, float && posY, std:
 	return m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, posX, posY, text, scale, align, color);
 }
 
+void GraphicsClass::ChangeRenderWindow()
+{
+	RENDER_MATERIAL_EDITOR = !RENDER_MATERIAL_EDITOR;
+}
+
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -883,11 +900,16 @@ bool GraphicsClass::Render()
 		m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 	//STANDARD SCENE RENDERING
-		result = RenderScene();
-		if (!result)
-			return false;
-
-		UpdateUI();
+		if (RENDER_MATERIAL_EDITOR == false)
+		{
+			result = RenderScene();
+			if (!result)
+				return false;
+		}
+		else
+		{
+			UpdateUI();
+		}
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
 		//m_skyboxPreviewRight->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -1161,6 +1183,9 @@ bool GraphicsClass::RenderGUI()
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	if (RENDER_MATERIAL_EDITOR)
+		goto Finished_drawing;
+
 	ImGui::Begin("BaseWindow");
 	
 	//Sliders - roughness/metalness in case of empty texture maps
@@ -1238,6 +1263,7 @@ bool GraphicsClass::RenderGUI()
 	//Finish ImGui and render
 	ImGui::End();
 
+Finished_drawing:
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

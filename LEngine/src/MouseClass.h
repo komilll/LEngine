@@ -7,6 +7,7 @@
 
 #include <dinput.h>
 #include "d3dclass.h"
+#include <utility>
 
 class MouseClass
 {
@@ -28,8 +29,15 @@ public:
 	void SetLMBPressed(bool enable);
 	bool GetRMBPressed();
 	void SetRMBPressed(bool enable);
+
+	POINT CurrentMouseLocation();
+	std::pair<float, float> MouseFrameMovement();
 	
 	D3DClass* GetD3D();
+
+private:
+	void CalculateMouseMovement();
+	POINT CalculateMousePosition();
 
 public:
 	bool isInputConsumed = false;
@@ -40,6 +48,8 @@ private:
 
 	DIMOUSESTATE m_mouseState;
 
+	POINT m_lastMousePoint;
+	POINT m_frameMovement;
 	int m_screenWidth, m_screenHeight;
 	float m_mouseX, m_mouseY;
 	float m_mouseMaxX, m_mouseMaxY;

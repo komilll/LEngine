@@ -5,6 +5,11 @@ UIBase::UIBase()
 	BaseShaderClass::BaseShaderClass();
 }
 
+bool UIBase::InitializeModelGeneric(ID3D11Device * device, RectangleVertices rectangleVertices, bool withTex)
+{
+	return InitializeModelGeneric(device, ModelClass::ShapeSize::RECTANGLE, rectangleVertices.minX, rectangleVertices.maxX, rectangleVertices.maxY, rectangleVertices.minY, withTex);
+}
+
 bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool withTex)
 {
 	m_model = new ModelClass;

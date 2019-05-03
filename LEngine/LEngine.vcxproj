@@ -186,6 +186,7 @@
     <ClInclude Include="src\MouseClass.h" />
     <ClInclude Include="src\MouseClassContainer.h" />
     <ClInclude Include="src\RenderTextureClass.h" />
+    <ClInclude Include="src\ShaderEditorManager.h" />
     <ClInclude Include="src\ShaderPBRClass.h" />
     <ClInclude Include="src\ShaderSpecularClass.h" />
     <ClInclude Include="src\ShadowMapClass.h" />
@@ -197,6 +198,7 @@
     <ClInclude Include="src\UIBase.h" />
     <ClInclude Include="src\UIButton.h" />
     <ClInclude Include="src\UIShaderEditorBlock.h" />
+    <ClInclude Include="src\UIShaderEditorInput.h" />
     <ClInclude Include="src\UISlider.h" />
     <ClInclude Include="src\UITexture.h" />
     <ClInclude Include="src\UITexturePreview.h" />
@@ -226,6 +228,7 @@
     <ClCompile Include="src\MouseClassContainer.cpp" />
     <ClCompile Include="src\PostProcessShader.cpp" />
     <ClCompile Include="src\RenderTextureClass.cpp" />
+    <ClCompile Include="src\ShaderEditorManager.cpp" />
     <ClCompile Include="src\ShaderPBRClass.cpp" />
     <ClCompile Include="src\ShaderSpecularClass.cpp" />
     <ClCompile Include="src\ShadowMapClass.cpp" />
@@ -237,6 +240,7 @@
     <ClCompile Include="src\UIBase.cpp" />
     <ClCompile Include="src\UIButton.cpp" />
     <ClCompile Include="src\UIShaderEditorBlock.cpp" />
+    <ClCompile Include="src\UIShaderEditorInput.cpp" />
     <ClCompile Include="src\UISlider.cpp" />
     <ClCompile Include="src\UITexture.cpp" />
     <ClCompile Include="src\UITexturePreview.cpp" />

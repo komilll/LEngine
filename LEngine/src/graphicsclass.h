@@ -65,6 +65,8 @@ const int MAX_TEXTURE_INPUT = 4;
 static const char* GrainTypeArray[] = { "Small", "Unregular", "Unregular white" };
 static const char* CURRENT_GRAIN_TYPE = GrainTypeArray[0];
 
+static bool RENDER_MATERIAL_EDITOR = true;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +128,8 @@ public:
 	D3DClass* GetD3D();
 
 	TextEngine::FontData* AddText(float&& posX, float&& posY, std::string&& text, float&& scale = 1.0f, TextEngine::Align &&align = TextEngine::Align::LEFT, XMVECTOR&& color = DirectX::Colors::White);
+
+	void ChangeRenderWindow();
 
 private:
 	bool Render();

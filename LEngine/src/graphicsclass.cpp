@@ -601,16 +601,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
-
-#pragma region Material Editor
-	m_shaderBlock = new UIShaderEditorBlock;
-	if (!m_shaderBlock->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -0.4f, 0.4f, 1.0f, 0.3f))
-		return false;
-	m_shaderBlock->ChangeColor(0.2f, 0.2f, 0.2f, 0.8f);
-	//m_shaderBlock->Move(0.2f, -0.5f);
-#pragma endregion
-
-
 	return true;
 }
 
@@ -710,25 +700,9 @@ void GraphicsClass::UpdateUI()
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	m_D3D->EnableAlphaBlending();
-	if (m_shaderBlock)
+	if (m_shaderEditorManager)
 	{
-		m_shaderBlock->Render(m_D3D->GetDeviceContext());
-		if (m_shaderBlock->IsDragging())
-		{
-			std::pair<float, float> mouseMov = m_mouse->GetMouse()->MouseFrameMovement();
-			m_shaderBlock->Move(mouseMov.first, mouseMov.second);
-			if (m_mouse->GetMouse()->GetLMBPressed() == false)
-			{
-				m_shaderBlock->StopDragging();
-			}
-		}
-		else if (m_shaderBlock->MouseOnArea(m_mouse->GetMouse()))
-		{
-			if (m_mouse->GetMouse()->GetLMBPressed())
-			{
-				m_shaderBlock->StartDragging();
-			}
-		}
+		m_shaderEditorManager->UpdateBlocks();
 	}
 	m_D3D->DisableAlphaBlending();
 
@@ -826,6 +800,9 @@ void GraphicsClass::SetMouseRef(MouseClass * mouse)
 	m_mouse->SetMouse(mouse);
 	if (m_mouse->GetModel() == nullptr)
 		m_mouse->InitializeMouse();
+
+	if (!CreateShaderEditor())
+		PostQuitMessage(0);
 }
 
 MouseClass* GraphicsClass::GetMouse()
@@ -2282,6 +2259,16 @@ bool GraphicsClass::ApplyChromaticAberration(ID3D11ShaderResourceView * chromati
 bool GraphicsClass::ApplyGrain(ID3D11ShaderResourceView * grainTexture, ID3D11ShaderResourceView * mainFrameBuffer)
 {
 	m_postProcessShader->UseGrain(true);
+	return true;
+}
+
+bool GraphicsClass::CreateShaderEditor()
+{
+	m_shaderEditorManager = new ShaderEditorManager(m_D3D, m_mouse->GetMouse());
+		
+	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.0f }));
+	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }));
+
 	return true;
 }
 

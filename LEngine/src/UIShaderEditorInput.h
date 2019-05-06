@@ -4,7 +4,7 @@
 
 #include "UIBase.h"
 
-///<summary>Class used for rendering Material Editor blocks</summary>
+///<summary>Class used for rendering Material Editor input point</summary>
 class UIShaderEditorInput : public UIBase
 {
 public:
@@ -18,10 +18,20 @@ public:
 	bool Initialize(D3DClass* d3d, float centerX, float centerY, float size);
 	
 	void Move(float x, float y);
+	void GetTranslation(float& x, float& y);
+
+	void GetPosition(float & x, float & y);
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
+	void StartDragging();
+	void StopDragging();
+	bool IsDragging();
+
 private:
+	bool m_dragged{ false };
+	float m_value{ 0 };
+
 	float m_translationX{ 0 };
 	float m_translationY{ 0 };
 

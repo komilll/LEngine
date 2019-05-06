@@ -3,6 +3,15 @@
 UIShaderEditorBlock::UIShaderEditorBlock()
 {
 	UIBase::UIBase();
+	ChangeColor(blockColor);
+}
+
+UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition)
+{
+	UIBase::UIBase();
+	m_moveAfterInitializing = true;
+	m_movemementAfterInitialization = startPosition;
+	ChangeColor(blockColor);
 }
 
 bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
@@ -48,6 +57,10 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d)
 	CalculateBlockSize();
 	InitializeInputNodes();
 	InitializeOutputNodes();
+	if (m_moveAfterInitializing)
+	{
+		Move(m_movemementAfterInitialization.x, m_movemementAfterInitialization.y);
+	}
 
 	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
 }
@@ -87,6 +100,39 @@ void UIShaderEditorBlock::StopDragging()
 bool UIShaderEditorBlock::IsDragging()
 {
 	return m_dragged;
+}
+
+bool UIShaderEditorBlock::IsPinDragging()
+{
+	return m_pinDragged;
+}
+
+UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
+{
+	for (const auto& pin : m_outputNodes)
+	{
+		if (pin->IsDragging())
+		{
+			if (mouse->GetLMBPressed() == false)
+			{
+				pin->StopDragging();
+				m_pinDragged = false;
+			}
+			return pin;
+		}
+	}
+
+	for (const auto& pin : m_outputNodes)
+	{
+		if (pin->MouseOnArea(mouse) && mouse->GetLMBPressed())
+		{
+			pin->StartDragging();
+			m_pinDragged = true;
+			return pin;
+		}
+	}
+
+	return nullptr;
 }
 
 bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
@@ -138,7 +184,7 @@ bool UIShaderEditorBlock::InitializeOutputNodes()
 {
 	for (int i = 0; i < m_outputNodesCount; ++i)
 	{
-		UIShaderEditorInput* outputNode = new UIShaderEditorInput;
+		UIShaderEditorOutput* outputNode = new UIShaderEditorOutput;
 		if (!outputNode->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE,
 			m_blockVertices.maxX - inOutMargin.x - inOutSize.x, m_blockVertices.maxX - inOutMargin.x,
 			m_blockVertices.maxY - inOutMargin.y, m_blockVertices.maxY - inOutMargin.y - inOutSize.y))
@@ -152,4 +198,16 @@ bool UIShaderEditorBlock::InitializeOutputNodes()
 	}
 
 	return true;
+}
+
+UIShaderEditorInput* UIShaderEditorBlock::CheckIfMouseOnInputPin(MouseClass* mouse)
+{
+	for (const auto& pin : m_inputNodes)
+	{
+		if (pin->MouseOnArea(mouse))
+		{
+			return pin;
+		}
+	}
+	return nullptr;
 }

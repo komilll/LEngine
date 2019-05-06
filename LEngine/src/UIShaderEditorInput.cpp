@@ -68,6 +68,18 @@ void UIShaderEditorInput::Move(float x, float y)
 	m_translationY += y;
 }
 
+void UIShaderEditorInput::GetTranslation(float & x, float & y)
+{
+	x = m_translationX;
+	y = m_translationY;
+}
+
+void UIShaderEditorInput::GetPosition(float & x, float & y)
+{
+	x = (max_X - min_X) * 0.5f + min_X + m_translationX;
+	y = (max_Y - min_Y) * 0.5f + min_Y + m_translationY;
+}
+
 bool UIShaderEditorInput::Render(ID3D11DeviceContext * deviceContext)
 {
 	XMMATRIX tmpMatrix;
@@ -75,4 +87,21 @@ bool UIShaderEditorInput::Render(ID3D11DeviceContext * deviceContext)
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
 	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
+}
+
+void UIShaderEditorInput::StartDragging()
+{
+	m_dragged = true;
+	ChangeColor(0.0, 1.0f, 0.0f, 1.0f);
+}
+
+void UIShaderEditorInput::StopDragging()
+{
+	m_dragged = false;
+	ChangeColor(1.0f, 0.0f, 0.0f, 1.0f);
+}
+
+bool UIShaderEditorInput::IsDragging()
+{
+	return m_dragged;
 }

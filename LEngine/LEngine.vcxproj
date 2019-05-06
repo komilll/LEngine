@@ -197,8 +197,11 @@
     <ClInclude Include="src\UIBackground.h" />
     <ClInclude Include="src\UIBase.h" />
     <ClInclude Include="src\UIButton.h" />
+    <ClInclude Include="src\UILine.h" />
     <ClInclude Include="src\UIShaderEditorBlock.h" />
     <ClInclude Include="src\UIShaderEditorInput.h" />
+    <ClInclude Include="src\UIShaderEditorOutput.h" />
+    <ClInclude Include="src\UIShaderPBRBlock.h" />
     <ClInclude Include="src\UISlider.h" />
     <ClInclude Include="src\UITexture.h" />
     <ClInclude Include="src\UITexturePreview.h" />
@@ -239,8 +242,11 @@
     <ClCompile Include="src\UIBackground.cpp" />
     <ClCompile Include="src\UIBase.cpp" />
     <ClCompile Include="src\UIButton.cpp" />
+    <ClCompile Include="src\UILine.cpp" />
     <ClCompile Include="src\UIShaderEditorBlock.cpp" />
     <ClCompile Include="src\UIShaderEditorInput.cpp" />
+    <ClCompile Include="src\UIShaderEditorOutput.cpp" />
+    <ClCompile Include="src\UIShaderPBRBlock.cpp" />
     <ClCompile Include="src\UISlider.cpp" />
     <ClCompile Include="src\UITexture.cpp" />
     <ClCompile Include="src\UITexturePreview.cpp" />

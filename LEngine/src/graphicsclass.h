@@ -41,7 +41,7 @@
 #include "PostProcessShader.h"
 #include "VignetteShader.h"
 #include "LUTShader.h"
-#include "UIShaderEditorBlock.h"
+#include "ShaderEditorManager.h"
 
 /////////////
 // GLOBALS //
@@ -175,6 +175,9 @@ private:
 	bool ApplyChromaticAberration(ID3D11ShaderResourceView* chromaticAberrationTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyGrain(ID3D11ShaderResourceView* grainTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 
+	//Fill shader editor manager with data
+	bool CreateShaderEditor();
+
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
 	static float lerp(float a, float b, float val);
@@ -244,7 +247,7 @@ private:
 	UITexture* m_skyboxPreviewBack;
 
 	//Material editor
-	UIShaderEditorBlock* m_shaderBlock;
+	ShaderEditorManager* m_shaderEditorManager;
 
 	//SHADOW MAP
 	ShadowMapClass* m_shadowMapShader;

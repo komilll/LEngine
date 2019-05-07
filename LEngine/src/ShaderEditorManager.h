@@ -16,7 +16,7 @@ public:
 	ShaderEditorManager(D3DClass* d3d, MouseClass* mouse);
 
 	void UpdateBlocks();
-	void AddShaderBlock(UIShaderEditorBlock* && block);
+	void AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount);
 	void AddShaderBlock(UIShaderEditorBlock* & block);
 
 private:

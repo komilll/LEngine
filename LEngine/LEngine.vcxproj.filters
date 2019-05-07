@@ -148,6 +148,12 @@
     <None Include="lutShader.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="uiline.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="uiline.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">

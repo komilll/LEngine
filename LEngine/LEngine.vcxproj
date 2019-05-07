@@ -158,6 +158,8 @@
     <None Include="textureShader.vs" />
     <None Include="uibase.ps" />
     <None Include="uibase.vs" />
+    <None Include="uiline.ps" />
+    <None Include="uiline.vs" />
     <None Include="uiTexturePreview.ps" />
     <None Include="uiTexturePreview.vs" />
   </ItemGroup>

@@ -5,6 +5,8 @@
 #include "UIBase.h"
 #include "UIShaderEditorInput.h"
 #include "UIShaderEditorOutput.h"
+#include <iostream>
+#include <fstream>
 
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderEditorBlock : public UIBase
@@ -32,11 +34,7 @@ public:
 
 	bool MouseOnArea(MouseClass* mouse) override;
 
-	bool Initialize(D3DClass* d3d);
-	///<summary> Initialize shape: Rectangle/Triangle </summary>
-	bool Initialize(D3DClass* d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom);
-	///<summary> Initialize shape: Square </summary>
-	bool Initialize(D3DClass* d3d, float centerX, float centerY, float size);
+	bool Initialize(D3DClass* d3d, int inCount, int outCount);
 	
 	void Move(float x, float y);
 	void StartDragging();
@@ -50,10 +48,16 @@ public:
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
+	void GenerateShaderCode(ID3D11DeviceContext * deviceContext);
+
 private:
-	void CalculateBlockSize();
-	bool InitializeInputNodes();
-	bool InitializeOutputNodes();
+	void CalculateBlockSize(int inCount, int outCount);
+	bool InitializeInputNodes(int inCount);
+	bool InitializeOutputNodes(int outCount);
+
+	std::string CreateFunctionDefinition();
+	std::string CreateFunctionDeclaration();
+	std::string CreateFunctionDeclarationBase();
 
 private:
 	D3DClass* m_D3D{ nullptr };
@@ -67,10 +71,14 @@ private:
 	bool m_pinDragged = { false };
 	RectangleVertices m_blockVertices;
 
-	int m_inputNodesCount = 1;
-	int m_outputNodesCount = 3;
 	vector<UIShaderEditorInput*> m_inputNodes = {};
 	vector<UIShaderEditorOutput*> m_outputNodes = {};
+
+	std::string m_returnType{ "float" };
+	std::vector<std::string> m_argumentTypes{ "float", "float" };
+	std::vector<std::string> m_argumentNames{ "a", "b" };
+	std::string m_functionName{ "add" };
+	std::string m_functionBody{ "return a + b;" };
 
 private:
 	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f } };

@@ -48,31 +48,22 @@ bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 	return result;
 }
 
-bool UIShaderEditorBlock::Initialize(D3DClass * d3d)
+bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 {
 	m_D3D = d3d;
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
 
-	CalculateBlockSize();
-	InitializeInputNodes();
-	InitializeOutputNodes();
+	CalculateBlockSize(inCount, outCount);
+	InitializeInputNodes(inCount);
+	InitializeOutputNodes(outCount);
+	GenerateShaderCode(d3d->GetDeviceContext());
 	if (m_moveAfterInitializing)
 	{
 		Move(m_movemementAfterInitialization.x, m_movemementAfterInitialization.y);
 	}
 
 	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
-}
-
-bool UIShaderEditorBlock::Initialize(D3DClass * d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom)
-{
-	return Initialize(d3d);
-}
-
-bool UIShaderEditorBlock::Initialize(D3DClass * d3d, float centerX, float centerY, float size)
-{
-	return Initialize(d3d);
 }
 
 void UIShaderEditorBlock::Move(float x, float y)
@@ -150,9 +141,30 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
 }
 
-void UIShaderEditorBlock::CalculateBlockSize()
+void UIShaderEditorBlock::GenerateShaderCode(ID3D11DeviceContext * deviceContext)
 {
-	int inOutCount = m_inputNodesCount > m_outputNodesCount ? m_inputNodesCount : m_outputNodesCount;
+	std::vector<float> args = {};
+	for (const auto& node : m_inputNodes)
+	{
+		if (node->m_connectedOutputNode != nullptr)
+		{
+			args.push_back(node->m_connectedOutputNode->m_value);
+		}
+	}
+
+	//////////////////////////
+	std::string funcDeclaration = CreateFunctionDeclaration();
+	std::string funcDefinition = CreateFunctionDefinition();
+
+	if (ofstream file{"function.txt"})
+	{
+		file << funcDefinition;
+	}
+}
+
+void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
+{
+	int inOutCount = inCount > outCount ? inCount : outCount;
 	Size blockSize = blockSizeVector[inOutCount - 1];
 	m_blockVertices.minX = -blockSize.x * 0.5f;
 	m_blockVertices.maxX = blockSize.x * 0.5f;
@@ -160,9 +172,9 @@ void UIShaderEditorBlock::CalculateBlockSize()
 	m_blockVertices.maxY= blockSize.y * 0.5f;
 }
 
-bool UIShaderEditorBlock::InitializeInputNodes()
+bool UIShaderEditorBlock::InitializeInputNodes(int count)
 {
-	for (int i = 0; i < m_inputNodesCount; ++i)
+	for (int i = 0; i < count; ++i)
 	{
 		UIShaderEditorInput* inputNode = new UIShaderEditorInput;
 		if (!inputNode->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE,
@@ -180,9 +192,9 @@ bool UIShaderEditorBlock::InitializeInputNodes()
 	return true;
 }
 
-bool UIShaderEditorBlock::InitializeOutputNodes()
+bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 {
-	for (int i = 0; i < m_outputNodesCount; ++i)
+	for (int i = 0; i < count; ++i)
 	{
 		UIShaderEditorOutput* outputNode = new UIShaderEditorOutput;
 		if (!outputNode->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE,
@@ -198,6 +210,41 @@ bool UIShaderEditorBlock::InitializeOutputNodes()
 	}
 
 	return true;
+}
+
+std::string UIShaderEditorBlock::CreateFunctionDefinition()
+{
+	std::string funcDefinition = CreateFunctionDeclarationBase();
+
+	funcDefinition += "\n{";
+	funcDefinition += "\n\t" + m_functionBody;
+	funcDefinition += "\n}";
+
+	return funcDefinition;
+}
+
+std::string UIShaderEditorBlock::CreateFunctionDeclaration()
+{
+	std::string funcDeclaration = CreateFunctionDeclarationBase();
+	funcDeclaration += ";";
+
+	return funcDeclaration;
+}
+
+std::string UIShaderEditorBlock::CreateFunctionDeclarationBase()
+{
+	std::string funcDeclaration = (m_returnType + " " + m_functionName + "(");
+	for (int i = 0; i < m_argumentNames.size(); ++i)
+	{
+		funcDeclaration += m_argumentTypes.at(i) + " ";
+		funcDeclaration += m_argumentNames.at(i);
+		if (i < m_argumentNames.size() - 1)
+		{
+			funcDeclaration += ", ";
+		}
+	}
+	funcDeclaration += ")";
+	return funcDeclaration;
 }
 
 UIShaderEditorInput* UIShaderEditorBlock::CheckIfMouseOnInputPin(MouseClass* mouse)

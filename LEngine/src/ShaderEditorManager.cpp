@@ -108,7 +108,7 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		{
 			if (out && currentBlock && currentBlock->IsPinDragging() == false)
 			{
-				out->SetConnectedInput(in);
+				in->m_connectedOutputNode = out;
 				in->ChangeColor(0.0f, 0.0f, 1.0f, 1.0f);
 				DrawLine(in, out);
 				break;
@@ -135,9 +135,9 @@ void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutpu
 	m_line->Initialize(m_D3D, out, in);
 }
 
-void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* && block)
+void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount)
 {
-	block->Initialize(m_D3D);
+	block->Initialize(m_D3D, inCount, outCount);
 	m_blocks.push_back(block);
 }
 

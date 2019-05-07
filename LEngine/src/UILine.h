@@ -18,6 +18,9 @@ public:
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
 private:
+	bool CalculateLine();
+
+private:
 	D3DClass* m_D3D{ nullptr };
 	UIShaderEditorInput* m_endPin;
 	UIShaderEditorOutput* m_startPin;
@@ -26,7 +29,10 @@ private:
 	float m_translationX{ 0.0f };
 	float m_translationY{ 0.0f };
 
+	float m_xDiff{ 0.0f };
+	float m_yDiff{ 0.0f };
+
 private:
-	const float lineThickness = 0.02f;
+	const float lineThickness = 0.008f;
 };
 #endif // !_UIBASE_H_

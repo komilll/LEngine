@@ -104,8 +104,3 @@ bool UIShaderEditorOutput::IsDragging()
 {
 	return m_dragged;
 }
-
-void UIShaderEditorOutput::SetConnectedInput(UIShaderEditorInput * input)
-{
-	m_connectedInputNode = input;
-}

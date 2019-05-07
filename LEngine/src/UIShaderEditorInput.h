@@ -3,6 +3,7 @@
 #define _UISHADEREDITORINPUT_H_
 
 #include "UIBase.h"
+#include "UIShaderEditorOutput.h"
 
 ///<summary>Class used for rendering Material Editor input point</summary>
 class UIShaderEditorInput : public UIBase
@@ -28,9 +29,11 @@ public:
 	void StopDragging();
 	bool IsDragging();
 
+public:
+	UIShaderEditorOutput* m_connectedOutputNode{ nullptr };
+
 private:
 	bool m_dragged{ false };
-	float m_value{ 0 };
 
 	float m_translationX{ 0 };
 	float m_translationY{ 0 };

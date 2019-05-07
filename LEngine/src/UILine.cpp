@@ -7,12 +7,28 @@ UILine::UILine()
 
 bool UILine::Initialize(D3DClass * d3d, UIShaderEditorOutput * startPin, UIShaderEditorInput * endPin)
 {
-	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
 
+	m_D3D = d3d;
 	m_startPin = startPin;
 	m_endPin = endPin;
 
+	return CalculateLine();
+}
+
+bool UILine::Render(ID3D11DeviceContext * deviceContext)
+{
+	CalculateLine();
+
+	XMMATRIX worldMatrix = XMMatrixRotationZ(atan(m_yDiff / m_xDiff));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+
+	return UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0);
+}
+
+bool UILine::CalculateLine()
+{
 	float endPinX;
 	float endPinY;
 	float startPinX;
@@ -21,24 +37,13 @@ bool UILine::Initialize(D3DClass * d3d, UIShaderEditorOutput * startPin, UIShade
 	m_startPin->GetPosition(startPinX, startPinY);
 	m_endPin->GetPosition(endPinX, endPinY);
 
-	float xDiff = (endPinX - startPinX);
-	float yDiff = (endPinY - startPinY);
-	//float lineLength = std::sqrt(xDiff * xDiff + yDiff * yDiff);
-	float lineLength = std::abs(xDiff);
+	m_xDiff = (endPinX - startPinX);
+	m_yDiff = (endPinY - startPinY);
+	float lineLength = std::sqrt(m_xDiff * m_xDiff + m_yDiff * m_yDiff);
 
-	startPin->GetPosition(m_translationX, m_translationY);
-	//m_translationX += (lineLength * 0.5f);
+	m_startPin->GetPosition(m_translationX, m_translationY);
 
-	m_vertices = RectangleVertices{0.0f, lineLength, 0.0f, lineThickness};
+	m_vertices = RectangleVertices{ 0.0f, lineLength, 0.0f, lineThickness };
 
-	return InitializeModelGeneric(d3d->GetDevice(), m_vertices);
-}
-
-bool UILine::Render(ID3D11DeviceContext * deviceContext)
-{
-	XMMATRIX tmpMatrix;
-	tmpMatrix *= 0;
-	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
-
-	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
+	return InitializeModelGeneric(m_D3D->GetDevice(), m_vertices);
 }

@@ -1,0 +1,226 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: pbr_generated.ps
+////////////////////////////////////////////////////////////////////////////////
+
+/////////////
+// GLOBALS //
+/////////////
+Texture2D shaderTexture[4];
+SamplerState SampleType;
+
+cbuffer LightingBuffer
+{
+	float3 g_direction;
+	float g_lightStrength;
+};
+
+cbuffer PBRBuffer
+{
+	float g_roughness;
+	float g_metalness;
+	float2 g_paddingPBR;
+};
+
+cbuffer ShaderTextureBuffer
+{
+	int g_hasNormalMap;
+	int g_hasRoughnessMap;
+	int g_hasMetalnessMap;
+	int g_paddingShaderTextureBuffer;
+};
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex: TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
+	float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
+};
+
+//////////////
+// CLASSES //
+//////////////
+float3 GetNormalValue(float4 normalMap, float3 tangent, float3 binormal, float3 normal);
+float GetRoughness(float roughnessMap, float roughness);
+float GetMetalness(float metalnessMap, float metalness);
+
+float GeometrySchlickGGX(float NdotV, float k);
+float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
+float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
+float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp);
+
+//SHADER EDITOR METHODS
+float add(float a, float b)
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+//CONST VALUES
+	float PI = 3.14159265359;
+
+//Calculated values
+	float specular;
+	float3 normal;
+	float lightIntensity;
+	float3 lightDir = normalize(g_direction);
+	float4 normalMap;
+	float roughnessMap;
+	float metalnessMap;
+
+//PBR parameters
+	float roughness;
+	float metalness;
+	float3 albedo;
+
+//Load texture data
+	albedo = shaderTexture[0].Sample(SampleType, input.tex);
+	normalMap = shaderTexture[1].Sample(SampleType, input.tex);
+	roughnessMap = shaderTexture[2].Sample(SampleType, input.tex);
+	metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
+
+//Calculate normal for model
+	normal = GetNormalValue(normalMap, input.tangent, input.binormal, input.normal);
+
+//Calculate other PBR values
+	roughness = GetRoughness(roughnessMap, g_roughness);
+	metalness = GetMetalness(metalnessMap, g_metalness);
+
+//Light intensity - currently used, may be disabled in future[?]
+	lightIntensity = saturate(dot(normal, lightDir));	
+	
+//Helper values
+	float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
+	float NdotH = max(dot(normal, halfV), 0.0);
+	float NdotV = max(dot(normal, input.viewDirection), 0.0);
+	float NdotL = max(dot(normal, lightDir), 0.0);
+
+//NORMAL DISTRUBUTION FUNCTION
+	float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
+//////////////////////////////
+
+//GEOMETRY FUNCTION
+	float G = GeometrySmithGGX(roughness, NdotV, NdotL);
+///////////////////
+
+//FRESNEL EQUATION
+	float F = FresnelSchlick(float3(0.04, 0.04, 0.04), albedo, metalness, NdotV, 5.0);
+/////////////////
+
+//FINAL CALCULATIONS
+	float3 numerator = D * G * F;
+	float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+	specular = numerator / max(denominator, 0.001);
+
+	float3 kS = F;
+	float3 kD = float3(1.0, 1.0, 1.0) - kS;
+	kD *= 1.0 - metalness;
+
+	float3 Lo = (kD * albedo / PI + specular) * NdotL;
+
+	float3 ambient = 0.03 * albedo;
+	float3 tempColor = (ambient + Lo);
+	tempColor = tempColor / (tempColor + float3(1.0, 1.0, 1.0));
+	tempColor = pow(tempColor, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+	float4 finalColor = float4(tempColor, 1.0);
+
+	return finalColor * g_lightStrength;//* lightIntensity;
+}
+
+float GeometrySchlickGGX(float NdotV, float k)
+{
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return nom / denom;
+}
+
+float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH)
+{
+	float a2 = max(roughness * roughness, 0.001);
+	float denom = 1.0 + NdotH * NdotH * (a2 - 1.0);
+	denom = denom * denom;
+	denom = denom * PI;
+	
+	return a2 / denom;
+}
+
+float GeometrySmithGGX(float roughness, float NdotV, float NdotL)
+{
+	float k = (roughness + 1);
+	k = (k * k) / 8;
+    float ggx1 = GeometrySchlickGGX(NdotV, k);
+    float ggx2 = GeometrySchlickGGX(NdotL, k);
+
+	return ggx1 * ggx2;
+}
+
+float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp)
+{
+	F0 = lerp(F0, albedo, metalness);
+
+	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// GET TEXTURE PBR VALUES
+////////////////////////////////////////////////////////////////////////////////
+float3 GetNormalValue(float4 normalMap, float3 tangent, float3 binormal, float3 normal)
+{
+	[branch] if(g_hasNormalMap)
+	{
+		normalMap = (normalMap * 2.0f) - 1.0f; //Convert from [0, 1] to [-1, 1]
+		normal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
+		return normalize(normal);
+	}
+	else
+	{
+		return normal;
+	}
+}
+
+float GetRoughness(float roughnessMap, float roughness)
+{
+	[branch] if (g_hasRoughnessMap)
+	{
+		return roughnessMap;
+	}
+	else
+	{
+		return roughness;
+	}
+}
+
+float GetMetalness(float metalnessMap, float metalness)
+{
+	[branch] if (g_hasMetalnessMap)
+	{
+		return metalnessMap;
+	}
+	else
+	{
+		return metalness;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SHADER EDITOR METHODS
+////////////////////////////////////////////////////////////////////////////////
+float add(float a, float b)
+{
+	return a + b;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// GENERATED METHODS
+////////////////////////////////////////////////////////////////////////////////
+float CalculateRoughness()
+{
+	
+}

@@ -80,6 +80,24 @@ bool ShaderEditorManager::UpdatePBRBlock()
 
 bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 {
+	std::string func{};
+	for (int i = 0; i < m_blocks.size(); ++i)
+	{
+		const auto& block = m_blocks.at(i);
+		if (block->GetInputCount() == 0) //Variable
+		{
+			char variableName = i + 65;
+			block->m_variableName = variableName;
+		}
+		func += block->GenerateShaderCode();
+	}
+
+	if (ofstream output{ "function.txt" })
+	{
+		output << func;
+	}
+	//m_pbrBlock->GenerateCode();
+
 	for (const auto& block : m_blocks)
 	{
 		if (block->IsDragging())
@@ -102,6 +120,8 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		}
 	}
 
+	//If dropped on input pin - connect them
+	bool canTryPBR = true;
 	for (const auto& block : m_blocks)
 	{
 		if (UIShaderEditorInput* in = block->CheckIfMouseOnInputPin(m_mouse))
@@ -111,7 +131,21 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 				in->m_connectedOutputNode = out;
 				in->ChangeColor(0.0f, 0.0f, 1.0f, 1.0f);
 				DrawLine(in, out);
+				canTryPBR = false;
 				break;
+			}
+		}
+	}
+	//If dropped on PBR input pin - connect them
+	if (canTryPBR && m_pbrBlock)
+	{
+		if (UIShaderEditorInput* in = m_pbrBlock->CheckIfMouseOnInputPin(m_mouse))
+		{
+			if (out && currentBlock && currentBlock->IsPinDragging() == false)
+			{
+				in->m_connectedOutputNode = out;
+				in->ChangeColor(0.0f, 0.0f, 1.0f, 1.0f);
+				DrawLine(in, out);
 			}
 		}
 	}
@@ -131,8 +165,19 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 
 void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutput * out)
 {
-	m_line = new UILine();
-	m_line->Initialize(m_D3D, out, in);
+	for (int i = m_lines.size() - 1; i >= 0; --i)
+	{
+		if (m_lines.at(i)->GetInput() == in)
+		{
+			delete m_lines.at(i);
+			m_lines.at(i) = nullptr;
+			m_lines.erase(m_lines.begin()+i);
+		}
+	}
+
+	UILine* line = new UILine;
+	line->Initialize(m_D3D, out, in);
+	m_lines.push_back(line);
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount)
@@ -148,9 +193,9 @@ void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock *& block)
 
 bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 {
-	if (m_line)
+	for (const auto& line : m_lines)
 	{
-		if (!m_line->Render(deviceContext))
+		if (!line->Render(deviceContext))
 			return false;
 	}
 

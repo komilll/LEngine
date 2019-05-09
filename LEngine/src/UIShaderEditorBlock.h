@@ -48,16 +48,16 @@ public:
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
-	void GenerateShaderCode(ID3D11DeviceContext * deviceContext);
+	std::string GenerateShaderCode();
+	int GetInputCount();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
 	bool InitializeInputNodes(int inCount);
 	bool InitializeOutputNodes(int outCount);
 
-	std::string CreateFunctionDefinition();
-	std::string CreateFunctionDeclaration();
-	std::string CreateFunctionDeclarationBase();
+public:
+	std::string m_variableName{"test"};
 
 private:
 	D3DClass* m_D3D{ nullptr };
@@ -76,9 +76,7 @@ private:
 
 	std::string m_returnType{ "float" };
 	std::vector<std::string> m_argumentTypes{ "float", "float" };
-	std::vector<std::string> m_argumentNames{ "a", "b" };
 	std::string m_functionName{ "add" };
-	std::string m_functionBody{ "return a + b;" };
 
 private:
 	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f } };

@@ -2266,8 +2266,9 @@ bool GraphicsClass::CreateShaderEditor()
 {
 	m_shaderEditorManager = new ShaderEditorManager(m_D3D, m_mouse->GetMouse());
 		
-	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.0f }), 0, 1);
-	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }), 0, 1);
+	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.2f }), 0, 1);
+	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, -0.2f }), 0, 1);
+	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }), 2, 1);
 
 	return true;
 }

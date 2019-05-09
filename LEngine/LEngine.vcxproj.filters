@@ -154,6 +154,12 @@
     <None Include="uiline.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\Debug\pbr_generated.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Debug\pbr_generated.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">

@@ -27,6 +27,11 @@ bool UILine::Render(ID3D11DeviceContext * deviceContext)
 	return UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0);
 }
 
+UIShaderEditorInput * UILine::GetInput()
+{
+	return m_endPin;
+}
+
 bool UILine::CalculateLine()
 {
 	float endPinX;

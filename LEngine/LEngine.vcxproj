@@ -117,6 +117,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\Debug\pbr_generated.ps" />
+    <None Include="..\Debug\pbr_generated.vs" />
     <None Include="bloomRange.ps" />
     <None Include="bloomRange.vs" />
     <None Include="blurHorizontal.ps" />

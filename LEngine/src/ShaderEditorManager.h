@@ -30,7 +30,7 @@ private:
 	MouseClass* m_mouse;
 	vector<UIShaderEditorBlock*> m_blocks = {};
 
-	UILine* m_line{ nullptr };
+	std::vector<UILine*> m_lines = {};
 	UIShaderPBRBlock* m_pbrBlock;
 };
 

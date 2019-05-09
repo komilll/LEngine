@@ -38,7 +38,11 @@ public:
 	void StopDragging();
 	bool IsDragging();
 
+	void GenerateCode();
+
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
+
+	UIShaderEditorInput * CheckIfMouseOnInputPin(MouseClass * mouse);
 
 private:
 	void CalculateBlockVertices();
@@ -54,9 +58,13 @@ private:
 	float m_translationY{ 0 };
 	bool m_dragged = { false };
 
-	int m_inputNodesCount = 1;
+	int m_inputNodesCount = 2;
 	vector<UIShaderEditorInput*> m_inputNodes = {};
 	UIBase::RectangleVertices m_blockVertices;
+
+	std::string m_returnType{ "float" };
+	std::vector<std::string> m_argumentTypes{ "float", "float" };
+	std::string m_functionName{ "add" };
 
 private:
 	const Size blockSizeVector = Size{ 0.2f, 0.8f };

@@ -17,6 +17,8 @@ public:
 	
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
+	UIShaderEditorInput* GetInput();
+
 private:
 	bool CalculateLine();
 

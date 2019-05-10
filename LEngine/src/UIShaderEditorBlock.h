@@ -48,8 +48,10 @@ public:
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
-	std::string GenerateShaderCode();
+	std::string GenerateShaderCode(bool skipTabulator = false);
 	int GetInputCount();
+	void SetOutputPinName(std::string name);
+	UIShaderEditorOutput* GetFirstOutputNode();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
@@ -58,6 +60,8 @@ private:
 
 public:
 	std::string m_variableName{"test"};
+	vector<UIShaderEditorInput*> m_inputNodes = {};
+	vector<UIShaderEditorOutput*> m_outputNodes = {};
 
 private:
 	D3DClass* m_D3D{ nullptr };
@@ -70,9 +74,6 @@ private:
 	bool m_dragged = { false };
 	bool m_pinDragged = { false };
 	RectangleVertices m_blockVertices;
-
-	vector<UIShaderEditorInput*> m_inputNodes = {};
-	vector<UIShaderEditorOutput*> m_outputNodes = {};
 
 	std::string m_returnType{ "float" };
 	std::vector<std::string> m_argumentTypes{ "float", "float" };

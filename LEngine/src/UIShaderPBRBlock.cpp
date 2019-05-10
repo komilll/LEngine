@@ -88,36 +88,6 @@ bool UIShaderPBRBlock::IsDragging()
 	return m_dragged;
 }
 
-void UIShaderPBRBlock::GenerateCode()
-{
-	//std::string func{ m_functionName + "(" };
-	//std::vector<float> args = {};
-	//for (const auto& node : m_inputNodes)
-	//{
-	//	if (node->m_connectedOutputNode != nullptr)
-	//	{
-	//		args.push_back(node->m_connectedOutputNode->m_value);
-	//	}
-	//}
-	//for (int i = 0; i < args.size(); ++i)
-	//{
-	//	std::ostringstream ss;
-	//	ss << args.at(i);
-	//	func += ss.str();
-	//	if (i < args.size() - 1)
-	//	{
-	//		func += ", ";
-	//	}
-	//}
-	//func += ");";
-
-	////////////////////////////
-	//if (ofstream file{ "function.txt" })
-	//{
-	//	file << func;
-	//}
-}
-
 bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 {
 	for (const auto& node : m_inputNodes)

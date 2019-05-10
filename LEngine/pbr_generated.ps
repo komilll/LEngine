@@ -46,16 +46,22 @@ struct PixelInputType
 // CLASSES //
 //////////////
 float3 GetNormalValue(float4 normalMap, float3 tangent, float3 binormal, float3 normal);
-float GetRoughness(float roughnessMap, float roughness);
-float GetMetalness(float metalnessMap, float metalness);
+//float GetRoughness(float roughnessMap, float roughness);
+//float GetMetalness(float metalnessMap, float metalness);
 
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
 float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
 float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp);
 
+//PBR INPUTS
+float GetRoughness();
+float GetMetalness();
+float3 GetNormal();
+float4 GetBaseColor();
+
 //SHADER EDITOR METHODS
-float add(float a, float b)
+float add(float a, float b);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
@@ -89,8 +95,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	normal = GetNormalValue(normalMap, input.tangent, input.binormal, input.normal);
 
 //Calculate other PBR values
-	roughness = GetRoughness(roughnessMap, g_roughness);
-	metalness = GetMetalness(metalnessMap, g_metalness);
+	roughness = GetRoughness();
+	metalness = GetMetalness();
 
 //Light intensity - currently used, may be disabled in future[?]
 	lightIntensity = saturate(dot(normal, lightDir));	
@@ -220,7 +226,3 @@ float add(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 // GENERATED METHODS
 ////////////////////////////////////////////////////////////////////////////////
-float CalculateRoughness()
-{
-	
-}

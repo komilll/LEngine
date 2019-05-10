@@ -154,10 +154,10 @@
     <None Include="uiline.vs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Debug\pbr_generated.ps">
+    <None Include="pbr_generated.ps">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Debug\pbr_generated.vs">
+    <None Include="pbr_generated.vs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

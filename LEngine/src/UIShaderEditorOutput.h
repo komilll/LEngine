@@ -28,7 +28,8 @@ public:
 	bool IsDragging();
 
 public:
-	float m_value{ 0 };
+	float m_value{ 0.0f };
+	std::string m_variableName{};
 
 private:
 	bool m_dragged{ false };

@@ -80,6 +80,7 @@ bool ShaderEditorManager::UpdatePBRBlock()
 
 bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 {
+#pragma region HLSL CODE GENERATOR
 	std::string func{};
 	for (int i = 0; i < m_blocks.size(); ++i)
 	{
@@ -88,15 +89,67 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		{
 			char variableName = i + 65;
 			block->m_variableName = variableName;
+			block->SetOutputPinName(block->m_variableName);
 		}
-		func += block->GenerateShaderCode();
+	}
+	for (int i = 0; i < m_blocks.size(); ++i)
+	{
+		const auto& block = m_blocks.at(i);
+		if (block->GetInputCount() > 0) //Function
+		{
+			std::string variableName{ "out_" };
+			variableName += (char)(i + '0');
+			block->m_variableName = variableName;
+		}
+	}
+	for (int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
+	{
+		if (UIShaderEditorOutput* out = m_pbrBlock->m_inputNodes.at(i)->m_connectedOutputNode)
+		{
+			std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
+			std::string funcBody{ "\n{\n" };
+
+			for (const auto& block : m_blocks)
+			{
+				if (out == block->GetFirstOutputNode())
+				{
+					m_originalGeneratorBlock = block;
+					funcBody += GenerateBlockCode(block);
+					break;
+				}
+			}
+
+			func += (funcName + funcBody);
+			func += "\n}";
+			func += "\n"; //New line and empty line
+		}
+		else
+		{
+			std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
+			func += funcName;
+			func += "\n{\n";
+
+			std::string type = m_pbrBlock->m_inputTypes.at(i);
+			if (type == "float")
+				func += "\treturn 0.0f;";
+			else if (type == "float2")
+				func += "\treturn float2(0.0f, 0.0f);";
+			else if (type == "float3")
+				func += "\treturn float3(0.0f, 0.0f, 0.0f);";
+			else if (type == "float4")
+				func += "\treturn float4(0.0f, 0.0f, 0.0f, 0.0f);";
+
+			func += "\n}";
+			func += "\n"; //New line and empty line
+		}
 	}
 
-	if (ofstream output{ "function.txt" })
-	{
-		output << func;
-	}
-	//m_pbrBlock->GenerateCode();
+	std::ifstream  src("pbr_generated.ps", std::ios::binary);
+	std::ofstream  dst("function.txt", std::ios::binary);
+
+	dst << src.rdbuf();
+	dst << func;
+#pragma endregion
 
 	for (const auto& block : m_blocks)
 	{
@@ -178,6 +231,48 @@ void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutpu
 	UILine* line = new UILine;
 	line->Initialize(m_D3D, out, in);
 	m_lines.push_back(line);
+}
+
+std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
+{
+	if (block->m_inputNodes.size() == 0)
+	{
+		if (block->GetFirstOutputNode())
+		{
+			return block->GenerateShaderCode();
+		}
+		else
+			return "";
+	}
+
+	std::string toReturn{};
+	for (const auto& in : block->m_inputNodes)
+	{
+		UIShaderEditorOutput* out = in->m_connectedOutputNode;
+		for (const auto& connectedBlock : m_blocks)
+		{
+			for (const auto& otherOut : connectedBlock->m_outputNodes)
+			{
+				if (out == otherOut)
+				{
+					toReturn += { GenerateBlockCode(connectedBlock) };
+					goto skipHere;
+				}
+			}
+		}
+	skipHere:
+		{}
+	}
+
+	if (m_originalGeneratorBlock == block)
+	{
+		toReturn += "\treturn ";
+		toReturn += block->GenerateShaderCode(true);
+	}
+	else
+		toReturn += block->GenerateShaderCode();
+
+	return toReturn;
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount)

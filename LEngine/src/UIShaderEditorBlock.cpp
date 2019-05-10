@@ -140,12 +140,13 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
 }
 
-std::string UIShaderEditorBlock::GenerateShaderCode()
+std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 {	
 	std::string func{};
 	if (GetInputCount() == 0) //Variable
 	{
-		func = { m_variableName + " = "};
+		func = { (skipTabulator ? "" : "\t") };
+		func += "float " + m_variableName + " = ";
 		if (m_outputNodes.size() > 0)
 		{
 			float val = m_outputNodes.at(0)->m_value;
@@ -159,22 +160,20 @@ std::string UIShaderEditorBlock::GenerateShaderCode()
 			func = "";
 		}
 	}
-	else
+	else //Function call
 	{
-		func = { m_variableName + " = " + m_functionName + "(" };
-		std::vector<float> args = {};
+		func = { (skipTabulator ? "" : "\t") + m_variableName + " = " + m_functionName + "(" };
+		std::vector<std::string> args = {};
 		for (const auto& node : m_inputNodes)
 		{
 			if (node->m_connectedOutputNode != nullptr)
 			{
-				args.push_back(node->m_connectedOutputNode->m_value);
+				args.push_back(node->m_connectedOutputNode->m_variableName);
 			}
 		}
 		for (int i = 0; i < args.size(); ++i)
 		{
-			std::ostringstream ss;
-			ss << args.at(i);
-			func += ss.str();
+			func += args.at(i);
 			if (i < args.size() - 1)
 			{
 				func += ", ";
@@ -189,6 +188,22 @@ std::string UIShaderEditorBlock::GenerateShaderCode()
 int UIShaderEditorBlock::GetInputCount()
 {
 	return m_inputNodes.size();
+}
+
+void UIShaderEditorBlock::SetOutputPinName(std::string name)
+{
+	if (m_outputNodes.size() == 1 && m_outputNodes.at(0))
+	{
+		m_outputNodes.at(0)->m_variableName = name;
+	}
+}
+
+UIShaderEditorOutput * UIShaderEditorBlock::GetFirstOutputNode()
+{
+	if (m_outputNodes.size() == 1)
+		return m_outputNodes.at(0);
+	else
+		return nullptr;
 }
 
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)

@@ -24,11 +24,13 @@ private:
 	bool UpdatePBRBlock();
 	bool UpdatePinsOfAllBlocks();
 	void DrawLine(UIShaderEditorInput* in, UIShaderEditorOutput* out);
+	std::string GenerateBlockCode(UIShaderEditorBlock* block);
 
 private:
 	D3DClass* m_D3D;
 	MouseClass* m_mouse;
 	vector<UIShaderEditorBlock*> m_blocks = {};
+	UIShaderEditorBlock* m_originalGeneratorBlock{};
 
 	std::vector<UILine*> m_lines = {};
 	UIShaderPBRBlock* m_pbrBlock;

@@ -48,7 +48,7 @@ private:
 
 public:
 	const std::vector<std::string> m_inputTypes = { "float4", "float", "float", "float3" };
-	const std::vector<std::string> m_inputNames = { "BaseColor", "Metallness", "Roughness", "Normal" };
+	const std::vector<std::string> m_inputNames = { "BaseColor", "Metalness", "Roughness", "Normal" };
 	vector<UIShaderEditorInput*> m_inputNodes = {};
 
 private:

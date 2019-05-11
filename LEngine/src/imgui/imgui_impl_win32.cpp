@@ -234,6 +234,14 @@ void    ImGui_ImplWin32_NewFrame()
     ImGui_ImplWin32_UpdateGamepads();
 }
 
+void PassMouseInfo(bool LMBPressed, bool RMBPreesed)
+{
+	m_lastFrameLMBIMGUI = m_LMBPressedIMGUI;
+	m_lastFrameRMBIMGUI = m_RMBPressedIMGUI;
+	m_LMBPressedIMGUI = LMBPressed;
+	m_RMBPressedIMGUI = RMBPreesed;
+}
+
 // Allow compilation with old Windows SDK. MinGW doesn't have default _WIN32_WINNT/WINVER versions.
 #ifndef WM_MOUSEHWHEEL
 #define WM_MOUSEHWHEEL 0x020E
@@ -259,6 +267,16 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
 		msg = WM_LBUTTONDOWN;
 	else if (msg == WM_KEYUP && (wParam == 16 || wParam == 17)) //Left SHIFT
 		msg = WM_LBUTTONUP;
+
+	//if (!m_lastFrameLMBIMGUI && m_LMBPressedIMGUI)
+	//	msg = WM_LBUTTONDOWN;
+	//else if (m_lastFrameLMBIMGUI && !m_lastFrameLMBIMGUI)
+	//	msg = WM_LBUTTONUP;
+
+	//if (!m_lastFrameRMBIMGUI && m_RMBPressedIMGUI)
+	//	msg = WM_RBUTTONDOWN;
+	//else if (m_lastFrameRMBIMGUI && !m_RMBPressedIMGUI)
+	//	msg = WM_RBUTTONUP;
 
 	//if (msg == WM_KEYDOWN && wParam == 32) //Space - simulate (Right Mouse Button)
 	//	msg = WM_RBUTTONDOWN;

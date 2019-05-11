@@ -112,7 +112,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	BaseShaderClass::vertexInputType input(names, formats);
 
-	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_base.vs", L"pbr_base.ps", input))
+	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_used.vs", L"pbr_used.ps", input))
 		return false;
 
 	//Load textures for PBR shader
@@ -1159,6 +1159,7 @@ bool GraphicsClass::RenderGUI()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	PassMouseInfo(m_mouse->GetMouse()->GetLMBPressed(), m_mouse->GetMouse()->GetRMBPressed());
 
 	if (RENDER_MATERIAL_EDITOR)
 		goto Finished_drawing;

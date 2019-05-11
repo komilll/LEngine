@@ -136,6 +136,14 @@ void SystemClass::Run()
 
 bool SystemClass::Frame()
 {
+	if (m_Mouse)
+	{
+		if (m_Mouse->GetLMBPressed())
+			MessageHandler(m_hwnd, WM_KEYDOWN, 17, -1);
+		else
+			MessageHandler(m_hwnd, WM_KEYUP, 17, -1);
+	}
+
 	if(m_Input->IsKeyDown(VK_ESCAPE))
 		return false;
 

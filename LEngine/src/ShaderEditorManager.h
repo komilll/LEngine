@@ -18,6 +18,7 @@ public:
 	void UpdateBlocks();
 	void AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount);
 	void AddShaderBlock(UIShaderEditorBlock* & block);
+	void GenerateCodeToFile();
 
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);

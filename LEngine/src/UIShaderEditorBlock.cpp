@@ -162,7 +162,7 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 	}
 	else //Function call
 	{
-		func = { (skipTabulator ? "" : "\t") + m_variableName + " = " + m_functionName + "(" };
+		func = { (skipTabulator ? "" : "\t") + m_returnType + " " + m_variableName + " = " + m_functionName + "(" };
 		std::vector<std::string> args = {};
 		for (const auto& node : m_inputNodes)
 		{

@@ -191,30 +191,6 @@ float3 GetNormalValue(float4 normalMap, float3 tangent, float3 binormal, float3 
 	}
 }
 
-float GetRoughness(float roughnessMap, float roughness)
-{
-	[branch] if (g_hasRoughnessMap)
-	{
-		return roughnessMap;
-	}
-	else
-	{
-		return roughness;
-	}
-}
-
-float GetMetalness(float metalnessMap, float metalness)
-{
-	[branch] if (g_hasMetalnessMap)
-	{
-		return metalnessMap;
-	}
-	else
-	{
-		return metalness;
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS
 ////////////////////////////////////////////////////////////////////////////////

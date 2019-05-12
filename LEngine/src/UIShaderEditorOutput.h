@@ -30,6 +30,7 @@ public:
 public:
 	float m_value{ 0.0f };
 	std::string m_variableName{};
+	bool m_toDeleteLine{ false };
 
 private:
 	bool m_dragged{ false };

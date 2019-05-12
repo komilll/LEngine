@@ -61,6 +61,12 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 	{
 		Move(m_movemementAfterInitialization.x, m_movemementAfterInitialization.y);
 	}
+	m_textEngine = new TextEngine;
+	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
+	m_blockName = m_functionName;
+	for (char& c : m_blockName)
+		c = toupper(c);
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, m_blockName, 1.0f, TextEngine::Align::CENTER);
 
 	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
 }
@@ -114,11 +120,33 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 
 	for (const auto& pin : m_outputNodes)
 	{
-		if (pin->MouseOnArea(mouse) && mouse->GetLMBPressed())
+		if (pin->MouseOnArea(mouse))
 		{
-			pin->StartDragging();
-			m_pinDragged = true;
-			return pin;
+			if (mouse->GetLMBPressed())
+			{
+				pin->StartDragging();
+				m_pinDragged = true;
+				return pin;
+			}
+			else if (mouse->GetRMBPressed())
+			{
+				pin->m_toDeleteLine = true;
+				m_pinDragged = false;
+				return nullptr;
+			}
+		}
+	}
+
+	for (const auto& pin : m_inputNodes)
+	{
+		if (pin->MouseOnArea(mouse))
+		{
+			if (mouse->GetRMBPressed())
+			{
+				pin->m_connectedOutputNode = nullptr;
+				m_pinDragged = false;
+				return nullptr;
+			}
 		}
 	}
 
@@ -127,17 +155,28 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 
 bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 {
-	for (const auto& node : m_inputNodes)
-		node->Render(deviceContext);
-
-	for (const auto& node : m_outputNodes)
-		node->Render(deviceContext);
-
 	XMMATRIX tmpMatrix;
 	tmpMatrix *= 0;
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
-	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
+	if (UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+	{
+		for (const auto& node : m_inputNodes)
+			node->Render(deviceContext);
+
+		for (const auto& node : m_outputNodes)
+			node->Render(deviceContext);
+
+		if (m_textEngine)
+		{
+			m_textEngine->GetData(0)->SetPosition(m_translationX, m_translationY, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+			m_textEngine->RenderText(deviceContext, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+		}
+
+		return true;
+	}
+	else
+		return false;
 }
 
 std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)

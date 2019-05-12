@@ -32,6 +32,11 @@ UIShaderEditorInput * UILine::GetInput()
 	return m_endPin;
 }
 
+UIShaderEditorOutput * UILine::GetOutput()
+{
+	return m_startPin;
+}
+
 bool UILine::CalculateLine()
 {
 	float endPinX;

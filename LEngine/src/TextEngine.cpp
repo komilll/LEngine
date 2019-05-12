@@ -13,6 +13,7 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 {
 	FontData data;
 
+	m_spriteBatch = std::make_unique<SpriteBatch>(deviceContext);
 	std::wstring wstr = std::wstring(text_.begin(), text_.end());
 
 	//Measure new text length and change position based on aligments
@@ -36,10 +37,9 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 
 void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWidth, float screenHeight)
 {
-	std::unique_ptr<DirectX::SpriteBatch> spriteBatch = std::make_unique<SpriteBatch>(deviceContext);
 	DirectX::XMVECTOR fontPos;
 
-	spriteBatch->Begin();
+	m_spriteBatch->Begin();
 	//Fetch data from list and render each text
 	for (int i = 0; i < m_data.size(); i++)
 	{
@@ -48,9 +48,9 @@ void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWid
 
 		std::wstring wstr = std::wstring(m_data.at(i).text.begin(), m_data.at(i).text.end());
 
-		m_font->DrawString(spriteBatch.get(), wstr.c_str(), fontPos, m_data.at(i).color, 0.0f, m_data.at(i).origin, m_data.at(i).scale);
+		m_font->DrawString(m_spriteBatch.get(), wstr.c_str(), fontPos, m_data.at(i).color, 0.0f, m_data.at(i).origin, m_data.at(i).scale);
 	}
-	spriteBatch->End();
+	m_spriteBatch->End();
 }
 
 TextEngine::FontData * TextEngine::GetData(int index)

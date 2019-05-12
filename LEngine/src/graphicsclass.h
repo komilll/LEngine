@@ -65,13 +65,13 @@ const int MAX_TEXTURE_INPUT = 4;
 static const char* GrainTypeArray[] = { "Small", "Unregular", "Unregular white" };
 static const char* CURRENT_GRAIN_TYPE = GrainTypeArray[0];
 
-static bool RENDER_MATERIAL_EDITOR = true;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
 ////////////////////////////////////////////////////////////////////////////////
 class GraphicsClass
 {
+public:
+	bool RENDER_MATERIAL_EDITOR = true;
 private:
 	enum class GrainType : int
 	{
@@ -122,6 +122,7 @@ public:
 	void RotateCamera(XMVECTOR rotation);
 
 	void UpdateUI();
+	void UpdateShaderEditorMouseOnly();
 	void SetMouseRef(MouseClass* mouse);
 	MouseClass* GetMouse();
 		

@@ -794,6 +794,14 @@ void GraphicsClass::UpdateUI()
 	}
 }
 
+void GraphicsClass::UpdateShaderEditorMouseOnly()
+{
+	if (m_shaderEditorManager)
+	{
+		m_shaderEditorManager->UpdateBlocks(true);
+	}
+}
+
 void GraphicsClass::SetMouseRef(MouseClass * mouse)
 {
 	ShowCursor(true);
@@ -859,26 +867,25 @@ bool GraphicsClass::Render()
 	else
 	{
 		//CreateShadowMap(m_shadowMapTexture);
-
-		if (m_postprocessSSAO)
-		{
-			if (!RenderGBufferPosition(m_positionBuffer, m_GBufferShaderPosition))
-				return false;
-
-			if (!RenderGBufferNormal(m_normalBuffer, m_GBufferShaderNormal))
-				return false;
-
-			m_GBufferShaderSSAO->LoadPositionTexture(m_positionBuffer->GetShaderResourceView());
-			m_GBufferShaderSSAO->LoadNormalTexture(m_normalBuffer->GetShaderResourceView());
-
-			if (!RenderSSAOTexture(m_ssaoTexture, m_GBufferShaderSSAO))
-				return false;
-		}
-		m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-
-	//STANDARD SCENE RENDERING
 		if (RENDER_MATERIAL_EDITOR == false)
 		{
+			if (m_postprocessSSAO)
+			{
+				if (!RenderGBufferPosition(m_positionBuffer, m_GBufferShaderPosition))
+					return false;
+
+				if (!RenderGBufferNormal(m_normalBuffer, m_GBufferShaderNormal))
+					return false;
+
+				m_GBufferShaderSSAO->LoadPositionTexture(m_positionBuffer->GetShaderResourceView());
+				m_GBufferShaderSSAO->LoadNormalTexture(m_normalBuffer->GetShaderResourceView());
+
+				if (!RenderSSAOTexture(m_ssaoTexture, m_GBufferShaderSSAO))
+					return false;
+			}
+			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+
+			//STANDARD SCENE RENDERING		
 			result = RenderScene();
 			if (!result)
 				return false;
@@ -1162,7 +1169,50 @@ bool GraphicsClass::RenderGUI()
 	PassMouseInfo(m_mouse->GetMouse()->GetLMBPressed(), m_mouse->GetMouse()->GetRMBPressed());
 
 	if (RENDER_MATERIAL_EDITOR)
+	{
+		//Base window of editor - flow control/variables
+		{
+			ImGui::Begin("Shader editor");
+			if (ImGui::Button("Generate shader"))
+			{
+				m_shaderEditorManager->GenerateCodeToFile();
+			}
+			ImGui::End();
+		}
+		//Adding new blocks
+		{
+			ImGui::Begin("Add block");
+			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), ChoosingWindowItems, 2))
+			{
+
+			}
+			//if (m_shaderEditorManager->WillRenderChoosingWindow())
+			//{
+			//	if (ImGui::BeginCombo("Block type:", CURRENT_GRAIN_TYPE))
+			//	{
+			//		constexpr int count = (int)GrainType::Count;
+			//		for (int i = 0; i < count; ++i)
+			//		{
+			//			bool isSelected = (i == (int)m_grainSettings.type);
+			//			if (ImGui::Selectable(GrainTypeArray[i], isSelected))
+			//			{
+			//				CURRENT_GRAIN_TYPE = GrainTypeArray[i];
+			//				m_grainSettings.type = (GrainType)i;
+			//			}
+			//			if (isSelected)
+			//			{
+			//				ImGui::SetItemDefaultFocus();
+			//			}
+			//		}
+			//		ImGui::EndCombo();
+			//	}
+			//}
+			ImGui::End();
+		}
+
+
 		goto Finished_drawing;
+	}
 
 	ImGui::Begin("BaseWindow");
 	

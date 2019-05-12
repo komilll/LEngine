@@ -5,8 +5,12 @@
 #include "UIBase.h"
 #include "UIShaderEditorInput.h"
 #include "UIShaderEditorOutput.h"
+#include "TextEngine.h"
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <algorithm>
+#include <cctype>
 
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderEditorBlock : public UIBase
@@ -74,10 +78,12 @@ private:
 	bool m_dragged = { false };
 	bool m_pinDragged = { false };
 	RectangleVertices m_blockVertices;
+	TextEngine* m_textEngine;
 
 	std::string m_returnType{ "float" };
 	std::vector<std::string> m_argumentTypes{ "float", "float" };
 	std::string m_functionName{ "add" };
+	std::string m_blockName{ "add" };
 
 private:
 	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f } };

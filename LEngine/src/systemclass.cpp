@@ -171,8 +171,9 @@ bool SystemClass::Frame()
 
 	if (m_Graphics->Frame() == false)
 		return false;
-
-	m_Graphics->UpdateUI();
+	
+	if (m_Graphics->RENDER_MATERIAL_EDITOR)
+		m_Graphics->UpdateShaderEditorMouseOnly();
 
 	return true;
 }

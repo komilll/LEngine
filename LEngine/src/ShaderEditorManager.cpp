@@ -6,18 +6,22 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	m_mouse = mouse;
 	m_pbrBlock = new UIShaderPBRBlock();
 	m_pbrBlock->Initialize(d3d);
+	LoadFunctionsFromDirectory();
 }
 
-void ShaderEditorManager::UpdateBlocks()
+void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 {
-	if (!RenderBlocks(m_D3D->GetDeviceContext()))
-		return;
+	if (!mouseOnly)
+	{
+		if (!RenderBlocks(m_D3D->GetDeviceContext()))
+			return;
+	}
 
 	//Check pins first - before moving block, interact with pins
 	if (!UpdatePinsOfAllBlocks())
 		return;
 
-	if (!UpdatePBRBlock())
+	if (!UpdatePBRBlock(mouseOnly))
 		return;
 
 	//If user is dragging one block - he won't interact with any other block until freed previous one
@@ -44,9 +48,15 @@ void ShaderEditorManager::UpdateBlocks()
 			return;
 		}
 	}
+
+	//No interaction with blocks or pins - check if pressed to create new block
+	if (m_mouse->GetRMBPressed())
+	{
+		ShowFunctionChoosingWindow();
+	}
 }
 
-bool ShaderEditorManager::UpdatePBRBlock()
+bool ShaderEditorManager::UpdatePBRBlock(bool mouseOnly)
 {
 	for (const auto& block : m_blocks)
 	{
@@ -56,7 +66,9 @@ bool ShaderEditorManager::UpdatePBRBlock()
 
 	if (m_pbrBlock)
 	{
-		m_pbrBlock->Render(m_D3D->GetDeviceContext());
+		//if (!mouseOnly)
+		//	m_pbrBlock->Render(m_D3D->GetDeviceContext());
+
 		if (m_pbrBlock->IsDragging())
 		{
 			std::pair<float, float> mouseMov = m_mouse->MouseFrameMovement();
@@ -129,6 +141,11 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 				in->ChangeColor(0.0f, 0.0f, 1.0f, 1.0f);
 				DrawLine(in, out);
 			}
+			else if (m_mouse->GetRMBPressed())
+			{
+				in->m_connectedOutputNode = nullptr;
+				return false;
+			}
 		}
 	}
 
@@ -159,6 +176,7 @@ void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutpu
 
 	UILine* line = new UILine;
 	line->Initialize(m_D3D, out, in);
+	out->m_toDeleteLine = false;
 	m_lines.push_back(line);
 }
 
@@ -202,6 +220,88 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 		toReturn += block->GenerateShaderCode();
 
 	return toReturn;
+}
+
+std::string ShaderEditorManager::GetFunctionDeclarations()
+{
+	std::string toReturn{};
+
+	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions"))
+	{
+		if (std::ifstream stream{ file, std::ios::binary })
+		{
+			std::string line{};
+			getline(stream, line);
+			std::string finLine{};
+			for (const char& c : line)
+			{
+				if (c != '\n' && c != '\r')
+					finLine += c;
+			}
+			finLine += ";\n";
+			toReturn += finLine;
+		}
+	}
+	return toReturn;
+}
+
+std::string ShaderEditorManager::GetFunctionDefinitions()
+{
+	std::string toReturn{};
+
+	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions"))
+	{
+		if (std::ifstream stream{ file, std::ios::binary })
+		{
+			while (!stream.eof())
+			{
+				std::string line{};
+				getline(stream, line);
+				line += "\n";
+				toReturn += line;
+			}
+		}
+	}
+
+	return toReturn;
+}
+
+vector<std::string> ShaderEditorManager::GetFilenamesInDirectory(std::string dir, bool withDir)
+{
+	vector<string> names;
+	string search_path{ dir + "/*.*" };
+	WIN32_FIND_DATA fd;
+	HANDLE hFind = ::FindFirstFile(search_path.c_str(), &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			// read all (real) files in current folder
+			// , delete '!' read other 2 default folder . and ..
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				if (withDir)
+					names.push_back(dir + "/" + fd.cFileName);
+				else
+					names.push_back(fd.cFileName);
+			}
+		} while (::FindNextFile(hFind, &fd));
+		::FindClose(hFind);
+	}
+
+	return names;
+}
+
+void ShaderEditorManager::ShowFunctionChoosingWindow()
+{
+	m_choosingWindow = true;
+}
+
+void ShaderEditorManager::LoadFunctionsFromDirectory()
+{
+	//std::vector<std::string> names = GetFilenamesInDirectory("ShaderFunctions", false);
+	//
+	//for (int i = 0; i < names.size(); ++i)
+	//{
+	//	 strcpy(m_choosingWindowItems[i], names.at(i).c_str());
+	//}
 }
 
 void ShaderEditorManager::GenerateCodeToFile()
@@ -268,12 +368,35 @@ void ShaderEditorManager::GenerateCodeToFile()
 			func += "\n"; //New line and empty line
 		}
 	}
+	
+	//std::ofstream dst("pbr_used.ps", std::ios::binary);
+	std::ofstream dst("function.txt", std::ios::binary);
 
-	std::ifstream  src("pbr_generated.ps", std::ios::binary);
-	std::ofstream  dst("pbr_used.ps", std::ios::binary);
+	if (std::ifstream src{ "ShaderEditor/base_declarations.txt", std::ios::binary })
+	{
+		dst << src.rdbuf(); //base_declarations
+	}
+	dst << GetFunctionDeclarations();
+	if (std::ifstream src{ "ShaderEditor/base_body.txt", std::ios::binary })
+	{
+		dst << src.rdbuf(); //base_body
+	}
+	dst << GetFunctionDefinitions();
+	if (std::ifstream src{ "ShaderEditor/generated_header.txt", std::ios::binary })
+	{
+		dst << src.rdbuf(); //generated_header
+	}
+	dst << func; //Get generated functions
+}
 
-	dst << src.rdbuf();
-	dst << func;
+bool ShaderEditorManager::WillRenderChoosingWindow()
+{
+	return m_choosingWindow;
+}
+
+int * ShaderEditorManager::GetChoosingWindowHandler()
+{
+	return &m_choosingWindowHandler;
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount)
@@ -289,12 +412,6 @@ void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock *& block)
 
 bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 {
-	for (const auto& line : m_lines)
-	{
-		if (!line->Render(deviceContext))
-			return false;
-	}
-
 	for (const auto& block : m_blocks)
 	{
 		if (!block->Render(deviceContext))
@@ -304,6 +421,37 @@ bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 	if (m_pbrBlock)
 	{
 		if (!m_pbrBlock->Render(deviceContext))
+			return false;
+	}
+
+	for (int i = 0; i < m_lines.size(); ++i)
+	{		
+		//Click on output pin - break connection
+		if (m_lines.at(i)->GetOutput()->m_toDeleteLine)
+		{
+			m_lines.at(i)->GetOutput()->m_toDeleteLine = false;
+			m_lines.at(i)->GetInput()->m_connectedOutputNode = nullptr;
+			delete m_lines.at(i);
+			m_lines.at(i) = nullptr;
+			m_lines.erase(m_lines.begin() + i);
+			continue;
+		}
+		//Clicked on input pin - break connection
+		else if (!m_lines.at(i)->GetInput() || !m_lines.at(i)->GetInput()->m_connectedOutputNode)
+		{
+			delete m_lines.at(i);
+			m_lines.at(i) = nullptr;
+			m_lines.erase(m_lines.begin() + i);
+			continue;
+		}
+		//Line is empty for some reason - remove from collection
+		else if (m_lines.at(i) == nullptr)
+		{
+			m_lines.erase(m_lines.begin() + i);
+			continue;
+		}
+
+		if (!m_lines.at(i)->Render(deviceContext))
 			return false;
 	}
 

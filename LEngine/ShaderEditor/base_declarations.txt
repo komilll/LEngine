@@ -1,0 +1,63 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: pbr_generated.ps
+////////////////////////////////////////////////////////////////////////////////
+
+/////////////
+// GLOBALS //
+/////////////
+Texture2D shaderTexture[4];
+SamplerState SampleType;
+
+cbuffer LightingBuffer
+{
+	float3 g_direction;
+	float g_lightStrength;
+};
+
+cbuffer PBRBuffer
+{
+	float g_roughness;
+	float g_metalness;
+	float2 g_paddingPBR;
+};
+
+cbuffer ShaderTextureBuffer
+{
+	int g_hasNormalMap;
+	int g_hasRoughnessMap;
+	int g_hasMetalnessMap;
+	int g_paddingShaderTextureBuffer;
+};
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex: TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
+	float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
+};
+
+//////////////
+// CLASSES //
+//////////////
+float3 GetNormalValue(float4 normalMap, float3 tangent, float3 binormal, float3 normal);
+//float GetRoughness(float roughnessMap, float roughness);
+//float GetMetalness(float metalnessMap, float metalness);
+
+float GeometrySchlickGGX(float NdotV, float k);
+float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
+float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
+float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp);
+
+//PBR INPUTS
+float GetRoughness();
+float GetMetalness();
+float3 GetNormal();
+float4 GetBaseColor();
+
+//SHADER EDITOR METHODS

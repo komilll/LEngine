@@ -90,14 +90,19 @@ bool UIShaderPBRBlock::IsDragging()
 
 bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 {
-	for (const auto& node : m_inputNodes)
-		node->Render(deviceContext);
-
 	XMMATRIX tmpMatrix;
 	tmpMatrix *= 0;
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
-	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
+	if (UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+	{
+		for (const auto& node : m_inputNodes)
+			node->Render(deviceContext);
+
+		return true;
+	}
+	else
+		return false;
 }
 
 void UIShaderPBRBlock::CalculateBlockVertices()

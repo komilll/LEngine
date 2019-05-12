@@ -17,15 +17,20 @@
 class TextEngine
 {
 public:
-	enum Align{ LEFT, RIGHT, CENTER };
+	enum class Align{ LEFT, RIGHT, CENTER };
 
 public:
 	//Represents data of single text input
 	struct FontData
 	{
-		DirectX::XMVECTOR origin{ 0.0, 0.0, 0.0, 0.0 };
+	private:
+		float screenPosX = 0;
+		float screenPosY = 0;
+
+	public:
 		float posX = 0;
 		float posY = 0;
+		DirectX::XMVECTOR origin{ 0.0, 0.0, 0.0, 0.0 };
 		float scale = 0;
 		std::string text = "";
 		XMVECTOR color = Colors::White;
@@ -49,6 +54,13 @@ public:
 		{
 			index = index_;
 		}
+		void SetPosition(float posX_, float posY_, float screenWidth, float screenHeight)
+		{
+			screenPosX = posX_;
+			screenPosY = posY_;
+			posX = screenWidth * (0.5f + posX_ * 0.5f);
+			posY = screenHeight * (0.5f - posY_ * 0.5f);
+		}
 
 	private: int index = 0;
 	};
@@ -63,6 +75,7 @@ public:
 	void RenderText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight);
 	///<summary>Fetch single text data entry</summary>
 	TextEngine::FontData* GetData(int index);
+	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 
 private:
 	std::unique_ptr<DirectX::SpriteFont> m_font;

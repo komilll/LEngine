@@ -213,7 +213,8 @@ float4 GetBaseColor()
 }
 float GetMetalness()
 {
-	return 0.0f;
+	float out_0 = add(0.0f, 0.0f);
+	return out_0;
 }
 float GetRoughness()
 {

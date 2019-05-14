@@ -5,15 +5,15 @@ UIBase::UIBase()
 	BaseShaderClass::BaseShaderClass();
 }
 
-bool UIBase::InitializeModelGeneric(ID3D11Device * device, RectangleVertices rectangleVertices, bool withTex)
+bool UIBase::InitializeModelGeneric(ID3D11Device * device, RectangleVertices rectangleVertices, bool withTex, bool isEmpty)
 {
-	return InitializeModelGeneric(device, ModelClass::ShapeSize::RECTANGLE, rectangleVertices.minX, rectangleVertices.maxX, rectangleVertices.maxY, rectangleVertices.minY, withTex);
+	return InitializeModelGeneric(device, ModelClass::ShapeSize::RECTANGLE, rectangleVertices.minX, rectangleVertices.maxX, rectangleVertices.maxY, rectangleVertices.minY, withTex, isEmpty);
 }
 
-bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool withTex)
+bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty)
 {
 	m_model = new ModelClass;
-	if (!m_model->Initialize(device, shape, left, right, top, bottom, withTex))
+	if (!m_model->Initialize(device, shape, left, right, top, bottom, withTex, isEmpty))
 		return false;
 
 	return true;

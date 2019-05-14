@@ -354,6 +354,13 @@ void SystemClass::HandleInput()
 		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ rotatePerTick, 0, 0 });
 
 	m_Graphics->RotateCamera(cameraRotation);
+
+	//Handle deleting blocks in Shader Editor
+	if (m_Input->IsKeyDown(VK_DELETE))
+	{
+		m_Input->KeyUp(VK_DELETE);
+		m_Graphics->DeleteCurrentShaderBlock();
+	}
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)

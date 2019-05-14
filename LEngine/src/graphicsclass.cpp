@@ -836,6 +836,11 @@ void GraphicsClass::ChangeRenderWindow()
 	RENDER_MATERIAL_EDITOR = !RENDER_MATERIAL_EDITOR;
 }
 
+void GraphicsClass::DeleteCurrentShaderBlock()
+{
+	m_shaderEditorManager->DeleteCurrentShaderBlock();
+}
+
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -1180,36 +1185,27 @@ bool GraphicsClass::RenderGUI()
 			ImGui::End();
 		}
 		//Adding new blocks
+		if (m_shaderEditorManager->WillRenderChoosingWindow())
 		{
-			ImGui::Begin("Add block");
+			ImGui::Begin("Add block", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize | ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings
+					| ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
+			
+			ImGui::SetWindowPos({ m_shaderEditorManager->GetWindowPositionX(), m_shaderEditorManager->GetWindowPositionY() });
 			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), ChoosingWindowItems, 2))
 			{
-
+				m_shaderEditorManager->CreateBlock(ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 			}
-			//if (m_shaderEditorManager->WillRenderChoosingWindow())
-			//{
-			//	if (ImGui::BeginCombo("Block type:", CURRENT_GRAIN_TYPE))
-			//	{
-			//		constexpr int count = (int)GrainType::Count;
-			//		for (int i = 0; i < count; ++i)
-			//		{
-			//			bool isSelected = (i == (int)m_grainSettings.type);
-			//			if (ImGui::Selectable(GrainTypeArray[i], isSelected))
-			//			{
-			//				CURRENT_GRAIN_TYPE = GrainTypeArray[i];
-			//				m_grainSettings.type = (GrainType)i;
-			//			}
-			//			if (isSelected)
-			//			{
-			//				ImGui::SetItemDefaultFocus();
-			//			}
-			//		}
-			//		ImGui::EndCombo();
-			//	}
-			//}
-			ImGui::End();
-		}
 
+			ImGui::End();
+
+			if (m_shaderEditorManager->WillRenderChoosingWindow())
+			{
+				if (m_mouse->GetMouse()->GetLMBPressed() || m_mouse->GetMouse()->GetRMBPressed())
+				{
+					//m_shaderEditorManager->PressedOutsideOfChoosingWindow();
+				}
+			}
+		}
 
 		goto Finished_drawing;
 	}
@@ -2317,9 +2313,9 @@ bool GraphicsClass::CreateShaderEditor()
 {
 	m_shaderEditorManager = new ShaderEditorManager(m_D3D, m_mouse->GetMouse());
 		
-	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.2f }), 0, 1);
-	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, -0.2f }), 0, 1);
-	m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }), 2, 1);
+	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.2f }), 0, 1);
+	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, -0.2f }), 0, 1);
+	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }), 2, 1);
 
 	return true;
 }

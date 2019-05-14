@@ -132,6 +132,8 @@ public:
 
 	void ChangeRenderWindow();
 
+	void DeleteCurrentShaderBlock();
+
 private:
 	bool Render();
 	bool RenderScene();

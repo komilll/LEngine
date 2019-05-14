@@ -14,6 +14,18 @@ UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition)
 	ChangeColor(blockColor);
 }
 
+UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition, std::string functionName, std::string returnType, vector<std::string> argumentTypes)
+{
+	UIBase::UIBase();
+	m_moveAfterInitializing = true;
+	m_movemementAfterInitialization = startPosition;
+	ChangeColor(blockColor);
+
+	m_functionName = functionName;
+	m_returnType = returnType;
+	m_argumentTypes = argumentTypes;
+}
+
 bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 {
 	bool result = false;
@@ -61,12 +73,21 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 	{
 		Move(m_movemementAfterInitialization.x, m_movemementAfterInitialization.y);
 	}
+	//Create text on block
 	m_textEngine = new TextEngine;
 	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
 	m_blockName = m_functionName;
 	for (char& c : m_blockName)
 		c = toupper(c);
 	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, m_blockName, 1.0f, TextEngine::Align::CENTER);
+
+	//Create outline
+	m_outlineObject = new UIBase;
+	if (!m_outlineObject->Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+		return false;
+	if (!m_outlineObject->InitializeModelGeneric(d3d->GetDevice(), CalculateOutlineSize(m_blockVertices), false, true))
+		return false;
+	m_outlineObject->ChangeColor(outlineColor);
 
 	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
 }
@@ -86,6 +107,7 @@ void UIShaderEditorBlock::Move(float x, float y)
 void UIShaderEditorBlock::StartDragging()
 {
 	m_dragged = true;
+	m_focused = true;
 }
 
 void UIShaderEditorBlock::StopDragging()
@@ -159,6 +181,14 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	tmpMatrix *= 0;
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
+	if (m_focused && m_outlineObject)
+	{
+		//Render outline
+		if (!m_outlineObject->Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+			return false;
+	}
+	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+
 	if (UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
 	{
 		for (const auto& node : m_inputNodes)
@@ -209,6 +239,10 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 			{
 				args.push_back(node->m_connectedOutputNode->m_variableName);
 			}
+			else
+			{
+				args.push_back("0.0f");
+			}
 		}
 		for (int i = 0; i < args.size(); ++i)
 		{
@@ -252,7 +286,12 @@ void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 	m_blockVertices.minX = -blockSize.x * 0.5f;
 	m_blockVertices.maxX = blockSize.x * 0.5f;
 	m_blockVertices.minY = -blockSize.y * 0.5f;
-	m_blockVertices.maxY= blockSize.y * 0.5f;
+	m_blockVertices.maxY = blockSize.y * 0.5f;
+}
+
+UIBase::RectangleVertices UIShaderEditorBlock::CalculateOutlineSize(UIBase::RectangleVertices blockSize)
+{
+	return RectangleVertices{ blockSize.minX - outlineMargin, blockSize.maxX + outlineMargin, blockSize.minY - outlineMargin, blockSize.maxY + outlineMargin };
 }
 
 bool UIShaderEditorBlock::InitializeInputNodes(int count)

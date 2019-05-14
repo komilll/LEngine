@@ -4,6 +4,7 @@
 
 #include "UIBase.h"
 #include "UIShaderEditorInput.h"
+#include "TextEngine.h"
 
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderPBRBlock : public UIBase
@@ -62,6 +63,7 @@ private:
 	bool m_dragged = { false };
 
 	UIBase::RectangleVertices m_blockVertices;
+	TextEngine* m_textEngine;
 
 	//INPUT - PBR
 	//0 - Base Color

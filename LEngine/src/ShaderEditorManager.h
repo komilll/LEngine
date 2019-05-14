@@ -10,25 +10,32 @@
 #include "d3dclass.h"
 #include "UILine.h"
 
-static const char* ChoosingWindowItems[] = { "ADD", "SUBSTRACT" };
+static const char* ChoosingWindowItems[];
 class ShaderEditorManager
 {
 public:
 	ShaderEditorManager(D3DClass* d3d, MouseClass* mouse);
 
 	void UpdateBlocks(bool mouseOnly = false);
-	void AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount);
-	void AddShaderBlock(UIShaderEditorBlock* & block);
+	void AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount);
+	void AddShaderBlock(UIShaderEditorBlock* block);
 	void GenerateCodeToFile();
 	
 	bool WillRenderChoosingWindow();
 	int* GetChoosingWindowHandler();
+	void CreateBlock(std::string name);
+	float GetWindowPositionX();
+	float GetWindowPositionY();
+	void PressedOutsideOfChoosingWindow();
+	void DeleteCurrentShaderBlock();
 
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);
 	bool UpdatePBRBlock(bool mouseOnly = false);
 	bool UpdatePinsOfAllBlocks();
 	void DrawLine(UIShaderEditorInput* in, UIShaderEditorOutput* out);
+	void ResetFocusOnAllBlocks();
+	void CreateChoosingWindowItemsArray();
 
 	//GENERATING SHADER CODE
 	std::string GenerateBlockCode(UIShaderEditorBlock* block);
@@ -50,6 +57,10 @@ private:
 
 	bool m_choosingWindow{ false };
 	int m_choosingWindowHandler{ 0 };
+	int m_choosingWindowPosX{ 0 };
+	int m_choosingWindowPosY{ 0 };
+	float m_choosingWindowPosXScreenspace{ 0 };
+	float m_choosingWindowPosYScreenspace{ 0 };
 };
 
 #endif

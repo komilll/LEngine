@@ -44,15 +44,21 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 	{
 		if (block->MouseOnArea(m_mouse) && m_mouse->GetLMBPressed())
 		{
+			ResetFocusOnAllBlocks();
 			block->StartDragging();
 			return;
 		}
 	}
 
 	//No interaction with blocks or pins - check if pressed to create new block
-	if (m_mouse->GetRMBPressed())
+	if (m_mouse->GetRMBPressed() && !WillRenderChoosingWindow())
 	{
+		m_mouse->SetRMBPressed(false);
 		ShowFunctionChoosingWindow();
+	}
+	else if (m_mouse->GetLMBPressed() && !WillRenderChoosingWindow())
+	{
+		ResetFocusOnAllBlocks();
 	}
 }
 
@@ -180,6 +186,27 @@ void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutpu
 	m_lines.push_back(line);
 }
 
+void ShaderEditorManager::ResetFocusOnAllBlocks()
+{
+	for (const auto& block : m_blocks)
+	{
+		block->m_focused = false;
+	}
+}
+
+void ShaderEditorManager::CreateChoosingWindowItemsArray()
+{
+	//ChoosingWindowItems = new char[GetFilenamesInDirectory("ShaderFunctions", false).size()];
+	std::string toReturn{};
+
+	char* test[] = {"TEST"};
+
+	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions", false))
+	{
+		
+	}
+}
+
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 {
 	if (block->m_inputNodes.size() == 0)
@@ -291,6 +318,10 @@ vector<std::string> ShaderEditorManager::GetFilenamesInDirectory(std::string dir
 
 void ShaderEditorManager::ShowFunctionChoosingWindow()
 {
+	m_choosingWindowPosX = m_mouse->CurrentMouseLocation().x;
+	m_choosingWindowPosY = m_mouse->CurrentMouseLocation().y;
+	m_mouse->GetMouseLocationScreenSpace(m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace);
+	
 	m_choosingWindow = true;
 }
 
@@ -399,13 +430,105 @@ int * ShaderEditorManager::GetChoosingWindowHandler()
 	return &m_choosingWindowHandler;
 }
 
-void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* && block, int inCount, int outCount)
+void ShaderEditorManager::CreateBlock(std::string name)
+{
+	m_choosingWindow = false;
+	std::string line{};
+	std::string returnType{};
+	vector<std::string> argumentTypes{""};
+	std::string functionName{};
+	bool filledReturnType = false;
+	bool filledFunctionName = false;
+	bool argumentWaitForComma = false;
+	int argumentIndex = 0;
+
+	for (char& c : name)
+		c = tolower(c);
+
+	if (ifstream in{ "ShaderFunctions/" + name + ".txt"})
+	{
+		getline(in, line);
+		for (const auto& c : line)
+		{
+			if (!filledReturnType)
+			{
+				if (c != ' ')
+					returnType += c;
+				else
+					filledReturnType = true;
+			}
+			else if (!filledFunctionName)
+			{
+				if (c != '(')
+					functionName += c;
+				else
+					filledFunctionName = true;
+			}
+			else
+			{
+				if (c == ' ')
+				{
+					if (argumentTypes.at(argumentIndex) != "")
+					{
+						argumentWaitForComma = true;
+					}
+					continue;
+				}
+				else if (argumentWaitForComma)
+				{
+					if (c == ',')
+					{
+						argumentWaitForComma = false;
+						argumentTypes.push_back({});
+						argumentIndex++;
+					}
+					continue;
+				}
+				argumentTypes.at(argumentIndex) += c;
+			}
+		}
+	}
+
+	AddShaderBlock(new UIShaderEditorBlock({ {m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes}), argumentTypes.size(), 1);
+}
+
+float ShaderEditorManager::GetWindowPositionX()
+{
+	return m_choosingWindowPosX;
+}
+
+float ShaderEditorManager::GetWindowPositionY()
+{
+	return m_choosingWindowPosY;
+}
+
+void ShaderEditorManager::PressedOutsideOfChoosingWindow()
+{
+	m_choosingWindow = false;
+}
+
+void ShaderEditorManager::DeleteCurrentShaderBlock()
+{
+	for (int i = m_blocks.size() - 1; i > -1; i--)
+	{
+		auto& block = m_blocks.at(i);
+		if (block->m_focused)
+		{
+			//TODO Potentially memory leak
+			delete block;
+			block = nullptr;
+			m_blocks.erase(m_blocks.begin() + i);
+		}
+	}
+}
+
+void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount)
 {
 	block->Initialize(m_D3D, inCount, outCount);
 	m_blocks.push_back(block);
 }
 
-void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock *& block)
+void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock * block)
 {
 	m_blocks.push_back(block);
 }

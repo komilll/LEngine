@@ -35,6 +35,7 @@ private:
 public:
 	UIShaderEditorBlock();
 	UIShaderEditorBlock(XMFLOAT2 startPosition);
+	UIShaderEditorBlock(XMFLOAT2 startPosition, std::string functionName, std::string returnType, vector<std::string> argumentTypes);
 
 	bool MouseOnArea(MouseClass* mouse) override;
 
@@ -59,6 +60,7 @@ public:
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
+	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize);
 	bool InitializeInputNodes(int inCount);
 	bool InitializeOutputNodes(int outCount);
 
@@ -66,6 +68,7 @@ public:
 	std::string m_variableName{"test"};
 	vector<UIShaderEditorInput*> m_inputNodes = {};
 	vector<UIShaderEditorOutput*> m_outputNodes = {};
+	bool m_focused = { false };
 
 private:
 	D3DClass* m_D3D{ nullptr };
@@ -85,11 +88,16 @@ private:
 	std::string m_functionName{ "add" };
 	std::string m_blockName{ "add" };
 
+	UIBase* m_outlineObject{ nullptr };
+
 private:
 	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f } };
 	const Margin inOutMargin = Margin{ 0.02f, 0.11f };
 	const Size inOutSize = Size{ 0.03f, 0.04f };
 	const float paddingBetweenBlocks = 0.08f;
 	const XMFLOAT4 blockColor{0.2f, 0.2f, 0.2f, 0.8f};
+	//Outline
+	const XMFLOAT4 outlineColor{0.7f, 0.7f, 0.7f, 0.95f};
+	const float outlineMargin = 0.001f;
 };
 #endif // !_UIBASE_H_

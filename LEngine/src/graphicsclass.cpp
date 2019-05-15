@@ -1191,9 +1191,17 @@ bool GraphicsClass::RenderGUI()
 					| ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
 			
 			ImGui::SetWindowPos({ m_shaderEditorManager->GetWindowPositionX(), m_shaderEditorManager->GetWindowPositionY() });
-			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), ChoosingWindowItems, 2))
+			if (ImGui::InputText("SEARCH", m_shaderEditorManager->m_choosingWindowSearch.data(), m_shaderEditorManager->k_choosingWindowSearchSize))
 			{
-				m_shaderEditorManager->CreateBlock(ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
+				if (m_shaderEditorManager->m_choosingWindowSearch.size() == m_shaderEditorManager->k_choosingWindowSearchSize)
+				{
+					m_shaderEditorManager->m_choosingWindowSearch.pop_back();
+				}
+			}
+
+			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), m_shaderEditorManager->ChoosingWindowItems.data(), 2))
+			{
+				m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 			}
 
 			ImGui::End();

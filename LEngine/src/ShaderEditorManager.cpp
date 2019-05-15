@@ -7,6 +7,8 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	m_pbrBlock = new UIShaderPBRBlock();
 	m_pbrBlock->Initialize(d3d);
 	LoadFunctionsFromDirectory();
+	CreateChoosingWindowItemsArray();
+
 }
 
 void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
@@ -196,15 +198,19 @@ void ShaderEditorManager::ResetFocusOnAllBlocks()
 
 void ShaderEditorManager::CreateChoosingWindowItemsArray()
 {
-	//ChoosingWindowItems = new char[GetFilenamesInDirectory("ShaderFunctions", false).size()];
-	std::string toReturn{};
-
-	char* test[] = {"TEST"};
-
 	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions", false))
 	{
-		
+		std::string tmp{};
+		for (const auto& c : file)
+		{
+			if (c == '.')
+				break;
+			tmp += ::toupper(c);
+		}
+		ChoosingWindowItems.push_back(new char());
+		strcpy(const_cast<char*>(ChoosingWindowItems.at(ChoosingWindowItems.size() - 1)), tmp.c_str());
 	}
+	std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
 }
 
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
@@ -515,6 +521,39 @@ void ShaderEditorManager::DeleteCurrentShaderBlock()
 		if (block->m_focused)
 		{
 			//TODO Potentially memory leak
+			for (const auto& line : m_lines)
+			{
+				for (const auto& pin : block->m_inputNodes)
+				{
+					if (line->GetInput() == pin)
+					{
+						line->GetOutput()->m_toDeleteLine = true;
+					}
+				}
+			}
+
+			for (auto& pin : block->m_outputNodes)
+			{
+				for (const auto& otherBlock : m_blocks)
+				{
+					for (const auto& otherPin : otherBlock->m_inputNodes)
+					{
+						if (pin == otherPin->m_connectedOutputNode)
+						{
+							otherPin->m_connectedOutputNode = nullptr;
+						}
+					}
+				}
+				delete pin;
+				pin = nullptr;
+			}
+			for (auto& pin : block->m_inputNodes)
+			{
+				pin->m_connectedOutputNode = nullptr;
+				delete pin;
+				pin = nullptr;
+			}
+
 			delete block;
 			block = nullptr;
 			m_blocks.erase(m_blocks.begin() + i);
@@ -568,7 +607,7 @@ bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 			continue;
 		}
 		//Line is empty for some reason - remove from collection
-		else if (m_lines.at(i) == nullptr)
+		else if (!m_lines.at(i))
 		{
 			m_lines.erase(m_lines.begin() + i);
 			continue;

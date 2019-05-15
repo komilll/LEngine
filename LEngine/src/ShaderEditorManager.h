@@ -10,7 +10,6 @@
 #include "d3dclass.h"
 #include "UILine.h"
 
-static const char* ChoosingWindowItems[];
 class ShaderEditorManager
 {
 public:
@@ -45,6 +44,11 @@ private:
 
 	void ShowFunctionChoosingWindow();
 	void LoadFunctionsFromDirectory();
+
+public:
+	std::vector<const char*> ChoosingWindowItems{};
+	std::vector<char> m_choosingWindowSearch{ ' ' };
+	const int k_choosingWindowSearchSize{ 10 };
 
 private:
 	D3DClass* m_D3D;

@@ -1191,15 +1191,17 @@ bool GraphicsClass::RenderGUI()
 					| ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
 			
 			ImGui::SetWindowPos({ m_shaderEditorManager->GetWindowPositionX(), m_shaderEditorManager->GetWindowPositionY() });
-			if (ImGui::InputText("SEARCH", m_shaderEditorManager->m_choosingWindowSearch.data(), m_shaderEditorManager->k_choosingWindowSearchSize))
+			if (ImGui::InputText("SEARCH", const_cast<char*>(m_shaderEditorManager->m_choosingWindowSearch.data()), m_shaderEditorManager->k_choosingWindowSearchSize))
 			{
-				if (m_shaderEditorManager->m_choosingWindowSearch.size() == m_shaderEditorManager->k_choosingWindowSearchSize)
-				{
-					m_shaderEditorManager->m_choosingWindowSearch.pop_back();
-				}
+				//m_shaderEditorManager->UpdateChoosingWindowChar();
+				//if (m_shaderEditorManager->m_choosingWindowSearch.size() == m_shaderEditorManager->k_choosingWindowSearchSize)
+				//{
+				//	m_shaderEditorManager->m_choosingWindowSearch.pop_back();
+				//}
 			}
+			m_shaderEditorManager->SearchThroughChoosingWindow();
 
-			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), m_shaderEditorManager->ChoosingWindowItems.data(), 2))
+			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), m_shaderEditorManager->ChoosingWindowItems.data(), m_shaderEditorManager->ChoosingWindowItems.size()))
 			{
 				m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 			}

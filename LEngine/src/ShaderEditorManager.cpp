@@ -8,7 +8,6 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	m_pbrBlock->Initialize(d3d);
 	LoadFunctionsFromDirectory();
 	CreateChoosingWindowItemsArray();
-
 }
 
 void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
@@ -211,6 +210,7 @@ void ShaderEditorManager::CreateChoosingWindowItemsArray()
 		strcpy(const_cast<char*>(ChoosingWindowItems.at(ChoosingWindowItems.size() - 1)), tmp.c_str());
 	}
 	std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
+	ChoosingWindowItemsOriginal._Construct(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
 }
 
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
@@ -511,6 +511,27 @@ float ShaderEditorManager::GetWindowPositionY()
 void ShaderEditorManager::PressedOutsideOfChoosingWindow()
 {
 	m_choosingWindow = false;
+}
+
+void ShaderEditorManager::SearchThroughChoosingWindow()
+{
+	ChoosingWindowItems._Construct(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
+
+	for (int i = ChoosingWindowItems.size() - 1; i >= 0; i--)
+	{
+		std::string str{ ChoosingWindowItems.at(i) };
+		std::string mainStr{};
+
+		for (int i = 0; i < strlen(m_choosingWindowSearch.data()); ++i)
+			mainStr += ::toupper(m_choosingWindowSearch[i]);
+
+		std::size_t found = str.find(mainStr);
+
+		if (found == std::string::npos)
+		{
+			ChoosingWindowItems.erase(ChoosingWindowItems.begin() + i);
+		}
+	}
 }
 
 void ShaderEditorManager::DeleteCurrentShaderBlock()

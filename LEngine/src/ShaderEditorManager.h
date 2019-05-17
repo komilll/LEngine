@@ -25,7 +25,10 @@ public:
 	void CreateBlock(std::string name);
 	float GetWindowPositionX();
 	float GetWindowPositionY();
+	
 	void PressedOutsideOfChoosingWindow();
+	void SearchThroughChoosingWindow();
+
 	void DeleteCurrentShaderBlock();
 
 private:
@@ -47,7 +50,7 @@ private:
 
 public:
 	std::vector<const char*> ChoosingWindowItems{};
-	std::vector<char> m_choosingWindowSearch{ ' ' };
+	std::string m_choosingWindowSearch{};
 	const int k_choosingWindowSearchSize{ 10 };
 
 private:
@@ -55,6 +58,7 @@ private:
 	MouseClass* m_mouse;
 	vector<UIShaderEditorBlock*> m_blocks = {};
 	UIShaderEditorBlock* m_originalGeneratorBlock{};
+	std::vector<const char*> ChoosingWindowItemsOriginal{};
 
 	std::vector<UILine*> m_lines = {};
 	UIShaderPBRBlock* m_pbrBlock;

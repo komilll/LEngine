@@ -344,15 +344,6 @@ void SystemClass::HandleInput()
 	if (m_Input->IsKeyDown(VK_Q))
 		m_Graphics->MoveCameraDown(movementPerTick);
 
-	if (m_Input->IsKeyDown(VK_RIGHT))
-		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, rotatePerTick, 0 });
-	if (m_Input->IsKeyDown(VK_LEFT))
-		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -rotatePerTick, 0 });
-	if (m_Input->IsKeyDown(VK_UP))
-		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ -rotatePerTick, 0, 0 });
-	if (m_Input->IsKeyDown(VK_DOWN))
-		cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ rotatePerTick, 0, 0 });
-
 	m_Graphics->RotateCamera(cameraRotation);
 
 	//Handle deleting blocks in Shader Editor
@@ -360,6 +351,40 @@ void SystemClass::HandleInput()
 	{
 		m_Input->KeyUp(VK_DELETE);
 		m_Graphics->DeleteCurrentShaderBlock();
+	}
+
+	if (m_Graphics->RENDER_MATERIAL_EDITOR)
+	{
+		if (m_Graphics->IsChoosingShaderWindowActive())
+		{
+			if (m_Input->IsKeyDown(VK_UP))
+				m_Graphics->ChangeChoosingWindowShaderFocus(GraphicsClass::ShaderWindowDirection::Up);
+			else if (m_Input->IsKeyDown(VK_DOWN))
+				m_Graphics->ChangeChoosingWindowShaderFocus(GraphicsClass::ShaderWindowDirection::Down);
+			else if (m_Input->IsAlphanumericKeyDown())
+			{
+				m_Graphics->FocusOnChoosingWindowsShader();
+			}
+
+			m_Input->KeyUp(VK_UP);
+			m_Input->KeyUp(VK_DOWN);
+
+			if (m_Input->IsKeyDown(VK_RETURN))
+			{
+				m_Graphics->AcceptCurrentChoosingWindowShader();
+			}
+		}
+	}
+	else
+	{
+		if (m_Input->IsKeyDown(VK_RIGHT))
+			cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, rotatePerTick, 0 });
+		if (m_Input->IsKeyDown(VK_LEFT))
+			cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -rotatePerTick, 0 });
+		if (m_Input->IsKeyDown(VK_UP))
+			cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ -rotatePerTick, 0, 0 });
+		if (m_Input->IsKeyDown(VK_DOWN))
+			cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ rotatePerTick, 0, 0 });
 	}
 }
 

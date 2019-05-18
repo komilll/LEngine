@@ -209,8 +209,10 @@ void ShaderEditorManager::CreateChoosingWindowItemsArray()
 		ChoosingWindowItems.push_back(new char());
 		strcpy(const_cast<char*>(ChoosingWindowItems.at(ChoosingWindowItems.size() - 1)), tmp.c_str());
 	}
-	std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
 	ChoosingWindowItemsOriginal._Construct(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
+
+	std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
+	std::sort(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
 }
 
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
@@ -451,7 +453,13 @@ void ShaderEditorManager::CreateBlock(std::string name)
 	for (char& c : name)
 		c = tolower(c);
 
-	if (ifstream in{ "ShaderFunctions/" + name + ".txt"})
+	m_choosingWindowSearch = "";
+
+	if (name == "float")
+	{
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "", "float", argumentTypes }), 0, 1);
+	}
+	else if (ifstream in{ "ShaderFunctions/" + name + ".txt"})
 	{
 		getline(in, line);
 		for (const auto& c : line)
@@ -493,9 +501,8 @@ void ShaderEditorManager::CreateBlock(std::string name)
 				argumentTypes.at(argumentIndex) += c;
 			}
 		}
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes }), argumentTypes.size(), 1);
 	}
-
-	AddShaderBlock(new UIShaderEditorBlock({ {m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes}), argumentTypes.size(), 1);
 }
 
 float ShaderEditorManager::GetWindowPositionX()
@@ -522,8 +529,8 @@ void ShaderEditorManager::SearchThroughChoosingWindow()
 		std::string str{ ChoosingWindowItems.at(i) };
 		std::string mainStr{};
 
-		for (int i = 0; i < strlen(m_choosingWindowSearch.data()); ++i)
-			mainStr += ::toupper(m_choosingWindowSearch[i]);
+		for (int i = 0; i < std::strlen(m_choosingWindowSearch.data()); ++i)
+			mainStr += ::toupper(m_choosingWindowSearch.data()[i]);
 
 		std::size_t found = str.find(mainStr);
 
@@ -532,6 +539,9 @@ void ShaderEditorManager::SearchThroughChoosingWindow()
 			ChoosingWindowItems.erase(ChoosingWindowItems.begin() + i);
 		}
 	}
+
+	std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end(),
+		[](const std::string& a, const std::string& b) {return a < b; });
 }
 
 void ShaderEditorManager::DeleteCurrentShaderBlock()

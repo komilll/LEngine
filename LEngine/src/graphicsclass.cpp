@@ -841,6 +841,41 @@ void GraphicsClass::DeleteCurrentShaderBlock()
 	m_shaderEditorManager->DeleteCurrentShaderBlock();
 }
 
+bool GraphicsClass::IsChoosingShaderWindowActive()
+{
+	return m_shaderEditorManager->WillRenderChoosingWindow();
+}
+
+void GraphicsClass::ChangeChoosingWindowShaderFocus(ShaderWindowDirection direction)
+{
+	if (direction == GraphicsClass::ShaderWindowDirection::Down)
+	{
+		(*m_shaderEditorManager->GetChoosingWindowHandler())++;
+		if (*m_shaderEditorManager->GetChoosingWindowHandler() >= m_shaderEditorManager->ChoosingWindowItems.size())
+		{
+			(*m_shaderEditorManager->GetChoosingWindowHandler()) = 0;
+		}
+	}
+	else if (direction == GraphicsClass::ShaderWindowDirection::Up)
+	{
+		(*m_shaderEditorManager->GetChoosingWindowHandler())--;
+		if (*m_shaderEditorManager->GetChoosingWindowHandler() < 0)
+		{
+			(*m_shaderEditorManager->GetChoosingWindowHandler()) = m_shaderEditorManager->ChoosingWindowItems.size() - 1;
+		}
+	}
+}
+
+void GraphicsClass::FocusOnChoosingWindowsShader()
+{
+	m_focusOnChoosingWindowsShader = true;
+}
+
+void GraphicsClass::AcceptCurrentChoosingWindowShader()
+{
+	m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
+}
+
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -1186,18 +1221,24 @@ bool GraphicsClass::RenderGUI()
 		}
 		//Adding new blocks
 		if (m_shaderEditorManager->WillRenderChoosingWindow())
-		{
+		{			
 			ImGui::Begin("Add block", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize | ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings
 					| ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
 			
 			ImGui::SetWindowPos({ m_shaderEditorManager->GetWindowPositionX(), m_shaderEditorManager->GetWindowPositionY() });
 			if (ImGui::InputText("SEARCH", const_cast<char*>(m_shaderEditorManager->m_choosingWindowSearch.data()), m_shaderEditorManager->k_choosingWindowSearchSize))
 			{
-				//m_shaderEditorManager->UpdateChoosingWindowChar();
-				//if (m_shaderEditorManager->m_choosingWindowSearch.size() == m_shaderEditorManager->k_choosingWindowSearchSize)
-				//{
-				//	m_shaderEditorManager->m_choosingWindowSearch.pop_back();
-				//}
+			}
+
+			if (*m_shaderEditorManager->GetChoosingWindowHandler() >= m_shaderEditorManager->ChoosingWindowItems.size())
+			{
+				*m_shaderEditorManager->GetChoosingWindowHandler() = 0;
+			}
+
+			if (m_focusOnChoosingWindowsShader)
+			{
+				m_focusOnChoosingWindowsShader = false;
+				ImGui::SetKeyboardFocusHere(0);
 			}
 			m_shaderEditorManager->SearchThroughChoosingWindow();
 
@@ -1205,16 +1246,17 @@ bool GraphicsClass::RenderGUI()
 			{
 				m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 			}
+			if (!ImGui::IsWindowFocused() && !ImGui::IsWindowHovered() && !m_mouse->GetMouse()->GetLMBPressed())
+			{
+				if (m_hideShaderWindowOnNextTry)
+				{
+					m_hideShaderWindowOnNextTry = false;
+					m_shaderEditorManager->CreateBlock("");
+				}
+				m_hideShaderWindowOnNextTry = true;
+			}
 
 			ImGui::End();
-
-			if (m_shaderEditorManager->WillRenderChoosingWindow())
-			{
-				if (m_mouse->GetMouse()->GetLMBPressed() || m_mouse->GetMouse()->GetRMBPressed())
-				{
-					//m_shaderEditorManager->PressedOutsideOfChoosingWindow();
-				}
-			}
 		}
 
 		goto Finished_drawing;

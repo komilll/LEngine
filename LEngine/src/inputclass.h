@@ -21,6 +21,9 @@ public:
 	void KeyUp(unsigned int);
 
 	bool IsKeyDown(unsigned int);
+	bool IsLetterKeyDown();
+	bool IsNumberKeyDown();
+	bool IsAlphanumericKeyDown();
 
 private:
 	bool m_keys[256];

@@ -55,3 +55,28 @@ bool InputClass::IsKeyDown(unsigned int key)
 	// Return what state the key is in (pressed/not pressed).
 	return m_keys[key];
 }
+
+bool InputClass::IsLetterKeyDown()
+{
+	for (unsigned int i = 65; i <= 90; ++i)
+	{
+		if (IsKeyDown(i))
+			return true;
+	}
+	return false;
+}
+
+bool InputClass::IsNumberKeyDown()
+{
+	for (unsigned int i = 48; i <= 57; ++i)
+	{
+		if (IsKeyDown(i))
+			return true;
+	}
+	return false;
+}
+
+bool InputClass::IsAlphanumericKeyDown()
+{
+	return IsLetterKeyDown() || IsNumberKeyDown();
+}

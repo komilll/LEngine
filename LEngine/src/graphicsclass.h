@@ -72,6 +72,12 @@ class GraphicsClass
 {
 public:
 	bool RENDER_MATERIAL_EDITOR = true;
+
+	enum class ShaderWindowDirection : int
+	{
+		Up = 0,
+		Down = 1
+	};
 private:
 	enum class GrainType : int
 	{
@@ -133,6 +139,10 @@ public:
 	void ChangeRenderWindow();
 
 	void DeleteCurrentShaderBlock();
+	bool IsChoosingShaderWindowActive();
+	void ChangeChoosingWindowShaderFocus(ShaderWindowDirection direction);
+	void FocusOnChoosingWindowsShader();
+	void AcceptCurrentChoosingWindowShader();
 
 private:
 	bool Render();
@@ -294,6 +304,8 @@ private:
 
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
+	bool m_focusOnChoosingWindowsShader{ false };
+	bool m_hideShaderWindowOnNextTry{ false };
 
 	//POST-PROCESS STACK
 	PostProcessShader* m_postProcessShader;

@@ -39,18 +39,21 @@ void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWid
 {
 	DirectX::XMVECTOR fontPos;
 
-	m_spriteBatch->Begin();
-	//Fetch data from list and render each text
-	for (int i = 0; i < m_data.size(); i++)
+	if (m_spriteBatch)
 	{
-		fontPos.m128_f32[0] = m_data.at(i).posX;
-		fontPos.m128_f32[1] = m_data.at(i).posY;
+		m_spriteBatch->Begin();
+		//Fetch data from list and render each text
+		for (int i = 0; i < m_data.size(); i++)
+		{
+			fontPos.m128_f32[0] = m_data.at(i).posX;
+			fontPos.m128_f32[1] = m_data.at(i).posY;
 
-		std::wstring wstr = std::wstring(m_data.at(i).text.begin(), m_data.at(i).text.end());
+			std::wstring wstr = std::wstring(m_data.at(i).text.begin(), m_data.at(i).text.end());
 
-		m_font->DrawString(m_spriteBatch.get(), wstr.c_str(), fontPos, m_data.at(i).color, 0.0f, m_data.at(i).origin, m_data.at(i).scale);
+			m_font->DrawString(m_spriteBatch.get(), wstr.c_str(), fontPos, m_data.at(i).color, 0.0f, m_data.at(i).origin, m_data.at(i).scale);
+		}
+		m_spriteBatch->End();
 	}
-	m_spriteBatch->End();
 }
 
 TextEngine::FontData * TextEngine::GetData(int index)

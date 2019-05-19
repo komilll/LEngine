@@ -75,7 +75,7 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 	}
 	//Create text on block
 	m_textEngine = new TextEngine;
-	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
+	m_textEngine->Initialize(d3d->GetDevice(), L"Fonts/font.spritefont");
 	m_blockName = m_functionName;
 	for (char& c : m_blockName)
 		c = toupper(c);
@@ -89,7 +89,7 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 		return false;
 	m_outlineObject->ChangeColor(outlineColor);
 
-	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
+	return (m_blockInitialized = InitializeModelGeneric(d3d->GetDevice(), m_blockVertices));
 }
 
 void UIShaderEditorBlock::Move(float x, float y)
@@ -177,6 +177,9 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 
 bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 {
+	if (!m_blockInitialized)
+		return true;
+
 	XMMATRIX tmpMatrix;
 	tmpMatrix *= 0;
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
@@ -199,7 +202,18 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 
 		if (m_textEngine)
 		{
-			m_textEngine->GetData(0)->SetPosition(m_translationX, m_translationY, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+			if (m_functionName == "float")
+			{
+				m_textEngine->GetData(0)->SetPosition(m_translationX - 0.1f, m_translationY, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				ostringstream oss;
+				oss << m_outputNodes[0]->m_value;
+				m_textEngine->GetData(0)->text = "FLOAT:" + oss.str();
+				m_textEngine->GetData(0)->scale = 0.75f;
+			}
+			else
+			{
+				m_textEngine->GetData(0)->SetPosition(m_translationX, m_translationY, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+			}
 			m_textEngine->RenderText(deviceContext, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 		}
 
@@ -252,7 +266,7 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 				func += ", ";
 			}
 		}
-		func += ");";
+		func += ");\n";
 	}
 
 	return func;
@@ -299,6 +313,7 @@ bool UIShaderEditorBlock::InitializeInputNodes(int count)
 	for (int i = 0; i < count; ++i)
 	{
 		UIShaderEditorInput* inputNode = new UIShaderEditorInput;
+		inputNode->m_returnType = m_argumentTypes.at(i);
 		if (!inputNode->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE,
 			m_blockVertices.minX + inOutMargin.x, m_blockVertices.minX + inOutMargin.x + inOutSize.x,
 			m_blockVertices.maxY - inOutMargin.y, m_blockVertices.maxY - inOutMargin.y - inOutSize.y))
@@ -319,6 +334,7 @@ bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 	for (int i = 0; i < count; ++i)
 	{
 		UIShaderEditorOutput* outputNode = new UIShaderEditorOutput;
+		outputNode->m_returnType = m_returnType;
 		if (!outputNode->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE,
 			m_blockVertices.maxX - inOutMargin.x - inOutSize.x, m_blockVertices.maxX - inOutMargin.x,
 			m_blockVertices.maxY - inOutMargin.y, m_blockVertices.maxY - inOutMargin.y - inOutSize.y))

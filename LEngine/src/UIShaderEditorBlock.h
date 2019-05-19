@@ -11,6 +11,7 @@
 #include <string>
 #include <algorithm>
 #include <cctype>
+#include <sstream>
 
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderEditorBlock : public UIBase
@@ -72,6 +73,7 @@ public:
 
 private:
 	D3DClass* m_D3D{ nullptr };
+	bool m_blockInitialized{ false };
 
 	bool m_moveAfterInitializing{ false };
 	XMFLOAT2 m_movemementAfterInitialization{ 0,0 };

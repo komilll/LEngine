@@ -41,14 +41,28 @@ bool UIShaderEditorOutput::MouseOnArea(MouseClass * mouse)
 
 bool UIShaderEditorOutput::Initialize(D3DClass * d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom)
 {
-	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+	if (m_returnType == "float" || m_returnType == "")
+	{
+		if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+			return false;
+	}
+	else if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), PIN_SHADER_VS, PIN_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+	{
 		return false;
+	}
 
 	m_D3D = d3d;
 	min_X = left;
 	max_X = right;
 	min_Y = bottom;
 	max_Y = top;
+
+	if (m_returnType == "float2")
+		LoadTexture(d3d->GetDevice(), L"float2.png", m_pinTexture, m_pinTextureView, false);
+	else if (m_returnType == "float3")
+		LoadTexture(d3d->GetDevice(), L"float3.png", m_pinTexture, m_pinTextureView, false);
+	else if (m_returnType == "float4")
+		LoadTexture(d3d->GetDevice(), L"float4.png", m_pinTexture, m_pinTextureView, false);
 
 	return InitializeModelGeneric(d3d->GetDevice(), shape, left, right, top, bottom);
 }
@@ -57,6 +71,13 @@ bool UIShaderEditorOutput::Initialize(D3DClass * d3d, float centerX, float cente
 {
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
+
+	if (m_returnType == "float2")
+		LoadTexture(d3d->GetDevice(), L"float2.png", m_pinTexture, m_pinTextureView, false);
+	else if (m_returnType == "float3")
+		LoadTexture(d3d->GetDevice(), L"float3.png", m_pinTexture, m_pinTextureView, false);
+	else if (m_returnType == "float4")
+		LoadTexture(d3d->GetDevice(), L"float4.png", m_pinTexture, m_pinTextureView, false);
 
 	return InitializeSquare(d3d->GetDevice(), centerX, centerY, size);
 }
@@ -86,6 +107,17 @@ bool UIShaderEditorOutput::Render(ID3D11DeviceContext * deviceContext)
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
 	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
+}
+
+bool UIShaderEditorOutput::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
+{
+	if (UIBase::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+		return false;
+
+	if (m_returnType != "float" && m_returnType != "")
+		deviceContext->PSSetShaderResources(0, 1, &m_pinTextureView);
+
+	return true;
 }
 
 void UIShaderEditorOutput::StartDragging()

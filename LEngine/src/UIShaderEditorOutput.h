@@ -22,6 +22,7 @@ public:
 	void GetPosition(float & x, float & y);
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
+	virtual bool SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) override;
 
 	void StartDragging();
 	void StopDragging();
@@ -30,7 +31,10 @@ public:
 public:
 	float m_value{ 0.0f };
 	std::string m_variableName{};
+	std::string m_returnType{};
 	bool m_toDeleteLine{ false };
+	ID3D11Resource* m_pinTexture;
+	ID3D11ShaderResourceView* m_pinTextureView;
 
 private:
 	bool m_dragged{ false };

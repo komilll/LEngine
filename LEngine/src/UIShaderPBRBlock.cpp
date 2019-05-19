@@ -124,6 +124,7 @@ bool UIShaderPBRBlock::InitializeInputNodes()
 	for (int i = 0; i < m_inputNodesCount; ++i)
 	{
 		UIShaderEditorInput* inputNode = new UIShaderEditorInput;
+		inputNode->m_returnType = "float";
 		if (!inputNode->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE,
 			m_blockVertices.minX + inOutMargin.x, m_blockVertices.minX + inOutMargin.x + inOutSize.x,
 			m_blockVertices.maxY - inOutMargin.y, m_blockVertices.maxY - inOutMargin.y - inOutSize.y))

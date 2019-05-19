@@ -10,6 +10,9 @@
 constexpr WCHAR* UI_SHADER_VS = L"uibase.vs";
 constexpr WCHAR* UI_SHADER_PS = L"uibase.ps";
 
+constexpr WCHAR* PIN_SHADER_VS = L"shaderPin.vs";
+constexpr WCHAR* PIN_SHADER_PS = L"shaderPin.ps";
+
 ///<summary>Class used for rendering objects on screenspace</summary>
 class UIBase : public BaseShaderClass
 {

@@ -8,6 +8,8 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	m_pbrBlock->Initialize(d3d);
 	LoadFunctionsFromDirectory();
 	CreateChoosingWindowItemsArray();
+
+	m_blocks.reserve(64);
 }
 
 void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
@@ -45,8 +47,12 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 	{
 		if (block->MouseOnArea(m_mouse) && m_mouse->GetLMBPressed())
 		{
-			ResetFocusOnAllBlocks();
-			block->StartDragging();
+			if (!m_mouseHoveredImGui)
+			{
+				ResetFocusOnAllBlocks();
+				block->StartDragging();
+				m_focusedBlock = block;
+			}
 			return;
 		}
 	}
@@ -59,7 +65,8 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 	}
 	else if (m_mouse->GetLMBPressed() && !WillRenderChoosingWindow())
 	{
-		ResetFocusOnAllBlocks();
+		if (!m_mouseHoveredImGui)
+			ResetFocusOnAllBlocks();
 	}
 }
 
@@ -193,6 +200,7 @@ void ShaderEditorManager::ResetFocusOnAllBlocks()
 	{
 		block->m_focused = false;
 	}
+	m_focusedBlock = nullptr;
 }
 
 void ShaderEditorManager::CreateChoosingWindowItemsArray()
@@ -331,6 +339,7 @@ void ShaderEditorManager::ShowFunctionChoosingWindow()
 	m_mouse->GetMouseLocationScreenSpace(m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace);
 	
 	m_choosingWindow = true;
+	*m_focusOnChoosingWindowsShader = false;
 }
 
 void ShaderEditorManager::LoadFunctionsFromDirectory()
@@ -364,6 +373,7 @@ void ShaderEditorManager::GenerateCodeToFile()
 			std::string variableName{ "out_" };
 			variableName += (char)(i + '0');
 			block->m_variableName = variableName;
+			block->m_outputNodes[0]->m_variableName = variableName;
 		}
 	}
 	for (int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
@@ -457,7 +467,7 @@ void ShaderEditorManager::CreateBlock(std::string name)
 
 	if (name == "float")
 	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "", "float", argumentTypes }), 0, 1);
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float", "float", argumentTypes }), 0, 1);
 	}
 	else if (ifstream in{ "ShaderFunctions/" + name + ".txt"})
 	{
@@ -569,33 +579,52 @@ void ShaderEditorManager::DeleteCurrentShaderBlock()
 				{
 					for (const auto& otherPin : otherBlock->m_inputNodes)
 					{
-						if (pin == otherPin->m_connectedOutputNode)
+						if (pin && otherPin && pin == otherPin->m_connectedOutputNode)
 						{
 							otherPin->m_connectedOutputNode = nullptr;
 						}
 					}
 				}
-				delete pin;
-				pin = nullptr;
+				if (pin)
+				{
+					delete pin;
+					pin = nullptr;
+				}
 			}
 			for (auto& pin : block->m_inputNodes)
 			{
-				pin->m_connectedOutputNode = nullptr;
-				delete pin;
-				pin = nullptr;
+				if (pin)
+				{
+					pin->m_connectedOutputNode = nullptr;
+					delete pin;
+					pin = nullptr;
+				}
 			}
-
-			delete block;
-			block = nullptr;
-			m_blocks.erase(m_blocks.begin() + i);
+			if (block)
+			{
+				delete block;
+				block = nullptr;
+				m_blocks.erase(m_blocks.begin() + i);
+			}
 		}
 	}
+	//m_focusedBlock = nullptr;
+}
+
+void ShaderEditorManager::UpdateMouseHoveredOnImGui(bool hovered)
+{
+	m_mouseHoveredImGui = hovered;
+}
+
+void ShaderEditorManager::SetRefToClickedOutside(bool* clickedOutside)
+{
+	m_focusOnChoosingWindowsShader = clickedOutside;
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount)
 {
-	block->Initialize(m_D3D, inCount, outCount);
-	m_blocks.push_back(block);
+	if (block->Initialize(m_D3D, inCount, outCount))
+		m_blocks.push_back(block);
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock * block)

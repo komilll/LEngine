@@ -838,30 +838,37 @@ void GraphicsClass::ChangeRenderWindow()
 
 void GraphicsClass::DeleteCurrentShaderBlock()
 {
-	m_shaderEditorManager->DeleteCurrentShaderBlock();
+	if (m_shaderEditorManager)
+		m_shaderEditorManager->DeleteCurrentShaderBlock();
 }
 
 bool GraphicsClass::IsChoosingShaderWindowActive()
 {
-	return m_shaderEditorManager->WillRenderChoosingWindow();
+	if (m_shaderEditorManager)
+		return m_shaderEditorManager->WillRenderChoosingWindow();
+	else
+		return false;
 }
 
 void GraphicsClass::ChangeChoosingWindowShaderFocus(ShaderWindowDirection direction)
 {
-	if (direction == GraphicsClass::ShaderWindowDirection::Down)
+	if (m_shaderEditorManager)
 	{
-		(*m_shaderEditorManager->GetChoosingWindowHandler())++;
-		if (*m_shaderEditorManager->GetChoosingWindowHandler() >= m_shaderEditorManager->ChoosingWindowItems.size())
+		if (direction == GraphicsClass::ShaderWindowDirection::Down)
 		{
-			(*m_shaderEditorManager->GetChoosingWindowHandler()) = 0;
+			(*m_shaderEditorManager->GetChoosingWindowHandler())++;
+			if (*m_shaderEditorManager->GetChoosingWindowHandler() >= m_shaderEditorManager->ChoosingWindowItems.size())
+			{
+				(*m_shaderEditorManager->GetChoosingWindowHandler()) = 0;
+			}
 		}
-	}
-	else if (direction == GraphicsClass::ShaderWindowDirection::Up)
-	{
-		(*m_shaderEditorManager->GetChoosingWindowHandler())--;
-		if (*m_shaderEditorManager->GetChoosingWindowHandler() < 0)
+		else if (direction == GraphicsClass::ShaderWindowDirection::Up)
 		{
-			(*m_shaderEditorManager->GetChoosingWindowHandler()) = m_shaderEditorManager->ChoosingWindowItems.size() - 1;
+			(*m_shaderEditorManager->GetChoosingWindowHandler())--;
+			if (*m_shaderEditorManager->GetChoosingWindowHandler() < 0)
+			{
+				(*m_shaderEditorManager->GetChoosingWindowHandler()) = m_shaderEditorManager->ChoosingWindowItems.size() - 1;
+			}
 		}
 	}
 }
@@ -873,7 +880,8 @@ void GraphicsClass::FocusOnChoosingWindowsShader()
 
 void GraphicsClass::AcceptCurrentChoosingWindowShader()
 {
-	m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
+	if (m_shaderEditorManager)
+		m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 }
 
 bool GraphicsClass::Render()
@@ -1208,7 +1216,7 @@ bool GraphicsClass::RenderGUI()
 	ImGui::NewFrame();
 	PassMouseInfo(m_mouse->GetMouse()->GetLMBPressed(), m_mouse->GetMouse()->GetRMBPressed());
 
-	if (RENDER_MATERIAL_EDITOR)
+	if (RENDER_MATERIAL_EDITOR && m_shaderEditorManager)
 	{
 		//Base window of editor - flow control/variables
 		{
@@ -1217,6 +1225,13 @@ bool GraphicsClass::RenderGUI()
 			{
 				m_shaderEditorManager->GenerateCodeToFile();
 			}
+			//Show scalar options
+			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0)
+			{
+				if (m_shaderEditorManager->m_focusedBlock->m_outputNodes.size() > 0 && &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0])
+					ImGui::InputFloat("Value", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_value);
+			}
+			m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
 			ImGui::End();
 		}
 		//Adding new blocks
@@ -1244,16 +1259,18 @@ bool GraphicsClass::RenderGUI()
 
 			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), m_shaderEditorManager->ChoosingWindowItems.data(), m_shaderEditorManager->ChoosingWindowItems.size()))
 			{
+				m_hideShaderWindowOnNextTry = false;
 				m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 			}
-			if (!ImGui::IsWindowFocused() && !ImGui::IsWindowHovered() && !m_mouse->GetMouse()->GetLMBPressed())
+			else if (!ImGui::IsWindowFocused() && !ImGui::IsWindowHovered() && !m_mouse->GetMouse()->GetLMBPressed())
 			{
 				if (m_hideShaderWindowOnNextTry)
 				{
 					m_hideShaderWindowOnNextTry = false;
 					m_shaderEditorManager->CreateBlock("");
 				}
-				m_hideShaderWindowOnNextTry = true;
+				else
+					m_hideShaderWindowOnNextTry = true;
 			}
 
 			ImGui::End();
@@ -2364,7 +2381,8 @@ bool GraphicsClass::ApplyGrain(ID3D11ShaderResourceView * grainTexture, ID3D11Sh
 bool GraphicsClass::CreateShaderEditor()
 {
 	m_shaderEditorManager = new ShaderEditorManager(m_D3D, m_mouse->GetMouse());
-		
+	m_shaderEditorManager->SetRefToClickedOutside(&m_focusOnChoosingWindowsShader);
+
 	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.2f }), 0, 1);
 	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, -0.2f }), 0, 1);
 	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }), 2, 1);

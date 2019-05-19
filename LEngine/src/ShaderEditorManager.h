@@ -30,6 +30,8 @@ public:
 	void SearchThroughChoosingWindow();
 
 	void DeleteCurrentShaderBlock();
+	void UpdateMouseHoveredOnImGui(bool hovered);
+	void SetRefToClickedOutside(bool* clickedOutside);
 
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);
@@ -52,13 +54,17 @@ public:
 	std::vector<const char*> ChoosingWindowItems{};
 	std::string m_choosingWindowSearch{};
 	const int k_choosingWindowSearchSize{ 10 };
+	UIShaderEditorBlock* m_focusedBlock{ nullptr };
 
 private:
 	D3DClass* m_D3D;
 	MouseClass* m_mouse;
-	vector<UIShaderEditorBlock*> m_blocks = {};
+	vector<UIShaderEditorBlock*> m_blocks{};
 	UIShaderEditorBlock* m_originalGeneratorBlock{};
 	std::vector<const char*> ChoosingWindowItemsOriginal{};
+
+	bool m_mouseHoveredImGui{ false };
+	bool* m_focusOnChoosingWindowsShader{ nullptr };
 
 	std::vector<UILine*> m_lines = {};
 	UIShaderPBRBlock* m_pbrBlock;

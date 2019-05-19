@@ -142,6 +142,8 @@
     <None Include="positionGBuffer.vs" />
     <None Include="postprocess.ps" />
     <None Include="postprocess.vs" />
+    <None Include="shaderPin.ps" />
+    <None Include="shaderPin.vs" />
     <None Include="shadowmap.ps" />
     <None Include="shadowmap.vs" />
     <None Include="singleColor.ps" />

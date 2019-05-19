@@ -24,6 +24,7 @@ public:
 	void GetPosition(float & x, float & y);
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
+	virtual bool SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) override;
 
 	void StartDragging();
 	void StopDragging();
@@ -31,6 +32,9 @@ public:
 
 public:
 	UIShaderEditorOutput* m_connectedOutputNode{ nullptr };
+	std::string m_returnType{};
+	ID3D11Resource* m_pinTexture;
+	ID3D11ShaderResourceView* m_pinTextureView;
 
 private:
 	bool m_dragged{ false };

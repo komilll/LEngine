@@ -144,17 +144,17 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 	{
 		if (pin->MouseOnArea(mouse))
 		{
+			if (mouse->GetMMBPressed())
+			{
+				pin->m_toDeleteLine = true;
+				m_pinDragged = false;
+				return nullptr;
+			}
 			if (mouse->GetLMBPressed())
 			{
 				pin->StartDragging();
 				m_pinDragged = true;
 				return pin;
-			}
-			else if (mouse->GetRMBPressed())
-			{
-				pin->m_toDeleteLine = true;
-				m_pinDragged = false;
-				return nullptr;
 			}
 		}
 	}
@@ -163,7 +163,7 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 	{
 		if (pin->MouseOnArea(mouse))
 		{
-			if (mouse->GetRMBPressed())
+			if (mouse->GetMMBPressed())
 			{
 				pin->m_connectedOutputNode = nullptr;
 				m_pinDragged = false;
@@ -229,13 +229,50 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 	if (GetInputCount() == 0) //Variable
 	{
 		func = { (skipTabulator ? "" : "\t") };
-		func += "float " + m_variableName + " = ";
+		func += m_returnType + " " + m_variableName + " = ";
 		if (m_outputNodes.size() > 0)
 		{
-			float val = m_outputNodes.at(0)->m_value;
 			std::ostringstream ss;
-			ss << val;
-			func += ss.str();
+			if (m_functionName == "texture")
+			{
+				
+			}
+			else if (m_returnType == "float")
+			{
+				float val = m_outputNodes.at(0)->m_value;
+				ss << val << ".0f";
+				func += ss.str();
+			}
+			else if (m_returnType == "float2")
+			{
+				XMFLOAT2 val{ m_outputNodes.at(0)->m_valueTwo };
+				func += "float2(";
+				ss << val.x << ".0f, ";
+				ss << val.y << ".0f";
+				func += ss.str();
+				func += ")";
+			}
+			else if (m_returnType == "float3")
+			{
+				XMFLOAT3 val{ m_outputNodes.at(0)->m_valueThree };
+				func += "float3(";
+				ss << val.x << ".0f, ";
+				ss << val.y << ".0f, ";
+				ss << val.z << ".0f";
+				func += ss.str();
+				func += ")";
+			}
+			else if (m_returnType == "float4")
+			{
+				XMFLOAT4 val{ m_outputNodes.at(0)->m_valueFour };
+				func += "float4(";
+				ss << val.x << ".0f, ";
+				ss << val.y << ".0f, ";
+				ss << val.z << ".0f, ";
+				ss << val.w << ".0f";
+				func += ss.str();
+				func += ")";
+			}
 			func += ";\n";
 		}
 		else
@@ -293,6 +330,11 @@ UIShaderEditorOutput * UIShaderEditorBlock::GetFirstOutputNode()
 		return nullptr;
 }
 
+std::string UIShaderEditorBlock::GetFunctionName()
+{
+	return m_functionName;
+}
+
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 {
 	int inOutCount = inCount > outCount ? inCount : outCount;
@@ -320,7 +362,6 @@ bool UIShaderEditorBlock::InitializeInputNodes(int count)
 		{
 			return false;
 		}
-		inputNode->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 		inputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);
 
 		m_inputNodes.push_back(inputNode);
@@ -341,7 +382,6 @@ bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 		{
 			return false;
 		}
-		outputNode->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 		outputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);
 
 		m_outputNodes.push_back(outputNode);

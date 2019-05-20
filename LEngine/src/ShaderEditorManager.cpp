@@ -136,9 +136,13 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		{
 			if (out && currentBlock && currentBlock->IsPinDragging() == false)
 			{
-				in->m_connectedOutputNode = out;
-				in->ChangeColor(0.0f, 0.0f, 1.0f, 1.0f);
-				DrawLine(in, out);
+				if (CheckConnectionRules(in, out))
+				{
+					in->m_connectedOutputNode = out;
+					in->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
+					out->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
+					DrawLine(in, out);
+				}
 				canTryPBR = false;
 				break;
 			}
@@ -151,9 +155,13 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		{
 			if (out && currentBlock && currentBlock->IsPinDragging() == false)
 			{
-				in->m_connectedOutputNode = out;
-				in->ChangeColor(0.0f, 0.0f, 1.0f, 1.0f);
-				DrawLine(in, out);
+				if (CheckConnectionRules(in, out))
+				{
+					in->m_connectedOutputNode = out;
+					in->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
+					out->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
+					DrawLine(in, out);
+				}
 			}
 			else if (m_mouse->GetRMBPressed())
 			{
@@ -223,13 +231,63 @@ void ShaderEditorManager::CreateChoosingWindowItemsArray()
 	std::sort(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
 }
 
+bool ShaderEditorManager::CheckConnectionRules(UIShaderEditorInput * in, UIShaderEditorOutput * out)
+{
+	if (in->m_returnType == out->m_returnType)
+		return true;
+	if (out->m_returnType == "float")
+		return true;
+	if (out->m_returnType == "float3" && in->m_returnType == "float4")
+		return true;
+
+	return false;
+}
+
+bool ShaderEditorManager::TryCreateScalarBlocks(std::string name)
+{
+	if (name == "float1")
+	{
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float", "float",{ "" } }), 0, 1);
+		return true;
+	}
+	else if (name == "float2")
+	{
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float2", "float2",{ "" } }), 0, 1);
+		return true;
+	}
+	else if (name == "float3")
+	{
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float3", "float3",{ "" } }), 0, 1);
+		return true;
+	}
+	else if (name == "float4")
+	{
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float4", "float4",{ "" } }), 0, 1);
+		return true;
+	}
+	else if (name == "texture")
+	{
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "texture", "float4",{ "" } }), 0, 1);
+		return true;
+	}
+
+	return false;
+}
+
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 {
 	if (block->m_inputNodes.size() == 0)
 	{
 		if (block->GetFirstOutputNode())
 		{
-			return block->GenerateShaderCode();
+			std::string tmp = block->GenerateShaderCode();
+			for (const auto& elem : m_usedVariableNamesInGenerator)
+			{
+				if (elem == tmp)
+					return "";
+			}
+			m_usedVariableNamesInGenerator.push_back(tmp);
+			return tmp;
 		}
 		else
 			return "";
@@ -385,6 +443,7 @@ void ShaderEditorManager::GenerateCodeToFile()
 
 			for (const auto& block : m_blocks)
 			{
+				m_usedVariableNamesInGenerator.empty();
 				if (out == block->GetFirstOutputNode())
 				{
 					m_originalGeneratorBlock = block;
@@ -465,10 +524,8 @@ void ShaderEditorManager::CreateBlock(std::string name)
 
 	m_choosingWindowSearch = "";
 
-	if (name == "float")
-	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float", "float", argumentTypes }), 0, 1);
-	}
+	if (TryCreateScalarBlocks(name))
+	{ }
 	else if (ifstream in{ "ShaderFunctions/" + name + ".txt"})
 	{
 		getline(in, line);

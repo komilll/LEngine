@@ -64,6 +64,7 @@ bool SystemClass::Initialize()
 		return false;
 
 	m_Graphics->SetMouseRef(m_Mouse);
+	m_Mouse->m_inputClass = m_Input;
 	
 	return true;
 }
@@ -344,7 +345,6 @@ void SystemClass::HandleInput()
 	if (m_Input->IsKeyDown(VK_Q))
 		m_Graphics->MoveCameraDown(movementPerTick);
 
-	m_Graphics->RotateCamera(cameraRotation);
 
 	//Handle deleting blocks in Shader Editor
 	if (m_Input->IsKeyDown(VK_DELETE))
@@ -385,6 +385,8 @@ void SystemClass::HandleInput()
 			cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ -rotatePerTick, 0, 0 });
 		if (m_Input->IsKeyDown(VK_DOWN))
 			cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ rotatePerTick, 0, 0 });
+
+		m_Graphics->RotateCamera(cameraRotation);
 	}
 }
 

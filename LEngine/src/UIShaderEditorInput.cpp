@@ -64,6 +64,7 @@ bool UIShaderEditorInput::Initialize(D3DClass * d3d, ModelClass::ShapeSize shape
 		LoadTexture(d3d->GetDevice(), L"float3.png", m_pinTexture, m_pinTextureView, false);
 	else if (m_returnType == "float4")
 		LoadTexture(d3d->GetDevice(), L"float4.png", m_pinTexture, m_pinTextureView, false);
+	StopDragging();
 
 	return InitializeModelGeneric(d3d->GetDevice(), shape, left, right, top, bottom);
 }
@@ -124,13 +125,19 @@ bool UIShaderEditorInput::SetShaderParameters(ID3D11DeviceContext * deviceContex
 void UIShaderEditorInput::StartDragging()
 {
 	m_dragged = true;
-	ChangeColor(0.0, 1.0f, 0.0f, 1.0f);
+	if (m_returnType == "float")
+		ChangeColor(1.0, 1.0f, 1.0f, 1.0f);
+	else
+		ChangeColor(2.5f, 2.5f, 2.5f, 2.5f);
 }
 
 void UIShaderEditorInput::StopDragging()
 {
 	m_dragged = false;
-	ChangeColor(1.0f, 0.0f, 0.0f, 1.0f);
+	if (m_returnType == "float")
+		ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
+	else
+		ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 bool UIShaderEditorInput::IsDragging()

@@ -1,4 +1,19 @@
+float add(float a, float b)
+{
+	return a + b;
+}
+
 float2 add(float2 a, float2 b)
+{
+	return a + b;
+}
+
+float3 add(float3 a, float3 b)
+{
+	return a + b;
+}
+
+float4 add(float4 a, float4 b)
 {
 	return a + b;
 }

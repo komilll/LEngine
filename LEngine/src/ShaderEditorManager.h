@@ -40,6 +40,8 @@ private:
 	void DrawLine(UIShaderEditorInput* in, UIShaderEditorOutput* out);
 	void ResetFocusOnAllBlocks();
 	void CreateChoosingWindowItemsArray();
+	bool CheckConnectionRules(UIShaderEditorInput* in, UIShaderEditorOutput* out);
+	bool TryCreateScalarBlocks(std::string name);
 
 	//GENERATING SHADER CODE
 	std::string GenerateBlockCode(UIShaderEditorBlock* block);
@@ -68,6 +70,8 @@ private:
 
 	std::vector<UILine*> m_lines = {};
 	UIShaderPBRBlock* m_pbrBlock;
+
+	std::vector<std::string> m_usedVariableNamesInGenerator{};
 
 	bool m_choosingWindow{ false };
 	int m_choosingWindowHandler{ 0 };

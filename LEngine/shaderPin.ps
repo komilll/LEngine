@@ -22,5 +22,5 @@ cbuffer AppearanceBuffer
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	return shaderTexture.Sample(SampleType, input.tex);
+	return shaderTexture.Sample(SampleType, input.tex) * appearanceBufferColor;
 }

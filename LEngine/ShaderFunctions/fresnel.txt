@@ -1,0 +1,6 @@
+float fresnel(float3 F0, float3 albedo, float metalness, float NdotV, float exp)
+{
+	F0 = lerp(F0, albedo, metalness);
+
+	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
+}

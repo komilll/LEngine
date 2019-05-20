@@ -58,6 +58,7 @@ public:
 	int GetInputCount();
 	void SetOutputPinName(std::string name);
 	UIShaderEditorOutput* GetFirstOutputNode();
+	std::string GetFunctionName();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
@@ -83,7 +84,7 @@ private:
 	bool m_dragged = { false };
 	bool m_pinDragged = { false };
 	RectangleVertices m_blockVertices;
-	TextEngine* m_textEngine;
+	TextEngine* m_textEngine{ nullptr };
 
 	std::string m_returnType{ "float" };
 	std::vector<std::string> m_argumentTypes{ "float", "float" };
@@ -93,7 +94,7 @@ private:
 	UIBase* m_outlineObject{ nullptr };
 
 private:
-	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f } };
+	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f }, Size{ 0.4f, 0.51f } };
 	const Margin inOutMargin = Margin{ 0.02f, 0.11f };
 	const Size inOutSize = Size{ 0.03f, 0.04f };
 	const float paddingBetweenBlocks = 0.08f;

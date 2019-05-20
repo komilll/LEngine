@@ -166,6 +166,16 @@ void MouseClass::SetRMBPressed(bool enable)
 	m_mouseState.rgbButtons[1] = enable;
 }
 
+bool MouseClass::GetMMBPressed()
+{
+	return m_mouseState.rgbButtons[2];
+}
+
+void MouseClass::SetMMBPressed(bool enable)
+{
+	m_mouseState.rgbButtons[2] = enable;
+}
+
 POINT MouseClass::CurrentMouseLocation()
 {
 	return m_lastMousePoint;

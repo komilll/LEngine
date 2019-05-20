@@ -181,6 +181,7 @@ private:
 	bool RenderSSAOTexture(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
 	//ImGUI
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
+	inline void RenderTextureViewImGuiEditor(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
 	//Applying post-processes
 	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
 	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);
@@ -210,6 +211,7 @@ private:
 	UITexturePreview* m_texturePreviewNormal;
 	UITexturePreview* m_texturePreviewAlbedo;
 	ID3D11ShaderResourceView* m_emptyTexView[MAX_TEXTURE_INPUT];
+	ID3D11ShaderResourceView* m_emptyTexViewEditor;
 
 	UIBackground* m_debugBackground;
 	MouseClassContainer* m_mouse;

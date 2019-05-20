@@ -207,6 +207,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		m_emptyTexView[i] = nullptr;
 		UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, m_emptyTexView[i]);
 	}
+	UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, m_emptyTexViewEditor);
 
 #pragma endregion
 
@@ -1229,7 +1230,39 @@ bool GraphicsClass::RenderGUI()
 			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0)
 			{
 				if (m_shaderEditorManager->m_focusedBlock->m_outputNodes.size() > 0 && &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0])
-					ImGui::InputFloat("Value", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_value);
+				{
+					if (m_shaderEditorManager->m_focusedBlock->GetFunctionName() == "texture")
+					{
+						RenderTextureViewImGuiEditor(m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTexture,
+							m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTextureView, "Texture");
+					}
+					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float")
+					{
+						ImGui::InputFloat("Value", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_value);
+						}
+					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float2")
+					{
+						ImGui::InputFloat("Value_1", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueTwo[0]);
+						ImGui::InputFloat("Value_2", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueTwo[1]);
+					}
+					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float3")
+					{
+						ImGui::InputFloat("Value_1", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree[0]);
+						ImGui::InputFloat("Value_2", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree[1]);
+						ImGui::InputFloat("Value_3", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree[2]);
+
+						ImGui::ColorPicker3("Color value", m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree);
+					}
+					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float4")
+					{
+						ImGui::InputFloat("Value_1", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[0]);
+						ImGui::InputFloat("Value_2", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[1]);
+						ImGui::InputFloat("Value_3", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[2]);
+						ImGui::InputFloat("Value_4", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[3]);
+
+						ImGui::ColorPicker4("Color value", m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour);
+					}					
+				}
 			}
 			m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
 			ImGui::End();
@@ -2307,6 +2340,21 @@ void GraphicsClass::RenderTextureViewImGui(ID3D11Resource *& resource, ID3D11Sha
 	}
 
 	m_internalTextureViewIndex++;
+}
+
+inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char * label)
+{
+	ImGui::Text(label);
+	if (ImGui::ImageButton(resourceView == nullptr ? m_emptyTexViewEditor : resourceView, ImVec2{ 64, 64 }))
+	{
+		UITexturePreview::TextureChooseWindow(m_D3D, resource, resourceView);
+	}
+	ImGui::SameLine();
+	std::string buttonText = "X";
+	if (ImGui::Button(buttonText.c_str(), ImVec2{ 16, 16 }))
+	{
+		UITexturePreview::DeletePassedTexture(m_D3D, resource, resourceView);
+	}
 }
 
 bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer)

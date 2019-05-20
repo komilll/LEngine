@@ -7,6 +7,7 @@
 
 #include <dinput.h>
 #include "d3dclass.h"
+#include "inputclass.h"
 #include <utility>
 
 class MouseClass
@@ -29,6 +30,8 @@ public:
 	void SetLMBPressed(bool enable);
 	bool GetRMBPressed();
 	void SetRMBPressed(bool enable);
+	bool GetMMBPressed();
+	void SetMMBPressed(bool enable);
 
 	POINT CurrentMouseLocation();
 	std::pair<float, float> MouseFrameMovement();
@@ -41,6 +44,7 @@ private:
 
 public:
 	bool isInputConsumed = false;
+	InputClass* m_inputClass;
 
 private:
 	IDirectInput8* m_directInput;

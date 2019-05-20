@@ -30,11 +30,17 @@ public:
 
 public:
 	float m_value{ 0.0f };
+	float m_valueTwo[2]{ 0.0f, 0.0f };
+	float m_valueThree[3]{ 0.0f, 0.0f, 0.0f };
+	float m_valueFour[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
 	std::string m_variableName{};
 	std::string m_returnType{};
 	bool m_toDeleteLine{ false };
 	ID3D11Resource* m_pinTexture;
 	ID3D11ShaderResourceView* m_pinTextureView;
+
+	ID3D11Resource* m_connectedTexture;
+	ID3D11ShaderResourceView* m_connectedTextureView;
 
 private:
 	bool m_dragged{ false };

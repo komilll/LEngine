@@ -45,12 +45,15 @@ private:
 
 	//GENERATING SHADER CODE
 	std::string GenerateBlockCode(UIShaderEditorBlock* block);
+	std::string GetTextureDeclarations();
 	std::string GetFunctionDeclarations();
 	std::string GetFunctionDefinitions();
 	vector<std::string> GetFilenamesInDirectory(std::string dir, bool withDir = true);
 
 	void ShowFunctionChoosingWindow();
 	void LoadFunctionsFromDirectory();
+
+	void GeneratePBRClassCode();
 
 public:
 	std::vector<const char*> ChoosingWindowItems{};
@@ -72,6 +75,7 @@ private:
 	UIShaderPBRBlock* m_pbrBlock;
 
 	std::vector<std::string> m_usedVariableNamesInGenerator{};
+	std::vector<std::string> m_generatedTextureAdresses{};
 
 	bool m_choosingWindow{ false };
 	int m_choosingWindowHandler{ 0 };

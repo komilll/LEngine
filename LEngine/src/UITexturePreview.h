@@ -19,7 +19,7 @@ public:
 	void ConnectTextures(ID3D11Resource*& texture, ID3D11ShaderResourceView*& textureView);
 	///<summary> Pick new texture from Windows Explorer </summary>
 	void TextureChooseWindow(HWND owner);
-	static void TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView);
+	static std::string TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView);
 	static void DeletePassedTexture(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView);
 	void DeleteTexture();
 

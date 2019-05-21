@@ -245,7 +245,9 @@ bool ShaderPBRClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMM
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_metalnessTextureView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_irradianceMapView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_brdfLutView);
-	for (int i = 0; i < m_environmentMapViews.size(); i++)
-		deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_environmentMapViews[i]);
+	for (const auto& map : m_environmentMapViews)
+		deviceContext->PSSetShaderResources(bufferNumber++, 1, &map);
+	for (const auto& map : m_additionalMapViews)
+		deviceContext->PSSetShaderResources(bufferNumber++, 1, &map);
 	return true;
 }

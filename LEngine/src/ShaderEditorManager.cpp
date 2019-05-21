@@ -323,6 +323,30 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 	return toReturn;
 }
 
+std::string ShaderEditorManager::GetTextureDeclarations()
+{
+	int count = 0;
+	for (const auto& block : m_blocks) 
+	{
+		if (block->GetFunctionName() == "texture")
+		{
+			count++;
+			m_generatedTextureAdresses.push_back(block->m_outputNodes[0]->m_texturePath);
+		}
+	}
+	ostringstream ss;
+	ss << count;
+
+	std::string toReturn = "Texture2D additionalTexture[" + ss.str() + "];\n";
+	for (const auto& block : m_blocks)
+	{
+		if (block->GetFunctionName() == "texture")
+		{
+			toReturn += "static float4 " + block->m_outputNodes[0]->m_variableName + " = ";
+		}
+	}
+}
+
 std::string ShaderEditorManager::GetFunctionDeclarations()
 {
 	std::string toReturn{};
@@ -410,6 +434,25 @@ void ShaderEditorManager::LoadFunctionsFromDirectory()
 	//}
 }
 
+void ShaderEditorManager::GeneratePBRClassCode()
+{
+	std::ofstream dst("functionPBR.txt", std::ios::binary);
+	if (std::ifstream src{ "ShaderEditor/shader_pbr_generated_base.txt", std::ios::binary })
+	{
+		dst << src.rdbuf(); //base_textures_header
+	}
+	dst << "void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device * &device)\n";
+	dst << "{\n";
+	dst << "\tID3D11Resource* resource;\n\n";
+	for (int i = 0; i < m_generatedTextureAdresses.size(); ++i)
+	{
+		dst << "\tm_additionalMapViews.push_back(nullptr);\n";
+		dst << "\tLoadTexture(device, L\"" + m_generatedTextureAdresses.at(i) + "\", resource, *m_additionalMapViews._Mylast(), true);\n";
+	}
+	dst << "}";
+	dst.close();
+}
+
 void ShaderEditorManager::GenerateCodeToFile()
 {
 	std::string func{};
@@ -418,9 +461,19 @@ void ShaderEditorManager::GenerateCodeToFile()
 		const auto& block = m_blocks.at(i);
 		if (block->GetInputCount() == 0) //Variable
 		{
-			char variableName = i + 65;
-			block->m_variableName = variableName;
-			block->SetOutputPinName(block->m_variableName);
+			if (block->GetFunctionName() == "texture") //Texture
+			{
+				ostringstream ss;
+				ss << i;
+				block->m_variableName = "tex_" + ss.str();
+				block->SetOutputPinName(block->m_variableName);
+			}
+			else
+			{
+				char variableName = i + 65;
+				block->m_variableName = variableName;
+				block->SetOutputPinName(block->m_variableName);
+			}
 		}
 	}
 	for (int i = 0; i < m_blocks.size(); ++i)
@@ -480,6 +533,11 @@ void ShaderEditorManager::GenerateCodeToFile()
 	//std::ofstream dst("pbr_used.ps", std::ios::binary);
 	std::ofstream dst("function.txt", std::ios::binary);
 
+	if (std::ifstream src{ "ShaderEditor/base_textures_header.txt", std::ios::binary })
+	{
+		dst << src.rdbuf(); //base_textures_header
+	}
+	dst << GetTextureDeclarations(); //Get Texture2D ... declaration of variable
 	if (std::ifstream src{ "ShaderEditor/base_declarations.txt", std::ios::binary })
 	{
 		dst << src.rdbuf(); //base_declarations
@@ -495,6 +553,9 @@ void ShaderEditorManager::GenerateCodeToFile()
 		dst << src.rdbuf(); //generated_header
 	}
 	dst << func; //Get generated functions
+	dst.close();
+
+	GeneratePBRClassCode();
 }
 
 bool ShaderEditorManager::WillRenderChoosingWindow()

@@ -1234,7 +1234,8 @@ bool GraphicsClass::RenderGUI()
 					if (m_shaderEditorManager->m_focusedBlock->GetFunctionName() == "texture")
 					{
 						RenderTextureViewImGuiEditor(m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTexture,
-							m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTextureView, "Texture");
+							m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTextureView, "Texture", 
+							m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_texturePath);
 					}
 					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float")
 					{
@@ -2342,18 +2343,34 @@ void GraphicsClass::RenderTextureViewImGui(ID3D11Resource *& resource, ID3D11Sha
 	m_internalTextureViewIndex++;
 }
 
-inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char * label)
+inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char * label, std::string& path)
 {
 	ImGui::Text(label);
 	if (ImGui::ImageButton(resourceView == nullptr ? m_emptyTexViewEditor : resourceView, ImVec2{ 64, 64 }))
 	{
-		UITexturePreview::TextureChooseWindow(m_D3D, resource, resourceView);
+		path = UITexturePreview::TextureChooseWindow(m_D3D, resource, resourceView);
+		std::string curr{};
+		for (int i = path.length() - 1; i > -1; --i)
+		{
+			curr = path[i] + curr;
+			if (curr == "LEngine")
+			{
+				int index = i + 8;
+				path.erase(path.begin(), path.begin() + index);
+				break;
+			}
+			else if (path[i] == '\\')
+			{
+				curr = "";
+			}
+		}
 	}
 	ImGui::SameLine();
 	std::string buttonText = "X";
 	if (ImGui::Button(buttonText.c_str(), ImVec2{ 16, 16 }))
 	{
 		UITexturePreview::DeletePassedTexture(m_D3D, resource, resourceView);
+		path = "";
 	}
 }
 

@@ -7,8 +7,7 @@
 /////////////
 Texture2D shaderTexture[4];
 SamplerState SampleType;
-
-cbuffer LightingBuffer
+Texture2D additionalTexture[1];cbuffer LightingBuffer
 {
 	float3 g_direction;
 	float g_lightStrength;
@@ -70,6 +69,7 @@ float divide(float a, float b);
 float fresnel(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
 float multiply(float a, float b);
 float substract(float a, float b);
+;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
@@ -244,6 +244,7 @@ float substract(float a, float b)
 	return a - b;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,14 +254,7 @@ float4 GetBaseColor()
 }
 float GetMetalness()
 {
-	float3 B = float3(1.0f, 2.0f, 3.0f);
-	float3 C = float3(4.0f, 5.0f, 6.0f);
-	float D = 1.0f;
-	float E = 2.0f;
-	float F = 3.0f;
-	float out_0 = fresnel(B, C, D, E, F);
-
-	return out_0;
+	return 0.0f;
 }
 float GetRoughness()
 {

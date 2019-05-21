@@ -41,6 +41,7 @@ public:
 
 	ID3D11Resource* m_connectedTexture;
 	ID3D11ShaderResourceView* m_connectedTextureView;
+	std::string m_texturePath{};
 
 private:
 	bool m_dragged{ false };

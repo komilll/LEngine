@@ -117,7 +117,8 @@ private:
 	ID3D11Resource* m_environmentMapTexture;
 	ID3D11ShaderResourceView* m_environmentMapTextureView;
 
-	std::vector<ID3D11ShaderResourceView*> m_environmentMapViews;
+	std::vector<ID3D11ShaderResourceView*> m_environmentMapViews{};
+	std::vector<ID3D11ShaderResourceView*> m_additionalMapViews{};
 };
 
 #endif // !_SHADERPBRCLASS_H_

@@ -49,7 +49,7 @@ void UITexturePreview::ConnectTextures(ID3D11Resource *& texture, ID3D11ShaderRe
 }
 
 //Static method
-void UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
+std::string UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 {
 	PWSTR pszFilePath;
 	wchar_t* wFilePath = 0;
@@ -80,6 +80,7 @@ void UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& text
 				if (SUCCEEDED(hr))
 				{
 					wFilePath = pszFilePath;
+
 					//LoadNewTextureFromFile(wFilePath); -- INLINED
 					if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, texture, textureView))
 					{
@@ -99,7 +100,10 @@ void UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource *& text
 		}
 		pFileOpen->Release();
 	}
-
+	
+	wstring ws(wFilePath);
+	string str(ws.begin(), ws.end());
+	return str;
 	//Do not call - because it will disallow using open dialog again
 	//CoUninitialize();
 }

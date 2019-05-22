@@ -46,6 +46,7 @@ private:
 	//GENERATING SHADER CODE
 	std::string GenerateBlockCode(UIShaderEditorBlock* block);
 	std::string GetTextureDeclarations();
+	std::string GetTextureDefinitions();
 	std::string GetFunctionDeclarations();
 	std::string GetFunctionDefinitions();
 	vector<std::string> GetFilenamesInDirectory(std::string dir, bool withDir = true);

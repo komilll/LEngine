@@ -84,14 +84,14 @@ private:
 	bool m_dragged = { false };
 	bool m_pinDragged = { false };
 	RectangleVertices m_blockVertices;
-	TextEngine* m_textEngine{ nullptr };
+	TextEngine* m_textEngine{};
 
 	std::string m_returnType{ "float" };
 	std::vector<std::string> m_argumentTypes{ "float", "float" };
 	std::string m_functionName{ "add" };
 	std::string m_blockName{ "add" };
 
-	UIBase* m_outlineObject{ nullptr };
+	UIBase* m_outlineObject{};
 
 private:
 	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f }, Size{ 0.4f, 0.51f } };

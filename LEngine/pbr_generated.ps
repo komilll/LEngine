@@ -92,9 +92,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
 
 //Calculate normal for model
-	normal = GetNormalValue(normalMap, input.tangent, input.binormal, input.normal);
+	//normal = GetNormalValue(normalMap, input.tangent, input.binormal, input.normal);
+	normal = GetNormalValue(GetNormal(), input.tangent, input.binormal, input.normal);
 
 //Calculate other PBR values
+	albedo = GetBaseColor();
 	roughness = GetRoughness();
 	metalness = GetMetalness();
 

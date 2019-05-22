@@ -239,6 +239,8 @@ bool ShaderEditorManager::CheckConnectionRules(UIShaderEditorInput * in, UIShade
 		return true;
 	if (out->m_returnType == "float3" && in->m_returnType == "float4")
 		return true;
+	if (out->m_returnType == "float4" && in->m_returnType == "float3")
+		return true;
 
 	return false;
 }
@@ -280,13 +282,17 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 	{
 		if (block->GetFirstOutputNode())
 		{
-			std::string tmp = block->GenerateShaderCode();
+			std::string tmp = block->GenerateShaderCode();			
 			for (const auto& elem : m_usedVariableNamesInGenerator)
 			{
 				if (elem == tmp)
+				{
 					return "";
+				}
 			}
 			m_usedVariableNamesInGenerator.push_back(tmp);
+			if (tmp == "\t;\n")
+				tmp = "";
 			return tmp;
 		}
 		else
@@ -337,14 +343,35 @@ std::string ShaderEditorManager::GetTextureDeclarations()
 	ostringstream ss;
 	ss << count;
 
-	std::string toReturn = "Texture2D additionalTexture[" + ss.str() + "];\n";
+	std::string toReturn = "Texture2D additionalTexture[" + ss.str() + "];\n";	
 	for (const auto& block : m_blocks)
 	{
 		if (block->GetFunctionName() == "texture")
 		{
-			toReturn += "static float4 " + block->m_outputNodes[0]->m_variableName + " = ";
+			ostringstream ss;
+			toReturn += "static float4 " + block->m_outputNodes[0]->m_variableName + ";\n";
 		}
 	}
+	return toReturn;
+}
+
+std::string ShaderEditorManager::GetTextureDefinitions()
+{
+	std::string toReturn{};
+
+	int index = 0;
+	for (const auto& block : m_blocks)
+	{
+		if (block->GetFunctionName() == "texture")
+		{
+			ostringstream ss;
+			ss << index;
+			index++;
+			toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture[" + ss.str() + "].Sample(SampleType, input.tex);\n";
+		}
+	}
+
+	return toReturn;
 }
 
 std::string ShaderEditorManager::GetFunctionDeclarations()
@@ -357,6 +384,10 @@ std::string ShaderEditorManager::GetFunctionDeclarations()
 		{
 			std::string line{};
 			getline(stream, line);
+			if (line == "")
+			{
+				continue;
+			}
 			std::string finLine{};
 			for (const char& c : line)
 			{
@@ -506,6 +537,10 @@ void ShaderEditorManager::GenerateCodeToFile()
 			}
 
 			func += (funcName + funcBody);
+			if (funcBody == "\n{\n" && m_originalGeneratorBlock->GetFunctionName() == "texture")
+			{
+				func += "\treturn " + m_originalGeneratorBlock->m_variableName + ";";
+			}
 			func += "\n}";
 			func += "\n"; //New line and empty line
 		}
@@ -543,9 +578,14 @@ void ShaderEditorManager::GenerateCodeToFile()
 		dst << src.rdbuf(); //base_declarations
 	}
 	dst << GetFunctionDeclarations();
-	if (std::ifstream src{ "ShaderEditor/base_body.txt", std::ios::binary })
+	if (std::ifstream src{ "ShaderEditor/base_body_start.txt", std::ios::binary })
 	{
-		dst << src.rdbuf(); //base_body
+		dst << src.rdbuf(); //base_body_start
+	}
+	dst << GetTextureDefinitions();
+	if (std::ifstream src{ "ShaderEditor/base_body_continue.txt", std::ios::binary })
+	{
+		dst << src.rdbuf(); //base_body_continue
 	}
 	dst << GetFunctionDefinitions();
 	if (std::ifstream src{ "ShaderEditor/generated_header.txt", std::ios::binary })
@@ -754,13 +794,13 @@ bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 {
 	for (const auto& block : m_blocks)
 	{
-		if (!block->Render(deviceContext))
+		if (block && !block->Render(deviceContext))
 			return false;
 	}
 
 	if (m_pbrBlock)
 	{
-		if (!m_pbrBlock->Render(deviceContext))
+		if (m_pbrBlock && !m_pbrBlock->Render(deviceContext))
 			return false;
 	}
 

@@ -101,9 +101,14 @@ std::string UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource 
 		pFileOpen->Release();
 	}
 	
-	wstring ws(wFilePath);
-	string str(ws.begin(), ws.end());
-	return str;
+	if (wFilePath != NULL)
+	{
+		wstring ws(wFilePath);
+		string str(ws.begin(), ws.end());
+		return str;
+	}
+
+	return "";
 	//Do not call - because it will disallow using open dialog again
 	//CoUninitialize();
 }

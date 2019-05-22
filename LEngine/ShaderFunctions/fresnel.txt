@@ -1,4 +1,4 @@
-float fresnel(float3 F0, float3 albedo, float metalness, float NdotV, float exp)
+float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp)
 {
 	F0 = lerp(F0, albedo, metalness);
 

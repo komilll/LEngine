@@ -45,9 +45,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
+	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
 	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
-	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
+	m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -67,7 +67,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 		return false;
 
-	result = m_Model->Initialize(m_D3D->GetDevice(), "happy1.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
 	if(!result)
 		return false;
 

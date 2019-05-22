@@ -138,6 +138,8 @@
     <None Include="pbr_base.vs" />
     <None Include="pbr_generated.ps" />
     <None Include="pbr_generated.vs" />
+    <None Include="pbr_used.ps" />
+    <None Include="pbr_used.vs" />
     <None Include="positionGBuffer.ps" />
     <None Include="positionGBuffer.vs" />
     <None Include="postprocess.ps" />

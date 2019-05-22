@@ -166,6 +166,12 @@
     <None Include="shaderPin.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="pbr_used.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="pbr_used.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">

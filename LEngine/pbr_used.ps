@@ -7,7 +7,10 @@
 /////////////
 Texture2D shaderTexture[4];
 SamplerState SampleType;
-
+Texture2D additionalTexture[3];
+static float4 tex_0;
+static float4 tex_1;
+static float4 tex_2;
 cbuffer LightingBuffer
 {
 	float3 g_direction;
@@ -63,11 +66,8 @@ float4 GetBaseColor();
 //SHADER EDITOR METHODS
 float add(float a, float b);
 float divide(float a, float b);
-;
-;
-;
-;
-float fresnel(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
+float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
+float get_x(float4 a);
 float multiply(float a, float b);
 float substract(float a, float b);
 
@@ -76,6 +76,10 @@ float substract(float a, float b);
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
+	tex_0 = additionalTexture[0].Sample(SampleType, input.tex);
+	tex_1 = additionalTexture[1].Sample(SampleType, input.tex);
+	tex_2 = additionalTexture[2].Sample(SampleType, input.tex);
+
 //CONST VALUES
 	float PI = 3.14159265359;
 
@@ -229,11 +233,15 @@ float divide(float a, float b)
 
 
 
-float fresnel(float3 F0, float3 albedo, float metalness, float NdotV, float exp)
+float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp)
 {
 	F0 = lerp(F0, albedo, metalness);
 
 	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
+}
+float get_x(float4 a)
+{
+	return a.r;
 }
 float multiply(float a, float b)
 {
@@ -244,27 +252,25 @@ float substract(float a, float b)
 	return a - b;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return float4(0.0f, 0.0f, 0.0f, 0.0f);
+	return tex_1;
 }
 float GetMetalness()
 {
-	float3 B = float3(1.0f, 2.0f, 3.0f);
-	float3 C = float3(4.0f, 5.0f, 6.0f);
-	float D = 1.0f;
-	float E = 2.0f;
-	float F = 3.0f;
-	float out_0 = fresnel(B, C, D, E, F);
+	float out_3 = get_x(tex_0);
 
-	return out_0;
+	return out_3;
 }
 float GetRoughness()
 {
-	return 0.0f;
+	float out_4 = get_x(tex_2);
+
+	return out_4;
 }
 float3 GetNormal()
 {

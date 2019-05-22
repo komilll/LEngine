@@ -253,11 +253,14 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 		deviceContext->PSSetShaderResources(bufferNumber++, 1, &map);
 	return true;
 }
-
 void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device * &device)
 {
 	ID3D11Resource* resource;
 
 	m_additionalMapViews.push_back(nullptr);
-	LoadTexture(device, L"", resource, *m_additionalMapViews._Mylast(), true);
+	LoadTexture(device, L"Metal_006_Base_Color.dds", resource, *m_additionalMapViews._Mylast(), true);
+	m_additionalMapViews.push_back(nullptr);
+	LoadTexture(device, L"Metal_006_Metallic.dds", resource, *m_additionalMapViews._Mylast(), true);
+	m_additionalMapViews.push_back(nullptr);
+	LoadTexture(device, L"Metal_006_Roughness.dds", resource, *m_additionalMapViews._Mylast(), true);
 }

@@ -49,7 +49,7 @@ private:
 	float m_translationX{ 0 };
 	float m_translationY{ 0 };
 
-	D3DClass* m_D3D{ nullptr };
+	D3DClass* m_D3D{};
 
 	float min_X;
 	float max_X;

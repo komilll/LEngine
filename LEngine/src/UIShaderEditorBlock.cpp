@@ -187,7 +187,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	if (m_focused && m_outlineObject)
 	{
 		//Render outline
-		if (!m_outlineObject->Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+		if (m_outlineObject && !m_outlineObject->Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
 			return false;
 	}
 	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
@@ -195,10 +195,16 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	if (UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
 	{
 		for (const auto& node : m_inputNodes)
-			node->Render(deviceContext);
+		{
+			if (node)
+				node->Render(deviceContext);
+		}
 
 		for (const auto& node : m_outputNodes)
-			node->Render(deviceContext);
+		{
+			if (node)
+				node->Render(deviceContext);
+		}
 
 		if (m_textEngine)
 		{
@@ -229,13 +235,16 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 	if (GetInputCount() == 0) //Variable
 	{
 		func = { (skipTabulator ? "" : "\t") };
-		func += m_returnType + " " + m_variableName + " = ";
+		if (m_functionName != "texture") //Texture is already defined - skip
+		{
+			func += m_returnType + " " + m_variableName + " = ";
+		}
 		if (m_outputNodes.size() > 0)
 		{
 			std::ostringstream ss;
 			if (m_functionName == "texture")
 			{
-				
+				//Leave empty - already defined
 			}
 			else if (m_returnType == "float")
 			{

@@ -63,7 +63,8 @@ private:
 	bool m_dragged = { false };
 
 	UIBase::RectangleVertices m_blockVertices;
-	TextEngine* m_textEngine;
+	TextEngine* m_textEngine{};
+	std::vector<pair<float, float>> m_textPositionModifiers{ {-0.01f, 0.27f}, { 0.02f, 0.195f }, { 0.02f, 0.11f }, { 0.0075f-0.01f, 0.03f } };
 
 	//INPUT - PBR
 	//0 - Base Color

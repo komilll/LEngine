@@ -13,7 +13,7 @@ bool UIBase::InitializeModelGeneric(ID3D11Device * device, RectangleVertices rec
 bool UIBase::InitializeModelGeneric(ID3D11Device * device, ModelClass::ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty)
 {
 	m_model = new ModelClass;
-	if (!m_model->Initialize(device, shape, left, right, top, bottom, withTex, isEmpty))
+	if (!m_model || !m_model->Initialize(device, shape, left, right, top, bottom, withTex, isEmpty))
 		return false;
 
 	return true;

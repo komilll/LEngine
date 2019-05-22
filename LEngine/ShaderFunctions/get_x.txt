@@ -1,0 +1,4 @@
+float get_x(float4 a)
+{
+	return a.r;
+}

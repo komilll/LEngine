@@ -321,7 +321,8 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 	if (m_originalGeneratorBlock == block)
 	{
 		toReturn += block->GenerateShaderCode();
-		toReturn += "\n\treturn " + block->m_variableName + ";";
+		//toReturn += "\n\treturn " + block->m_variableName + ";";
+		toReturn += ConvertReturnType(block->m_variableName, block->GetReturnType(), m_originalRequiredType);
 	}
 	else
 		toReturn += block->GenerateShaderCode();
@@ -343,16 +344,21 @@ std::string ShaderEditorManager::GetTextureDeclarations()
 	ostringstream ss;
 	ss << count;
 
-	std::string toReturn = "Texture2D additionalTexture[" + ss.str() + "];\n";	
-	for (const auto& block : m_blocks)
+	if (count > 0)
 	{
-		if (block->GetFunctionName() == "texture")
+		std::string toReturn = "Texture2D additionalTexture[" + ss.str() + "];\n";
+		for (const auto& block : m_blocks)
 		{
-			ostringstream ss;
-			toReturn += "static float4 " + block->m_outputNodes[0]->m_variableName + ";\n";
+			if (block->GetFunctionName() == "texture")
+			{
+				ostringstream ss;
+				toReturn += "static float4 " + block->m_outputNodes[0]->m_variableName + ";\n";
+			}
 		}
+		return toReturn;
 	}
-	return toReturn;
+
+	return "";
 }
 
 std::string ShaderEditorManager::GetTextureDefinitions()
@@ -445,6 +451,36 @@ vector<std::string> ShaderEditorManager::GetFilenamesInDirectory(std::string dir
 	return names;
 }
 
+std::string ShaderEditorManager::ConvertReturnType(std::string outName, std::string typeIn, std::string typeOut)
+{
+	if (typeIn == typeOut)
+	{
+		return "\n\treturn " + outName + ";";
+	}
+
+	if (typeIn == "float")
+	{
+		if (typeOut == "float2")
+			return "\n\treturn float2(" + outName + ", " + outName + ");";
+		if (typeOut == "float3")
+			return "\n\treturn float3(" + outName + ", " + outName + ", " + outName + ");";
+		if (typeOut == "float4")
+			return "\n\treturn float4(" + outName + ", " + outName + ", " + outName + ", " + outName + ");";
+	}
+	else if (typeIn == "float3")
+	{
+		if (typeOut == "float4")
+			return "\n\treturn float3(" + outName + ".x, " + outName + ".y, " + outName + ".z, 1.0f);";
+	}
+	else if (typeIn == "float4")
+	{
+		if (typeOut == "float3")
+			return "\n\treturn float4(" + outName + ".x, " + outName + ".y, " + outName + ".z);";
+	}
+
+	return "ERROR";
+}
+
 void ShaderEditorManager::ShowFunctionChoosingWindow()
 {
 	m_choosingWindowPosX = m_mouse->CurrentMouseLocation().x;
@@ -467,18 +503,20 @@ void ShaderEditorManager::LoadFunctionsFromDirectory()
 
 void ShaderEditorManager::GeneratePBRClassCode()
 {
-	std::ofstream dst("functionPBR.txt", std::ios::binary);
+	std::ofstream dst("src/ShaderPBRGenerated.cpp", std::ios::binary);
 	if (std::ifstream src{ "ShaderEditor/shader_pbr_generated_base.txt", std::ios::binary })
 	{
 		dst << src.rdbuf(); //base_textures_header
 	}
-	dst << "void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device * &device)\n";
+	dst << "void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)\n";
 	dst << "{\n";
-	dst << "\tID3D11Resource* resource;\n\n";
+	dst << "\tID3D11Resource* resource{nullptr};\n\n";
 	for (int i = 0; i < m_generatedTextureAdresses.size(); ++i)
 	{
+		ostringstream ss;
+		ss << i;
 		dst << "\tm_additionalMapViews.push_back(nullptr);\n";
-		dst << "\tLoadTexture(device, L\"" + m_generatedTextureAdresses.at(i) + "\", resource, *m_additionalMapViews._Mylast(), true);\n";
+		dst << "\tLoadTexture(device, L\"" + m_generatedTextureAdresses.at(i) + "\", resource, m_additionalMapViews.at(" + ss.str() + "), true);\n";
 	}
 	dst << "}";
 	dst.close();
@@ -531,6 +569,7 @@ void ShaderEditorManager::GenerateCodeToFile()
 				if (out == block->GetFirstOutputNode())
 				{
 					m_originalGeneratorBlock = block;
+					m_originalRequiredType = m_pbrBlock->m_inputNodes.at(i)->m_returnType;
 					funcBody += GenerateBlockCode(block);
 					break;
 				}
@@ -566,7 +605,7 @@ void ShaderEditorManager::GenerateCodeToFile()
 	}
 	
 	//std::ofstream dst("pbr_used.ps", std::ios::binary);
-	std::ofstream dst("function.txt", std::ios::binary);
+	std::ofstream dst("pbr_used.ps", std::ios::binary);
 
 	if (std::ifstream src{ "ShaderEditor/base_textures_header.txt", std::ios::binary })
 	{

@@ -22,6 +22,7 @@
 #include "MouseClassContainer.h"
 #include "UISlider.h"
 #include "ShaderPBRClass.h"
+#include "ShaderPBRGenerated.h"
 #include "UITexturePreview.h"
 #include "SkyboxShaderClass.h"
 #include "RenderTextureClass.h"
@@ -203,7 +204,7 @@ private:
 	ModelClass* m_cubeModel;
 	ModelClass* m_skyboxModel;
 	ShaderSpecularClass* m_specularShader;
-	ShaderPBRClass* m_pbrShader;
+	ShaderPBRGenerated* m_pbrShader;
 	SkyboxShaderClass* m_skyboxShader;
 	TextEngine* m_textEngine;
 	UITexturePreview* m_texturePreviewRoughness;

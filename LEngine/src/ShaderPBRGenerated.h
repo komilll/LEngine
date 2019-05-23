@@ -81,7 +81,7 @@ public:
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
 //GENERATED METHODS
-	void LoadGeneratedTextures(ID3D11Device * &device);
+	void LoadGeneratedTextures(ID3D11Device * device);
 
 public:
 	//Texture resources

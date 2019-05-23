@@ -539,6 +539,7 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 	else
 	{
 		verticesCount = 24;
+		vertices = new VertexType[verticesCount];
 		////// LEFT //////
 		//First triangle
 		vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.	
@@ -583,8 +584,11 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 
 	m_indexCount = verticesCount;
 
-	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
-		return false;
+	if (indices != 0)
+	{
+		if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
+			return false;
+	}
 
 	return true;
 }

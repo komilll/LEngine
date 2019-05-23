@@ -50,6 +50,7 @@ private:
 	std::string GetFunctionDeclarations();
 	std::string GetFunctionDefinitions();
 	vector<std::string> GetFilenamesInDirectory(std::string dir, bool withDir = true);
+	std::string ConvertReturnType(std::string outName, std::string typeIn, std::string typeOut);
 
 	void ShowFunctionChoosingWindow();
 	void LoadFunctionsFromDirectory();
@@ -67,6 +68,7 @@ private:
 	MouseClass* m_mouse;
 	vector<UIShaderEditorBlock*> m_blocks{};
 	UIShaderEditorBlock* m_originalGeneratorBlock{};
+	std::string m_originalRequiredType{};
 	std::vector<const char*> ChoosingWindowItemsOriginal{};
 
 	bool m_mouseHoveredImGui{ false };

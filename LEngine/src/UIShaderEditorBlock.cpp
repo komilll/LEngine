@@ -249,15 +249,24 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 			else if (m_returnType == "float")
 			{
 				float val = m_outputNodes.at(0)->m_value;
-				ss << val << ".0f";
+				if ((int)val == val)
+					ss << val << ".0f";
+				else
+					ss << val << "f";
 				func += ss.str();
 			}
 			else if (m_returnType == "float2")
 			{
 				XMFLOAT2 val{ m_outputNodes.at(0)->m_valueTwo };
 				func += "float2(";
-				ss << val.x << ".0f, ";
-				ss << val.y << ".0f";
+				if ((int)val.x == val.x)
+					ss << val.x << ".0f, ";
+				else
+					ss << val.x << "f, ";
+				if ((int)val.y == val.y)
+					ss << val.y << ".0f";
+				else
+					ss << val.y << "f";
 				func += ss.str();
 				func += ")";
 			}
@@ -265,9 +274,18 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 			{
 				XMFLOAT3 val{ m_outputNodes.at(0)->m_valueThree };
 				func += "float3(";
-				ss << val.x << ".0f, ";
-				ss << val.y << ".0f, ";
-				ss << val.z << ".0f";
+				if ((int)val.x == val.x)
+					ss << val.x << ".0f, ";
+				else
+					ss << val.x << "f, ";
+				if ((int)val.y == val.y)
+					ss << val.y << ".0f, ";
+				else
+					ss << val.y << "f, ";
+				if ((int)val.z == val.z)
+					ss << val.z << ".0f";
+				else
+					ss << val.z << "f";
 				func += ss.str();
 				func += ")";
 			}
@@ -275,10 +293,22 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 			{
 				XMFLOAT4 val{ m_outputNodes.at(0)->m_valueFour };
 				func += "float4(";
-				ss << val.x << ".0f, ";
-				ss << val.y << ".0f, ";
-				ss << val.z << ".0f, ";
-				ss << val.w << ".0f";
+				if ((int)val.x == val.x)
+					ss << val.x << ".0f, ";
+				else
+					ss << val.x << "f, ";
+				if ((int)val.y == val.y)
+					ss << val.y << ".0f, ";
+				else
+					ss << val.y << "f, ";
+				if ((int)val.z == val.z)
+					ss << val.z << ".0f, ";
+				else
+					ss << val.z << "f, ";
+				if ((int)val.w == val.w)
+					ss << val.w << ".0f";
+				else
+					ss << val.w << "f";
 				func += ss.str();
 				func += ")";
 			}
@@ -293,15 +323,17 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 	{
 		func = { (skipTabulator ? "" : "\t") + m_returnType + " " + m_variableName + " = " + m_functionName + "(" };
 		std::vector<std::string> args = {};
-		for (const auto& node : m_inputNodes)
+
+		for (int i = 0; i < m_inputNodes.size(); ++i)
 		{
+			const auto& node = m_inputNodes.at(i);
 			if (node->m_connectedOutputNode != nullptr)
 			{
 				args.push_back(node->m_connectedOutputNode->m_variableName);
 			}
 			else
 			{
-				args.push_back("0.0f");
+				args.push_back(ReturnEmptyForGivenType(m_argumentTypes.at(i)));
 			}
 		}
 		for (int i = 0; i < args.size(); ++i)
@@ -342,6 +374,11 @@ UIShaderEditorOutput * UIShaderEditorBlock::GetFirstOutputNode()
 std::string UIShaderEditorBlock::GetFunctionName()
 {
 	return m_functionName;
+}
+
+std::string UIShaderEditorBlock::GetReturnType()
+{
+	return m_returnType;
 }
 
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
@@ -397,6 +434,20 @@ bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 	}
 
 	return true;
+}
+
+std::string UIShaderEditorBlock::ReturnEmptyForGivenType(std::string type)
+{
+	if (type == "float")
+		return "0.0f";
+	else if (type == "float2")
+		return "float2(0.0f, 0.0f)";
+	else if (type == "float3")
+		return "float3(0.0f, 0.0f, 0.0f)";
+	else if (type == "float4")
+		return "float4(0.0f, 0.0f, 0.0f, 0.0f)";
+
+	return "";
 }
 
 UIShaderEditorInput* UIShaderEditorBlock::CheckIfMouseOnInputPin(MouseClass* mouse)

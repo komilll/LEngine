@@ -1,14 +1,22 @@
+#define NUM_LIGHTS_DIRECTIONAL 1
+#define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer
 {
-	float3 g_direction;
-	float g_lightStrength;
+	float4 g_directionalLightDirectionStrength[NUM_LIGHTS_DIRECTIONAL];
+	float4 g_directionalLightColor[NUM_LIGHTS_DIRECTIONAL];
+#if NUM_LIGHTS_POINT > 0
+	float4 g_pointLightPositionWithRadius[NUM_LIGHTS_POINT];
+	float4 g_pointLightColorWithStrength[NUM_LIGHTS_POINT];
+#endif
 };
 
 cbuffer PBRBuffer
 {
 	float g_roughness;
 	float g_metalness;
-	float2 g_paddingPBR;
+	float g_roughnessLOD;
+	float g_paddingPBR;
+	float4 g_albedoTint;
 };
 
 cbuffer ShaderTextureBuffer
@@ -16,7 +24,7 @@ cbuffer ShaderTextureBuffer
 	int g_hasNormalMap;
 	int g_hasRoughnessMap;
 	int g_hasMetalnessMap;
-	int g_paddingShaderTextureBuffer;
+	int g_hasAlbedoMap;
 };
 
 //////////////
@@ -30,24 +38,31 @@ struct PixelInputType
 	float3 viewDirection : TEXCOORD1;
 	float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
+	float3 diffuseLookUp : TEXCOORD2;
 };
 
 //////////////
 // CLASSES //
 //////////////
-float3 GetNormalValue(float4 normalMap, float3 tangent, float3 binormal, float3 normal);
-//float GetRoughness(float roughnessMap, float roughness);
-//float GetMetalness(float metalnessMap, float metalness);
-
-float GeometrySchlickGGX(float NdotV, float k);
-float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
-float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
-float FresnelSchlick(float F0, float3 albedo, float metalness, float NdotV, float exp);
-
-//PBR INPUTS
+float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 normal);
 float GetRoughness();
 float GetMetalness();
 float3 GetNormal();
 float4 GetBaseColor();
 
-//SHADER EDITOR METHODS
+float GeometrySchlickGGX(float NdotV, float k);
+float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
+float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
+float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
+float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness);
+
+float3 GetPrefilteredColor(float roughness, float3 R);
+
+//////////////////
+// CONST VALUES //
+//////////////////
+static const float PI = 3.14159265359;
+//Point light const values
+static const float POINT_LIGHT_CONSTANT = 1.0f;
+static const float POINT_LIGHT_LINEAR = 0.7f;
+static const float POINT_LIGHT_QUADRATIC = 1.8f;

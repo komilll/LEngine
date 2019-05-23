@@ -78,7 +78,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//Create mouse container
 	m_mouse = new MouseClassContainer;
 
-	if (!(m_pbrShader = new ShaderPBRClass))
+	if (!(m_pbrShader = new ShaderPBRGenerated))
 		return false;
 
 	//INITIALIZE ImGUI
@@ -112,7 +112,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
 	BaseShaderClass::vertexInputType input(names, formats);
 
-	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_used.vs", L"pbr_used.ps", input))
+	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_base.vs", L"pbr_base.ps", input))
 		return false;
 
 	//Load textures for PBR shader
@@ -124,7 +124,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
 		return false;
-
+	
+	m_pbrShader->LoadGeneratedTextures(m_D3D->GetDevice());
 	//m_pbrShader->SetRoughness(0.32f);
 	//m_pbrShader->SetMetalness(1.0f);
 

@@ -59,12 +59,14 @@ public:
 	void SetOutputPinName(std::string name);
 	UIShaderEditorOutput* GetFirstOutputNode();
 	std::string GetFunctionName();
+	std::string GetReturnType();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
 	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize);
 	bool InitializeInputNodes(int inCount);
 	bool InitializeOutputNodes(int outCount);
+	std::string ReturnEmptyForGivenType(std::string type);
 
 public:
 	std::string m_variableName{"test"};

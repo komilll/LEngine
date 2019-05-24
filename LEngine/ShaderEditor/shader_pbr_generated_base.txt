@@ -241,10 +241,6 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	/////// RESOURCES ///////
 	//Pixel shader resources
 	bufferNumber = 0;
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_diffuseTextureView);
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_normalTextureView);
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_roughnessTextureView);
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_metalnessTextureView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_irradianceMapView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_brdfLutView);
 	for (const auto& map : m_environmentMapViews)

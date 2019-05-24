@@ -30,6 +30,8 @@ public:
 	void StopDragging();
 	bool IsDragging();
 
+	void SetScale(float scale);
+
 public:
 	UIShaderEditorOutput* m_connectedOutputNode{ nullptr };
 	std::string m_returnType{};
@@ -41,6 +43,8 @@ private:
 
 	float m_translationX{ 0 };
 	float m_translationY{ 0 };
+
+	float m_scale{ 1.0f };
 
 	D3DClass* m_D3D{};
 

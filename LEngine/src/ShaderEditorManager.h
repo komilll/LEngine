@@ -80,6 +80,8 @@ private:
 	std::vector<std::string> m_usedVariableNamesInGenerator{};
 	std::vector<std::string> m_generatedTextureAdresses{};
 
+	float m_scale{ 1.0f };
+
 	bool m_choosingWindow{ false };
 	int m_choosingWindowHandler{ 0 };
 	int m_choosingWindowPosX{ 0 };

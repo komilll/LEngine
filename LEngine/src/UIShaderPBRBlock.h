@@ -38,6 +38,7 @@ public:
 	void StartDragging();
 	void StopDragging();
 	bool IsDragging();
+	void SetScale(float scale);
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
@@ -61,6 +62,7 @@ private:
 	float m_translationX{ 0 };
 	float m_translationY{ 0 };
 	bool m_dragged = { false };
+	float m_scale{ 1.0f };
 
 	UIBase::RectangleVertices m_blockVertices;
 	TextEngine* m_textEngine{};

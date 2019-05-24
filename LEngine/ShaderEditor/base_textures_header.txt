@@ -5,9 +5,11 @@
 /////////////
 // GLOBALS //
 /////////////
-Texture2D shaderTexture[4];
-TextureCube irradianceMap;
-Texture2D specularLUT;
-TextureCube environmentMap[5];
-SamplerState SampleType;
-
+TextureCube irradianceMap : register(t0);
+Texture2D specularLUT : register(t1);
+TextureCube environmentMap_1 : register(t2);
+TextureCube environmentMap_2 : register(t3);
+TextureCube environmentMap_3 : register(t4);
+TextureCube environmentMap_4 : register(t5);
+TextureCube environmentMap_5 : register(t6);
+SamplerState SampleType : register(s0);

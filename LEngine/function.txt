@@ -5,17 +5,23 @@
 /////////////
 // GLOBALS //
 /////////////
-Texture2D shaderTexture[4];
-TextureCube irradianceMap;
-Texture2D specularLUT;
-TextureCube environmentMap[5];
-SamplerState SampleType;
-
-Texture2D additionalTexture[4];
+TextureCube irradianceMap : register(t0);
+Texture2D specularLUT : register(t1);
+TextureCube environmentMap_1 : register(t2);
+TextureCube environmentMap_2 : register(t3);
+TextureCube environmentMap_3 : register(t4);
+TextureCube environmentMap_4 : register(t5);
+TextureCube environmentMap_5 : register(t6);
+SamplerState SampleType : register(s0);
+Texture2D additionalTexture_0 : register(t6);
 static float4 tex_0;
+Texture2D additionalTexture_1 : register(t7);
 static float4 tex_1;
+Texture2D additionalTexture_2 : register(t8);
+static float4 tex_2;
+Texture2D additionalTexture_3 : register(t9);
 static float4 tex_3;
-static float4 tex_5;
+
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer
@@ -96,10 +102,10 @@ float substract(float a, float b);
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	tex_0 = additionalTexture[0].Sample(SampleType, input.tex);
-	tex_1 = additionalTexture[1].Sample(SampleType, input.tex);
-	tex_3 = additionalTexture[2].Sample(SampleType, input.tex);
-	tex_5 = additionalTexture[3].Sample(SampleType, input.tex);
+	tex_0 = additionalTexture_0].Sample(SampleType, input.tex);
+	tex_1 = additionalTexture_1].Sample(SampleType, input.tex);
+	tex_2 = additionalTexture_2].Sample(SampleType, input.tex);
+	tex_3 = additionalTexture_3].Sample(SampleType, input.tex);
 
 //Calculated values
 	float specular;
@@ -118,7 +124,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 //Load texture data
 	//albedo = shaderTexture[0].Sample(SampleType, input.tex);
-	normalMap = shaderTexture[1].Sample(SampleType, input.tex);
+	//normalMap = shaderTexture[1].Sample(SampleType, input.tex);
 	//roughnessMap = shaderTexture[2].Sample(SampleType, input.tex);
 	//metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
 
@@ -146,7 +152,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	F0 = lerp(F0, albedo, metalness);
 //////////////////
 //DIFFUSE IRRADIANCE
-	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(normalMap, input.tangent, input.binormal, input.diffuseLookUp)).rgb;
+	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(GetNormal(), input.tangent, input.binormal, input.diffuseLookUp)).rgb;
 	float3 diffuse = irradiance * albedo;
 	//float3 ambient = 0.03 * albedo;
 
@@ -284,16 +290,9 @@ float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness)
 ////////////////////////////////////////////////////////////////////////////////
 float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 normal)
 {
-	[branch] if(g_hasNormalMap)
-	{
-		normalMap = (normalMap * 2.0f) - 1.0f; //Convert from [0, 1] to [-1, 1]
-		normal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
-		return normalize(normal);
-	}
-	else
-	{
-		return normal;
-	}
+	normalMap = (normalMap * 2.0f) - 1.0f; //Convert from [0, 1] to [-1, 1]
+	normal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
+	return normalize(normal);
 }
 
 ////////////////////////////////////////////////////////////
@@ -301,11 +300,11 @@ float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 
 ////////////////////////////////////////////////////////////
 float3 GetPrefilteredColor(float roughness, float3 R)
 {
-	float3 color_0 = environmentMap[0].Sample(SampleType, R);
-	float3 color_1 = environmentMap[1].Sample(SampleType, R);
-	float3 color_2 = environmentMap[2].Sample(SampleType, R);
-	float3 color_3 = environmentMap[3].Sample(SampleType, R);
-	float3 color_4 = environmentMap[4].Sample(SampleType, R);
+	float3 color_0 = environmentMap_1.Sample(SampleType, R);
+	float3 color_1 = environmentMap_2.Sample(SampleType, R);
+	float3 color_2 = environmentMap_3.Sample(SampleType, R);
+	float3 color_3 = environmentMap_4.Sample(SampleType, R);
+	float3 color_4 = environmentMap_5.Sample(SampleType, R);
 
 	float3 colors[5] = {color_0, color_1, color_2, color_3, color_4};
 	int index = clamp(roughness * 5, 0, 4);
@@ -374,17 +373,17 @@ float4 GetBaseColor()
 }
 float GetMetalness()
 {
-	float out_2 = get_x(tex_1);
-
-	return out_2;
-}
-float GetRoughness()
-{
-	float out_4 = get_x(tex_3);
+	float out_4 = get_x(tex_1);
 
 	return out_4;
 }
+float GetRoughness()
+{
+	float out_5 = get_x(tex_2);
+
+	return out_5;
+}
 float3 GetNormal()
 {
-	return tex_5;
+	return tex_3;
 }

@@ -216,8 +216,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	
 	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
 	//return saturate(finalColor);// * lightIntensity;
-	return finalColor * g_albedoTint;// * lightIntensity;
+	//return finalColor * g_albedoTint;// * lightIntensity;
 
+	return float4(prefilteredColor, 1.0f);
+	
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
 	//return float4(ambient, 1.0);
 }

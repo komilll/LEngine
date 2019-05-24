@@ -16,6 +16,7 @@ public:
 	bool Initialize(D3DClass* d3d, UIShaderEditorOutput* startPin, UIShaderEditorInput* endPin);
 	
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
+	void SetScale(float scale);
 
 	UIShaderEditorInput* GetInput();
 	UIShaderEditorOutput* GetOutput();
@@ -34,6 +35,8 @@ private:
 
 	float m_xDiff{ 0.0f };
 	float m_yDiff{ 0.0f };
+
+	float m_scale{ 1.0f };
 
 private:
 	const float lineThickness = 0.008f;

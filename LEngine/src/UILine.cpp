@@ -23,8 +23,14 @@ bool UILine::Render(ID3D11DeviceContext * deviceContext)
 
 	XMMATRIX worldMatrix = XMMatrixRotationZ(atan(m_yDiff / m_xDiff));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
 
 	return UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0);
+}
+
+void UILine::SetScale(float scale)
+{
+	m_scale = scale;
 }
 
 UIShaderEditorInput * UILine::GetInput()

@@ -241,10 +241,6 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	/////// RESOURCES ///////
 	//Pixel shader resources
 	bufferNumber = 0;
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_diffuseTextureView);
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_normalTextureView);
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_roughnessTextureView);
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_metalnessTextureView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_irradianceMapView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_brdfLutView);
 	for (const auto& map : m_environmentMapViews)
@@ -258,11 +254,11 @@ void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)
 	ID3D11Resource* resource{nullptr};
 
 	m_additionalMapViews.push_back(nullptr);
+	m_additionalMapViews.push_back(nullptr);
+	m_additionalMapViews.push_back(nullptr);
+	m_additionalMapViews.push_back(nullptr);
 	LoadTexture(device, L"Metal_006_Base_Color.dds", resource, m_additionalMapViews.at(0), true);
-	m_additionalMapViews.push_back(nullptr);
-	LoadTexture(device, L"Metal_006_Base_Color.dds", resource, m_additionalMapViews.at(1), true);
-	m_additionalMapViews.push_back(nullptr);
-	LoadTexture(device, L"Metal_006_Base_Color.dds", resource, m_additionalMapViews.at(2), true);
-	m_additionalMapViews.push_back(nullptr);
-	LoadTexture(device, L"Metal_006_Base_Color.dds", resource, m_additionalMapViews.at(3), true);
+	LoadTexture(device, L"Metal_006_Metallic.dds", resource, m_additionalMapViews.at(1), true);
+	LoadTexture(device, L"Metal_006_Roughness.dds", resource, m_additionalMapViews.at(2), true);
+	LoadTexture(device, L"Metal_006_Normal.dds", resource, m_additionalMapViews.at(3), true);
 }

@@ -151,6 +151,11 @@ bool MouseClass::SetMouseLocation(int mouseX, int mouseY)
 	return true;
 }
 
+std::pair<float, float> MouseClass::GetMouseMovementFrame()
+{
+	return { m_mouseState.lX, m_mouseState.lY };
+}
+
 bool MouseClass::GetLMBPressed()
 {
 	return m_mouseState.rgbButtons[0];
@@ -174,6 +179,11 @@ bool MouseClass::GetMMBPressed()
 void MouseClass::SetMMBPressed(bool enable)
 {
 	m_mouseState.rgbButtons[2] = enable;
+}
+
+int MouseClass::GetMouseScroll()
+{
+	return (m_mouseState.lZ / 120.0f);
 }
 
 POINT MouseClass::CurrentMouseLocation()

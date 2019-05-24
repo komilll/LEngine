@@ -43,7 +43,7 @@ bool UIShaderEditorOutput::Initialize(D3DClass * d3d, ModelClass::ShapeSize shap
 {
 	if (m_returnType == "float" || m_returnType == "")
 	{
-		if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+		if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 			return false;
 	}
 	else if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), PIN_SHADER_VS, PIN_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
@@ -103,11 +103,15 @@ void UIShaderEditorOutput::GetPosition(float & x, float & y)
 
 bool UIShaderEditorOutput::Render(ID3D11DeviceContext * deviceContext)
 {
-	XMMATRIX tmpMatrix;
-	tmpMatrix *= 0;
-	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+	//XMMATRIX tmpMatrix;
+	//tmpMatrix *= 0;
+	//tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
-	return UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0);
+	XMMATRIX worldMatrix = XMMatrixIdentity();
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
+
+	return UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0);
 }
 
 bool UIShaderEditorOutput::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
@@ -142,4 +146,9 @@ void UIShaderEditorOutput::StopDragging()
 bool UIShaderEditorOutput::IsDragging()
 {
 	return m_dragged;
+}
+
+void UIShaderEditorOutput::SetScale(float scale)
+{
+	m_scale = scale;
 }

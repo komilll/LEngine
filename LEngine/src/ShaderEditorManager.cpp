@@ -18,6 +18,31 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 	{
 		if (!RenderBlocks(m_D3D->GetDeviceContext()))
 			return;
+		
+		if (m_mouse->GetMouseScroll() != 0.0f && !WillRenderChoosingWindow())
+		{
+			m_scale += (float)m_mouse->GetMouseScroll() * 0.1f;
+			if (m_scale > 1.0f)
+				m_scale = 1.0f;
+			else if (m_scale < 0.1f)
+				m_scale = 0.1f;
+
+			for (const auto& line : m_lines)
+				line->SetScale(m_scale);
+
+			for (const auto& block : m_blocks)
+			{
+				block->SetScale(m_scale);
+				for (const auto& in : block->m_inputNodes)
+					in->SetScale(m_scale);
+				for (const auto& out : block->m_outputNodes)
+					out->SetScale(m_scale);
+			}
+
+			m_pbrBlock->SetScale(m_scale);
+			for (const auto& in : m_pbrBlock->m_inputNodes)
+				in->SetScale(m_scale);
+		}
 	}
 
 	//Check pins first - before moving block, interact with pins
@@ -33,7 +58,7 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		if (block->IsDragging())
 		{
 			std::pair<float, float> mouseMov = m_mouse->MouseFrameMovement();
-			block->Move(mouseMov.first, mouseMov.second);
+			block->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
 			if (m_mouse->GetLMBPressed() == false)
 			{
 				block->StopDragging();
@@ -86,7 +111,7 @@ bool ShaderEditorManager::UpdatePBRBlock(bool mouseOnly)
 		if (m_pbrBlock->IsDragging())
 		{
 			std::pair<float, float> mouseMov = m_mouse->MouseFrameMovement();
-			m_pbrBlock->Move(mouseMov.first, mouseMov.second);
+			m_pbrBlock->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
 			if (m_mouse->GetLMBPressed() == false)
 			{
 				m_pbrBlock->StopDragging();
@@ -180,6 +205,17 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 	{
 		if (block->DragPins(m_mouse))
 			return false;
+	}
+	//No pin is being dragged, nor any block - try to move screen
+	if (m_mouse->GetMMBPressed())
+	{
+		float moveX = -m_mouse->GetMouseMovementFrame().first / m_D3D->GetWindowSize().x / m_scale;
+		float moveY = m_mouse->GetMouseMovementFrame().second / m_D3D->GetWindowSize().y / m_scale;
+		for (const auto& block : m_blocks)
+		{
+			block->Move(moveX, moveY);
+		}
+		m_pbrBlock->Move(moveX, moveY);
 	}
 	return true;
 }
@@ -341,18 +377,22 @@ std::string ShaderEditorManager::GetTextureDeclarations()
 			m_generatedTextureAdresses.push_back(block->m_outputNodes[0]->m_texturePath);
 		}
 	}
-	ostringstream ss;
-	ss << count;
 
 	if (count > 0)
 	{
-		std::string toReturn = "Texture2D additionalTexture[" + ss.str() + "];\n";
+		int index = 0;
+		std::string toReturn{};
 		for (const auto& block : m_blocks)
 		{
 			if (block->GetFunctionName() == "texture")
 			{
-				ostringstream ss;
+				ostringstream ssBegin;
+				ostringstream ssEnd;
+				ssBegin << index;
+				ssEnd << (index + 7);
+				toReturn += "Texture2D additionalTexture_" + ssBegin.str() + " : register(t" + ssEnd.str() + ");\n";
 				toReturn += "static float4 " + block->m_outputNodes[0]->m_variableName + ";\n";
+				index++;
 			}
 		}
 		return toReturn;
@@ -373,7 +413,7 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 			ostringstream ss;
 			ss << index;
 			index++;
-			toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture[" + ss.str() + "].Sample(SampleType, input.tex);\n";
+			toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
 		}
 	}
 
@@ -511,11 +551,15 @@ void ShaderEditorManager::GeneratePBRClassCode()
 	dst << "void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)\n";
 	dst << "{\n";
 	dst << "\tID3D11Resource* resource{nullptr};\n\n";
+
+	for (int i = 0; i < m_generatedTextureAdresses.size(); ++i)
+	{
+		dst << "\tm_additionalMapViews.push_back(nullptr);\n";
+	}
 	for (int i = 0; i < m_generatedTextureAdresses.size(); ++i)
 	{
 		ostringstream ss;
 		ss << i;
-		dst << "\tm_additionalMapViews.push_back(nullptr);\n";
 		dst << "\tLoadTexture(device, L\"" + m_generatedTextureAdresses.at(i) + "\", resource, m_additionalMapViews.at(" + ss.str() + "), true);\n";
 	}
 	dst << "}";
@@ -604,7 +648,7 @@ void ShaderEditorManager::GenerateCodeToFile()
 		}
 	}
 	
-	//std::ofstream dst("pbr_used.ps", std::ios::binary);
+	//std::ofstream dst("function.txt", std::ios::binary);
 	std::ofstream dst("pbr_used.ps", std::ios::binary);
 
 	if (std::ifstream src{ "ShaderEditor/base_textures_header.txt", std::ios::binary })
@@ -821,7 +865,15 @@ void ShaderEditorManager::SetRefToClickedOutside(bool* clickedOutside)
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount)
 {
 	if (block->Initialize(m_D3D, inCount, outCount))
+	{
+		block->SetScale(m_scale);
+		for (const auto& in : block->m_inputNodes)
+			in->SetScale(m_scale);
+		for (const auto& out : block->m_outputNodes)
+			out->SetScale(m_scale);
+
 		m_blocks.push_back(block);
+	}
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock * block)

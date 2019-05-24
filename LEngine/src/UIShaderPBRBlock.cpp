@@ -39,8 +39,8 @@ bool UIShaderPBRBlock::MouseOnArea(MouseClass * mouse)
 
 	mouseY *= -1.0f;
 
-	if (mouseX >(m_blockVertices.minX + m_translationX) && mouseX < (m_blockVertices.maxX + m_translationX) &&
-		mouseY >(m_blockVertices.minY + m_translationY) && mouseY < (m_blockVertices.maxY + m_translationY))
+	if (mouseX >(m_blockVertices.minX + m_translationX) * m_scale && mouseX < (m_blockVertices.maxX + m_translationX) * m_scale &&
+		mouseY >(m_blockVertices.minY + m_translationY) * m_scale && mouseY < (m_blockVertices.maxY + m_translationY) * m_scale)
 	{
 		result = true;
 	}
@@ -51,7 +51,7 @@ bool UIShaderPBRBlock::MouseOnArea(MouseClass * mouse)
 bool UIShaderPBRBlock::Initialize(D3DClass * d3d)
 {
 	m_D3D = d3d;
-	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
 
 	CalculateBlockVertices();
@@ -95,13 +95,22 @@ bool UIShaderPBRBlock::IsDragging()
 	return m_dragged;
 }
 
+void UIShaderPBRBlock::SetScale(float scale)
+{
+	m_scale = scale;
+}
+
 bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 {
-	XMMATRIX tmpMatrix;
-	tmpMatrix *= 0;
-	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+	//XMMATRIX tmpMatrix;
+	//tmpMatrix *= 0;
+	//tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+
+	XMMATRIX worldMatrix = XMMatrixIdentity();
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
 	
-	if (UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+	if (UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
 	{
 		for (const auto& node : m_inputNodes)
 		{
@@ -113,8 +122,9 @@ bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 		{
 			for (int i = 0; i < m_textPositionModifiers.size(); ++i)
 			{
-				m_textEngine->GetData(i)->SetPosition(m_translationX + m_textPositionModifiers.at(i).first, 
-					m_translationY + m_textPositionModifiers.at(i).second, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(i)->SetPosition((m_translationX + m_textPositionModifiers.at(i).first) * m_scale,
+					(m_translationY + m_textPositionModifiers.at(i).second) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(i)->scale = 0.38f * m_scale;
 				m_textEngine->RenderText(deviceContext, 1, 1);
 			}
 		}

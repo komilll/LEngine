@@ -28,6 +28,8 @@ public:
 	void StopDragging();
 	bool IsDragging();
 
+	void SetScale(float scale);
+
 public:
 	float m_value{ 0.0f };
 	float m_valueTwo[2]{ 0.0f, 0.0f };
@@ -48,6 +50,8 @@ private:
 
 	float m_translationX{ 0 };
 	float m_translationY{ 0 };
+
+	float m_scale{ 1.0f };
 
 	D3DClass* m_D3D{};
 

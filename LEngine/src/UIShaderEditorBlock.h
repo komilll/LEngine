@@ -61,6 +61,8 @@ public:
 	std::string GetFunctionName();
 	std::string GetReturnType();
 
+	void SetScale(float scale);
+
 private:
 	void CalculateBlockSize(int inCount, int outCount);
 	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize);
@@ -94,6 +96,8 @@ private:
 	std::string m_blockName{ "add" };
 
 	UIBase* m_outlineObject{};
+
+	float m_scale{ 1.0f };
 
 private:
 	const vector<Size> blockSizeVector = { Size{ 0.4f, 0.2f }, Size{ 0.4f, 0.28f }, Size{ 0.4f, 0.35f }, Size{ 0.4f, 0.43f }, Size{ 0.4f, 0.51f } };

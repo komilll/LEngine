@@ -192,11 +192,11 @@ float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 
 ////////////////////////////////////////////////////////////
 float3 GetPrefilteredColor(float roughness, float3 R)
 {
-	float3 color_0 = environmentMap[0].Sample(SampleType, R);
-	float3 color_1 = environmentMap[1].Sample(SampleType, R);
-	float3 color_2 = environmentMap[2].Sample(SampleType, R);
-	float3 color_3 = environmentMap[3].Sample(SampleType, R);
-	float3 color_4 = environmentMap[4].Sample(SampleType, R);
+	float3 color_0 = environmentMap_1.Sample(SampleType, R);
+	float3 color_1 = environmentMap_2.Sample(SampleType, R);
+	float3 color_2 = environmentMap_3.Sample(SampleType, R);
+	float3 color_3 = environmentMap_4.Sample(SampleType, R);
+	float3 color_4 = environmentMap_5.Sample(SampleType, R);
 
 	float3 colors[5] = {color_0, color_1, color_2, color_3, color_4};
 	int index = clamp(roughness * 5, 0, 4);

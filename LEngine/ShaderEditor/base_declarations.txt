@@ -1,3 +1,4 @@
+
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer

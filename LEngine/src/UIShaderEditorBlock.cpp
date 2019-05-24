@@ -51,8 +51,8 @@ bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 
 	mouseY *= -1.0f;
 
-	if (mouseX > (m_blockVertices.minX + m_translationX) && mouseX < (m_blockVertices.maxX + m_translationX) &&
-		mouseY > (m_blockVertices.minY + m_translationY) && mouseY < (m_blockVertices.maxY + m_translationY) )
+	if (mouseX > (m_blockVertices.minX + m_translationX) * m_scale && mouseX < (m_blockVertices.maxX + m_translationX) * m_scale &&
+		mouseY > (m_blockVertices.minY + m_translationY) * m_scale && mouseY < (m_blockVertices.maxY + m_translationY) * m_scale)
 	{
 		result = true;
 	}
@@ -63,7 +63,7 @@ bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 {
 	m_D3D = d3d;
-	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
 
 	CalculateBlockSize(inCount, outCount);
@@ -83,7 +83,7 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 
 	//Create outline
 	m_outlineObject = new UIBase;
-	if (!m_outlineObject->Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+	if (!m_outlineObject->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
 	if (!m_outlineObject->InitializeModelGeneric(d3d->GetDevice(), CalculateOutlineSize(m_blockVertices), false, true))
 		return false;
@@ -180,19 +180,25 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	if (!m_blockInitialized)
 		return true;
 
-	XMMATRIX tmpMatrix;
-	tmpMatrix *= 0;
-	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+	XMMATRIX worldMatrix = XMMatrixIdentity();
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
+
+	//worldMatrix *= 0;
+	//worldMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 
 	if (m_focused && m_outlineObject)
 	{
 		//Render outline
-		if (m_outlineObject && !m_outlineObject->Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+		if (m_outlineObject && !m_outlineObject->Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
 			return false;
 	}
-	tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+	//worldMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
+	worldMatrix = XMMatrixIdentity();
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
 
-	if (UIBase::Render(deviceContext, 0, tmpMatrix, tmpMatrix * 0, tmpMatrix * 0))
+	if (UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
 	{
 		for (const auto& node : m_inputNodes)
 		{
@@ -210,16 +216,17 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 		{
 			if (m_functionName == "float")
 			{
-				m_textEngine->GetData(0)->SetPosition(m_translationX - 0.1f, m_translationY, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(0)->SetPosition((m_translationX - 0.1f) * m_scale, m_translationY * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 				ostringstream oss;
 				oss << m_outputNodes[0]->m_value;
 				m_textEngine->GetData(0)->text = "FLOAT:" + oss.str();
-				m_textEngine->GetData(0)->scale = 0.75f;
+				m_textEngine->GetData(0)->scale = 0.75f * m_scale;
 			}
 			else
 			{
-				m_textEngine->GetData(0)->SetPosition(m_translationX, m_translationY, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-			}
+				m_textEngine->GetData(0)->scale = m_scale;
+				m_textEngine->GetData(0)->SetPosition(m_translationX * m_scale, m_translationY * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+			}			
 			m_textEngine->RenderText(deviceContext, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 		}
 
@@ -379,6 +386,11 @@ std::string UIShaderEditorBlock::GetFunctionName()
 std::string UIShaderEditorBlock::GetReturnType()
 {
 	return m_returnType;
+}
+
+void UIShaderEditorBlock::SetScale(float scale)
+{
+	m_scale = scale;
 }
 
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)

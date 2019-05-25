@@ -374,6 +374,19 @@ void SystemClass::HandleInput()
 				m_Graphics->AcceptCurrentChoosingWindowShader();
 			}
 		}
+		if ((::GetKeyState(VK_CONTROL) & 0x8000) != 0 && !m_Mouse->GetLMBPressed())
+		{
+			if (m_Input->IsKeyDown(VK_C))
+			{
+				m_Input->KeyUp(VK_C);
+				m_Graphics->CopyBlocks();
+			}
+			else if (m_Input->IsKeyDown(VK_V))
+			{
+				m_Input->KeyUp(VK_V);
+				m_Graphics->PasteBlocks();
+			}
+		}
 	}
 	else
 	{

@@ -145,6 +145,9 @@ public:
 	void FocusOnChoosingWindowsShader();
 	void AcceptCurrentChoosingWindowShader();
 
+	void CopyBlocks();
+	void PasteBlocks();
+
 private:
 	bool Render();
 	bool RenderScene();

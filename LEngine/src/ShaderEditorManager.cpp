@@ -10,6 +10,11 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	CreateChoosingWindowItemsArray();
 
 	m_blocks.reserve(64);
+	m_markingArea = new UIBase;
+	m_markingArea->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(m_markingArea->GetInputNames(), m_markingArea->GetInputFormats()));
+	//m_markingArea->InitializeModelGeneric(d3d->GetDevice(), {0.2f, 0.5f, -0.5f, 0.5f}, false, true);
+	m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { -10000.0f, -10000.0f, -10000.0f, -10000.0f }, false, true);
+	m_markingArea->ChangeColor(0.85f, 0.85f, 0.85f, 1.0f);
 }
 
 void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
@@ -45,53 +50,92 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		}
 	}
 
-	//Check pins first - before moving block, interact with pins
-	if (!UpdatePinsOfAllBlocks())
-		return;
-
-	if (!UpdatePBRBlock(mouseOnly))
-		return;
-
-	//If user is dragging one block - he won't interact with any other block until freed previous one
-	for (const auto& block : m_blocks)
+	if (!m_alreadyMarkingArea)
 	{
-		if (block->IsDragging())
+		m_focusedPBR = m_pbrBlock->m_focused;
+		//Check pins first - before moving block, interact with pins
+		if (!UpdatePinsOfAllBlocks())
+			return;
+
+		if (!UpdatePBRBlock(mouseOnly))
+			return;
+
+		//If user is dragging one block - he won't interact with any other block until freed previous one
+		for (const auto& block : m_blocks)
 		{
-			std::pair<float, float> mouseMov = m_mouse->MouseFrameMovement();
-			block->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
-			if (m_mouse->GetLMBPressed() == false)
+			if (block->IsDragging())
 			{
-				block->StopDragging();
+				std::pair<float, float> mouseMov = m_mouse->MouseFrameMovement();
+				block->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
+				if (m_mouse->GetLMBPressed() == false)
+				{
+					block->StopDragging();
+				}
+				MoveMultipleBlocks(block, mouseMov);
+				return;
 			}
+		}
+
+		//User can start dragging only one block at the time - dragging multiple blocks is not available
+		for (const auto& block : m_blocks)
+		{
+			if (block->MouseOnArea(m_mouse) && m_mouse->GetLMBPressed())
+			{
+				if (!m_mouseHoveredImGui)
+				{
+					TryToResetFocusOnAllBlocks();
+					block->StartDragging();
+					m_focusedBlock = block;
+				}
+				return;
+			}
+		}
+
+		//No interaction with blocks or pins - check if pressed to create new block
+		if (m_mouse->GetRMBPressed() && !WillRenderChoosingWindow())
+		{
+			m_mouse->SetRMBPressed(false);
+			ShowFunctionChoosingWindow();
+		}
+		else if (m_mouse->GetLMBPressed() && !WillRenderChoosingWindow())
+		{
+			TryToResetFocusOnAllBlocks();
+		}
+		//No pin is being dragged, nor any block - try to move screen
+		if (m_mouse->GetMMBPressed())
+		{
+			float moveX = -m_mouse->GetMouseMovementFrame().first / m_D3D->GetWindowSize().x / m_scale;
+			float moveY = m_mouse->GetMouseMovementFrame().second / m_D3D->GetWindowSize().y / m_scale;
+			for (const auto& block : m_blocks)
+			{
+				block->Move(moveX, moveY);
+			}
+			m_pbrBlock->Move(moveX, moveY);
 			return;
 		}
 	}
-
-	//User can start dragging only one block at the time - dragging multiple blocks is not available
-	for (const auto& block : m_blocks)
+	//No blocks interaction/screen movement - try to mark many elements (to further movement/deleting/copying)
+	if (m_mouse->GetLMBPressed()) //Start marking area
 	{
-		if (block->MouseOnArea(m_mouse) && m_mouse->GetLMBPressed())
+		if (!m_alreadyMarkingArea)
 		{
-			if (!m_mouseHoveredImGui)
-			{
-				ResetFocusOnAllBlocks();
-				block->StartDragging();
-				m_focusedBlock = block;
-			}
-			return;
+			m_alreadyMarkingArea = true;
+			std::pair<float, float> tmpMousePos = GetCurrentMousePosition();
+			m_mouseDragStartX = tmpMousePos.first;
+			m_mouseDragStartY = tmpMousePos.second;
+		}
+		else
+		{
+			float newWidth = 0.007f / m_scale;
+			m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { GetMarkingBounds() }, false, true, newWidth);
 		}
 	}
-
-	//No interaction with blocks or pins - check if pressed to create new block
-	if (m_mouse->GetRMBPressed() && !WillRenderChoosingWindow())
+	else if (m_alreadyMarkingArea) //Stop marking area
 	{
-		m_mouse->SetRMBPressed(false);
-		ShowFunctionChoosingWindow();
-	}
-	else if (m_mouse->GetLMBPressed() && !WillRenderChoosingWindow())
-	{
-		if (!m_mouseHoveredImGui)
-			ResetFocusOnAllBlocks();
+		TryToMarkManyBlocks(GetMarkingBounds());
+		m_alreadyMarkingArea = false;
+		m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { -10000.0f, -10000.0f, -10000.0f, -10000.0f }, false, true);
+		return;
 	}
 }
 
@@ -111,7 +155,8 @@ bool ShaderEditorManager::UpdatePBRBlock(bool mouseOnly)
 		if (m_pbrBlock->IsDragging())
 		{
 			std::pair<float, float> mouseMov = m_mouse->MouseFrameMovement();
-			m_pbrBlock->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
+			//m_pbrBlock->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
+			MoveMultipleBlocks(nullptr, mouseMov);
 			if (m_mouse->GetLMBPressed() == false)
 			{
 				m_pbrBlock->StopDragging();
@@ -121,6 +166,11 @@ bool ShaderEditorManager::UpdatePBRBlock(bool mouseOnly)
 
 		if (m_pbrBlock->MouseOnArea(m_mouse) && m_mouse->GetLMBPressed())
 		{
+			if (!m_mouseHoveredImGui)
+			{
+				m_pbrBlock->m_focused = true;
+				m_focusedBlock = nullptr;
+			}
 			m_pbrBlock->StartDragging();
 			return false;
 		}
@@ -206,17 +256,6 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		if (block->DragPins(m_mouse))
 			return false;
 	}
-	//No pin is being dragged, nor any block - try to move screen
-	if (m_mouse->GetMMBPressed())
-	{
-		float moveX = -m_mouse->GetMouseMovementFrame().first / m_D3D->GetWindowSize().x / m_scale;
-		float moveY = m_mouse->GetMouseMovementFrame().second / m_D3D->GetWindowSize().y / m_scale;
-		for (const auto& block : m_blocks)
-		{
-			block->Move(moveX, moveY);
-		}
-		m_pbrBlock->Move(moveX, moveY);
-	}
 	return true;
 }
 
@@ -244,7 +283,33 @@ void ShaderEditorManager::ResetFocusOnAllBlocks()
 	{
 		block->m_focused = false;
 	}
+	m_pbrBlock->m_focused = false;
 	m_focusedBlock = nullptr;
+}
+
+bool ShaderEditorManager::TryToResetFocusOnAllBlocks()
+{
+	if (!m_mouseHoveredImGui)
+	{
+		bool canReset = true;
+		int count = 0;
+		for (const auto& block : m_blocks)
+		{
+			if (block->m_focused)
+			{
+				count++;
+				if (block->MouseOnArea(m_mouse))
+					canReset = false;
+			}
+		}
+		if (canReset || count <= 1)
+		{
+			ResetFocusOnAllBlocks();
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void ShaderEditorManager::CreateChoosingWindowItemsArray()
@@ -286,26 +351,31 @@ bool ShaderEditorManager::TryCreateScalarBlocks(std::string name)
 	if (name == "float1")
 	{
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float", "float",{ "" } }), 0, 1);
+		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "float2")
 	{
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float2", "float2",{ "" } }), 0, 1);
+		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "float3")
 	{
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float3", "float3",{ "" } }), 0, 1);
+		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "float4")
 	{
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float4", "float4",{ "" } }), 0, 1);
+		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "texture")
 	{
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "texture", "float4",{ "" } }), 0, 1);
+		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 
@@ -566,6 +636,150 @@ void ShaderEditorManager::GeneratePBRClassCode()
 	dst.close();
 }
 
+bool ShaderEditorManager::SaveMaterial(std::string filename)
+{
+	std::ofstream output("Materials/" + filename + ".material", std::ios::binary);
+	
+	int count = m_blocks.size();
+	std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
+	output.write(reinterpret_cast<const char*>(&count), sizeof(count));
+
+	for (const auto& block : m_blocks)
+	{
+		float x = block->GetPosition().x;
+		float y = block->GetPosition().y;
+		std::string name = block->m_fileName;
+
+		output.write(reinterpret_cast<const char*>(&x), sizeof(x));
+		output.write(reinterpret_cast<const char*>(&y), sizeof(y));
+		int index = 0;
+		for (const auto& func : functions)
+		{
+			if (name + ".txt" == func)
+			{
+				output.write(reinterpret_cast<const char*>(&index), sizeof(index));
+				break;
+			}
+			index++;
+		}
+	}
+
+	output.clear();
+	output.close();
+
+	return true;
+}
+
+bool ShaderEditorManager::LoadMaterial(std::string filename)
+{
+	std::ifstream input("Materials/" + filename + ".material", std::ios::binary);
+	if (input.fail())
+		return false;
+
+	int numOfElements;
+	input.read(reinterpret_cast<char*>(&numOfElements), sizeof(numOfElements));
+
+	float x;
+	float y;
+	int index = 0;
+	std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
+
+	for (int i = 0; i < numOfElements; ++i)
+	{
+		input.read(reinterpret_cast<char*>(&x), sizeof(x));
+		input.read(reinterpret_cast<char*>(&y), sizeof(y));
+		input.read(reinterpret_cast<char*>(&index), sizeof(index));
+
+		std::string name = functions.at(index);
+		const std::string toRemove = ".txt";
+		size_t pos = name.find(toRemove);
+		if (pos != std::string::npos)
+		{
+			name.erase(pos, toRemove.length());
+		}
+		CreateBlock(name);
+		m_blocks.at(m_blocks.size() - 1)->Move(x, y);
+	}
+
+	input.clear();
+	input.close();
+
+	return true;
+}
+
+std::pair<float, float> ShaderEditorManager::GetCurrentMousePosition()
+{
+	float mouseX{ 0 };
+	float mouseY{ 0 };
+	POINT p = m_mouse->CurrentMouseLocation();
+
+	//Calculate mouse X
+	mouseX = (float)p.x / (float)m_D3D->GetWindowSize().x;
+	mouseX = mouseX * 2.0f - 1.0f;
+	if (mouseX > 1.0f)
+		mouseX = 1.0f;
+	else if (mouseX < -1.0f)
+		mouseX = -1.0f;
+
+	//Calculate mouse Y
+	mouseY = (float)p.y / (float)m_D3D->GetWindowSize().y;
+	mouseY = mouseY * 2.0f - 1.0f;
+	if (mouseY > 1.0f)
+		mouseY = 1.0f;
+	else if (mouseY < -1.0f)
+		mouseY = -1.0f;
+
+	mouseY *= -1.0f;
+
+	return{ mouseX, mouseY };
+}
+
+UIBase::RectangleVertices ShaderEditorManager::GetMarkingBounds()
+{
+	std::pair<float, float> tmpMousePos = GetCurrentMousePosition();
+	float currentMouseX = tmpMousePos.first;
+	float currentMouseY = tmpMousePos.second;
+
+	float minX = (m_mouseDragStartX < currentMouseX) ? m_mouseDragStartX : currentMouseX;
+	float maxX = (m_mouseDragStartX > currentMouseX) ? m_mouseDragStartX : currentMouseX;
+	float minY = (m_mouseDragStartY < currentMouseY) ? m_mouseDragStartY : currentMouseY;
+	float maxY = (m_mouseDragStartY > currentMouseY) ? m_mouseDragStartY : currentMouseY;
+
+	return{ minX / m_scale, maxX / m_scale, minY / m_scale, maxY / m_scale };
+}
+
+void ShaderEditorManager::TryToMarkManyBlocks(float minX, float maxX, float minY, float maxY)
+{
+	TryToMarkManyBlocks({ minX, maxX, minY, maxY });
+}
+
+void ShaderEditorManager::TryToMarkManyBlocks(UIBase::RectangleVertices bounds)
+{
+	for (const auto& block : m_blocks)
+	{
+		if (block->TryToMarkBlock(bounds))
+		{
+			block->m_focused = true;
+		}
+	}
+	if (m_pbrBlock->TryToMarkBlock(bounds))
+		m_pbrBlock->m_focused = true;
+}
+
+void ShaderEditorManager::MoveMultipleBlocks(UIShaderEditorBlock * currentBlock, std::pair<float, float> mouseMov)
+{
+	//Move all focused blocks (not only the dragged one)
+	for (const auto& otherBlock : m_blocks)
+	{
+		if (otherBlock->m_focused && currentBlock != otherBlock)
+		{
+			otherBlock->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
+		}
+	}
+	if (m_pbrBlock->m_focused || m_pbrBlock->IsDragging())
+		m_pbrBlock->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
+}
+
 void ShaderEditorManager::GenerateCodeToFile()
 {
 	std::string func{};
@@ -753,6 +967,7 @@ void ShaderEditorManager::CreateBlock(std::string name)
 			}
 		}
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes }), argumentTypes.size(), 1);
+		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 	}
 }
 
@@ -862,6 +1077,28 @@ void ShaderEditorManager::SetRefToClickedOutside(bool* clickedOutside)
 	m_focusOnChoosingWindowsShader = clickedOutside;
 }
 
+void ShaderEditorManager::CopyBlocks()
+{
+	for (const auto& block : m_blocks)
+	{
+		if (block->m_focused)
+		{
+			m_copiedBlocks.push_back(block);
+		}
+	}
+}
+
+void ShaderEditorManager::PasteBlocks()
+{
+	ResetFocusOnAllBlocks();
+	for (const auto& block : m_copiedBlocks)
+	{
+		CreateBlock(block->m_fileName);
+		m_blocks.at(m_blocks.size() - 1)->Move(block->GetPosition().x + 0.25f * m_scale, block->GetPosition().y + 0.1f * m_scale);
+		m_blocks.at(m_blocks.size() - 1)->m_focused = true;
+	}
+}
+
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount)
 {
 	if (block->Initialize(m_D3D, inCount, outCount))
@@ -923,6 +1160,16 @@ bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 		}
 
 		if (!m_lines.at(i)->Render(deviceContext))
+			return false;
+	}
+
+	if (m_markingArea)
+	{
+		XMMATRIX worldMatrix = XMMatrixIdentity();
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, 0.0f, 0.0f));
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
+
+		if (!m_markingArea->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
 			return false;
 	}
 

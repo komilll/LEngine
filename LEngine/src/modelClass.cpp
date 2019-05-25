@@ -29,14 +29,14 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 	return true;
 }
 
-bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty)
+bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
 {
 	m_position = XMFLOAT4(0, 0, 0, 0);
 
 	switch (shape)
 	{
 		case ModelClass::ShapeSize::RECTANGLE:
-			return CreateRectangle(device, left, right, top, bottom, withTex, isEmpty);
+			return CreateRectangle(device, left, right, top, bottom, withTex, isEmpty, borderWidth);
 		case ModelClass::ShapeSize::TRIANGLE:
 			return CreateTriangle(device, left, right, top, bottom);
 		default:
@@ -502,14 +502,14 @@ bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &
 }
 
 /////// SHAPES DRAWING ///////
-bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom, bool withTex, bool isEmpty)
+bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
 {
 	VertexType* vertices;
 	unsigned long* indices;
 
 	int verticesCount = 6;
 
-	float widthLeft = 0.007f;
+	float widthLeft = borderWidth;
 	float widthTop = widthLeft * 16.0f / 9.0f;
 
 	vertices = new VertexType[verticesCount];

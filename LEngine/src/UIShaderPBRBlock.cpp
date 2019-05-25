@@ -68,6 +68,13 @@ bool UIShaderPBRBlock::Initialize(D3DClass * d3d)
 	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Roughness", 0.38f, TextEngine::Align::CENTER);
 	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Normal", 0.38f, TextEngine::Align::CENTER);
 
+	m_outlineObject = new UIBase;
+	if (!m_outlineObject->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+		return false;
+	if (!m_outlineObject->InitializeModelGeneric(d3d->GetDevice(), CalculateOutlineSize(m_blockVertices), false, true))
+		return false;
+	m_outlineObject->ChangeColor(outlineColor);
+
 	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
 }
 
@@ -100,6 +107,60 @@ void UIShaderPBRBlock::SetScale(float scale)
 	m_scale = scale;
 }
 
+bool UIShaderPBRBlock::TryToMarkBlock(RectangleVertices markingBounds)
+{
+	int correctPos = 0; //Need to get 2 points
+	float minX = m_blockVertices.minX + m_translationX;
+	float maxX = m_blockVertices.maxX + m_translationX;
+	float minY = m_blockVertices.minY + m_translationY;
+	float maxY = m_blockVertices.maxY + m_translationY;
+
+	//TEST X POSITION
+	//Block in middle X
+	if (markingBounds.minX < minX && markingBounds.maxX > maxX)
+	{
+		correctPos++;
+	}
+	//Block on left crossed X
+	else if (markingBounds.minX > minX && markingBounds.maxX > maxX && markingBounds.minX < maxX)
+	{
+		correctPos++;
+	}
+	//Block on right crossed X
+	else if (markingBounds.maxX < maxX && markingBounds.minX < minX && markingBounds.maxX > minX)
+	{
+		correctPos++;
+	}
+	//Crossed through middle X
+	else if (minX < markingBounds.minX && maxX > markingBounds.maxX)
+	{
+		correctPos++;
+	}
+	//TEXT Y POSITION
+	//Block in middle Y
+	if (markingBounds.minY < minY && markingBounds.maxY > maxY)
+	{
+		correctPos++;
+	}
+	//Block on top crossed Y
+	else if (markingBounds.maxY < maxY && markingBounds.minY < minY && markingBounds.maxY > minY)
+	{
+		correctPos++;
+	}
+	//Block on bottom crossed Y
+	else if (markingBounds.maxY > maxY && markingBounds.minY > minY && markingBounds.minY < maxY)
+	{
+		correctPos++;
+	}
+	//Crossed through middle Y
+	else if (markingBounds.maxY < maxY && markingBounds.minY > minY && markingBounds.maxY > minY)
+	{
+		correctPos++;
+	}
+
+	return correctPos >= 2;
+}
+
 bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 {
 	//XMMATRIX tmpMatrix;
@@ -110,6 +171,17 @@ bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
 	
+	if (m_focused && m_outlineObject)
+	{
+		//Render outline
+		if (m_outlineObject && !m_outlineObject->Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
+			return false;
+	}
+
+	worldMatrix = XMMatrixIdentity();
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
+	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
+
 	if (UIBase::Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
 	{
 		for (const auto& node : m_inputNodes)
@@ -159,6 +231,11 @@ bool UIShaderPBRBlock::InitializeInputNodes()
 	}
 
 	return true;
+}
+
+UIBase::RectangleVertices UIShaderPBRBlock::CalculateOutlineSize(RectangleVertices blockSize)
+{
+	return RectangleVertices{ blockSize.minX - outlineMargin, blockSize.maxX + outlineMargin, blockSize.minY - outlineMargin, blockSize.maxY + outlineMargin };
 }
 
 UIShaderEditorInput* UIShaderPBRBlock::CheckIfMouseOnInputPin(MouseClass* mouse)

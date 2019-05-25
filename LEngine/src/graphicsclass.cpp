@@ -885,6 +885,16 @@ void GraphicsClass::AcceptCurrentChoosingWindowShader()
 		m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 }
 
+void GraphicsClass::CopyBlocks()
+{
+	m_shaderEditorManager->CopyBlocks();
+}
+
+void GraphicsClass::PasteBlocks()
+{
+	m_shaderEditorManager->PasteBlocks();
+}
+
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -1225,6 +1235,14 @@ bool GraphicsClass::RenderGUI()
 			if (ImGui::Button("Generate shader"))
 			{
 				m_shaderEditorManager->GenerateCodeToFile();
+			}
+			if (ImGui::Button("Save material"))
+			{
+				m_shaderEditorManager->SaveMaterial("testMaterial");
+			}
+			if (ImGui::Button("Load material"))
+			{
+				m_shaderEditorManager->LoadMaterial("testMaterial");
 			}
 			//Show scalar options
 			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0)

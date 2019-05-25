@@ -33,12 +33,23 @@ public:
 	void UpdateMouseHoveredOnImGui(bool hovered);
 	void SetRefToClickedOutside(bool* clickedOutside);
 
+	void CopyBlocks();
+	void PasteBlocks();
+
+	//SAVE MATERIAL TO FILE
+	bool SaveMaterial(std::string filename);
+
+	//LOAD MATERIAL FROM FILE
+	bool LoadMaterial(std::string filename);
+
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);
 	bool UpdatePBRBlock(bool mouseOnly = false);
 	bool UpdatePinsOfAllBlocks();
 	void DrawLine(UIShaderEditorInput* in, UIShaderEditorOutput* out);
 	void ResetFocusOnAllBlocks();
+	///<summary> Might fail if there are multiple blocks focused </summary>
+	bool TryToResetFocusOnAllBlocks();
 	void CreateChoosingWindowItemsArray();
 	bool CheckConnectionRules(UIShaderEditorInput* in, UIShaderEditorOutput* out);
 	bool TryCreateScalarBlocks(std::string name);
@@ -57,11 +68,18 @@ private:
 
 	void GeneratePBRClassCode();
 
+	std::pair<float, float> GetCurrentMousePosition();
+	UIBase::RectangleVertices GetMarkingBounds();
+	void TryToMarkManyBlocks(float minX, float maxX, float minY, float maxY);
+	void TryToMarkManyBlocks(UIBase::RectangleVertices bounds);
+	void MoveMultipleBlocks(UIShaderEditorBlock* currentBlock, std::pair<float, float> mouseMov);
+
 public:
 	std::vector<const char*> ChoosingWindowItems{};
 	std::string m_choosingWindowSearch{};
 	const int k_choosingWindowSearchSize{ 10 };
 	UIShaderEditorBlock* m_focusedBlock{ nullptr };
+	bool m_focusedPBR{ false };
 
 private:
 	D3DClass* m_D3D;
@@ -76,11 +94,16 @@ private:
 
 	std::vector<UILine*> m_lines = {};
 	UIShaderPBRBlock* m_pbrBlock;
+	std::vector<UIShaderEditorBlock*> m_copiedBlocks{};
 
 	std::vector<std::string> m_usedVariableNamesInGenerator{};
 	std::vector<std::string> m_generatedTextureAdresses{};
 
 	float m_scale{ 1.0f };
+	bool m_alreadyMarkingArea{ false };
+	float m_mouseDragStartX{ 0.0f };
+	float m_mouseDragStartY{ 0.0f };
+	UIBase* m_markingArea{};
 
 	bool m_choosingWindow{ false };
 	int m_choosingWindowHandler{ 0 };

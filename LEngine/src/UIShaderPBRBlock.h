@@ -39,6 +39,7 @@ public:
 	void StopDragging();
 	bool IsDragging();
 	void SetScale(float scale);
+	bool TryToMarkBlock(RectangleVertices markingBounds);
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
@@ -47,11 +48,13 @@ public:
 private:
 	void CalculateBlockVertices();
 	bool InitializeInputNodes();
+	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize);
 
 public:
 	const std::vector<std::string> m_inputTypes = { "float4", "float", "float", "float3" };
 	const std::vector<std::string> m_inputNames = { "BaseColor", "Metalness", "Roughness", "Normal" };
 	vector<UIShaderEditorInput*> m_inputNodes = {};
+	bool m_focused{ false };
 
 private:
 	D3DClass* m_D3D{ nullptr };
@@ -63,6 +66,7 @@ private:
 	float m_translationY{ 0 };
 	bool m_dragged = { false };
 	float m_scale{ 1.0f };
+	UIBase* m_outlineObject{};
 
 	UIBase::RectangleVertices m_blockVertices;
 	TextEngine* m_textEngine{};
@@ -81,5 +85,8 @@ private:
 	const Size inOutSize = Size{ 0.03f, 0.04f };
 	const float paddingBetweenBlocks = 0.08f;
 	const XMFLOAT4 blockColor{0.4f, 0.4f, 0.4f, 0.8f};
+	//Outline
+	const XMFLOAT4 outlineColor{ 0.7f, 0.7f, 0.7f, 0.95f };
+	const float outlineMargin = 0.0f;
 };
 #endif // !_UIBASE_H_

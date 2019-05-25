@@ -393,6 +393,65 @@ void UIShaderEditorBlock::SetScale(float scale)
 	m_scale = scale;
 }
 
+bool UIShaderEditorBlock::TryToMarkBlock(RectangleVertices markingBounds)
+{
+	int correctPos = 0; //Need to get 2 points
+	float minX = m_blockVertices.minX + m_translationX;
+	float maxX = m_blockVertices.maxX + m_translationX;
+	float minY = m_blockVertices.minY + m_translationY;
+	float maxY = m_blockVertices.maxY + m_translationY;
+
+//TEST X POSITION
+	//Block in middle X
+	if (markingBounds.minX < minX && markingBounds.maxX > maxX)
+	{
+		correctPos++;
+	}
+	//Block on left crossed X
+	else if (markingBounds.minX > minX && markingBounds.maxX > maxX && markingBounds.minX < maxX)
+	{
+		correctPos++;
+	}
+	//Block on right crossed X
+	else if (markingBounds.maxX < maxX && markingBounds.minX < minX && markingBounds.maxX > minX)
+	{
+		correctPos++;
+	}
+	//Crossed through middle X
+	else if (minX < markingBounds.minX && maxX > markingBounds.maxX)
+	{
+		correctPos++;
+	}
+//TEXT Y POSITION
+	//Block in middle Y
+	if (markingBounds.minY < minY && markingBounds.maxY > maxY)
+	{
+		correctPos++;
+	}
+	//Block on top crossed Y
+	else if (markingBounds.maxY < maxY && markingBounds.minY < minY && markingBounds.maxY > minY)
+	{
+		correctPos++;
+	}
+	//Block on bottom crossed Y
+	else if (markingBounds.maxY > maxY && markingBounds.minY > minY && markingBounds.minY < maxY)
+	{
+		correctPos++;
+	}
+	//Crossed through middle Y
+	else if (markingBounds.maxY < maxY && markingBounds.minY > minY && markingBounds.maxY > minY)
+	{
+		correctPos++;
+	}
+
+	return correctPos >= 2;
+}
+
+UIShaderEditorBlock::Size UIShaderEditorBlock::GetPosition() const
+{
+	return Size(m_translationX, m_translationY);
+}
+
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 {
 	int inOutCount = inCount > outCount ? inCount : outCount;

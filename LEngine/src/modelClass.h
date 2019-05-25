@@ -43,7 +43,7 @@ public:
 	~ModelClass();
 
 	bool Initialize(ID3D11Device* device, const char* modelFilename);
-	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false);
+	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false, float borderWidth = 0.007f);
 	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
@@ -68,7 +68,7 @@ private:
 	bool ReadBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
 
 	//Create shapes
-	bool CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom, bool withTex, bool isEmpty);
+	bool CreateRectangle(ID3D11Device* device, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth);
 	bool CreateTriangle(ID3D11Device* device, float left, float right, float top, float bottom);
 	bool CreateSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 

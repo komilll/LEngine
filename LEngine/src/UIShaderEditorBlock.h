@@ -62,6 +62,8 @@ public:
 	std::string GetReturnType();
 
 	void SetScale(float scale);
+	bool TryToMarkBlock(RectangleVertices markingBounds);
+	Size GetPosition() const;
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
@@ -71,6 +73,7 @@ private:
 	std::string ReturnEmptyForGivenType(std::string type);
 
 public:
+	std::string m_fileName{};
 	std::string m_variableName{"test"};
 	vector<UIShaderEditorInput*> m_inputNodes = {};
 	vector<UIShaderEditorOutput*> m_outputNodes = {};

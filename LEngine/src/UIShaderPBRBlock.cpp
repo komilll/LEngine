@@ -161,6 +161,11 @@ bool UIShaderPBRBlock::TryToMarkBlock(RectangleVertices markingBounds)
 	return correctPos >= 2;
 }
 
+UIShaderPBRBlock::Size UIShaderPBRBlock::GetPosition()
+{
+	return UIShaderPBRBlock::Size(m_translationX, m_translationY);
+}
+
 bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 {
 	//XMMATRIX tmpMatrix;

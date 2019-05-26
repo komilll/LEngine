@@ -40,6 +40,7 @@ public:
 	bool IsDragging();
 	void SetScale(float scale);
 	bool TryToMarkBlock(RectangleVertices markingBounds);
+	UIShaderPBRBlock::Size GetPosition();
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 

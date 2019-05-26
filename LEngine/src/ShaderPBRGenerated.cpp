@@ -257,8 +257,8 @@ void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)
 	m_additionalMapViews.push_back(nullptr);
 	m_additionalMapViews.push_back(nullptr);
 	m_additionalMapViews.push_back(nullptr);
-	LoadTexture(device, L"Metal_006_Base_Color.dds", resource, m_additionalMapViews.at(0), true);
-	LoadTexture(device, L"Metal_006_Metallic.dds", resource, m_additionalMapViews.at(1), true);
-	LoadTexture(device, L"Metal_006_Roughness.dds", resource, m_additionalMapViews.at(2), true);
-	LoadTexture(device, L"Metal_006_Normal.dds", resource, m_additionalMapViews.at(3), true);
+	LoadTexture(device, L"", resource, m_additionalMapViews.at(0), true);
+	LoadTexture(device, L"", resource, m_additionalMapViews.at(1), true);
+	LoadTexture(device, L"", resource, m_additionalMapViews.at(2), true);
+	LoadTexture(device, L"", resource, m_additionalMapViews.at(3), true);
 }

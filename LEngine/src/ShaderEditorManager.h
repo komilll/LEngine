@@ -18,7 +18,7 @@ public:
 	void UpdateBlocks(bool mouseOnly = false);
 	void AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount);
 	void AddShaderBlock(UIShaderEditorBlock* block);
-	void GenerateCodeToFile();
+	void GenerateCodeToFile(std::string filename = "");
 	
 	bool WillRenderChoosingWindow();
 	int* GetChoosingWindowHandler();
@@ -66,7 +66,8 @@ private:
 	void ShowFunctionChoosingWindow();
 	void LoadFunctionsFromDirectory();
 
-	void GeneratePBRClassCode();
+	void GeneratePBRClassCode(std::string filename = "");
+	void GenerateVariableNames();
 
 	std::pair<float, float> GetCurrentMousePosition();
 	UIBase::RectangleVertices GetMarkingBounds();
@@ -74,12 +75,19 @@ private:
 	void TryToMarkManyBlocks(UIBase::RectangleVertices bounds);
 	void MoveMultipleBlocks(UIShaderEditorBlock* currentBlock, std::pair<float, float> mouseMov);
 
+	//SAVE/LOAD MATERIALS
+	UIShaderEditorOutput* FindOutputNode(std::string name);
+	std::string SaveBlockValueMaterial(UIShaderEditorBlock* block);
+	void DestroyEditor();
+	std::string GenerateMaterialName();
+
 public:
 	std::vector<const char*> ChoosingWindowItems{};
 	std::string m_choosingWindowSearch{};
 	const int k_choosingWindowSearchSize{ 10 };
 	UIShaderEditorBlock* m_focusedBlock{ nullptr };
 	bool m_focusedPBR{ false };
+	std::string m_materialToSaveName{};
 
 private:
 	D3DClass* m_D3D;

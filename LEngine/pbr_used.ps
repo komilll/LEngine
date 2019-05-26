@@ -13,14 +13,6 @@ TextureCube environmentMap_3 : register(t4);
 TextureCube environmentMap_4 : register(t5);
 TextureCube environmentMap_5 : register(t6);
 SamplerState SampleType : register(s0);
-Texture2D additionalTexture_0 : register(t7);
-static float4 tex_0;
-Texture2D additionalTexture_1 : register(t8);
-static float4 tex_1;
-Texture2D additionalTexture_2 : register(t9);
-static float4 tex_2;
-Texture2D additionalTexture_3 : register(t10);
-static float4 tex_3;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -102,10 +94,6 @@ float substract(float a, float b);
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
 
 //Calculated values
 	float specular;
@@ -369,21 +357,21 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return tex_0;
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 float GetMetalness()
 {
-	float out_4 = get_x(tex_1);
+	float C = 0.0f;
+	float B = 0.0f;
+	float out_0 = add(C, B);
 
-	return out_4;
+	return out_0;
 }
 float GetRoughness()
 {
-	float out_5 = get_x(tex_2);
-
-	return out_5;
+	return 0.0f;
 }
 float3 GetNormal()
 {
-	return tex_3;
+	return float3(0.0f, 0.0f, 0.0f);
 }

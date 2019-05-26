@@ -115,7 +115,7 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		}
 	}
 	//No blocks interaction/screen movement - try to mark many elements (to further movement/deleting/copying)
-	if (m_mouse->GetLMBPressed()) //Start marking area
+	if (m_mouse->GetLMBPressed() && !m_mouseHoveredImGui) //Start marking area
 	{
 		if (!m_alreadyMarkingArea)
 		{
@@ -611,9 +611,17 @@ void ShaderEditorManager::LoadFunctionsFromDirectory()
 	//}
 }
 
-void ShaderEditorManager::GeneratePBRClassCode()
+void ShaderEditorManager::GeneratePBRClassCode(std::string filename)
 {
-	std::ofstream dst("src/ShaderPBRGenerated.cpp", std::ios::binary);
+	if (filename == "")
+	{
+		filename = "src/ShaderPBRGenerated.cpp";
+	}
+	else
+	{
+		filename = "GeneratedCpp/" + filename + ".cpp";
+	}
+	std::ofstream dst(filename, std::ios::binary);
 	if (std::ifstream src{ "ShaderEditor/shader_pbr_generated_base.txt", std::ios::binary })
 	{
 		dst << src.rdbuf(); //base_textures_header
@@ -636,74 +644,247 @@ void ShaderEditorManager::GeneratePBRClassCode()
 	dst.close();
 }
 
-bool ShaderEditorManager::SaveMaterial(std::string filename)
+void ShaderEditorManager::GenerateVariableNames()
 {
-	std::ofstream output("Materials/" + filename + ".material", std::ios::binary);
-	
-	int count = m_blocks.size();
-	std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
-	output.write(reinterpret_cast<const char*>(&count), sizeof(count));
-
-	for (const auto& block : m_blocks)
+	for (int i = 0; i < m_blocks.size(); ++i)
 	{
-		float x = block->GetPosition().x;
-		float y = block->GetPosition().y;
-		std::string name = block->m_fileName;
-
-		output.write(reinterpret_cast<const char*>(&x), sizeof(x));
-		output.write(reinterpret_cast<const char*>(&y), sizeof(y));
-		int index = 0;
-		for (const auto& func : functions)
+		const auto& block = m_blocks.at(i);
+		if (block->GetInputCount() == 0) //Variable
 		{
-			if (name + ".txt" == func)
+			if (block->GetFunctionName() == "texture") //Texture
 			{
-				output.write(reinterpret_cast<const char*>(&index), sizeof(index));
-				break;
+				ostringstream ss;
+				ss << i;
+				block->m_variableName = "tex_" + ss.str();
+				block->SetOutputPinName(block->m_variableName);
 			}
-			index++;
+			else
+			{
+				char variableName = i + 65;
+				block->m_variableName = variableName;
+				block->SetOutputPinName(block->m_variableName);
+			}
 		}
 	}
+	for (int i = 0; i < m_blocks.size(); ++i)
+	{
+		const auto& block = m_blocks.at(i);
+		if (block->GetInputCount() > 0) //Function
+		{
+			std::string variableName{ "out_" };
+			variableName += (char)(i + '0');
+			block->m_variableName = variableName;
+			block->m_outputNodes[0]->m_variableName = variableName;
+		}
+	}
+}
 
-	output.clear();
-	output.close();
+bool ShaderEditorManager::SaveMaterial(std::string filename)
+{
+	if (filename == "")
+	{
+		filename = GenerateMaterialName();
+	}
+	GenerateVariableNames();
+	{
+		std::ofstream output("Materials/" + filename + ".material", std::ios::binary);
 
+		int count = m_blocks.size();
+		std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
+		output << count << "\n";
+
+		for (const auto& block : m_blocks)
+		{
+			output << "BLOCK" << "\n";
+			float x = block->GetPosition().x;
+			float y = block->GetPosition().y;
+			std::string name = block->m_fileName;
+
+			output << x << "\n";
+			output << y << "\n";
+			output << name << "\n";
+			output << SaveBlockValueMaterial(block);
+		}
+
+		output << m_pbrBlock->GetPosition().x << "\n";
+		output << m_pbrBlock->GetPosition().y << "\n";
+
+		output.clear();
+		output.close();
+	}
+	//
+	{
+		std::ofstream output("Materials/" + filename + ".materialpins", std::ios::binary);
+
+		for (const auto& block : m_blocks)
+		{
+			for (const auto& out : block->m_outputNodes)
+				output << out->m_variableName << "\n";
+		}
+
+		for (const auto& block : m_blocks)
+		{
+			for (const auto& in : block->m_inputNodes)
+			{
+				if (in->m_connectedOutputNode)
+					output << in->m_connectedOutputNode->m_variableName << "\n";
+				else
+					output << "test" << "\n";
+			}
+		}
+
+		for (const auto& in : m_pbrBlock->m_inputNodes)
+		{
+			if (in->m_connectedOutputNode)
+				output << in->m_connectedOutputNode->m_variableName << "\n";
+			else
+				output << "test" << "\n";
+		}
+
+		output.clear();
+		output.close();
+	}
+
+	GenerateCodeToFile(filename);
+	GeneratePBRClassCode(filename);
 	return true;
 }
 
 bool ShaderEditorManager::LoadMaterial(std::string filename)
 {
-	std::ifstream input("Materials/" + filename + ".material", std::ios::binary);
-	if (input.fail())
-		return false;
-
-	int numOfElements;
-	input.read(reinterpret_cast<char*>(&numOfElements), sizeof(numOfElements));
-
-	float x;
-	float y;
-	int index = 0;
-	std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
-
-	for (int i = 0; i < numOfElements; ++i)
+	if (filename == "")
 	{
-		input.read(reinterpret_cast<char*>(&x), sizeof(x));
-		input.read(reinterpret_cast<char*>(&y), sizeof(y));
-		input.read(reinterpret_cast<char*>(&index), sizeof(index));
-
-		std::string name = functions.at(index);
-		const std::string toRemove = ".txt";
-		size_t pos = name.find(toRemove);
-		if (pos != std::string::npos)
-		{
-			name.erase(pos, toRemove.length());
-		}
-		CreateBlock(name);
-		m_blocks.at(m_blocks.size() - 1)->Move(x, y);
+		filename = GenerateMaterialName();
 	}
+	DestroyEditor();
+	{
+		std::ifstream input("Materials/" + filename + ".material", std::ios::binary);
+		if (input.fail())
+			return false;
 
-	input.clear();
-	input.close();
+		std::string line;
+		int numOfElements;
 
+		getline(input, line);
+		numOfElements = ::atof(line.c_str());
+
+		float x;
+		float y;
+		std::string name;
+
+		for (int i = 0; i < numOfElements; ++i)
+		{
+			while (line != "BLOCK")
+			{
+				getline(input, line);
+			}
+			getline(input, line);
+			x = ::atof(line.c_str());
+
+			getline(input, line);
+			y = ::atof(line.c_str());
+
+			getline(input, line);
+			name = line;
+
+			CreateBlock(name);
+			auto block = m_blocks.at(m_blocks.size() - 1);
+			block->Move(x, y);
+
+#pragma region Load Value
+			//Load value of block (if scalar/texture)
+			if (block->m_fileName == "float1")
+			{
+				getline(input, line);
+				block->GetFirstOutputNode()->m_value = ::atof(line.c_str());
+			}
+			else if (block->m_fileName == "float2")
+			{
+				for (int i = 0; i < 2; ++i)
+				{
+					getline(input, line);
+					block->GetFirstOutputNode()->m_valueTwo[i] = ::atof(line.c_str());
+				}
+			}
+			else if (block->m_fileName == "float3")
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					getline(input, line);
+					block->GetFirstOutputNode()->m_valueThree[i] = ::atof(line.c_str());
+				}
+			}
+			else if (block->m_fileName == "float4")
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					getline(input, line);
+					block->GetFirstOutputNode()->m_valueFour[i] = ::atof(line.c_str());
+				}
+			}
+			else if (block->m_fileName == "texture")
+			{
+				getline(input, line);
+				std::wstring wLine = std::wstring(line.begin(), line.end());
+				const wchar_t* path = wLine.c_str();
+				BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView);
+			}
+#pragma endregion
+		}
+
+		getline(input, line);
+		x = ::atof(line.c_str());
+
+		getline(input, line);
+		y = ::atof(line.c_str());
+
+		m_pbrBlock->Move(x, y);
+
+		input.clear();
+		input.close();
+	}
+	//
+	{
+		std::ifstream input("Materials/" + filename + ".materialpins", std::ios::binary);
+		if (input.fail())
+			return false;
+
+		std::string line;
+
+		for (const auto& block : m_blocks)
+		{
+			for (const auto& out : block->m_outputNodes)
+			{
+				getline(input, line);
+				out->m_variableName = line;
+			}
+		}
+		for (const auto& block : m_blocks)
+		{
+			for (const auto& in : block->m_inputNodes)
+			{
+				getline(input, line);
+				in->m_connectedOutputNode = FindOutputNode(line);
+				if (in->m_connectedOutputNode)
+				{
+					DrawLine(in, in->m_connectedOutputNode);
+				}
+			}
+		}
+
+		for (const auto& in : m_pbrBlock->m_inputNodes)
+		{
+			getline(input, line);
+			in->m_connectedOutputNode = FindOutputNode(line);
+			if (in->m_connectedOutputNode)
+			{
+				DrawLine(in, in->m_connectedOutputNode);
+			}
+		}
+
+		input.clear();
+		input.close();
+	}
 	return true;
 }
 
@@ -780,40 +961,94 @@ void ShaderEditorManager::MoveMultipleBlocks(UIShaderEditorBlock * currentBlock,
 		m_pbrBlock->Move(mouseMov.first / m_scale, mouseMov.second / m_scale);
 }
 
-void ShaderEditorManager::GenerateCodeToFile()
+UIShaderEditorOutput * ShaderEditorManager::FindOutputNode(std::string name)
+{
+	for (const auto& block : m_blocks)
+	{
+		for (const auto& out : block->m_outputNodes)
+		{
+			if (out->m_variableName == name)
+			{
+				return out;
+			}
+		}
+	}
+	return nullptr;
+}
+
+std::string ShaderEditorManager::SaveBlockValueMaterial(UIShaderEditorBlock* block)
+{
+	if (block->m_fileName == "float1")
+	{
+		stringstream ss;
+		ss << block->GetFirstOutputNode()->m_value;
+		return ss.str() + "\n";
+	}
+	else if (block->m_fileName == "float2")
+	{
+		std::string toReturn;
+		for (int i = 0; i < 2; ++i)
+		{
+			stringstream ss;
+			ss << block->GetFirstOutputNode()->m_valueTwo[i];
+			toReturn += ss.str() + "\n";
+		}
+		return toReturn;
+	}
+	else if (block->m_fileName == "float3")
+	{
+		std::string toReturn;
+		for (int i = 0; i < 3; ++i)
+		{
+			stringstream ss;
+			ss << block->GetFirstOutputNode()->m_valueThree[i];
+			toReturn += ss.str() + "\n";
+		}
+		return toReturn;
+	}
+	else if (block->m_fileName == "float4")
+	{
+		std::string toReturn;
+		for (int i = 0; i < 4; ++i)
+		{
+			stringstream ss;
+			ss << block->GetFirstOutputNode()->m_valueFour[i];
+			toReturn += ss.str() + "\n";
+		}
+		return toReturn;
+	}
+	else if (block->m_fileName == "texture")
+	{
+		return block->GetFirstOutputNode()->m_texturePath + "\n";
+	}
+
+	return "";
+}
+
+void ShaderEditorManager::DestroyEditor()
+{
+	for (const auto& line : m_lines)
+	{
+		delete line;
+	}
+	m_lines.empty();
+	m_blocks.empty();
+}
+
+std::string ShaderEditorManager::GenerateMaterialName()
+{
+	std::string toReturn;
+	for (int i = 0; i < std::strlen(m_materialToSaveName.data()); ++i)
+		toReturn += ::tolower(m_materialToSaveName.data()[i]);
+	return toReturn;
+}
+
+void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 {
 	std::string func{};
-	for (int i = 0; i < m_blocks.size(); ++i)
-	{
-		const auto& block = m_blocks.at(i);
-		if (block->GetInputCount() == 0) //Variable
-		{
-			if (block->GetFunctionName() == "texture") //Texture
-			{
-				ostringstream ss;
-				ss << i;
-				block->m_variableName = "tex_" + ss.str();
-				block->SetOutputPinName(block->m_variableName);
-			}
-			else
-			{
-				char variableName = i + 65;
-				block->m_variableName = variableName;
-				block->SetOutputPinName(block->m_variableName);
-			}
-		}
-	}
-	for (int i = 0; i < m_blocks.size(); ++i)
-	{
-		const auto& block = m_blocks.at(i);
-		if (block->GetInputCount() > 0) //Function
-		{
-			std::string variableName{ "out_" };
-			variableName += (char)(i + '0');
-			block->m_variableName = variableName;
-			block->m_outputNodes[0]->m_variableName = variableName;
-		}
-	}
+
+	GenerateVariableNames();
+
 	for (int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
 	{
 		if (UIShaderEditorOutput* out = m_pbrBlock->m_inputNodes.at(i)->m_connectedOutputNode)
@@ -863,7 +1098,15 @@ void ShaderEditorManager::GenerateCodeToFile()
 	}
 	
 	//std::ofstream dst("function.txt", std::ios::binary);
-	std::ofstream dst("pbr_used.ps", std::ios::binary);
+	if (filename == "")
+	{
+		filename = "pbr_used.ps";
+	}
+	else
+	{
+		filename = "GeneratedShaders/" + filename + ".ps";
+	}
+	std::ofstream dst(filename, std::ios::binary);
 
 	if (std::ifstream src{ "ShaderEditor/base_textures_header.txt", std::ios::binary })
 	{

@@ -1236,13 +1236,16 @@ bool GraphicsClass::RenderGUI()
 			{
 				m_shaderEditorManager->GenerateCodeToFile();
 			}
+			ImGui::Spacing();
+			ImGui::Text("Material name:");
+			ImGui::InputText("", const_cast<char*>(m_shaderEditorManager->m_materialToSaveName.data()), 30);
 			if (ImGui::Button("Save material"))
 			{
-				m_shaderEditorManager->SaveMaterial("testMaterial");
+				m_shaderEditorManager->SaveMaterial(m_shaderEditorManager->m_materialToSaveName);
 			}
 			if (ImGui::Button("Load material"))
 			{
-				m_shaderEditorManager->LoadMaterial("testMaterial");
+				m_shaderEditorManager->LoadMaterial(m_shaderEditorManager->m_materialToSaveName);
 			}
 			//Show scalar options
 			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0)

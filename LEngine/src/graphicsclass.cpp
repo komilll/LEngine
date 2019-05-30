@@ -1229,8 +1229,46 @@ bool GraphicsClass::RenderGUI()
 
 	if (RENDER_MATERIAL_EDITOR && m_shaderEditorManager)
 	{
+		m_shaderEditorManager->ResetMouseHoveredOnImGui();
 		//Base window of editor - flow control/variables
 		{
+			ImGui::Begin("Materials explorer");
+
+			float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+			{
+				int materialIndex = 0;
+				for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
+				{
+					std::string tmp;
+					int i{ 0 };
+					for (const auto& c : name)
+					{
+						tmp += c;
+						i++;
+						if (i % 8 == 0)
+						{
+							i = 0;
+							tmp += "\n";
+						}
+					}
+					if (ImGui::Button(tmp.c_str(), ImVec2{ 64, 64 }))
+					{
+						m_shaderEditorManager->LoadMaterial(materialIndex);
+					}
+					//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
+					float lastButtonPos = ImGui::GetItemRectMax().x;
+					float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
+					if (nextButtonPos < windowLineWidth)
+					{
+						ImGui::SameLine();
+					}
+					materialIndex++;
+				}
+			}
+
+			m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
+			ImGui::End();
+			//////////////////
 			ImGui::Begin("Shader editor");
 			if (ImGui::Button("Generate shader"))
 			{
@@ -1248,44 +1286,19 @@ bool GraphicsClass::RenderGUI()
 				m_shaderEditorManager->LoadMaterial(m_shaderEditorManager->m_materialToSaveName);
 			}
 			//Show scalar options
-			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0)
+			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0
+				&& m_shaderEditorManager->m_focusedBlock->GetFirstOutputNode())
 			{
-				if (m_shaderEditorManager->m_focusedBlock->m_outputNodes.size() > 0 && &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0])
+				RenderInputForMaterial(m_shaderEditorManager->m_focusedBlock, true);
+			}
+			else
+			{
+				for (const auto& in : m_shaderEditorManager->GetMaterialInputs())
 				{
-					if (m_shaderEditorManager->m_focusedBlock->GetFunctionName() == "texture")
-					{
-						RenderTextureViewImGuiEditor(m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTexture,
-							m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_connectedTextureView, "Texture", 
-							m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_texturePath);
-					}
-					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float")
-					{
-						ImGui::InputFloat("Value", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_value);
-						}
-					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float2")
-					{
-						ImGui::InputFloat("Value_1", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueTwo[0]);
-						ImGui::InputFloat("Value_2", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueTwo[1]);
-					}
-					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float3")
-					{
-						ImGui::InputFloat("Value_1", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree[0]);
-						ImGui::InputFloat("Value_2", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree[1]);
-						ImGui::InputFloat("Value_3", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree[2]);
-
-						ImGui::ColorPicker3("Color value", m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueThree);
-					}
-					else if (m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_returnType == "float4")
-					{
-						ImGui::InputFloat("Value_1", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[0]);
-						ImGui::InputFloat("Value_2", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[1]);
-						ImGui::InputFloat("Value_3", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[2]);
-						ImGui::InputFloat("Value_4", &m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour[3]);
-
-						ImGui::ColorPicker4("Color value", m_shaderEditorManager->m_focusedBlock->m_outputNodes[0]->m_valueFour);
-					}					
+					RenderInputForMaterial(in);
 				}
 			}
+
 			m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
 			ImGui::End();
 		}
@@ -2364,9 +2377,12 @@ void GraphicsClass::RenderTextureViewImGui(ID3D11Resource *& resource, ID3D11Sha
 	m_internalTextureViewIndex++;
 }
 
-inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char * label, std::string& path)
+inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char * label, std::string& path, bool skipLabel)
 {
-	ImGui::Text(label);
+	if (!skipLabel)
+	{
+		ImGui::Text(label);
+	}
 	if (ImGui::ImageButton(resourceView == nullptr ? m_emptyTexViewEditor : resourceView, ImVec2{ 64, 64 }))
 	{
 		path = UITexturePreview::TextureChooseWindow(m_D3D, resource, resourceView);
@@ -2392,6 +2408,48 @@ inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resour
 	{
 		UITexturePreview::DeletePassedTexture(m_D3D, resource, resourceView);
 		path = "";
+	}
+}
+
+void GraphicsClass::RenderInputForMaterial(UIShaderEditorBlock * block, bool changeName)
+{
+	if (UIShaderEditorOutput* out = block->GetFirstOutputNode())
+	{
+		if (changeName)
+		{
+			ImGui::InputText("Variable name", const_cast<char*>(out->m_visibleName.data()), 30);
+		}
+
+		if (block->GetFunctionName() == "texture")
+		{
+			RenderTextureViewImGuiEditor(out->m_connectedTexture, out->m_connectedTextureView, out->m_visibleName.c_str(), out->m_texturePath, changeName);
+		}
+		else if (out->m_returnType == "float")
+		{
+			ImGui::InputFloat("Value", &out->m_value);
+		}
+		else if (out->m_returnType == "float2")
+		{
+			ImGui::InputFloat("Value_1", &out->m_valueTwo[0]);
+			ImGui::InputFloat("Value_2", &out->m_valueTwo[1]);
+		}
+		else if (out->m_returnType == "float3")
+		{
+			ImGui::InputFloat("Value_1", &out->m_valueThree[0]);
+			ImGui::InputFloat("Value_2", &out->m_valueThree[1]);
+			ImGui::InputFloat("Value_3", &out->m_valueThree[2]);
+
+			ImGui::ColorPicker3("Color value", out->m_valueThree);
+		}
+		else if (out->m_returnType == "float4")
+		{
+			ImGui::InputFloat("Value_1", &out->m_valueFour[0]);
+			ImGui::InputFloat("Value_2", &out->m_valueFour[1]);
+			ImGui::InputFloat("Value_3", &out->m_valueFour[2]);
+			ImGui::InputFloat("Value_4", &out->m_valueFour[3]);
+
+			ImGui::ColorPicker4("Color value", out->m_valueFour);
+		}
 	}
 }
 

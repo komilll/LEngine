@@ -5,7 +5,7 @@ UILine::UILine()
 	UIBase::UIBase();
 }
 
-bool UILine::Initialize(D3DClass * d3d, UIShaderEditorOutput * startPin, UIShaderEditorInput * endPin)
+bool UILine::Initialize(D3DClass * d3d, UIShaderEditorOutput * startPin, UIShaderEditorInput * endPin, float scale)
 {
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
@@ -13,6 +13,7 @@ bool UILine::Initialize(D3DClass * d3d, UIShaderEditorOutput * startPin, UIShade
 	m_D3D = d3d;
 	m_startPin = startPin;
 	m_endPin = endPin;
+	m_scale = scale;
 
 	return CalculateLine();
 }

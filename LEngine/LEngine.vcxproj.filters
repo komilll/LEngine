@@ -312,6 +312,9 @@
     <ClInclude Include="src\ShaderPBRGenerated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\MaterialPrefab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -444,6 +447,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ShaderPBRGenerated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialPrefab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

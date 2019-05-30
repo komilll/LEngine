@@ -9,6 +9,7 @@
 #include "MouseClass.h"
 #include "d3dclass.h"
 #include "UILine.h"
+#include "MaterialPrefab.h"
 
 class ShaderEditorManager
 {
@@ -30,6 +31,7 @@ public:
 	void SearchThroughChoosingWindow();
 
 	void DeleteCurrentShaderBlock();
+	void ResetMouseHoveredOnImGui();
 	void UpdateMouseHoveredOnImGui(bool hovered);
 	void SetRefToClickedOutside(bool* clickedOutside);
 
@@ -41,6 +43,10 @@ public:
 
 	//LOAD MATERIAL FROM FILE
 	bool LoadMaterial(std::string filename);
+	bool LoadMaterial(int index);
+	std::vector<std::string>& GetAllMaterialNames();
+	std::vector<MaterialPrefab>& GetAllMaterials();
+	std::vector<UIShaderEditorBlock*>& GetMaterialInputs();
 
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);
@@ -81,6 +87,10 @@ private:
 	void DestroyEditor();
 	std::string GenerateMaterialName();
 
+	//MATERIALS
+	void LoadAllMaterialsToArray();
+	void LoadMaterialInputs();
+
 public:
 	std::vector<const char*> ChoosingWindowItems{};
 	std::string m_choosingWindowSearch{};
@@ -106,6 +116,9 @@ private:
 
 	std::vector<std::string> m_usedVariableNamesInGenerator{};
 	std::vector<std::string> m_generatedTextureAdresses{};
+	std::vector<std::string> m_materialNames{};
+	std::vector<MaterialPrefab> m_materials{};
+	std::vector<UIShaderEditorBlock*> m_materialInputs{};
 
 	float m_scale{ 1.0f };
 	bool m_alreadyMarkingArea{ false };
@@ -119,6 +132,18 @@ private:
 	int m_choosingWindowPosY{ 0 };
 	float m_choosingWindowPosXScreenspace{ 0 };
 	float m_choosingWindowPosYScreenspace{ 0 };
+
+	//TEMPLATE
+	template<class T>
+	void DestroyVector(std::vector<T>& vec);
 };
 
 #endif
+
+template<class T>
+inline void ShaderEditorManager::DestroyVector(std::vector<T>& vec)
+{
+	for (int i = vec.size() - 1; i > -1; --i)
+		vec.erase(vec.begin() + i);
+	vec.empty();
+}

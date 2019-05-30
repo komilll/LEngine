@@ -13,7 +13,7 @@ public:
 	UILine();
 
 	///<summary> Initialize line</summary>
-	bool Initialize(D3DClass* d3d, UIShaderEditorOutput* startPin, UIShaderEditorInput* endPin);
+	bool Initialize(D3DClass* d3d, UIShaderEditorOutput* startPin, UIShaderEditorInput* endPin, float scale = 1.0f);
 	
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 	void SetScale(float scale);

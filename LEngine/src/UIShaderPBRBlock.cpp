@@ -78,6 +78,11 @@ bool UIShaderPBRBlock::Initialize(D3DClass * d3d)
 	return InitializeModelGeneric(d3d->GetDevice(), m_blockVertices);
 }
 
+void UIShaderPBRBlock::ResetPosition()
+{
+	Move(-m_translationX, -m_translationY);
+}
+
 void UIShaderPBRBlock::Move(float x, float y)
 {
 	for (const auto& node : m_inputNodes)

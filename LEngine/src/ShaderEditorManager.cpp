@@ -15,6 +15,8 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	//m_markingArea->InitializeModelGeneric(d3d->GetDevice(), {0.2f, 0.5f, -0.5f, 0.5f}, false, true);
 	m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { -10000.0f, -10000.0f, -10000.0f, -10000.0f }, false, true);
 	m_markingArea->ChangeColor(0.85f, 0.85f, 0.85f, 1.0f);
+
+	LoadAllMaterialsToArray();
 }
 
 void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
@@ -272,7 +274,7 @@ void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutpu
 	}
 
 	UILine* line = new UILine;
-	line->Initialize(m_D3D, out, in);
+	line->Initialize(m_D3D, out, in, m_scale);
 	out->m_toDeleteLine = false;
 	m_lines.push_back(line);
 }
@@ -699,11 +701,19 @@ bool ShaderEditorManager::SaveMaterial(std::string filename)
 			float x = block->GetPosition().x;
 			float y = block->GetPosition().y;
 			std::string name = block->m_fileName;
-
+			
 			output << x << "\n";
 			output << y << "\n";
 			output << name << "\n";
 			output << SaveBlockValueMaterial(block);
+			if (block->m_inputNodes.size() == 0 && block->GetFirstOutputNode())
+			{
+				for (const auto& out : block->m_outputNodes)
+				{
+					std::string str = out->m_visibleName;
+					output << str << "\n";
+				}
+			}
 		}
 
 		output << m_pbrBlock->GetPosition().x << "\n";
@@ -793,41 +803,48 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 
 #pragma region Load Value
 			//Load value of block (if scalar/texture)
-			if (block->m_fileName == "float1")
+			if (block->m_fileName == "float1" || block->m_fileName == "float2" || block->m_fileName == "float3" ||
+				block->m_fileName == "float4" | block->m_fileName == "texture")
 			{
+				if (block->m_fileName == "float1")
+				{
+					getline(input, line);
+					block->GetFirstOutputNode()->m_value = ::atof(line.c_str());
+				}
+				else if (block->m_fileName == "float2")
+				{
+					for (int i = 0; i < 2; ++i)
+					{
+						getline(input, line);
+						block->GetFirstOutputNode()->m_valueTwo[i] = ::atof(line.c_str());
+					}
+				}
+				else if (block->m_fileName == "float3")
+				{
+					for (int i = 0; i < 3; ++i)
+					{
+						getline(input, line);
+						block->GetFirstOutputNode()->m_valueThree[i] = ::atof(line.c_str());
+					}
+				}
+				else if (block->m_fileName == "float4")
+				{
+					for (int i = 0; i < 4; ++i)
+					{
+						getline(input, line);
+						block->GetFirstOutputNode()->m_valueFour[i] = ::atof(line.c_str());
+					}
+				}
+				else if (block->m_fileName == "texture")
+				{
+					getline(input, line);
+					std::wstring wLine = std::wstring(line.begin(), line.end());
+					const wchar_t* path = wLine.c_str();
+					BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView);
+				}
+
 				getline(input, line);
-				block->GetFirstOutputNode()->m_value = ::atof(line.c_str());
-			}
-			else if (block->m_fileName == "float2")
-			{
-				for (int i = 0; i < 2; ++i)
-				{
-					getline(input, line);
-					block->GetFirstOutputNode()->m_valueTwo[i] = ::atof(line.c_str());
-				}
-			}
-			else if (block->m_fileName == "float3")
-			{
-				for (int i = 0; i < 3; ++i)
-				{
-					getline(input, line);
-					block->GetFirstOutputNode()->m_valueThree[i] = ::atof(line.c_str());
-				}
-			}
-			else if (block->m_fileName == "float4")
-			{
-				for (int i = 0; i < 4; ++i)
-				{
-					getline(input, line);
-					block->GetFirstOutputNode()->m_valueFour[i] = ::atof(line.c_str());
-				}
-			}
-			else if (block->m_fileName == "texture")
-			{
-				getline(input, line);
-				std::wstring wLine = std::wstring(line.begin(), line.end());
-				const wchar_t* path = wLine.c_str();
-				BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView);
+				block->GetFirstOutputNode()->m_visibleName = line;
 			}
 #pragma endregion
 		}
@@ -838,6 +855,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 		getline(input, line);
 		y = ::atof(line.c_str());
 
+		m_pbrBlock->ResetPosition();
 		m_pbrBlock->Move(x, y);
 
 		input.clear();
@@ -885,7 +903,29 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 		input.clear();
 		input.close();
 	}
+
+	LoadMaterialInputs();
 	return true;
+}
+
+bool ShaderEditorManager::LoadMaterial(int index)
+{
+	return LoadMaterial(m_materialNames.at(index));
+}
+
+std::vector<std::string>& ShaderEditorManager::GetAllMaterialNames()
+{
+	return m_materialNames;
+}
+
+std::vector<MaterialPrefab>& ShaderEditorManager::GetAllMaterials()
+{
+	return m_materials;
+}
+
+std::vector<UIShaderEditorBlock*>& ShaderEditorManager::GetMaterialInputs()
+{
+	return m_materialInputs;
 }
 
 std::pair<float, float> ShaderEditorManager::GetCurrentMousePosition()
@@ -1027,12 +1067,9 @@ std::string ShaderEditorManager::SaveBlockValueMaterial(UIShaderEditorBlock* blo
 
 void ShaderEditorManager::DestroyEditor()
 {
-	for (const auto& line : m_lines)
-	{
-		delete line;
-	}
-	m_lines.empty();
-	m_blocks.empty();
+	DestroyVector(m_lines);
+	DestroyVector(m_blocks);
+	DestroyVector(m_materialInputs);
 }
 
 std::string ShaderEditorManager::GenerateMaterialName()
@@ -1041,6 +1078,37 @@ std::string ShaderEditorManager::GenerateMaterialName()
 	for (int i = 0; i < std::strlen(m_materialToSaveName.data()); ++i)
 		toReturn += ::tolower(m_materialToSaveName.data()[i]);
 	return toReturn;
+}
+
+void ShaderEditorManager::LoadAllMaterialsToArray()
+{
+	std::vector<std::string> allFiles = GetFilenamesInDirectory("Materials", false);
+	for (auto& file : allFiles)
+	{
+		size_t posNormal = file.find(".material");
+		if (posNormal != std::string::npos)
+		{
+			size_t posPins = file.find(".materialpins");
+			if (posPins != std::string::npos)
+			{
+				file.erase(file.begin() + posNormal, file.end());
+				m_materialNames.push_back(file);
+
+				m_materials.push_back({file});
+			}
+		}
+	}
+}
+
+void ShaderEditorManager::LoadMaterialInputs()
+{
+	for (const auto& block : m_blocks)
+	{
+		if (block->m_outputNodes.size() == 1 && block->m_inputNodes.size() == 0)
+		{
+			m_materialInputs.push_back(block);
+		}
+	}
 }
 
 void ShaderEditorManager::GenerateCodeToFile(std::string filename)
@@ -1098,6 +1166,7 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 	}
 	
 	//std::ofstream dst("function.txt", std::ios::binary);
+	GeneratePBRClassCode(filename);
 	if (filename == "")
 	{
 		filename = "pbr_used.ps";
@@ -1134,8 +1203,6 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 	}
 	dst << func; //Get generated functions
 	dst.close();
-
-	GeneratePBRClassCode();
 }
 
 bool ShaderEditorManager::WillRenderChoosingWindow()
@@ -1310,9 +1377,15 @@ void ShaderEditorManager::DeleteCurrentShaderBlock()
 	//m_focusedBlock = nullptr;
 }
 
+void ShaderEditorManager::ResetMouseHoveredOnImGui()
+{
+	m_mouseHoveredImGui = false;
+}
+
 void ShaderEditorManager::UpdateMouseHoveredOnImGui(bool hovered)
 {
-	m_mouseHoveredImGui = hovered;
+	if (hovered)
+		m_mouseHoveredImGui = true;
 }
 
 void ShaderEditorManager::SetRefToClickedOutside(bool* clickedOutside)
@@ -1375,7 +1448,7 @@ bool ShaderEditorManager::RenderBlocks(ID3D11DeviceContext* deviceContext)
 			return false;
 	}
 
-	for (int i = 0; i < m_lines.size(); ++i)
+	for (int i = m_lines.size() - 1; i > -1; --i)
 	{		
 		//Click on output pin - break connection
 		if (m_lines.at(i)->GetOutput()->m_toDeleteLine)

@@ -185,7 +185,8 @@ private:
 	bool RenderSSAOTexture(RenderTextureClass *targetTex, GBufferShader* shaderToExecute);
 	//ImGUI
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
-	inline void RenderTextureViewImGuiEditor(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label, std::string& path);
+	inline void RenderTextureViewImGuiEditor(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label, std::string& path, bool skipLabel = false);
+	void RenderInputForMaterial(UIShaderEditorBlock* block, bool changeName = false);
 	//Applying post-processes
 	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
 	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);

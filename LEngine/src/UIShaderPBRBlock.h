@@ -34,6 +34,7 @@ public:
 
 	bool Initialize(D3DClass* d3d);
 	
+	void ResetPosition();
 	void Move(float x, float y);
 	void StartDragging();
 	void StopDragging();

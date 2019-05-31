@@ -28,7 +28,6 @@ UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition, std::string fun
 
 bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 {
-	bool result = false;
 	float mouseX{ 0 };
 	float mouseY{ 0 };
 	POINT p = mouse->CurrentMouseLocation();
@@ -54,10 +53,10 @@ bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 	if (mouseX > (m_blockVertices.minX + m_translationX) * m_scale && mouseX < (m_blockVertices.maxX + m_translationX) * m_scale &&
 		mouseY > (m_blockVertices.minY + m_translationY) * m_scale && mouseY < (m_blockVertices.maxY + m_translationY) * m_scale)
 	{
-		result = true;
+		return true;
 	}
 
-	return result;
+	return false;
 }
 
 bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)

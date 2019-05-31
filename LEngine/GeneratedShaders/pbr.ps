@@ -20,7 +20,7 @@ static float4 tex_1;
 Texture2D additionalTexture_2 : register(t9);
 static float4 tex_2;
 Texture2D additionalTexture_3 : register(t10);
-static float4 tex_4;
+static float4 tex_3;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -105,7 +105,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
 	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
 	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_4 = additionalTexture_3.Sample(SampleType, input.tex);
+	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
 
 //Calculated values
 	float specular;
@@ -373,17 +373,17 @@ float4 GetBaseColor()
 }
 float GetMetalness()
 {
-	float out_3 = get_x(tex_4);
+	float out_4 = get_x(tex_1);
 
-	return out_3;
+	return out_4;
 }
 float GetRoughness()
 {
-	float out_5 = get_x(tex_1);
+	float out_5 = get_x(tex_2);
 
 	return out_5;
 }
 float3 GetNormal()
 {
-	return tex_2;
+	return tex_3;
 }

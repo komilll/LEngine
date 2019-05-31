@@ -29,6 +29,8 @@ public:
 	bool IsDragging();
 
 	void SetScale(float scale);
+	void SaveVisibleName();
+	std::string GetVisibleName();
 
 public:
 	float m_value{ 0.0f };
@@ -56,6 +58,7 @@ private:
 	float m_scale{ 1.0f };
 
 	D3DClass* m_D3D{};
+	std::string m_savedVisibleName{};
 
 	float min_X;
 	float max_X;

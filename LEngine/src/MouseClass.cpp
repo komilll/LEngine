@@ -186,7 +186,7 @@ int MouseClass::GetMouseScroll()
 	return (m_mouseState.lZ / 120.0f);
 }
 
-POINT MouseClass::CurrentMouseLocation()
+POINT MouseClass::CurrentMouseLocation() const
 {
 	return m_lastMousePoint;
 }

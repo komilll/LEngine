@@ -152,3 +152,18 @@ void UIShaderEditorOutput::SetScale(float scale)
 {
 	m_scale = scale;
 }
+
+void UIShaderEditorOutput::SaveVisibleName()
+{
+	//Really bad but needed due to using string.data() in ImGui in graphicsclass.cpp
+	m_savedVisibleName = "";
+	for (int i = 0; i < strlen(m_visibleName.data()); ++i)
+	{
+		m_savedVisibleName += m_visibleName.data()[i];
+	}
+}
+
+std::string UIShaderEditorOutput::GetVisibleName()
+{
+	return m_savedVisibleName;
+}

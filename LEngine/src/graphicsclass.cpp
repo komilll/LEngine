@@ -2417,7 +2417,10 @@ void GraphicsClass::RenderInputForMaterial(UIShaderEditorBlock * block, bool cha
 	{
 		if (changeName)
 		{
-			ImGui::InputText("Variable name", const_cast<char*>(out->m_visibleName.data()), 30);
+			if (ImGui::InputText("Variable name", const_cast<char*>(out->m_visibleName.data()), 30))
+			{
+				out->SaveVisibleName();
+			}
 		}
 
 		if (block->GetFunctionName() == "texture")

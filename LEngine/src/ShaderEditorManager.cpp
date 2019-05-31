@@ -85,7 +85,11 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 			{
 				if (!m_mouseHoveredImGui)
 				{
-					TryToResetFocusOnAllBlocks();
+					ShaderEditorManager::ETryDragResult tmp = TryToResetFocusOnAllBlocks(block);
+					if (tmp == ShaderEditorManager::ETryDragResult::DoNotCreate)
+					{
+						return;
+					}
 					block->StartDragging();
 					m_focusedBlock = block;
 				}
@@ -289,11 +293,17 @@ void ShaderEditorManager::ResetFocusOnAllBlocks()
 	m_focusedBlock = nullptr;
 }
 
-bool ShaderEditorManager::TryToResetFocusOnAllBlocks()
+ShaderEditorManager::ETryDragResult ShaderEditorManager::TryToResetFocusOnAllBlocks()
+{
+	return TryToResetFocusOnAllBlocks(nullptr);
+}
+
+ShaderEditorManager::ETryDragResult ShaderEditorManager::TryToResetFocusOnAllBlocks(UIShaderEditorBlock * const other)
 {
 	if (!m_mouseHoveredImGui)
 	{
 		bool canReset = true;
+		bool containsOther = false;
 		int count = 0;
 		for (const auto& block : m_blocks)
 		{
@@ -302,16 +312,25 @@ bool ShaderEditorManager::TryToResetFocusOnAllBlocks()
 				count++;
 				if (block->MouseOnArea(m_mouse))
 					canReset = false;
+
+				if (block == other)
+					containsOther = true;
 			}
+		}
+		if (!containsOther && other && count > 1)
+		{
+			//if (!canReset)
+				ResetFocusOnAllBlocks();
+			return ShaderEditorManager::ETryDragResult::DoNotCreate;
 		}
 		if (canReset || count <= 1)
 		{
 			ResetFocusOnAllBlocks();
-			return true;
+			return ShaderEditorManager::ETryDragResult::Succeed;
 		}
 	}
 
-	return false;
+	return ShaderEditorManager::ETryDragResult::Failed;
 }
 
 void ShaderEditorManager::CreateChoosingWindowItemsArray()
@@ -708,11 +727,7 @@ bool ShaderEditorManager::SaveMaterial(std::string filename)
 			output << SaveBlockValueMaterial(block);
 			if (block->m_inputNodes.size() == 0 && block->GetFirstOutputNode())
 			{
-				for (const auto& out : block->m_outputNodes)
-				{
-					std::string str = out->m_visibleName;
-					output << str << "\n";
-				}
+				output << block->GetFirstOutputNode()->GetVisibleName() << "\n";
 			}
 		}
 
@@ -845,6 +860,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 
 				getline(input, line);
 				block->GetFirstOutputNode()->m_visibleName = line;
+				block->GetFirstOutputNode()->SaveVisibleName();
 			}
 #pragma endregion
 		}
@@ -1395,6 +1411,7 @@ void ShaderEditorManager::SetRefToClickedOutside(bool* clickedOutside)
 
 void ShaderEditorManager::CopyBlocks()
 {
+	m_copiedBlocks.clear();
 	for (const auto& block : m_blocks)
 	{
 		if (block->m_focused)

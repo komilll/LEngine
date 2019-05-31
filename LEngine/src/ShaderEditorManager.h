@@ -13,6 +13,11 @@
 
 class ShaderEditorManager
 {
+private:
+	enum class ETryDragResult {
+		Succeed, Failed, DoNotCreate
+	};
+
 public:
 	ShaderEditorManager(D3DClass* d3d, MouseClass* mouse);
 
@@ -55,7 +60,8 @@ private:
 	void DrawLine(UIShaderEditorInput* in, UIShaderEditorOutput* out);
 	void ResetFocusOnAllBlocks();
 	///<summary> Might fail if there are multiple blocks focused </summary>
-	bool TryToResetFocusOnAllBlocks();
+	ShaderEditorManager::ETryDragResult TryToResetFocusOnAllBlocks();
+	ShaderEditorManager::ETryDragResult TryToResetFocusOnAllBlocks(UIShaderEditorBlock* const other);
 	void CreateChoosingWindowItemsArray();
 	bool CheckConnectionRules(UIShaderEditorInput* in, UIShaderEditorOutput* out);
 	bool TryCreateScalarBlocks(std::string name);

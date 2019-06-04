@@ -37,7 +37,7 @@ public:
 	float m_valueTwo[2]{ 0.0f, 0.0f };
 	float m_valueThree[3]{ 0.0f, 0.0f, 0.0f };
 	float m_valueFour[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
-	std::string m_visibleName{};
+	std::string m_visibleName{"Empty"};
 
 	std::string m_variableName{};
 	std::string m_returnType{};

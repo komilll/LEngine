@@ -62,11 +62,11 @@ bool UIShaderPBRBlock::Initialize(D3DClass * d3d)
 	}
 
 	m_textEngine = new TextEngine;
-	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Color", 0.38f, TextEngine::Align::CENTER);
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Metalness", 0.38f, TextEngine::Align::CENTER);
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Roughness", 0.38f, TextEngine::Align::CENTER);
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Normal", 0.38f, TextEngine::Align::CENTER);
+	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/Calibri_12.spritefont");
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Color");
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Metalness");
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Roughness");
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Normal");
 
 	m_outlineObject = new UIBase;
 	if (!m_outlineObject->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
@@ -206,7 +206,7 @@ bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 			{
 				m_textEngine->GetData(i)->SetPosition((m_translationX + m_textPositionModifiers.at(i).first) * m_scale,
 					(m_translationY + m_textPositionModifiers.at(i).second) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-				m_textEngine->GetData(i)->scale = 0.38f * m_scale;
+				m_textEngine->GetData(i)->scale = m_scale;
 				m_textEngine->RenderText(deviceContext, 1, 1);
 			}
 		}

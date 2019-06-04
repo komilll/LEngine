@@ -172,6 +172,12 @@
     <None Include="pbr_used.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="uitexture.ps">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="uitexture.vs">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">
@@ -315,6 +321,12 @@
     <ClInclude Include="src\MaterialPrefab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\UIColorBlockPreview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UITextureMoveable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -450,6 +462,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MaterialPrefab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UITextureMoveable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,12 +6,14 @@
 #include "UIShaderEditorInput.h"
 #include "UIShaderEditorOutput.h"
 #include "TextEngine.h"
+#include "UITextureMoveable.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <algorithm>
 #include <cctype>
 #include <sstream>
+#include <iomanip>
 
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderEditorBlock : public UIBase
@@ -36,7 +38,7 @@ private:
 public:
 	UIShaderEditorBlock();
 	UIShaderEditorBlock(XMFLOAT2 startPosition);
-	UIShaderEditorBlock(XMFLOAT2 startPosition, std::string functionName, std::string returnType, vector<std::string> argumentTypes);
+	UIShaderEditorBlock(XMFLOAT2 startPosition, std::string functionName, std::string returnType, vector<std::string> argumentTypes, int id);
 
 	bool MouseOnArea(MouseClass* mouse) override;
 
@@ -64,6 +66,8 @@ public:
 	void SetScale(float scale);
 	bool TryToMarkBlock(RectangleVertices markingBounds);
 	Size GetPosition() const;
+	void ChangeBlockName();
+	int GetBlockID();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
@@ -80,6 +84,10 @@ public:
 	bool m_focused = { false };
 
 private:
+	UIBase* m_colorPreview{ nullptr };
+	UITextureMoveable* m_texturePreview{ nullptr };
+
+	int m_blockID{ -1 };
 	D3DClass* m_D3D{ nullptr };
 	bool m_blockInitialized{ false };
 

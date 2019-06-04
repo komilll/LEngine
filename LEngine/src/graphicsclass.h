@@ -89,6 +89,13 @@ private:
 		Count = 3
 	};
 
+	enum class EMaterialInputResult : int
+	{
+		Continue,
+		StopOthers,
+		Break
+	};
+
 	struct BloomSettings
 	{
 		//float weights[5] = { 0.481f, 0.417f, 0.272f, 0.08f, 0.0f };
@@ -186,7 +193,7 @@ private:
 	//ImGUI
 	inline void RenderTextureViewImGui(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label);
 	inline void RenderTextureViewImGuiEditor(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label, std::string& path, bool skipLabel = false);
-	void RenderInputForMaterial(UIShaderEditorBlock* block, bool changeName = false);
+	EMaterialInputResult RenderInputForMaterial(UIShaderEditorBlock* block, bool changeName = false, bool isActive = false);
 	//Applying post-processes
 	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
 	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);

@@ -14,7 +14,7 @@ UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition)
 	ChangeColor(blockColor);
 }
 
-UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition, std::string functionName, std::string returnType, vector<std::string> argumentTypes)
+UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition, std::string functionName, std::string returnType, vector<std::string> argumentTypes, int id)
 {
 	UIBase::UIBase();
 	m_moveAfterInitializing = true;
@@ -24,6 +24,7 @@ UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition, std::string fun
 	m_functionName = functionName;
 	m_returnType = returnType;
 	m_argumentTypes = argumentTypes;
+	m_blockID = id;
 }
 
 bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
@@ -74,11 +75,12 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 	}
 	//Create text on block
 	m_textEngine = new TextEngine;
-	m_textEngine->Initialize(d3d->GetDevice(), L"Fonts/font.spritefont");
+	m_textEngine->Initialize(d3d->GetDevice(), L"Fonts/Calibri_12.spritefont");
 	m_blockName = m_functionName;
 	for (char& c : m_blockName)
 		c = toupper(c);
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, m_blockName, 1.0f, TextEngine::Align::CENTER);
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, m_blockName, 1.0f, TextEngine::Align::LEFT);
+	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, m_blockName, 1.0f, TextEngine::Align::LEFT);
 
 	//Create outline
 	m_outlineObject = new UIBase;
@@ -87,6 +89,29 @@ bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 	if (!m_outlineObject->InitializeModelGeneric(d3d->GetDevice(), CalculateOutlineSize(m_blockVertices), false, true))
 		return false;
 	m_outlineObject->ChangeColor(outlineColor);
+
+	//Create color preview if float3/float4
+	if (m_functionName == "float3" || m_functionName == "float4")
+	{
+		m_colorPreview = new UIBase();
+		if (!m_colorPreview->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+			return false;
+		constexpr float sizeX = 0.08f;
+		if (!m_colorPreview->InitializeModelGeneric(m_D3D->GetDevice(), UIBase::RectangleVertices::RectangleVertices(-sizeX, sizeX, -sizeX * 16.0f / 9.0f, sizeX * 16.0f / 9.0f)))
+			return false;
+		m_colorPreview->ChangeColor(1.0f, 0.0f, 0.0f, 0.5f);
+	}
+
+	//Create texture preview
+	else if (m_functionName == "texture")
+	{
+		constexpr float sizeX = 0.08f;
+		m_texturePreview = new UITextureMoveable();
+		if (!m_texturePreview->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"uitexture.vs", L"uitexture.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
+			return false;
+		if (!m_texturePreview->InitializeModelGeneric(m_D3D->GetDevice(), UIBase::RectangleVertices::RectangleVertices(-sizeX, sizeX, -sizeX * 16.0f / 9.0f, sizeX * 16.0f / 9.0f)))
+			return false;		
+	}
 
 	return (m_blockInitialized = InitializeModelGeneric(d3d->GetDevice(), m_blockVertices));
 }
@@ -215,18 +240,104 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 		{
 			if (m_functionName == "float")
 			{
-				m_textEngine->GetData(0)->SetPosition((m_translationX - 0.1f) * m_scale, m_translationY * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale, 
+					(m_translationY + 0.075f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 				ostringstream oss;
-				oss << m_outputNodes[0]->m_value;
-				m_textEngine->GetData(0)->text = "FLOAT:" + oss.str();
-				m_textEngine->GetData(0)->scale = 0.75f * m_scale;
+				oss << "(" << m_outputNodes[0]->m_value << ")";
+				m_textEngine->GetData(0)->text = oss.str();
+				m_textEngine->GetData(0)->scale = m_scale;
+			}
+			else if (m_functionName == "float2")
+			{
+				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+					(m_translationY + 0.075f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(0)->text = "(";
+				for (int i = 0; i < 2; ++i)
+				{
+					ostringstream oss;
+					oss << fixed << setprecision(2) << m_outputNodes[0]->m_valueTwo[i];
+					m_textEngine->GetData(0)->text += oss.str();
+					if (i < 1)
+						m_textEngine->GetData(0)->text += ", ";
+				}
+				m_textEngine->GetData(0)->text += ")";
+				m_textEngine->GetData(0)->scale = m_scale;
+			}
+			else if (m_functionName == "float3")
+			{
+				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+					(m_translationY + 0.175f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(0)->text = "(";
+				for (int i = 0; i < 3; ++i)
+				{
+					ostringstream oss;
+					oss << fixed << setprecision(2) << m_outputNodes[0]->m_valueThree[i];
+					m_textEngine->GetData(0)->text += oss.str();
+					if (i < 2)
+						m_textEngine->GetData(0)->text += ", ";
+				}
+				m_textEngine->GetData(0)->text += ")";
+				m_textEngine->GetData(0)->scale = m_scale;
+			}
+			else if (m_functionName == "float4")
+			{
+				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+					(m_translationY + 0.175f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(0)->text = "(";
+				for (int i = 0; i < 4; ++i)
+				{
+					ostringstream oss;
+					oss << fixed << setprecision(2) << m_outputNodes[0]->m_valueFour[i];
+					m_textEngine->GetData(0)->text += oss.str();
+					if (i < 3)
+						m_textEngine->GetData(0)->text += ", ";
+				}
+				m_textEngine->GetData(0)->text += ")";
+				m_textEngine->GetData(0)->scale = m_scale;
+
+				m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+					(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+				m_textEngine->GetData(1)->text = "TEST";
+				m_textEngine->GetData(1)->scale = m_scale;
 			}
 			else
 			{
 				m_textEngine->GetData(0)->scale = m_scale;
-				m_textEngine->GetData(0)->SetPosition(m_translationX * m_scale, m_translationY * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-			}			
+				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+					(m_translationY + 0.175f * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+			}
 			m_textEngine->RenderText(deviceContext, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+		}
+
+		if (m_functionName == "float3" || m_functionName == "float4")
+		{
+			if (m_colorPreview)
+			{
+				if (m_functionName == "float3")
+					m_colorPreview->ChangeColor(GetFirstOutputNode()->m_valueThree[0], GetFirstOutputNode()->m_valueThree[1], GetFirstOutputNode()->m_valueThree[2], 1.0f);
+				else if (m_functionName == "float4")
+					m_colorPreview->ChangeColor(GetFirstOutputNode()->m_valueFour[0], GetFirstOutputNode()->m_valueFour[1], GetFirstOutputNode()->m_valueFour[2], 1.0f);
+
+				constexpr float fixPosition = 0.04f;
+				worldMatrix = XMMatrixIdentity();
+				worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX - fixPosition, m_translationY - fixPosition, 0.0f));
+				worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
+				if (m_colorPreview && !m_colorPreview->Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
+					return false;
+			}
+		}
+		else if (m_functionName == "texture")
+		{
+			if (m_texturePreview)
+			{
+				constexpr float fixPosition = 0.04f;
+				worldMatrix = XMMatrixIdentity();
+				worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX - fixPosition, m_translationY - fixPosition, 0.0f));
+				worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
+				m_texturePreview->LoadTexture(m_D3D->GetDevice(), GetFirstOutputNode()->m_connectedTextureView);
+				if (m_texturePreview && !m_texturePreview->Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
+					return false;
+			}
 		}
 
 		return true;
@@ -451,10 +562,55 @@ UIShaderEditorBlock::Size UIShaderEditorBlock::GetPosition() const
 	return Size(m_translationX, m_translationY);
 }
 
+void UIShaderEditorBlock::ChangeBlockName()
+{
+	//m_textEngine->GetData(0)->text = GetFirstOutputNode()->GetVisibleName();
+}
+
+int UIShaderEditorBlock::GetBlockID()
+{
+	return m_blockID;
+}
+
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 {
 	int inOutCount = inCount > outCount ? inCount : outCount;
 	Size blockSize = blockSizeVector[inOutCount - 1];
+	blockSize.x = 0.1f;
+
+	if (m_functionName == "float")
+	{
+		inOutCount = 1;
+		blockSize.x *= 1;
+		blockSize.y += 0.05f;
+	}
+	else if (m_functionName == "float2")
+	{
+		inOutCount = 3;
+		blockSize.x *= 2;
+		blockSize.y += 0.05f;
+	}
+	else if (m_functionName == "float3")
+	{
+		inOutCount = 4;
+		blockSize.x *= 3;
+		blockSize.y = 0.4f;
+		blockSize.y += 0.05f;
+	}
+	else if (m_functionName == "float4")
+	{
+		inOutCount = 5;
+		blockSize.x *= 3;
+		blockSize.y = 0.4f;
+		blockSize.y += 0.05f;
+	}
+	else if (m_functionName == "texture")
+	{
+		inOutCount = 5;
+		blockSize.x *= 3;
+		blockSize.y = 0.4f;
+	}
+
 	m_blockVertices.minX = -blockSize.x * 0.5f;
 	m_blockVertices.maxX = blockSize.x * 0.5f;
 	m_blockVertices.minY = -blockSize.y * 0.5f;

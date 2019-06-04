@@ -52,12 +52,14 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		}
 	}
 
-	if (!m_alreadyMarkingArea)
+	if (!m_alreadyMarkingArea && !m_pickingColorObject)
 	{
 		m_focusedPBR = m_pbrBlock->m_focused;
 		//Check pins first - before moving block, interact with pins
 		if (!UpdatePinsOfAllBlocks())
 			return;
+
+		m_draggingScreen = false;
 
 		if (!UpdatePBRBlock(mouseOnly))
 			return;
@@ -110,6 +112,7 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		//No pin is being dragged, nor any block - try to move screen
 		if (m_mouse->GetMMBPressed())
 		{
+			m_draggingScreen = true;
 			float moveX = -m_mouse->GetMouseMovementFrame().first / m_D3D->GetWindowSize().x / m_scale;
 			float moveY = m_mouse->GetMouseMovementFrame().second / m_D3D->GetWindowSize().y / m_scale;
 			for (const auto& block : m_blocks)
@@ -187,6 +190,9 @@ bool ShaderEditorManager::UpdatePBRBlock(bool mouseOnly)
 
 bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 {
+	if (m_draggingScreen)
+		return true;
+
 	for (const auto& block : m_blocks)
 	{
 		if (block->IsDragging())
@@ -369,33 +375,34 @@ bool ShaderEditorManager::CheckConnectionRules(UIShaderEditorInput * in, UIShade
 
 bool ShaderEditorManager::TryCreateScalarBlocks(std::string name)
 {
+	m_blockIDCounter++;
 	if (name == "float1")
 	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float", "float",{ "" } }), 0, 1);
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float", "float",{ "" }, m_blockIDCounter }), 0, 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "float2")
 	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float2", "float2",{ "" } }), 0, 1);
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float2", "float2",{ "" }, m_blockIDCounter }), 0, 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "float3")
 	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float3", "float3",{ "" } }), 0, 1);
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float3", "float3",{ "" }, m_blockIDCounter }), 0, 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "float4")
 	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float4", "float4",{ "" } }), 0, 1);
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "float4", "float4",{ "" }, m_blockIDCounter }), 0, 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
 	else if (name == "texture")
 	{
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "texture", "float4",{ "" } }), 0, 1);
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, "texture", "float4",{ "" }, m_blockIDCounter }), 0, 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 		return true;
 	}
@@ -772,7 +779,13 @@ bool ShaderEditorManager::SaveMaterial(std::string filename)
 
 	GenerateCodeToFile(filename);
 	GeneratePBRClassCode(filename);
+	LoadAllMaterialsToArray(); //Generate array of materials again to show all materials on GUI
 	return true;
+}
+
+bool ShaderEditorManager::IsWorkingOnSavedMaterial()
+{
+	return m_currentMaterialName.size() > 0;
 }
 
 bool ShaderEditorManager::LoadMaterial(std::string filename)
@@ -781,6 +794,8 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 	{
 		filename = GenerateMaterialName();
 	}
+	m_currentMaterialName = filename;
+	m_materialToSaveName = m_currentMaterialName;
 	DestroyEditor();
 	{
 		std::ifstream input("Materials/" + filename + ".material", std::ios::binary);
@@ -856,11 +871,13 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 					std::wstring wLine = std::wstring(line.begin(), line.end());
 					const wchar_t* path = wLine.c_str();
 					BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView);
+					block->GetFirstOutputNode()->m_texturePath = line;
 				}
 
 				getline(input, line);
 				block->GetFirstOutputNode()->m_visibleName = line;
 				block->GetFirstOutputNode()->SaveVisibleName();
+				block->ChangeBlockName();
 			}
 #pragma endregion
 		}
@@ -1098,6 +1115,9 @@ std::string ShaderEditorManager::GenerateMaterialName()
 
 void ShaderEditorManager::LoadAllMaterialsToArray()
 {
+	m_materials.clear();
+	m_materialNames.clear();
+
 	std::vector<std::string> allFiles = GetFilenamesInDirectory("Materials", false);
 	for (auto& file : allFiles)
 	{
@@ -1114,10 +1134,13 @@ void ShaderEditorManager::LoadAllMaterialsToArray()
 			}
 		}
 	}
+
+	std::sort(m_materialNames.begin(), m_materialNames.end());
 }
 
 void ShaderEditorManager::LoadMaterialInputs()
 {
+	m_materialInputs.clear();
 	for (const auto& block : m_blocks)
 	{
 		if (block->m_outputNodes.size() == 1 && block->m_inputNodes.size() == 0)
@@ -1292,9 +1315,11 @@ void ShaderEditorManager::CreateBlock(std::string name)
 				argumentTypes.at(argumentIndex) += c;
 			}
 		}
-		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes }), argumentTypes.size(), 1);
+		m_blockIDCounter++;
+		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes, m_blockIDCounter }), argumentTypes.size(), 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 	}
+	LoadMaterialInputs();
 }
 
 float ShaderEditorManager::GetWindowPositionX()
@@ -1430,6 +1455,16 @@ void ShaderEditorManager::PasteBlocks()
 		m_blocks.at(m_blocks.size() - 1)->Move(block->GetPosition().x + 0.25f * m_scale, block->GetPosition().y + 0.1f * m_scale);
 		m_blocks.at(m_blocks.size() - 1)->m_focused = true;
 	}
+}
+
+void ShaderEditorManager::SetPickingColorElement(UIShaderEditorOutput* out)
+{
+	m_pickingColorObject = out;
+}
+
+UIShaderEditorOutput* ShaderEditorManager::GetPickingColorElement()
+{
+	return m_pickingColorObject;
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount)

@@ -3,6 +3,7 @@
 UIShaderEditorOutput::UIShaderEditorOutput()
 {
 	UIBase::UIBase();
+	m_visibleName = m_visibleName + m_returnType;
 }
 
 bool UIShaderEditorOutput::MouseOnArea(MouseClass * mouse)

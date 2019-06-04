@@ -1269,33 +1269,48 @@ bool GraphicsClass::RenderGUI()
 			m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
 			ImGui::End();
 			//////////////////
-			ImGui::Begin("Shader editor");
-			if (ImGui::Button("Generate shader"))
+			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor");
+			//if (ImGui::Button("Generate shader"))
+			//{
+			//	m_shaderEditorManager->GenerateCodeToFile();
+			//}
+			//ImGui::Spacing();
+			if (!m_shaderEditorManager->IsWorkingOnSavedMaterial())
 			{
-				m_shaderEditorManager->GenerateCodeToFile();
+				ImGui::Text("Material name:");
+				ImGui::InputText("", const_cast<char*>(m_shaderEditorManager->m_materialToSaveName.data()), 30);
 			}
-			ImGui::Spacing();
-			ImGui::Text("Material name:");
-			ImGui::InputText("", const_cast<char*>(m_shaderEditorManager->m_materialToSaveName.data()), 30);
 			if (ImGui::Button("Save material"))
 			{
 				m_shaderEditorManager->SaveMaterial(m_shaderEditorManager->m_materialToSaveName);
 			}
-			if (ImGui::Button("Load material"))
-			{
-				m_shaderEditorManager->LoadMaterial(m_shaderEditorManager->m_materialToSaveName);
-			}
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			//if (ImGui::Button("Load material"))
+			//{
+			//	m_shaderEditorManager->LoadMaterial(m_shaderEditorManager->m_materialToSaveName);
+			//}
 			//Show scalar options
 			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0
 				&& m_shaderEditorManager->m_focusedBlock->GetFirstOutputNode())
 			{
-				RenderInputForMaterial(m_shaderEditorManager->m_focusedBlock, true);
+				RenderInputForMaterial(m_shaderEditorManager->m_focusedBlock, true, false);
 			}
 			else
 			{
 				for (const auto& in : m_shaderEditorManager->GetMaterialInputs())
 				{
-					RenderInputForMaterial(in);
+					EMaterialInputResult result = RenderInputForMaterial(in, false, m_shaderEditorManager->GetPickingColorElement() == in->GetFirstOutputNode());
+					if (result == EMaterialInputResult::StopOthers)
+					{
+						m_shaderEditorManager->SetPickingColorElement(in->GetFirstOutputNode());
+						break;
+					}
+					else if (result == EMaterialInputResult::Break)
+					{
+						break;
+					}
 				}
 			}
 
@@ -2411,7 +2426,7 @@ inline void GraphicsClass::RenderTextureViewImGuiEditor(ID3D11Resource *& resour
 	}
 }
 
-void GraphicsClass::RenderInputForMaterial(UIShaderEditorBlock * block, bool changeName)
+GraphicsClass::EMaterialInputResult GraphicsClass::RenderInputForMaterial(UIShaderEditorBlock * block, bool changeName, bool isActive)
 {
 	if (UIShaderEditorOutput* out = block->GetFirstOutputNode())
 	{
@@ -2420,8 +2435,13 @@ void GraphicsClass::RenderInputForMaterial(UIShaderEditorBlock * block, bool cha
 			if (ImGui::InputText("Variable name", const_cast<char*>(out->m_visibleName.data()), 30))
 			{
 				out->SaveVisibleName();
+				block->ChangeBlockName();
 			}
 		}
+
+		stringstream ss;
+		ss << block->GetBlockID();
+		std::string hash = ss.str();
 
 		if (block->GetFunctionName() == "texture")
 		{
@@ -2429,31 +2449,65 @@ void GraphicsClass::RenderInputForMaterial(UIShaderEditorBlock * block, bool cha
 		}
 		else if (out->m_returnType == "float")
 		{
-			ImGui::InputFloat("Value", &out->m_value);
+			if (!changeName)
+				ImGui::Text(out->m_visibleName.c_str());
+			ImGui::InputFloat(hash.c_str(), &out->m_value);
 		}
 		else if (out->m_returnType == "float2")
 		{
-			ImGui::InputFloat("Value_1", &out->m_valueTwo[0]);
-			ImGui::InputFloat("Value_2", &out->m_valueTwo[1]);
+			if (!changeName)
+				ImGui::Text(out->m_visibleName.c_str());
+			ImGui::InputFloat2(hash.c_str(), &out->m_valueTwo[0]);
 		}
 		else if (out->m_returnType == "float3")
 		{
-			ImGui::InputFloat("Value_1", &out->m_valueThree[0]);
-			ImGui::InputFloat("Value_2", &out->m_valueThree[1]);
-			ImGui::InputFloat("Value_3", &out->m_valueThree[2]);
+			if (!changeName)
+				ImGui::Text(out->m_visibleName.c_str());
 
-			ImGui::ColorPicker3("Color value", out->m_valueThree);
+			ImGui::ColorEdit3(hash.c_str(), out->m_valueThree, ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoSmallPreview);
+			ImGui::SameLine();
+			if (isActive | ImGui::ColorButton(hash.c_str(), { out->m_valueThree[0], out->m_valueThree[1], out->m_valueThree[2], 1.0f }))
+			{
+				ImGui::ColorPicker3(hash.c_str(), out->m_valueThree, ImGuiColorEditFlags_NoInputs);
+				if (!ImGui::IsItemHovered() && m_mouse->GetMouse()->GetLMBPressed() && !m_shaderEditorManager->m_wasLeftButtonUp)
+				{
+					m_shaderEditorManager->m_wasLeftButtonUp = true;
+					m_shaderEditorManager->SetPickingColorElement(nullptr);
+					return EMaterialInputResult::Break;
+				}
+				else if (!m_mouse->GetMouse()->GetLMBPressed())
+				{
+					m_shaderEditorManager->m_wasLeftButtonUp = ImGui::IsItemHovered();
+				}
+				return EMaterialInputResult::StopOthers;
+			}
 		}
 		else if (out->m_returnType == "float4")
 		{
-			ImGui::InputFloat("Value_1", &out->m_valueFour[0]);
-			ImGui::InputFloat("Value_2", &out->m_valueFour[1]);
-			ImGui::InputFloat("Value_3", &out->m_valueFour[2]);
-			ImGui::InputFloat("Value_4", &out->m_valueFour[3]);
+			if (!changeName)
+				ImGui::Text(out->m_visibleName.c_str());
 
-			ImGui::ColorPicker4("Color value", out->m_valueFour);
+			ImGui::ColorEdit4(hash.c_str(), out->m_valueFour, ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoSmallPreview);
+			ImGui::SameLine();
+			if (isActive | ImGui::ColorButton(hash.c_str(), { out->m_valueFour[0], out->m_valueFour[1], out->m_valueFour[2], out->m_valueFour[3] }))
+			{
+				ImGui::ColorPicker4(hash.c_str(), out->m_valueFour, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+				if (!ImGui::IsItemHovered() && m_mouse->GetMouse()->GetLMBPressed() && !m_shaderEditorManager->m_wasLeftButtonUp)
+				{
+					m_shaderEditorManager->m_wasLeftButtonUp = true;
+					m_shaderEditorManager->SetPickingColorElement(nullptr);
+					return EMaterialInputResult::Break;
+				}
+				else if (!m_mouse->GetMouse()->GetLMBPressed())
+				{
+					m_shaderEditorManager->m_wasLeftButtonUp = ImGui::IsItemHovered();
+				}
+				return EMaterialInputResult::StopOthers;
+			}
 		}
 	}
+
+	return EMaterialInputResult::Continue;
 }
 
 bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer)

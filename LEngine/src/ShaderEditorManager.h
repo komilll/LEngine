@@ -43,8 +43,12 @@ public:
 	void CopyBlocks();
 	void PasteBlocks();
 
+	void SetPickingColorElement(UIShaderEditorOutput* out);
+	UIShaderEditorOutput* GetPickingColorElement();
+
 	//SAVE MATERIAL TO FILE
 	bool SaveMaterial(std::string filename);
+	bool IsWorkingOnSavedMaterial();
 
 	//LOAD MATERIAL FROM FILE
 	bool LoadMaterial(std::string filename);
@@ -103,6 +107,7 @@ public:
 	const int k_choosingWindowSearchSize{ 10 };
 	UIShaderEditorBlock* m_focusedBlock{ nullptr };
 	bool m_focusedPBR{ false };
+	bool m_wasLeftButtonUp{ false };
 	std::string m_materialToSaveName{};
 
 private:
@@ -126,12 +131,17 @@ private:
 	std::vector<MaterialPrefab> m_materials{};
 	std::vector<UIShaderEditorBlock*> m_materialInputs{};
 
+	std::string m_currentMaterialName{};
+	int m_blockIDCounter = -1;
+
 	float m_scale{ 1.0f };
 	bool m_alreadyMarkingArea{ false };
 	float m_mouseDragStartX{ 0.0f };
 	float m_mouseDragStartY{ 0.0f };
 	UIBase* m_markingArea{};
 
+	UIShaderEditorOutput* m_pickingColorObject{ nullptr };
+	bool m_draggingScreen{ false };
 	bool m_choosingWindow{ false };
 	int m_choosingWindowHandler{ 0 };
 	int m_choosingWindowPosX{ 0 };

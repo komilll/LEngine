@@ -166,6 +166,8 @@
     <None Include="uibase.vs" />
     <None Include="uiline.ps" />
     <None Include="uiline.vs" />
+    <None Include="uitexture.ps" />
+    <None Include="uitexture.vs" />
     <None Include="uiTexturePreview.ps" />
     <None Include="uiTexturePreview.vs" />
   </ItemGroup>
@@ -207,6 +209,7 @@
     <ClInclude Include="src\UIBackground.h" />
     <ClInclude Include="src\UIBase.h" />
     <ClInclude Include="src\UIButton.h" />
+    <ClInclude Include="src\UIColorBlockPreview.h" />
     <ClInclude Include="src\UILine.h" />
     <ClInclude Include="src\UIShaderEditorBlock.h" />
     <ClInclude Include="src\UIShaderEditorInput.h" />
@@ -214,6 +217,7 @@
     <ClInclude Include="src\UIShaderPBRBlock.h" />
     <ClInclude Include="src\UISlider.h" />
     <ClInclude Include="src\UITexture.h" />
+    <ClInclude Include="src\UITextureMoveable.h" />
     <ClInclude Include="src\UITexturePreview.h" />
     <ClInclude Include="src\UITick.h" />
     <ClInclude Include="src\VignetteShader.h" />
@@ -261,6 +265,7 @@
     <ClCompile Include="src\UIShaderPBRBlock.cpp" />
     <ClCompile Include="src\UISlider.cpp" />
     <ClCompile Include="src\UITexture.cpp" />
+    <ClCompile Include="src\UITextureMoveable.cpp" />
     <ClCompile Include="src\UITexturePreview.cpp" />
     <ClCompile Include="src\UITick.cpp" />
     <ClCompile Include="src\VignetteShader.cpp" />

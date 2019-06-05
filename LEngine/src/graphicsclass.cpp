@@ -1301,6 +1301,11 @@ bool GraphicsClass::RenderGUI()
 			{
 				for (const auto& in : m_shaderEditorManager->GetMaterialInputs())
 				{
+					if (!in->GetFirstOutputNode()->m_isVariable)
+					{
+						continue;
+					}
+
 					EMaterialInputResult result = RenderInputForMaterial(in, false, m_shaderEditorManager->GetPickingColorElement() == in->GetFirstOutputNode());
 					if (result == EMaterialInputResult::StopOthers)
 					{
@@ -2430,12 +2435,25 @@ GraphicsClass::EMaterialInputResult GraphicsClass::RenderInputForMaterial(UIShad
 {
 	if (UIShaderEditorOutput* out = block->GetFirstOutputNode())
 	{
-		if (changeName)
+		if (changeName && out->m_isVariable)
 		{
+			if (ImGui::Button("Demote variable"))
+			{
+				out->DemoteVariable();
+				block->UpdateVariable();
+			}
 			if (ImGui::InputText("Variable name", const_cast<char*>(out->m_visibleName.data()), 30))
 			{
 				out->SaveVisibleName();
 				block->ChangeBlockName();
+			}
+		}
+		else if (!out->m_isVariable)
+		{
+			if (ImGui::Button("Promote to variable"))
+			{
+				out->PromoteToVariable();
+				block->UpdateVariable();
 			}
 		}
 

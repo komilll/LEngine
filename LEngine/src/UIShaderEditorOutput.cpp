@@ -168,3 +168,19 @@ std::string UIShaderEditorOutput::GetVisibleName()
 {
 	return m_savedVisibleName;
 }
+
+void UIShaderEditorOutput::PromoteToVariable(std::string name)
+{
+	m_isVariable = true;
+	m_variableName = name;
+}
+
+void UIShaderEditorOutput::DemoteVariable()
+{
+	m_isVariable = false;
+}
+
+void UIShaderEditorOutput::PromoteToVariable()
+{
+	m_isVariable = true;
+}

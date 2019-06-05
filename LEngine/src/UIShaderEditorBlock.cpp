@@ -241,16 +241,28 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 			if (m_functionName == "float")
 			{
 				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale, 
-					(m_translationY + 0.075f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					(m_translationY + 0.035f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 				ostringstream oss;
 				oss << "(" << m_outputNodes[0]->m_value << ")";
 				m_textEngine->GetData(0)->text = oss.str();
 				m_textEngine->GetData(0)->scale = m_scale;
+
+				if (GetFirstOutputNode()->m_isVariable)
+				{
+					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->scale = m_scale;
+				}
+				else
+				{
+					m_textEngine->GetData(1)->scale = 0.0f;
+				}
 			}
 			else if (m_functionName == "float2")
 			{
 				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
-					(m_translationY + 0.075f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					(m_translationY + 0.035f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 				m_textEngine->GetData(0)->text = "(";
 				for (int i = 0; i < 2; ++i)
 				{
@@ -262,6 +274,18 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				}
 				m_textEngine->GetData(0)->text += ")";
 				m_textEngine->GetData(0)->scale = m_scale;
+				
+				if (GetFirstOutputNode()->m_isVariable)
+				{
+					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->scale = m_scale;
+				}
+				else
+				{
+					m_textEngine->GetData(1)->scale = 0.0f;
+				}
 			}
 			else if (m_functionName == "float3")
 			{
@@ -278,6 +302,18 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				}
 				m_textEngine->GetData(0)->text += ")";
 				m_textEngine->GetData(0)->scale = m_scale;
+
+				if (GetFirstOutputNode()->m_isVariable)
+				{
+					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->scale = m_scale;
+				}
+				else
+				{
+					m_textEngine->GetData(1)->scale = 0.0f;
+				}
 			}
 			else if (m_functionName == "float4")
 			{
@@ -295,10 +331,17 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				m_textEngine->GetData(0)->text += ")";
 				m_textEngine->GetData(0)->scale = m_scale;
 
-				m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
-					(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-				m_textEngine->GetData(1)->text = "TEST";
-				m_textEngine->GetData(1)->scale = m_scale;
+				if (GetFirstOutputNode()->m_isVariable)
+				{
+					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->scale = m_scale;
+				}
+				else
+				{
+					m_textEngine->GetData(1)->scale = 0.0f;
+				}
 			}
 			else
 			{
@@ -572,6 +615,13 @@ int UIShaderEditorBlock::GetBlockID()
 	return m_blockID;
 }
 
+void UIShaderEditorBlock::UpdateVariable()
+{
+	CalculateBlockSize(1, 1);
+	InitializeModelGeneric(m_D3D->GetDevice(), m_blockVertices);
+	m_outlineObject->InitializeModelGeneric(m_D3D->GetDevice(), CalculateOutlineSize(m_blockVertices), false, true);
+}
+
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 {
 	int inOutCount = inCount > outCount ? inCount : outCount;
@@ -582,33 +632,41 @@ void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 	{
 		inOutCount = 1;
 		blockSize.x *= 1;
-		blockSize.y += 0.05f;
+		blockSize.y = 0.11f;
+		if (GetFirstOutputNode() && GetFirstOutputNode()->m_isVariable)
+			blockSize.y += 0.05f;
 	}
 	else if (m_functionName == "float2")
 	{
 		inOutCount = 3;
 		blockSize.x *= 2;
-		blockSize.y += 0.05f;
+		blockSize.y = 0.11f;
+		if (GetFirstOutputNode() && GetFirstOutputNode()->m_isVariable)
+			blockSize.y += 0.05f;
 	}
 	else if (m_functionName == "float3")
 	{
 		inOutCount = 4;
 		blockSize.x *= 3;
 		blockSize.y = 0.4f;
-		blockSize.y += 0.05f;
+		if (GetFirstOutputNode() && GetFirstOutputNode()->m_isVariable)
+			blockSize.y += 0.05f;
 	}
 	else if (m_functionName == "float4")
 	{
 		inOutCount = 5;
 		blockSize.x *= 3;
 		blockSize.y = 0.4f;
-		blockSize.y += 0.05f;
+		if (GetFirstOutputNode() && GetFirstOutputNode()->m_isVariable)
+			blockSize.y += 0.05f;
 	}
 	else if (m_functionName == "texture")
 	{
 		inOutCount = 5;
 		blockSize.x *= 3;
 		blockSize.y = 0.4f;
+		if (GetFirstOutputNode() && GetFirstOutputNode()->m_isVariable)
+			blockSize.y += 0.05f;
 	}
 
 	m_blockVertices.minX = -blockSize.x * 0.5f;
@@ -634,7 +692,7 @@ bool UIShaderEditorBlock::InitializeInputNodes(int count)
 		{
 			return false;
 		}
-		inputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);
+		inputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);		
 
 		m_inputNodes.push_back(inputNode);
 	}
@@ -654,9 +712,13 @@ bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 		{
 			return false;
 		}
-		outputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);
+		outputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);				
 
 		m_outputNodes.push_back(outputNode);
+	}
+	if (m_outputNodes.size() == 1 && m_inputNodes.size() == 0)
+	{
+		GetFirstOutputNode()->Move(0.0f, 0.055f);
 	}
 
 	return true;

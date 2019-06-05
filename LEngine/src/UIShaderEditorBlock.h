@@ -68,6 +68,7 @@ public:
 	Size GetPosition() const;
 	void ChangeBlockName();
 	int GetBlockID();
+	void UpdateVariable();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);

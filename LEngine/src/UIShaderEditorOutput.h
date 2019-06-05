@@ -31,6 +31,9 @@ public:
 	void SetScale(float scale);
 	void SaveVisibleName();
 	std::string GetVisibleName();
+	void PromoteToVariable();
+	void PromoteToVariable(std::string name);
+	void DemoteVariable();
 
 public:
 	float m_value{ 0.0f };
@@ -48,6 +51,7 @@ public:
 	ID3D11Resource* m_connectedTexture;
 	ID3D11ShaderResourceView* m_connectedTextureView;
 	std::string m_texturePath{};
+	bool m_isVariable{ false };
 
 private:
 	bool m_dragged{ false };

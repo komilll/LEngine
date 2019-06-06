@@ -1,0 +1,4 @@
+float4 twotofourtypetwo(float2 x, float2 y)
+{
+	return float4(x, y);
+}

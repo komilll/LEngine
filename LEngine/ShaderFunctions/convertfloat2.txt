@@ -1,0 +1,4 @@
+float2 convertfloat2(float x, float y)
+{
+	return float2(x, y);
+}

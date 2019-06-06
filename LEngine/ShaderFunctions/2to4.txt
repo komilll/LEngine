@@ -1,0 +1,4 @@
+float4 twotofour(float2 x, float y, float z)
+{
+	return float4(x, y, z);
+}

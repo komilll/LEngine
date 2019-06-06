@@ -159,6 +159,7 @@ private:
 	bool Render();
 	bool RenderScene();
 	bool RenderGUI();
+	void ReinitializeMainModel();
 
 	bool RenderDebugSettings();
 	bool RenderSkybox();

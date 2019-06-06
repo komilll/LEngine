@@ -100,6 +100,7 @@ public:
 	float m_roughness = 0;
 	float m_metalness = 0;
 	float m_tint[3] = { 1,1,1 };
+	std::vector<std::string> m_materialNames;
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;

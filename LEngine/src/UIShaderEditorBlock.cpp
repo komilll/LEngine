@@ -243,8 +243,8 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale, 
 					(m_translationY + 0.035f) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 				ostringstream oss;
-				oss << "(" << m_outputNodes[0]->m_value << ")";
-				m_textEngine->GetData(0)->text = oss.str();
+				oss << fixed << setprecision(2) << m_outputNodes[0]->m_value;
+				m_textEngine->GetData(0)->text = "(" + oss.str() + ")";
 				m_textEngine->GetData(0)->scale = m_scale;
 
 				if (GetFirstOutputNode()->m_isVariable)

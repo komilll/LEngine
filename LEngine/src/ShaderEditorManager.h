@@ -56,6 +56,7 @@ public:
 	std::vector<std::string>& GetAllMaterialNames();
 	std::vector<MaterialPrefab>& GetAllMaterials();
 	std::vector<UIShaderEditorBlock*>& GetMaterialInputs();
+	std::vector<std::string> GetUsedTextures();
 
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);
@@ -130,6 +131,7 @@ private:
 	std::vector<std::string> m_materialNames{};
 	std::vector<MaterialPrefab> m_materials{};
 	std::vector<UIShaderEditorBlock*> m_materialInputs{};
+	std::vector<std::string> m_usedTextures{};
 
 	std::string m_currentMaterialName{};
 	int m_blockIDCounter = -1;

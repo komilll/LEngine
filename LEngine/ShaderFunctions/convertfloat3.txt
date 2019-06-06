@@ -1,0 +1,4 @@
+float3 convertfloat3(float x, float y, float z)
+{
+	return float3(x, y, z);
+}

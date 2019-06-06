@@ -90,7 +90,13 @@ static const float PI = 3.14159265359;
 static const float POINT_LIGHT_CONSTANT = 1.0f;
 static const float POINT_LIGHT_LINEAR = 0.7f;
 static const float POINT_LIGHT_QUADRATIC = 1.8f;
+float3 twotothree (float2 x, float y);
+float4 twotofour(float2 x, float y, float z);
+float4 twotofourtypetwo(float2 x, float2 y);
 float add(float a, float b);
+float2 convertfloat2(float x, float y);
+float3 convertfloat3(float x, float y, float z);
+float4 convertfloat4(float x, float y, float z, float w);
 float divide(float a, float b);
 float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
 float get_x(float4 a);
@@ -317,6 +323,18 @@ float3 GetPrefilteredColor(float roughness, float3 R)
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS
 ////////////////////////////////////////////////////////////////////////////////
+float3 twotothree (float2 x, float y)
+{
+	return float3(x, y);
+}
+float4 twotofour(float2 x, float y, float z)
+{
+	return float4(x, y, z);
+}
+float4 twotofourtypetwo(float2 x, float2 y)
+{
+	return float4(x, y);
+}
 float add(float a, float b)
 {
 	return a + b;
@@ -335,6 +353,18 @@ float3 add(float3 a, float3 b)
 float4 add(float4 a, float4 b)
 {
 	return a + b;
+}
+float2 convertfloat2(float x, float y)
+{
+	return float2(x, y);
+}
+float3 convertfloat3(float x, float y, float z)
+{
+	return float3(x, y, z);
+}
+float4 convertfloat4(float x, float y, float z, float w)
+{
+	return float4(x, y, z, w);
 }
 float divide(float a, float b)
 {

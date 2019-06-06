@@ -467,6 +467,7 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 std::string ShaderEditorManager::GetTextureDeclarations()
 {
 	int count = 0;
+	m_generatedTextureAdresses.clear();
 	for (const auto& block : m_blocks) 
 	{
 		if (block->GetFunctionName() == "texture")
@@ -619,6 +620,11 @@ std::string ShaderEditorManager::ConvertReturnType(std::string outName, std::str
 	return "ERROR";
 }
 
+std::vector<std::string> ShaderEditorManager::GetUsedTextures()
+{
+	return m_usedTextures;
+}
+
 void ShaderEditorManager::ShowFunctionChoosingWindow()
 {
 	m_choosingWindowPosX = m_mouse->CurrentMouseLocation().x;
@@ -641,6 +647,14 @@ void ShaderEditorManager::LoadFunctionsFromDirectory()
 
 void ShaderEditorManager::GeneratePBRClassCode(std::string filename)
 {
+	GetTextureDeclarations();
+	m_usedTextures.clear();
+	for (const auto& name : m_generatedTextureAdresses)
+	{
+		m_usedTextures.push_back(name);
+	}
+	return;
+
 	if (filename == "")
 	{
 		filename = "src/ShaderPBRGenerated.cpp";

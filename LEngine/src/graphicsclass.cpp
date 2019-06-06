@@ -835,6 +835,10 @@ TextEngine::FontData * GraphicsClass::AddText(float && posX, float && posY, std:
 void GraphicsClass::ChangeRenderWindow()
 {
 	RENDER_MATERIAL_EDITOR = !RENDER_MATERIAL_EDITOR;
+	if (!RENDER_MATERIAL_EDITOR)
+	{
+		ReinitializeMainModel();
+	}
 }
 
 void GraphicsClass::DeleteCurrentShaderBlock()
@@ -1270,11 +1274,11 @@ bool GraphicsClass::RenderGUI()
 			ImGui::End();
 			//////////////////
 			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor");
-			//if (ImGui::Button("Generate shader"))
-			//{
-			//	m_shaderEditorManager->GenerateCodeToFile();
-			//}
-			//ImGui::Spacing();
+			if (ImGui::Button("Generate shader"))
+			{
+				m_shaderEditorManager->GenerateCodeToFile();
+			}
+			ImGui::Spacing();
 			if (!m_shaderEditorManager->IsWorkingOnSavedMaterial())
 			{
 				ImGui::Text("Material name:");
@@ -1449,6 +1453,27 @@ Finished_drawing:
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	return true;
+}
+
+void GraphicsClass::ReinitializeMainModel()
+{
+	std::vector <LPCSTR> names;
+	names.push_back("position");
+	names.push_back("texcoord");
+	names.push_back("normal");
+	names.push_back("tangent");
+	names.push_back("binormal");
+	std::vector <DXGI_FORMAT> formats;
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	BaseShaderClass::vertexInputType input(names, formats);
+
+	m_pbrShader->m_materialNames = m_shaderEditorManager->GetUsedTextures();
+	m_pbrShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"pbr_used.vs", L"pbr_used.ps", input);
+	//m_pbrShader->LoadGeneratedTextures(m_D3D->GetDevice());
 }
 
 bool GraphicsClass::RenderDebugSettings()

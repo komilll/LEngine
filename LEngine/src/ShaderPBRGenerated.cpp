@@ -253,8 +253,15 @@ void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)
 {
 	ID3D11Resource* resource{nullptr};
 
-	m_additionalMapViews.push_back(nullptr);
-	m_additionalMapViews.push_back(nullptr);
-	LoadTexture(device, L"", resource, m_additionalMapViews.at(0), true);
-	LoadTexture(device, L"", resource, m_additionalMapViews.at(1), true);
+	m_additionalMapViews.clear();
+	for (const auto& name : m_materialNames)
+	{
+		m_additionalMapViews.push_back(nullptr);
+	}
+	for (int i = 0; i < m_materialNames.size(); ++i)
+	{
+		std::wstring widestr = std::wstring(m_materialNames.at(i).begin(), m_materialNames.at(i).end());
+		const wchar_t* widecstr = widestr.c_str();
+		LoadTexture(device, widecstr, resource, m_additionalMapViews.at(i), true);
+	}
 }

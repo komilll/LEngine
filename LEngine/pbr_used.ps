@@ -17,6 +17,10 @@ Texture2D additionalTexture_0 : register(t7);
 static float4 tex_0;
 Texture2D additionalTexture_1 : register(t8);
 static float4 tex_1;
+Texture2D additionalTexture_2 : register(t9);
+static float4 tex_2;
+Texture2D additionalTexture_3 : register(t10);
+static float4 tex_3;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -86,7 +90,13 @@ static const float PI = 3.14159265359;
 static const float POINT_LIGHT_CONSTANT = 1.0f;
 static const float POINT_LIGHT_LINEAR = 0.7f;
 static const float POINT_LIGHT_QUADRATIC = 1.8f;
+float3 twotothree (float2 x, float y);
+float4 twotofour(float2 x, float y, float z);
+float4 twotofourtypetwo(float2 x, float2 y);
 float add(float a, float b);
+float2 convertfloat2(float x, float y);
+float3 convertfloat3(float x, float y, float z);
+float4 convertfloat4(float x, float y, float z, float w);
 float divide(float a, float b);
 float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
 float get_x(float4 a);
@@ -100,6 +110,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
 	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
+	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
+	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
 
 //Calculated values
 	float specular;
@@ -311,6 +323,18 @@ float3 GetPrefilteredColor(float roughness, float3 R)
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS
 ////////////////////////////////////////////////////////////////////////////////
+float3 twotothree (float2 x, float y)
+{
+	return float3(x, y);
+}
+float4 twotofour(float2 x, float y, float z)
+{
+	return float4(x, y, z);
+}
+float4 twotofourtypetwo(float2 x, float2 y)
+{
+	return float4(x, y);
+}
 float add(float a, float b)
 {
 	return a + b;
@@ -329,6 +353,18 @@ float3 add(float3 a, float3 b)
 float4 add(float4 a, float4 b)
 {
 	return a + b;
+}
+float2 convertfloat2(float x, float y)
+{
+	return float2(x, y);
+}
+float3 convertfloat3(float x, float y, float z)
+{
+	return float3(x, y, z);
+}
+float4 convertfloat4(float x, float y, float z, float w)
+{
+	return float4(x, y, z, w);
 }
 float divide(float a, float b)
 {
@@ -363,17 +399,21 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return tex_1;
+	return tex_0;
 }
 float GetMetalness()
 {
-	return 0.0f;
+	float out_4 = get_x(tex_1);
+
+	return out_4;
 }
 float GetRoughness()
 {
-	return 0.0f;
+	float out_5 = get_x(tex_2);
+
+	return out_5;
 }
 float3 GetNormal()
 {
-	return float3(0.0f, 0.0f, 0.0f);
+	return tex_3;
 }

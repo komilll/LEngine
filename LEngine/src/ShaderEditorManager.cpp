@@ -211,6 +211,10 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 		if (block->IsPinDragging())
 		{
 			out = block->DragPins(m_mouse);
+			//if (block->DragPins(m_mouse) == UIShaderEditorBlock::EDragPinBehaviour::Break)
+			//{
+			//	m_refreshModel = true;
+			//}
 			currentBlock = block;
 		}
 	}
@@ -229,6 +233,7 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 					in->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 					out->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 					DrawLine(in, out);
+					m_refreshModel = true;
 				}
 				canTryPBR = false;
 				break;
@@ -248,6 +253,7 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 					in->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 					out->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 					DrawLine(in, out);
+					m_refreshModel = true;
 				}
 			}
 			else if (m_mouse->GetRMBPressed())

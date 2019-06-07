@@ -18,6 +18,16 @@
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderEditorBlock : public UIBase
 {
+public:
+	enum EDragPinBehaviour
+	{
+		Dragging,
+		Start,
+		Stop,
+		Break,
+		Nothing
+	};
+
 private:
 	struct Size
 	{
@@ -50,7 +60,7 @@ public:
 	bool IsDragging();
 	bool IsPinDragging();
 
-	UIShaderEditorOutput* DragPins(MouseClass* mouse);
+	UIShaderEditorOutput* DragPins(MouseClass* mouse/*, UIShaderEditorOutput* out*/);
 
 	UIShaderEditorInput* CheckIfMouseOnInputPin(MouseClass* mouse);
 

@@ -109,6 +109,7 @@ public:
 	UIShaderEditorBlock* m_focusedBlock{ nullptr };
 	bool m_focusedPBR{ false };
 	bool m_wasLeftButtonUp{ false };
+	bool m_refreshModel{ false };
 	std::string m_materialToSaveName{};
 
 private:

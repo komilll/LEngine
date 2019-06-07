@@ -261,6 +261,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
 		return false;
 
+	if (!(m_shaderPreview = new RenderTextureClass))
+		return false;
+	if (!(m_shaderPreview->Initialize(m_D3D->GetDevice(), screenWidth * 0.25f, screenHeight * 0.25f)))
+		return false;
+
 	//Blur shader - vertical and horizontal
 	m_blurShaderHorizontal = new BlurShaderClass;
 	if (!m_blurShaderHorizontal->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"blurHorizontal.vs", L"blurHorizontal.ps", input))
@@ -694,12 +699,6 @@ void GraphicsClass::RotateCamera(XMVECTOR rotation)
 
 void GraphicsClass::UpdateUI()
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	m_Camera->Render();
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-
 	m_D3D->EnableAlphaBlending();
 	if (m_shaderEditorManager)
 	{
@@ -955,7 +954,25 @@ bool GraphicsClass::Render()
 		}
 		else
 		{
+			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+
+			result = RenderScene();
+			if (!result)
+				return false;
+			
+			m_renderTexturePreview->BindTexture(m_shaderPreview->GetShaderResourceView());
+			result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
+			if (!result)
+				return false;
+
+			m_D3D->ResetViewport();
 			UpdateUI();
+			if (m_shaderEditorManager->m_refreshModel)
+			{
+				m_shaderEditorManager->m_refreshModel = false;
+				m_shaderEditorManager->GenerateCodeToFile();
+				ReinitializeMainModel();
+			}
 		}
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
@@ -1058,8 +1075,16 @@ bool GraphicsClass::RenderScene()
 	//	}
 	//}
 
-	m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	if (RENDER_MATERIAL_EDITOR)
+	{
+		m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else
+	{
+		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	}
 
 	if (DRAW_SKYBOX)
 	{
@@ -1231,52 +1256,62 @@ bool GraphicsClass::RenderGUI()
 	ImGui::NewFrame();
 	PassMouseInfo(m_mouse->GetMouse()->GetLMBPressed(), m_mouse->GetMouse()->GetRMBPressed());
 
+	//Render material-choose window
+	if (!RENDER_MATERIAL_EDITOR)
+	{
+		ImGui::SetNextWindowPos({ 1042, 24 });
+		ImGui::SetNextWindowSize({ 226, 659 });
+		ImGui::Begin("Materials explorer", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+
+		float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+		{
+			int materialIndex = 0;
+			for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
+			{
+				std::string tmp;
+				int i{ 0 };
+				for (const auto& c : name)
+				{
+					tmp += c;
+					i++;
+					if (i % 8 == 0)
+					{
+						i = 0;
+						tmp += "\n";
+					}
+				}
+				if (ImGui::Button(tmp.c_str(), ImVec2{ 64, 64 }))
+				{
+					m_shaderEditorManager->LoadMaterial(materialIndex);
+				}
+				//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
+				float lastButtonPos = ImGui::GetItemRectMax().x;
+				float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
+				if (nextButtonPos < windowLineWidth)
+				{
+					ImGui::SameLine();
+				}
+				materialIndex++;
+			}
+		}
+
+		m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
+		ImGui::End();
+	}
 	if (RENDER_MATERIAL_EDITOR && m_shaderEditorManager)
 	{
 		m_shaderEditorManager->ResetMouseHoveredOnImGui();
 		//Base window of editor - flow control/variables
 		{
-			ImGui::Begin("Materials explorer");
-
-			float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
-			{
-				int materialIndex = 0;
-				for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
-				{
-					std::string tmp;
-					int i{ 0 };
-					for (const auto& c : name)
-					{
-						tmp += c;
-						i++;
-						if (i % 8 == 0)
-						{
-							i = 0;
-							tmp += "\n";
-						}
-					}
-					if (ImGui::Button(tmp.c_str(), ImVec2{ 64, 64 }))
-					{
-						m_shaderEditorManager->LoadMaterial(materialIndex);
-					}
-					//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
-					float lastButtonPos = ImGui::GetItemRectMax().x;
-					float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
-					if (nextButtonPos < windowLineWidth)
-					{
-						ImGui::SameLine();
-					}
-					materialIndex++;
-				}
-			}
-
-			m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
-			ImGui::End();
 			//////////////////
-			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor");
+			ImGui::SetNextWindowPos({ 2, 180 });
+			ImGui::SetNextWindowSize({ 318, 541 });
+			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor", (bool*)0, 
+				ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 			if (ImGui::Button("Generate shader"))
 			{
 				m_shaderEditorManager->GenerateCodeToFile();
+				ReinitializeMainModel();
 			}
 			ImGui::Spacing();
 			if (!m_shaderEditorManager->IsWorkingOnSavedMaterial())

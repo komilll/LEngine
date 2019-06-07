@@ -232,6 +232,7 @@ private:
 	UISlider* m_metalnessSlider;
 
 	LightClass* m_directionalLight;
+	RenderTextureClass* m_shaderPreview;
 
 	//BILINEAR SCREEN BLUR
 	RenderTextureClass* m_renderTexture;

@@ -149,7 +149,7 @@ bool UIShaderEditorBlock::IsPinDragging()
 	return m_pinDragged;
 }
 
-UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
+UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse/*, UIShaderEditorOutput*& out*/)
 {
 	for (const auto& pin : m_outputNodes)
 	{
@@ -159,8 +159,10 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 			{
 				pin->StopDragging();
 				m_pinDragged = false;
+				//return EDragPinBehaviour::Stop;
 			}
 			return pin;
+			//return EDragPinBehaviour::Dragging;
 		}
 	}
 
@@ -173,12 +175,14 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 				pin->m_toDeleteLine = true;
 				m_pinDragged = false;
 				return nullptr;
+				//return EDragPinBehaviour::Break;
 			}
 			if (mouse->GetLMBPressed())
 			{
 				pin->StartDragging();
 				m_pinDragged = true;
 				return pin;
+				//return EDragPinBehaviour::Start;
 			}
 		}
 	}
@@ -192,11 +196,13 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse)
 				pin->m_connectedOutputNode = nullptr;
 				m_pinDragged = false;
 				return nullptr;
+				//return EDragPinBehaviour::Break;
 			}
 		}
 	}
 
 	return nullptr;
+	//return EDragPinBehaviour::Nothing;
 }
 
 bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)

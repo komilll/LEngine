@@ -210,11 +210,10 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 	{
 		if (block->IsPinDragging())
 		{
-			out = block->DragPins(m_mouse);
-			//if (block->DragPins(m_mouse) == UIShaderEditorBlock::EDragPinBehaviour::Break)
-			//{
-			//	m_refreshModel = true;
-			//}
+			if (block->DragPins(m_mouse, out) == UIShaderEditorBlock::EDragPinBehaviour::Break)
+			{
+				m_refreshModel = true;
+			}
 			currentBlock = block;
 		}
 	}
@@ -271,8 +270,14 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 	//If no pin is being dragged - check to start dragging
 	for (const auto& block : m_blocks)
 	{
-		if (block->DragPins(m_mouse))
+		if (block->DragPins(m_mouse, out) == UIShaderEditorBlock::EDragPinBehaviour::Break)
+		{
+			m_refreshModel = true;
+		}
+		if (out)
+		{
 			return false;
+		}
 	}
 	return true;
 }
@@ -489,7 +494,7 @@ std::string ShaderEditorManager::GetTextureDeclarations()
 		std::string toReturn{};
 		for (const auto& block : m_blocks)
 		{
-			if (block->GetFunctionName() == "texture")
+			if (block->GetFunctionName() == "texture" || block->GetFunctionName() == "sampletexture")
 			{
 				ostringstream ssBegin;
 				ostringstream ssEnd;
@@ -519,6 +524,40 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 			ss << index;
 			index++;
 			toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
+		}
+		else if (block->GetFunctionName() == "sampletexture")
+		{
+			for (int i = 0; i < m_blocks.size(); ++i)
+			{
+				if (block->m_inputNodes.at(0)->m_connectedOutputNode == m_blocks.at(i)->GetFirstOutputNode())
+				{
+					ostringstream ss;
+					ss << i;
+					i++;
+					//float x_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[0];
+					//float y_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[1];
+					{	
+						//stringstream firstVal;
+						//stringstream secondVal;
+						//firstVal << x_uv;
+						//secondVal << y_uv;
+						//if ((int)x_uv == x_uv)
+						//	firstVal.str() += ".0f";
+						//else
+						//	firstVal.str() += "f";
+
+						//if ((int)y_uv == y_uv)
+						//	secondVal.str() += ".0f";
+						//else
+						//	secondVal.str() += "f";
+
+						//toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex * float2("
+						//	+ firstVal.str() + ", " + secondVal.str() + "));\n";
+
+						//toReturn = "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
+					}
+				}
+			}
 		}
 	}
 
@@ -701,10 +740,7 @@ void ShaderEditorManager::GenerateVariableNames()
 		{
 			if (block->GetFunctionName() == "texture") //Texture
 			{
-				ostringstream ss;
-				ss << i;
-				block->m_variableName = "tex_" + ss.str();
-				block->SetOutputPinName(block->m_variableName);
+				GenerateTexVariableName(block, i);
 			}
 			else
 			{
@@ -719,12 +755,27 @@ void ShaderEditorManager::GenerateVariableNames()
 		const auto& block = m_blocks.at(i);
 		if (block->GetInputCount() > 0) //Function
 		{
-			std::string variableName{ "out_" };
-			variableName += (char)(i + '0');
-			block->m_variableName = variableName;
-			block->m_outputNodes[0]->m_variableName = variableName;
+			if (block->GetFunctionName() == "sampletexture")
+			{
+				GenerateTexVariableName(block, i);
+			}
+			else
+			{
+				std::string variableName{ "out_" };
+				variableName += (char)(i + '0');
+				block->m_variableName = variableName;
+				block->m_outputNodes[0]->m_variableName = variableName;
+			}
 		}
 	}
+}
+
+void ShaderEditorManager::GenerateTexVariableName(UIShaderEditorBlock* block, int index)
+{
+	ostringstream ss;
+	ss << index;
+	block->m_variableName = "tex_" + ss.str();
+	block->SetOutputPinName(block->m_variableName);
 }
 
 bool ShaderEditorManager::SaveMaterial(std::string filename)

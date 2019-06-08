@@ -928,6 +928,8 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
+		RefreshModelTick();
+
 		//CreateShadowMap(m_shadowMapTexture);
 		if (RENDER_MATERIAL_EDITOR == false)
 		{
@@ -966,13 +968,9 @@ bool GraphicsClass::Render()
 				return false;
 
 			m_D3D->ResetViewport();
+			m_D3D->TurnZBufferOff();
 			UpdateUI();
-			if (m_shaderEditorManager->m_refreshModel)
-			{
-				m_shaderEditorManager->m_refreshModel = false;
-				m_shaderEditorManager->GenerateCodeToFile();
-				ReinitializeMainModel();
-			}
+			m_D3D->TurnZBufferOn();
 		}
 
 	//PREVIEW SKYBOX IN 6 FACES FORM
@@ -1283,6 +1281,7 @@ bool GraphicsClass::RenderGUI()
 				if (ImGui::Button(tmp.c_str(), ImVec2{ 64, 64 }))
 				{
 					m_shaderEditorManager->LoadMaterial(materialIndex);
+					m_shaderEditorManager->m_refreshModel = true;
 				}
 				//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
 				float lastButtonPos = ImGui::GetItemRectMax().x;
@@ -1509,6 +1508,25 @@ void GraphicsClass::ReinitializeMainModel()
 	m_pbrShader->m_materialNames = m_shaderEditorManager->GetUsedTextures();
 	m_pbrShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"pbr_used.vs", L"pbr_used.ps", input);
 	//m_pbrShader->LoadGeneratedTextures(m_D3D->GetDevice());
+}
+
+void GraphicsClass::RefreshModelTick()
+{
+	if (m_shaderEditorManager->m_refreshModel)
+	{
+		m_shaderEditorManager->m_refreshModelTicks = 2;
+		m_shaderEditorManager->m_refreshModel = false;
+	}
+	if (m_shaderEditorManager->m_refreshModelTicks == 0)
+	{
+		m_shaderEditorManager->m_refreshModelTicks--;
+		m_shaderEditorManager->GenerateCodeToFile();
+		ReinitializeMainModel();
+	}
+	else if (m_shaderEditorManager->m_refreshModelTicks > 0)
+	{
+		m_shaderEditorManager->m_refreshModelTicks--;
+	}
 }
 
 bool GraphicsClass::RenderDebugSettings()

@@ -1,0 +1,4 @@
+float4 sampletexture(float4 t, float2 uv)
+{
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
+}

@@ -85,6 +85,7 @@ private:
 
 	void GeneratePBRClassCode(std::string filename = "");
 	void GenerateVariableNames();
+	void GenerateTexVariableName(UIShaderEditorBlock* block, int index);
 
 	std::pair<float, float> GetCurrentMousePosition();
 	UIBase::RectangleVertices GetMarkingBounds();
@@ -110,6 +111,7 @@ public:
 	bool m_focusedPBR{ false };
 	bool m_wasLeftButtonUp{ false };
 	bool m_refreshModel{ false };
+	int m_refreshModelTicks{ -1 };
 	std::string m_materialToSaveName{};
 
 private:

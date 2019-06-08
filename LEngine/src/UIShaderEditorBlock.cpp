@@ -149,7 +149,7 @@ bool UIShaderEditorBlock::IsPinDragging()
 	return m_pinDragged;
 }
 
-UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse/*, UIShaderEditorOutput*& out*/)
+UIShaderEditorBlock::EDragPinBehaviour UIShaderEditorBlock::DragPins(MouseClass * mouse, UIShaderEditorOutput*& out)
 {
 	for (const auto& pin : m_outputNodes)
 	{
@@ -159,10 +159,13 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse/*, UIShad
 			{
 				pin->StopDragging();
 				m_pinDragged = false;
-				//return EDragPinBehaviour::Stop;
+				out = pin;
+				//return pin;
+				return EDragPinBehaviour::Stop;
 			}
-			return pin;
-			//return EDragPinBehaviour::Dragging;
+			out = pin;
+			//return pin;
+			return EDragPinBehaviour::Dragging;
 		}
 	}
 
@@ -174,15 +177,17 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse/*, UIShad
 			{
 				pin->m_toDeleteLine = true;
 				m_pinDragged = false;
-				return nullptr;
-				//return EDragPinBehaviour::Break;
+				out = nullptr;
+				//return nullptr;
+				return EDragPinBehaviour::Break;
 			}
 			if (mouse->GetLMBPressed())
 			{
 				pin->StartDragging();
 				m_pinDragged = true;
-				return pin;
-				//return EDragPinBehaviour::Start;
+				out = pin;
+				//return pin;
+				return EDragPinBehaviour::Start;
 			}
 		}
 	}
@@ -195,14 +200,16 @@ UIShaderEditorOutput* UIShaderEditorBlock::DragPins(MouseClass * mouse/*, UIShad
 			{
 				pin->m_connectedOutputNode = nullptr;
 				m_pinDragged = false;
-				return nullptr;
-				//return EDragPinBehaviour::Break;
+				out = nullptr;
+				//return nullptr;
+				return EDragPinBehaviour::Break;
 			}
 		}
 	}
 
-	return nullptr;
-	//return EDragPinBehaviour::Nothing;
+	out = nullptr;
+	//return nullptr;
+	return EDragPinBehaviour::Nothing;
 }
 
 bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
@@ -262,6 +269,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				}
 				else
 				{
+					m_textEngine->GetData(1)->text = "";
 					m_textEngine->GetData(1)->scale = 0.0f;
 				}
 			}
@@ -290,6 +298,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				}
 				else
 				{
+					m_textEngine->GetData(1)->text = "";
 					m_textEngine->GetData(1)->scale = 0.0f;
 				}
 			}
@@ -318,6 +327,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				}
 				else
 				{
+					m_textEngine->GetData(1)->text = "";
 					m_textEngine->GetData(1)->scale = 0.0f;
 				}
 			}
@@ -346,6 +356,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				}
 				else
 				{
+					m_textEngine->GetData(1)->text = "";
 					m_textEngine->GetData(1)->scale = 0.0f;
 				}
 			}
@@ -354,6 +365,9 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				m_textEngine->GetData(0)->scale = m_scale;
 				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
 					(m_translationY + 0.175f * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+
+				m_textEngine->GetData(1)->text = "";
+				m_textEngine->GetData(1)->scale = 0.0f;
 			}
 			m_textEngine->RenderText(deviceContext, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 		}
@@ -485,7 +499,8 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 			func = "";
 		}
 	}
-	else //Function call
+	else if (m_functionName != "sampletexture") //Function call
+												//Skip for texture sample
 	{
 		func = { (skipTabulator ? "" : "\t") + m_returnType + " " + m_variableName + " = " + m_functionName + "(" };
 		std::vector<std::string> args = {};
@@ -673,6 +688,14 @@ void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 		blockSize.y = 0.4f;
 		if (GetFirstOutputNode() && GetFirstOutputNode()->m_isVariable)
 			blockSize.y += 0.05f;
+	}
+	else
+	{
+		blockSize.x = 0.02f;
+		if (m_functionName.size() > 12)
+			blockSize.x += m_functionName.size() * 0.017f;
+		else
+			blockSize.x += m_functionName.size() * 0.015f;
 	}
 
 	m_blockVertices.minX = -blockSize.x * 0.5f;

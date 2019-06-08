@@ -21,6 +21,8 @@ Texture2D additionalTexture_2 : register(t9);
 static float4 tex_2;
 Texture2D additionalTexture_3 : register(t10);
 static float4 tex_3;
+Texture2D additionalTexture_4 : register(t11);
+static float4 tex_6;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -101,6 +103,7 @@ float divide(float a, float b);
 float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
 float get_x(float4 a);
 float multiply(float a, float b);
+float4 sampletexture(float4 t, float2 uv);
 float substract(float a, float b);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,6 +115,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
 	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
 	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
+	tex_6 = additionalTexture_2.Sample(SampleType, input.tex * 0.5f);
 
 //Calculated values
 	float specular;
@@ -388,6 +392,10 @@ float multiply(float a, float b)
 {
 	return a * b;
 }
+float4 sampletexture(float4 t, float2 uv)
+{
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
+}
 float substract(float a, float b)
 {
 	return a - b;
@@ -399,7 +407,8 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return tex_0;
+
+	return tex_6;
 }
 float GetMetalness()
 {

@@ -107,7 +107,6 @@ bool UIShaderEditorInput::Render(ID3D11DeviceContext * deviceContext)
 	// tmpMatrix;
 	//tmpMatrix *= 0;
 	//tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
-
 	XMMATRIX worldMatrix = XMMatrixIdentity();
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));

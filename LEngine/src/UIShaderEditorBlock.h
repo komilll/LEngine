@@ -60,7 +60,7 @@ public:
 	bool IsDragging();
 	bool IsPinDragging();
 
-	UIShaderEditorOutput* DragPins(MouseClass* mouse/*, UIShaderEditorOutput* out*/);
+	UIShaderEditorBlock::EDragPinBehaviour DragPins(MouseClass* mouse, UIShaderEditorOutput*& out);
 
 	UIShaderEditorInput* CheckIfMouseOnInputPin(MouseClass* mouse);
 

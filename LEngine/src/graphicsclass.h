@@ -160,6 +160,7 @@ private:
 	bool RenderScene();
 	bool RenderGUI();
 	void ReinitializeMainModel();
+	void RefreshModelTick();
 
 	bool RenderDebugSettings();
 	bool RenderSkybox();

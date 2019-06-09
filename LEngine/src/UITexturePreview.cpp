@@ -54,13 +54,17 @@ std::string UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource 
 	PWSTR pszFilePath;
 	wchar_t* wFilePath = 0;
 	IFileOpenDialog *pFileOpen;
-	const COMDLG_FILTERSPEC rgSpec[] = { L"DDS (DirectDraw Surface)", L"*.dds" };
+	const COMDLG_FILTERSPEC ddsSpec = { L"DDS (DirectDraw Surface)", L"*.dds" };
+	const COMDLG_FILTERSPEC pngSpec = { L"PNG", L"*.png" };
+	const COMDLG_FILTERSPEC allSpec = { L"All files", L"*.*" };
+	const COMDLG_FILTERSPEC rgSpec[] = { ddsSpec, pngSpec, allSpec };
+
 	// Create the FileOpenDialog object.
 	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
 		IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
 
 	if (SUCCEEDED(hr))
-		hr = pFileOpen->SetFileTypes(1, rgSpec);
+		hr = pFileOpen->SetFileTypes(3, rgSpec);
 
 	if (SUCCEEDED(hr))
 	{
@@ -82,12 +86,15 @@ std::string UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource 
 					wFilePath = pszFilePath;
 
 					//LoadNewTextureFromFile(wFilePath); -- INLINED
-					if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, texture, textureView))
+					if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, texture, textureView, true)) //Try DDS
 					{
-						if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), EMPTY_TEX, texture, textureView))
+						if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, texture, textureView, false)) //Try non-DDS
 						{
-							MessageBox(*d3d->GetHWND(), "UITexturePreview -> Loading texture error", "Texture Loading Error", MB_OK);
-							PostQuitMessage(0);
+							if (!BaseShaderClass::LoadTexture(d3d->GetDevice(), EMPTY_TEX, texture, textureView))
+							{
+								MessageBox(*d3d->GetHWND(), "UITexturePreview -> Loading texture error", "Texture Loading Error", MB_OK);
+								PostQuitMessage(0);
+							}
 						}
 					}
 					//if (onlyPreview == false)

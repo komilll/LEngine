@@ -1,0 +1,4 @@
+float2 add2(float2 a, float2 b)
+{
+	return a + b;
+}

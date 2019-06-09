@@ -1,0 +1,4 @@
+float4 lerp4(float4 a, float4 b, float alpha)
+{
+	return lerp(a, b, alpha);
+}

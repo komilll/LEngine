@@ -697,6 +697,7 @@ void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 		else
 			blockSize.x += m_functionName.size() * 0.015f;
 	}
+	blockSize.x = max(blockSize.x, 0.125f);
 
 	m_blockVertices.minX = -blockSize.x * 0.5f;
 	m_blockVertices.maxX = blockSize.x * 0.5f;

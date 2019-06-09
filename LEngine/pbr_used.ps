@@ -16,13 +16,19 @@ SamplerState SampleType : register(s0);
 Texture2D additionalTexture_0 : register(t7);
 static float4 tex_0;
 Texture2D additionalTexture_1 : register(t8);
-static float4 tex_1;
-Texture2D additionalTexture_2 : register(t9);
-static float4 tex_2;
-Texture2D additionalTexture_3 : register(t10);
-static float4 tex_3;
-Texture2D additionalTexture_4 : register(t11);
 static float4 tex_6;
+Texture2D additionalTexture_2 : register(t9);
+static float4 tex_7;
+Texture2D additionalTexture_3 : register(t10);
+static float4 tex_11;
+Texture2D additionalTexture_4 : register(t11);
+static float4 tex_12;
+Texture2D additionalTexture_5 : register(t12);
+static float4 tex_16;
+Texture2D additionalTexture_6 : register(t13);
+static float4 tex_17;
+Texture2D additionalTexture_7 : register(t14);
+static float4 tex_30;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -95,14 +101,24 @@ static const float POINT_LIGHT_QUADRATIC = 1.8f;
 float3 twotothree (float2 x, float y);
 float4 twotofour(float2 x, float y, float z);
 float4 twotofourtypetwo(float2 x, float2 y);
-float add(float a, float b);
+float add1(float a, float b);
+float2 add2(float2 a, float2 b);
+float3 add3(float3 a, float3 b);
+float4 add4(float4 a, float4 b);
 float2 convertfloat2(float x, float y);
 float3 convertfloat3(float x, float y, float z);
 float4 convertfloat4(float x, float y, float z, float w);
 float divide(float a, float b);
 float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
 float get_x(float4 a);
-float multiply(float a, float b);
+float lerp1(float a, float b, float alpha);
+float2 lerp2(float2 a, float2 b, float alpha);
+float3 lerp3(float3 a, float3 b, float alpha);
+float4 lerp4(float4 a, float4 b, float alpha);
+float multiply1(float a, float b);
+float2 multiply2(float2 a, float2 b);
+float3 multiply3(float3 a, float3 b);
+float4 multiply4(float4 a, float4 b);
 float4 sampletexture(float4 t, float2 uv);
 float substract(float a, float b);
 
@@ -112,10 +128,13 @@ float substract(float a, float b);
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
-	tex_6 = additionalTexture_2.Sample(SampleType, input.tex * 0.5f);
+	tex_7 = additionalTexture_1.Sample(SampleType, input.tex);
+	tex_12 = additionalTexture_2.Sample(SampleType, input.tex);
+	tex_17 = additionalTexture_3.Sample(SampleType, input.tex);
+	tex_30 = additionalTexture_4.Sample(SampleType, input.tex);
+	tex_6 = additionalTexture_1.Sample(SampleType, input.tex * float2(0.2134, 0.213));
+	tex_11 = additionalTexture_2.Sample(SampleType, input.tex * float2(0.05, 0.05));
+	tex_16 = additionalTexture_3.Sample(SampleType, input.tex * float2(0.002, 0.002));
 
 //Calculated values
 	float specular;
@@ -339,22 +358,19 @@ float4 twotofourtypetwo(float2 x, float2 y)
 {
 	return float4(x, y);
 }
-float add(float a, float b)
+float add1(float a, float b)
 {
 	return a + b;
 }
-
-float2 add(float2 a, float2 b)
+float2 add2(float2 a, float2 b)
 {
 	return a + b;
 }
-
-float3 add(float3 a, float3 b)
+float3 add3(float3 a, float3 b)
 {
 	return a + b;
 }
-
-float4 add(float4 a, float4 b)
+float4 add4(float4 a, float4 b)
 {
 	return a + b;
 }
@@ -388,7 +404,35 @@ float get_x(float4 a)
 {
 	return a.r;
 }
-float multiply(float a, float b)
+float lerp1(float a, float b, float alpha)
+{
+	return lerp(a, b, alpha);
+}
+float2 lerp2(float2 a, float2 b, float alpha)
+{
+	return lerp(a, b, alpha);
+}
+float3 lerp3(float3 a, float3 b, float alpha)
+{
+	return lerp(a, b, alpha);
+}
+float4 lerp4(float4 a, float4 b, float alpha)
+{
+	return lerp(a, b, alpha);
+}
+float multiply1(float a, float b)
+{
+	return a * b;
+}
+float2 multiply2(float2 a, float2 b)
+{
+	return a * b;
+}
+float3 multiply3(float3 a, float3 b)
+{
+	return a * b;
+}
+float4 multiply4(float4 a, float4 b)
 {
 	return a * b;
 }
@@ -407,22 +451,43 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
+	float3 BB = float3(0.494505f, 0.494501f, 0.494501f);
+	float3 CC = float3(1.0f, 0.99999f, 0.99999f);
+	float2 I = float2(0.2134f, 0.213f);
+	float out_J = get_x(tex_6);
+	float W = 0.5f;
+	float out_K = add1(out_J, W);
+	float2 N = float2(0.05f, 0.05f);
+	float out_O = get_x(tex_11);
+	float X = 0.5f;
+	float out_P = add1(out_O, X);
+	float2 S = float2(0.002f, 0.002f);
+	float out_T = get_x(tex_16);
+	float Y = 0.5f;
+	float out_U = add1(out_T, Y);
+	float out_V = multiply1(out_P, out_U);
+	float out_Z = multiply1(out_K, out_V);
+	float4 out_DD = float4(lerp3(BB, CC, out_Z), 1.0f);
+	float4 out_EE = multiply4(out_DD, tex_30);
 
-	return tex_6;
+	return out_EE;
 }
 float GetMetalness()
 {
-	float out_4 = get_x(tex_1);
+	float B = 1.0f;
 
-	return out_4;
+	return B;
 }
 float GetRoughness()
 {
-	float out_5 = get_x(tex_2);
+	float D = 0.1f;
+	float C = 0.8f;
+	float F = 0.5f;
+	float out_E = lerp1(D, C, F);
 
-	return out_5;
+	return out_E;
 }
 float3 GetNormal()
 {
-	return tex_3;
+	return tex_0;
 }

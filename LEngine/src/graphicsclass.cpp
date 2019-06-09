@@ -1339,6 +1339,10 @@ bool GraphicsClass::RenderGUI()
 			{
 				for (const auto& in : m_shaderEditorManager->GetMaterialInputs())
 				{
+					if (!in || !in->GetFirstOutputNode())
+					{
+						continue;
+					}
 					if (!in->GetFirstOutputNode()->m_isVariable)
 					{
 						continue;

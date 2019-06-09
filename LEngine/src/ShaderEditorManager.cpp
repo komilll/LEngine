@@ -438,6 +438,11 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 			m_usedVariableNamesInGenerator.push_back(tmp);
 			if (tmp == "\t;\n")
 				tmp = "";
+			else if (m_originalGeneratorBlock == block)
+			{
+				tmp += ConvertReturnType(block->m_variableName, block->GetReturnType(), m_originalRequiredType);
+				return tmp;
+			}
 			return tmp;
 		}
 		else
@@ -514,6 +519,7 @@ std::string ShaderEditorManager::GetTextureDeclarations()
 std::string ShaderEditorManager::GetTextureDefinitions()
 {
 	std::string toReturn{};
+	std::map<int, int> textureMap; //Index of block / index of texture
 
 	int index = 0;
 	for (const auto& block : m_blocks)
@@ -522,39 +528,64 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 		{
 			ostringstream ss;
 			ss << index;
+			textureMap.insert({ block->GetBlockID(), index });
 			index++;
 			toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
 		}
-		else if (block->GetFunctionName() == "sampletexture")
+	}
+
+	for (const auto& block : m_blocks)
+	{
+		if (block->GetFunctionName() == "sampletexture")
 		{
 			for (int i = 0; i < m_blocks.size(); ++i)
 			{
-				if (block->m_inputNodes.at(0)->m_connectedOutputNode == m_blocks.at(i)->GetFirstOutputNode())
+				if (block->m_inputNodes.at(0)->m_connectedOutputNode && m_blocks.at(i)->GetFirstOutputNode() && 
+						block->m_inputNodes.at(0)->m_connectedOutputNode == m_blocks.at(i)->GetFirstOutputNode())
 				{
 					ostringstream ss;
-					ss << i;
-					i++;
-					//float x_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[0];
-					//float y_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[1];
-					{	
-						//stringstream firstVal;
-						//stringstream secondVal;
-						//firstVal << x_uv;
-						//secondVal << y_uv;
-						//if ((int)x_uv == x_uv)
-						//	firstVal.str() += ".0f";
-						//else
-						//	firstVal.str() += "f";
+					auto search = textureMap.find(m_blocks.at(i)->GetBlockID());
+					if (search != textureMap.end())
+					{
+						index = textureMap.at(m_blocks.at(i)->GetBlockID());
+					}
+					else
+					{
+						continue;
+					}
+					ss << index;
+					if (block->m_inputNodes.size() == 2 && block->m_inputNodes.at(1) && block->m_inputNodes.at(1)->m_connectedOutputNode)
+					{
+						float x_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[0];
+						float y_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[1];
 
-						//if ((int)y_uv == y_uv)
-						//	secondVal.str() += ".0f";
-						//else
-						//	secondVal.str() += "f";
+						if (x_uv == 0.0f && y_uv == 0.0f)
+						{
+							toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
+						}
+						else
+						{
+							stringstream firstVal;
+							stringstream secondVal;
+							firstVal << x_uv;
+							secondVal << y_uv;
+							if ((int)x_uv == x_uv)
+								firstVal.str() += ".0f";
+							else
+								firstVal.str() += "f";
 
-						//toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex * float2("
-						//	+ firstVal.str() + ", " + secondVal.str() + "));\n";
+							if ((int)y_uv == y_uv)
+								secondVal.str() += ".0f";
+							else
+								secondVal.str() += "f";
 
-						//toReturn = "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
+							toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex * float2("
+								+ firstVal.str() + ", " + secondVal.str() + "));\n";
+						}
+					}
+					else
+					{
+						toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
 					}
 				}
 			}
@@ -572,20 +603,45 @@ std::string ShaderEditorManager::GetFunctionDeclarations()
 	{
 		if (std::ifstream stream{ file, std::ios::binary })
 		{
-			std::string line{};
-			getline(stream, line);
-			if (line == "")
+			int count = 0;
+			while (!stream.eof())
 			{
-				continue;
+				std::string line{};
+				getline(stream, line);
+				if (line == "")
+				{
+					continue;
+				}
+				std::string finLine{};
+				for (const char& c : line)
+				{
+					if (c != '\n' && c != '\r')
+						finLine += c;
+				}
+				finLine += ";\n";
+				toReturn += finLine;
+
+				std::string previousLine = line;
+				bool finished = false;
+				while (!stream.eof() && !finished)
+				{
+					getline(stream, line);
+					if (line.size() > 0 && line == "{\r")
+					{
+						while (!stream.eof() && !finished)
+						{
+							getline(stream, line);
+							if (line.size() > 0 && line == "}\r")
+							{
+								getline(stream, line);
+								finished = true;
+								count++;
+								break;
+							}
+						}
+					}
+				}
 			}
-			std::string finLine{};
-			for (const char& c : line)
-			{
-				if (c != '\n' && c != '\r')
-					finLine += c;
-			}
-			finLine += ";\n";
-			toReturn += finLine;
 		}
 	}
 	return toReturn;
@@ -654,12 +710,12 @@ std::string ShaderEditorManager::ConvertReturnType(std::string outName, std::str
 	else if (typeIn == "float3")
 	{
 		if (typeOut == "float4")
-			return "\n\treturn float3(" + outName + ".x, " + outName + ".y, " + outName + ".z, 1.0f);";
+			return "\n\treturn float4(" + outName + ".x, " + outName + ".y, " + outName + ".z, 1.0f);";
 	}
 	else if (typeIn == "float4")
 	{
 		if (typeOut == "float3")
-			return "\n\treturn float4(" + outName + ".x, " + outName + ".y, " + outName + ".z);";
+			return "\n\treturn float3(" + outName + ".x, " + outName + ".y, " + outName + ".z);";
 	}
 
 	return "ERROR";
@@ -744,9 +800,19 @@ void ShaderEditorManager::GenerateVariableNames()
 			}
 			else
 			{
-				char variableName = i + 65;
-				block->m_variableName = variableName;
-				block->SetOutputPinName(block->m_variableName);
+				if (i + 65 <= 90)
+				{
+					char variableName = i + 65;
+					block->m_variableName = variableName;
+					block->SetOutputPinName(block->m_variableName);
+				}
+				else
+				{
+					char variableName = (i + 65) % 90 + 65;
+					block->m_variableName = { variableName };
+					block->m_variableName += variableName;
+					block->SetOutputPinName(block->m_variableName);
+				}
 			}
 		}
 	}
@@ -762,7 +828,17 @@ void ShaderEditorManager::GenerateVariableNames()
 			else
 			{
 				std::string variableName{ "out_" };
-				variableName += (char)(i + '0');
+				if (i + 65 <= 90)
+				{
+					char variableChar = i + 65;
+					variableName += variableChar;
+				}
+				else
+				{
+					char variableChar = (i + 65) % 90 + 65;
+					variableName += variableChar;
+					variableName += variableChar;
+				}
 				block->m_variableName = variableName;
 				block->m_outputNodes[0]->m_variableName = variableName;
 			}
@@ -941,7 +1017,10 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 					getline(input, line);
 					std::wstring wLine = std::wstring(line.begin(), line.end());
 					const wchar_t* path = wLine.c_str();
-					BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView);
+					if (!BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView, true))
+					{
+						BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, block->GetFirstOutputNode()->m_connectedTexture, block->GetFirstOutputNode()->m_connectedTextureView, false);
+					}
 					block->GetFirstOutputNode()->m_texturePath = line;
 				}
 
@@ -1225,6 +1304,7 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 {
 	std::string func{};
 
+	m_usedVariableNamesInGenerator.clear();
 	GenerateVariableNames();
 
 	for (int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
@@ -1236,7 +1316,7 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 
 			for (const auto& block : m_blocks)
 			{
-				m_usedVariableNamesInGenerator.empty();
+				m_usedVariableNamesInGenerator.clear();
 				if (out == block->GetFirstOutputNode())
 				{
 					m_originalGeneratorBlock = block;

@@ -135,6 +135,7 @@ private:
 	std::vector<MaterialPrefab> m_materials{};
 	std::vector<UIShaderEditorBlock*> m_materialInputs{};
 	std::vector<std::string> m_usedTextures{};
+	std::vector<std::string> m_universalFunctions{};
 
 	std::string m_currentMaterialName{};
 	int m_blockIDCounter = -1;

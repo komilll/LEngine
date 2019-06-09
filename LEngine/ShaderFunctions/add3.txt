@@ -1,0 +1,4 @@
+float3 add3(float3 a, float3 b)
+{
+	return a + b;
+}

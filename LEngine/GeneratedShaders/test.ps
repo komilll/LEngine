@@ -29,6 +29,10 @@ Texture2D additionalTexture_6 : register(t13);
 static float4 tex_17;
 Texture2D additionalTexture_7 : register(t14);
 static float4 tex_30;
+Texture2D additionalTexture_8 : register(t15);
+static float4 tex_31;
+Texture2D additionalTexture_9 : register(t16);
+static float4 tex_33;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -132,6 +136,8 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tex_12 = additionalTexture_2.Sample(SampleType, input.tex);
 	tex_17 = additionalTexture_3.Sample(SampleType, input.tex);
 	tex_30 = additionalTexture_4.Sample(SampleType, input.tex);
+	tex_31 = additionalTexture_5.Sample(SampleType, input.tex);
+	tex_33 = additionalTexture_6.Sample(SampleType, input.tex);
 	tex_6 = additionalTexture_1.Sample(SampleType, input.tex * float2(0.2134, 0.213));
 	tex_11 = additionalTexture_2.Sample(SampleType, input.tex * float2(0.05, 0.05));
 	tex_16 = additionalTexture_3.Sample(SampleType, input.tex * float2(0.002, 0.002));
@@ -451,41 +457,19 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float3 BB = float3(0.494505f, 0.494501f, 0.494501f);
-	float3 CC = float3(1.0f, 0.99999f, 0.99999f);
-	float2 I = float2(0.2134f, 0.213f);
-	float out_J = get_x(tex_6);
-	float W = 0.5f;
-	float out_K = add1(out_J, W);
-	float2 N = float2(0.05f, 0.05f);
-	float out_O = get_x(tex_11);
-	float X = 0.5f;
-	float out_P = add1(out_O, X);
-	float2 S = float2(0.002f, 0.002f);
-	float out_T = get_x(tex_16);
-	float Y = 0.5f;
-	float out_U = add1(out_T, Y);
-	float out_V = multiply1(out_P, out_U);
-	float out_Z = multiply1(out_K, out_V);
-	float3 out_DD = lerp3(BB, CC, out_Z);
-	float4 out_EE = multiply4(out_DD, tex_30);
-
-	return out_EE;
+	return tex_30;
 }
 float GetMetalness()
 {
-	float B = 1.0f;
+	float out_HH = get_x(tex_31);
 
-	return B;
+	return out_HH;
 }
 float GetRoughness()
 {
-	float D = 0.1f;
-	float C = 0.8f;
-	float F = 0.5f;
-	float out_E = lerp1(D, C, F);
+	float out_JJ = get_x(tex_33);
 
-	return out_E;
+	return out_JJ;
 }
 float3 GetNormal()
 {

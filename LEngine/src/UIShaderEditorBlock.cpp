@@ -510,7 +510,7 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 			const auto& node = m_inputNodes.at(i);
 			if (node->m_connectedOutputNode != nullptr)
 			{
-				args.push_back(node->m_connectedOutputNode->m_variableName);
+				args.push_back(ConvertType(node->m_connectedOutputNode->m_variableName, node->m_connectedOutputNode->m_returnType, m_argumentTypes.at(i)));
 			}
 			else
 			{
@@ -529,6 +529,36 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 	}
 
 	return func;
+}
+
+std::string UIShaderEditorBlock::ConvertType(std::string outName, std::string typeIn, std::string typeOut)
+{
+	if (typeIn == typeOut)
+	{
+		return outName;
+	}
+
+	if (typeIn == "float")
+	{
+		if (typeOut == "float2")
+			return "float2(" + outName + ", " + outName + ")";
+		if (typeOut == "float3")
+			return "float3(" + outName + ", " + outName + ", " + outName + ")";
+		if (typeOut == "float4")
+			return "float4(" + outName + ", " + outName + ", " + outName + ", " + outName + ")";
+	}
+	else if (typeIn == "float3")
+	{
+		if (typeOut == "float4")
+			return "float4(" + outName + ".x, " + outName + ".y, " + outName + ".z, 1.0f)";
+	}
+	else if (typeIn == "float4")
+	{
+		if (typeOut == "float3")
+			return "float3(" + outName + ".x, " + outName + ".y, " + outName + ".z)";
+	}
+
+	return "ERROR";
 }
 
 int UIShaderEditorBlock::GetInputCount()

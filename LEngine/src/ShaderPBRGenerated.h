@@ -83,6 +83,9 @@ public:
 //GENERATED METHODS
 	void LoadGeneratedTextures(ID3D11Device * device);
 
+private:
+	bool hasEnding(std::string const & fullString, std::string const & ending);
+
 public:
 	//Texture resources
 	ID3D11Resource* m_diffuseTexture;

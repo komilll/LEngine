@@ -262,6 +262,33 @@ void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)
 	{
 		std::wstring widestr = std::wstring(m_materialNames.at(i).begin(), m_materialNames.at(i).end());
 		const wchar_t* widecstr = widestr.c_str();
-		LoadTexture(device, widecstr, resource, m_additionalMapViews.at(i), true);
+
+		if (hasEnding(m_materialNames.at(i), "DDS"))
+		{
+			LoadTexture(device, widecstr, resource, m_additionalMapViews.at(i), true);
+		}
+		else
+		{
+			if (hasEnding(m_materialNames.at(i), "dds"))
+			{
+				LoadTexture(device, widecstr, resource, m_additionalMapViews.at(i), true);
+			}
+			else
+			{
+				LoadTexture(device, widecstr, resource, m_additionalMapViews.at(i), false);
+			}
+		}
+	}
+}
+
+bool ShaderPBRGenerated::hasEnding(std::string const &fullString, std::string const &ending)
+{
+	if (fullString.length() >= ending.length()) 
+	{
+		return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+	}
+	else 
+	{
+		return false;
 	}
 }

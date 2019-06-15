@@ -67,6 +67,7 @@ public:
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
 	std::string GenerateShaderCode(bool skipTabulator = false);
+	std::string ConvertType(std::string outName, std::string typeIn, std::string typeOut);
 	int GetInputCount();
 	void SetOutputPinName(std::string name);
 	UIShaderEditorOutput* GetFirstOutputNode();

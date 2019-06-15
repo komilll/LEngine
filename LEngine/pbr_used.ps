@@ -15,20 +15,6 @@ TextureCube environmentMap_5 : register(t6);
 SamplerState SampleType : register(s0);
 Texture2D additionalTexture_0 : register(t7);
 static float4 tex_0;
-Texture2D additionalTexture_1 : register(t8);
-static float4 tex_6;
-Texture2D additionalTexture_2 : register(t9);
-static float4 tex_7;
-Texture2D additionalTexture_3 : register(t10);
-static float4 tex_11;
-Texture2D additionalTexture_4 : register(t11);
-static float4 tex_12;
-Texture2D additionalTexture_5 : register(t12);
-static float4 tex_16;
-Texture2D additionalTexture_6 : register(t13);
-static float4 tex_17;
-Texture2D additionalTexture_7 : register(t14);
-static float4 tex_30;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -128,13 +114,6 @@ float substract(float a, float b);
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_7 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_12 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_17 = additionalTexture_3.Sample(SampleType, input.tex);
-	tex_30 = additionalTexture_4.Sample(SampleType, input.tex);
-	tex_6 = additionalTexture_1.Sample(SampleType, input.tex * float2(0.2134, 0.213));
-	tex_11 = additionalTexture_2.Sample(SampleType, input.tex * float2(0.05, 0.05));
-	tex_16 = additionalTexture_3.Sample(SampleType, input.tex * float2(0.002, 0.002));
 
 //Calculated values
 	float specular;
@@ -451,43 +430,17 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float3 BB = float3(0.494505f, 0.494501f, 0.494501f);
-	float3 CC = float3(1.0f, 0.99999f, 0.99999f);
-	float2 I = float2(0.2134f, 0.213f);
-	float out_J = get_x(tex_6);
-	float W = 0.5f;
-	float out_K = add1(out_J, W);
-	float2 N = float2(0.05f, 0.05f);
-	float out_O = get_x(tex_11);
-	float X = 0.5f;
-	float out_P = add1(out_O, X);
-	float2 S = float2(0.002f, 0.002f);
-	float out_T = get_x(tex_16);
-	float Y = 0.5f;
-	float out_U = add1(out_T, Y);
-	float out_V = multiply1(out_P, out_U);
-	float out_Z = multiply1(out_K, out_V);
-	float4 out_DD = float4(lerp3(BB, CC, out_Z), 1.0f);
-	float4 out_EE = multiply4(out_DD, tex_30);
-
-	return out_EE;
+	return tex_0;
 }
 float GetMetalness()
 {
-	float B = 1.0f;
-
-	return B;
+	return 0.0f;
 }
 float GetRoughness()
 {
-	float D = 0.1f;
-	float C = 0.8f;
-	float F = 0.5f;
-	float out_E = lerp1(D, C, F);
-
-	return out_E;
+	return 0.0f;
 }
 float3 GetNormal()
 {
-	return tex_0;
+	return float3(0.0f, 0.0f, 0.0f);
 }

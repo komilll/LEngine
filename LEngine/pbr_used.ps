@@ -15,6 +15,14 @@ TextureCube environmentMap_5 : register(t6);
 SamplerState SampleType : register(s0);
 Texture2D additionalTexture_0 : register(t7);
 static float4 tex_0;
+Texture2D additionalTexture_1 : register(t8);
+static float4 tex_1;
+Texture2D additionalTexture_2 : register(t9);
+static float4 tex_2;
+Texture2D additionalTexture_3 : register(t10);
+static float4 tex_3;
+Texture2D additionalTexture_4 : register(t11);
+static float4 tex_6;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -114,6 +122,10 @@ float substract(float a, float b);
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
+	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
+	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
+	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
+	tex_6 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.823048, 0.125694));
 
 //Calculated values
 	float specular;
@@ -137,6 +149,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
 
 //Calculate normal for model
+	input.tangent = normalize(input.tangent);
+	input.binormal = normalize(input.binormal);
+	input.normal = normalize(input.normal);
+
 	normal = GetNormalValue(GetNormal(), input.tangent, input.binormal, input.normal);
 
 //Calculate other PBR values
@@ -430,17 +446,23 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return tex_0;
+	float2 H = float2(0.823048f, 0.125694f);
+
+	return tex_6;
 }
 float GetMetalness()
 {
-	return 0.0f;
+	float out_E = get_x(tex_1);
+
+	return out_E;
 }
 float GetRoughness()
 {
-	return 0.0f;
+	float out_F = get_x(tex_2);
+
+	return out_F;
 }
 float3 GetNormal()
 {
-	return float3(0.0f, 0.0f, 0.0f);
+	return tex_3;
 }

@@ -29,10 +29,6 @@ CC
 out_DD
 out_EE
 tex_30
-tex_31
-out_HH
-tex_33
-out_JJ
 D
 C
 F
@@ -60,9 +56,7 @@ CC
 out_Z
 out_DD
 test
-tex_31
-tex_33
 tex_30
-out_HH
-out_JJ
+B
+out_E
 tex_0

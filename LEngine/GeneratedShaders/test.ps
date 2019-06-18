@@ -29,10 +29,6 @@ Texture2D additionalTexture_6 : register(t13);
 static float4 tex_17;
 Texture2D additionalTexture_7 : register(t14);
 static float4 tex_30;
-Texture2D additionalTexture_8 : register(t15);
-static float4 tex_31;
-Texture2D additionalTexture_9 : register(t16);
-static float4 tex_33;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -136,8 +132,6 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tex_12 = additionalTexture_2.Sample(SampleType, input.tex);
 	tex_17 = additionalTexture_3.Sample(SampleType, input.tex);
 	tex_30 = additionalTexture_4.Sample(SampleType, input.tex);
-	tex_31 = additionalTexture_5.Sample(SampleType, input.tex);
-	tex_33 = additionalTexture_6.Sample(SampleType, input.tex);
 	tex_6 = additionalTexture_1.Sample(SampleType, input.tex * float2(0.2134, 0.213));
 	tex_11 = additionalTexture_2.Sample(SampleType, input.tex * float2(0.05, 0.05));
 	tex_16 = additionalTexture_3.Sample(SampleType, input.tex * float2(0.002, 0.002));
@@ -325,8 +319,8 @@ float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness)
 ////////////////////////////////////////////////////////////////////////////////
 float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 normal)
 {
-	normalMap = (normalMap * 2.0f) - 1.0f; //Convert from [0, 1] to [-1, 1]
-	normal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
+	//normalMap = (normalMap * 2.0f) - 1.0f; //Convert from [0, 1] to [-1, 1]
+	//normal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
 	return normalize(normal);
 }
 
@@ -461,15 +455,18 @@ float4 GetBaseColor()
 }
 float GetMetalness()
 {
-	float out_HH = get_x(tex_31);
+	float B = 0.5f;
 
-	return out_HH;
+	return B;
 }
 float GetRoughness()
 {
-	float out_JJ = get_x(tex_33);
+	float D = 0.1f;
+	float C = 0.8f;
+	float F = 1.0f;
+	float out_E = lerp1(D, C, F);
 
-	return out_JJ;
+	return out_E;
 }
 float3 GetNormal()
 {

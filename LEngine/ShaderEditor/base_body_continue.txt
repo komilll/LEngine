@@ -21,6 +21,10 @@
 	//metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
 
 //Calculate normal for model
+	input.tangent = normalize(input.tangent);
+	input.binormal = normalize(input.binormal);
+	input.normal = normalize(input.normal);
+
 	normal = GetNormalValue(GetNormal(), input.tangent, input.binormal, input.normal);
 
 //Calculate other PBR values

@@ -1052,6 +1052,11 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	//m_Camera->SetRotation(-0.5f, 91.0f, 0);
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
+	//XMMATRIX rotationMatrix = XMMatrixIdentity();
+	//rotationMatrix = DirectX::XMMatrixMultiply(rotationMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	//rotationMatrix = DirectX::XMMatrixMultiply(rotationMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+
+	//m_pbrShader->SetRotationMatrix(rotationMatrix);
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 

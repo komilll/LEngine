@@ -178,6 +178,7 @@ void UIShaderEditorOutput::PromoteToVariable(std::string name)
 void UIShaderEditorOutput::DemoteVariable()
 {
 	m_isVariable = false;
+	m_variableName = "";
 }
 
 void UIShaderEditorOutput::PromoteToVariable()

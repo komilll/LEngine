@@ -15,6 +15,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
+#include <cctype>
 
 using namespace DirectX;
 
@@ -72,6 +74,7 @@ private:
 	bool CreateTriangle(ID3D11Device* device, float left, float right, float top, float bottom);
 	bool CreateSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 
+	bool is_number(const std::string& s);
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;

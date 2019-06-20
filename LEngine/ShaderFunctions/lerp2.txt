@@ -1,4 +1,5 @@
 float2 lerp2(float2 a, float2 b, float alpha)
 {
+	alpha = saturate(alpha);
 	return lerp(a, b, alpha);
 }

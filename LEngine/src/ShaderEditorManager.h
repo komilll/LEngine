@@ -71,6 +71,10 @@ private:
 	bool CheckConnectionRules(UIShaderEditorInput* in, UIShaderEditorOutput* out);
 	bool TryCreateScalarBlocks(std::string name);
 
+	void CopyBlockValues(UIShaderEditorBlock* const src, UIShaderEditorBlock* const dst);
+	void CopyCreatedBlocksConnections(std::vector<UIShaderEditorBlock*> src, std::vector<UIShaderEditorBlock*> dst);
+	bool FindOutputNode(UIShaderEditorOutput * const out, std::vector<UIShaderEditorBlock*> const blocks) const;
+
 	//GENERATING SHADER CODE
 	std::string GenerateBlockCode(UIShaderEditorBlock* block);
 	std::string GetTextureDeclarations();

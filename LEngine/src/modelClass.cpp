@@ -94,7 +94,7 @@ XMFLOAT4 ModelClass::GetPosition()
 bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)
 {
 	std::vector<VertexType> verticesVector(0);
-	VertexType* vertices;
+	VertexType* vertices{ nullptr };
 	unsigned long* indices;
 	HRESULT result;
 
@@ -102,8 +102,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	int m_vertexCount = 0;
 
 	char curChar;
-	std::string curLine;
-	std::ifstream input;
 
 	///////// CORRECT VERTICES LOADING ////////
 	std::vector<DirectX::XMFLOAT3> vertexPosition;
@@ -116,75 +114,66 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 #pragma region Read and save data from file
 	if (!ReadBinary(modelFilename, verticesVector, indicesVec))
 	{
-		input.open(modelFilename);
-
-		if (input.fail())
-			return false;
-
-		std::getline(input, curLine);
-
-		std::string x, y, z;
-		std::string type = "";
-		int curIndex = 0;
-		while (!input.eof())
+		if (std::ifstream input{ modelFilename, std::ios::binary })
 		{
-			if (curLine == "")
+			std::string x, y, z;
+			std::string type = "";
+			while (input >> type)
 			{
-				std::getline(input, curLine);
-				continue;
-			}
-
-			std::istringstream iss(curLine);
-			iss >> type;
-			if (type == "v")
-			{
-				iss >> x >> y >> z;
-				vertexPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
-			}
-			else if (type == "vt")
-			{
-				iss >> x >> y;
-				texPosition.push_back(DirectX::XMFLOAT2(std::stof(x), std::stof(y)));
-			}
-			else if (type == "vn")
-			{
-				iss >> x >> y >> z;
-				normalPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
-			}
-
-			std::getline(input, curLine);
-
-		}
-
-		vertices = new VertexType[m_vertexCount = vertexPosition.size()];
-
-		for (int i = 0; i < m_vertexCount; i++)
-		{
-			vertices[i].position = vertexPosition.at(i);
-		}
-		////////// FEEDING INDICES WITH DATA /////////
-		input.close();
-		input.open(modelFilename);
-		std::getline(input, curLine);
-		type = "";
-
-		int vIndex = 0;
-		int vtIndex = 0;
-		int vnIndex = 0;
-		while (!input.eof())
-		{
-			std::istringstream iss(curLine);
-			iss >> type;
-
-			if (type == "f")
-			{
-				if (texPosition.size() == 0)
-					vtIndex = -1;
-				while (iss >> x)
+				if (type == "")
 				{
-					SetIndices(x, vIndex, vtIndex, vnIndex);
+					continue;
+				}
+
+				if (type == "v")
+				{
+					input >> x >> y >> z;
+					vertexPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+				}
+				else if (type == "vt")
+				{
+					input >> x >> y >> z;
+					texPosition.push_back(DirectX::XMFLOAT2(std::stof(x), std::stof(y)));
+				}
+				else if (type == "vn")
+				{
+					input >> x >> y >> z;
+					normalPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+				}
+			}
+
+			vertices = new VertexType[m_vertexCount = vertexPosition.size()];
+
+			for (int i = 0; i < m_vertexCount; i++)
+			{
+				vertices[i].position = vertexPosition.at(i);
+			}
+		}
+			////////// FEEDING INDICES WITH DATA /////////
+		if (std::ifstream input{ modelFilename, std::ios::binary })
+		{
+			std::string line = "";
+			bool canEnter = false;
+			
+			int vIndex = 0;
+			int vtIndex = 0;
+			int vnIndex = 0;
+			//while (std::getline(input, line))
+			while (input >> line)
+			{
+				//std::istringstream iss(line);
+				//iss >> type;
+
+				if (line == "f")
+				{
+					canEnter = true;
+					if (texPosition.size() == 0)
+						vtIndex = -1;
+				}
+				else if (canEnter)
+				{
+					SetIndices(line, vIndex, vtIndex, vnIndex);
 					indicesVec.push_back(vIndex);
-					//indices[curIndex] = vIndex;
 					if (texPosition.size() > 0)
 					{
 						vertices[vIndex].tex = texPosition.at(vtIndex);
@@ -195,10 +184,8 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 						vertices[vIndex].normal = normalPosition.at(vnIndex);
 						normalIndices.push_back(vnIndex);
 					}
-					//curIndex++;
 				}
 			}
-			std::getline(input, curLine);
 		}
 	}
 	else
@@ -220,7 +207,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 		indices[i] = indicesVec.at(i);
 	}
 
-	input.close();
 	//CalculateDataForNormalMapping(vertices);
 
 	if (CreateBuffers(device, vertices, indices, m_vertexCount, m_indexCount) == false)
@@ -286,8 +272,14 @@ void ModelClass::SetIndices(std::string input, int & vertexIndex, int & textureI
 	while (std::getline(newStream, curOut, '/'))
 	{
 		int index = -1;
-		if (curOut != "")
+		if (curOut != "" && is_number(curOut))
+		{
 			index += stoi(curOut);
+		}
+		else
+		{
+			return;
+		}
 		
 		if (curIndex == 0)
 			vertexIndex = index;
@@ -710,4 +702,10 @@ bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float center
 		return false;
 
 	return true;
+}
+
+bool ModelClass::is_number(const std::string & s)
+{
+	return !s.empty() && std::find_if(s.begin(),
+		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }

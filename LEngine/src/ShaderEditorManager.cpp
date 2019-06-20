@@ -421,6 +421,64 @@ bool ShaderEditorManager::TryCreateScalarBlocks(std::string name)
 	return false;
 }
 
+void ShaderEditorManager::CopyBlockValues(UIShaderEditorBlock * const src, UIShaderEditorBlock * const dst)
+{
+	std::wstring wLine = std::wstring(src->GetFirstOutputNode()->m_texturePath.begin(), src->GetFirstOutputNode()->m_texturePath.end());
+	const wchar_t* path = wLine.c_str();
+	if (!BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, dst->GetFirstOutputNode()->m_connectedTexture, dst->GetFirstOutputNode()->m_connectedTextureView, true))
+	{
+		BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, dst->GetFirstOutputNode()->m_connectedTexture, dst->GetFirstOutputNode()->m_connectedTextureView, false);
+	}
+	dst->GetFirstOutputNode()->m_texturePath = src->GetFirstOutputNode()->m_texturePath;
+
+	dst->GetFirstOutputNode()->m_value = src->GetFirstOutputNode()->m_value;
+	dst->GetFirstOutputNode()->m_valueTwo[0] = src->GetFirstOutputNode()->m_valueTwo[0];
+	dst->GetFirstOutputNode()->m_valueTwo[1] = src->GetFirstOutputNode()->m_valueTwo[1];
+	dst->GetFirstOutputNode()->m_valueThree[0] = src->GetFirstOutputNode()->m_valueThree[0];
+	dst->GetFirstOutputNode()->m_valueThree[1] = src->GetFirstOutputNode()->m_valueThree[1];
+	dst->GetFirstOutputNode()->m_valueThree[2] = src->GetFirstOutputNode()->m_valueThree[2];
+	dst->GetFirstOutputNode()->m_valueFour[0] = src->GetFirstOutputNode()->m_valueFour[0];
+	dst->GetFirstOutputNode()->m_valueFour[1] = src->GetFirstOutputNode()->m_valueFour[1];
+	dst->GetFirstOutputNode()->m_valueFour[2] = src->GetFirstOutputNode()->m_valueFour[2];
+	dst->GetFirstOutputNode()->m_valueFour[3] = src->GetFirstOutputNode()->m_valueFour[3];
+}
+
+void ShaderEditorManager::CopyCreatedBlocksConnections(std::vector<UIShaderEditorBlock*> src, std::vector<UIShaderEditorBlock*> dst)
+{
+	return;
+	for (int bIndex = 0; bIndex < src.size(); ++bIndex)
+	{
+		for (int inIndex = 0; inIndex < src.at(bIndex)->m_inputNodes.size(); ++inIndex)
+		{
+			if (src.at(bIndex) && src.at(bIndex)->m_inputNodes.at(inIndex) && src.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode)
+			{
+				UIShaderEditorInput* in= src.at(bIndex)->m_inputNodes.at(inIndex);
+				UIShaderEditorOutput* out = src.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode;
+
+				if (FindOutputNode(out, src))
+				{
+					//dst.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode = out;
+				}
+			}
+		}
+	}
+}
+
+bool ShaderEditorManager::FindOutputNode(UIShaderEditorOutput * const out, std::vector<UIShaderEditorBlock*> const blocks) const
+{
+	for (const auto& block : blocks)
+	{
+		for (const auto& blockOut : block->m_outputNodes)
+		{
+			if (blockOut == out)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 {
 	if (block->m_inputNodes.size() == 0)
@@ -1027,6 +1085,10 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 				getline(input, line);
 				block->GetFirstOutputNode()->m_visibleName = line;
 				block->GetFirstOutputNode()->SaveVisibleName();
+				if (block->GetFirstOutputNode()->m_visibleName != "")
+				{
+					block->GetFirstOutputNode()->PromoteToVariable();
+				}
 				block->ChangeBlockName();
 			}
 #pragma endregion
@@ -1600,12 +1662,21 @@ void ShaderEditorManager::CopyBlocks()
 void ShaderEditorManager::PasteBlocks()
 {
 	ResetFocusOnAllBlocks();
+	std::vector<UIShaderEditorBlock*> createdBlocks;
+
 	for (const auto& block : m_copiedBlocks)
 	{
 		CreateBlock(block->m_fileName);
-		m_blocks.at(m_blocks.size() - 1)->Move(block->GetPosition().x + 0.25f * m_scale, block->GetPosition().y + 0.1f * m_scale);
-		m_blocks.at(m_blocks.size() - 1)->m_focused = true;
+		UIShaderEditorBlock* newBlock = m_blocks.at(m_blocks.size() - 1);
+		createdBlocks.push_back(newBlock);
+
+		CopyBlockValues(block, newBlock);
+		std::pair<float, float> pos = GetCurrentMousePosition();
+		newBlock->Move(pos.first * m_scale, pos.second * m_scale);
+		newBlock->m_focused = true;
 	}
+
+	CopyCreatedBlocksConnections(m_copiedBlocks, createdBlocks);
 }
 
 void ShaderEditorManager::SetPickingColorElement(UIShaderEditorOutput* out)

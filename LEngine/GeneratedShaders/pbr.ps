@@ -28,8 +28,10 @@ static float4 tex_6;
 #define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer
 {
+#if NUM_LIGHTS_DIRECTIONAL > 0
 	float4 g_directionalLightDirectionStrength[NUM_LIGHTS_DIRECTIONAL];
 	float4 g_directionalLightColor[NUM_LIGHTS_DIRECTIONAL];
+#endif
 #if NUM_LIGHTS_POINT > 0
 	float4 g_pointLightPositionWithRadius[NUM_LIGHTS_POINT];
 	float4 g_pointLightColorWithStrength[NUM_LIGHTS_POINT];
@@ -104,6 +106,7 @@ float3 convertfloat3(float x, float y, float z);
 float4 convertfloat4(float x, float y, float z, float w);
 float divide(float a, float b);
 float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
+float get_a(float4 a);
 float get_x(float4 a);
 float lerp1(float a, float b, float alpha);
 float2 lerp2(float2 a, float2 b, float alpha);
@@ -128,7 +131,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	tex_6 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.823048, 0.125694));
 
 //Calculated values
-	float specular;
+	float3 specular;
 	float3 normal;
 	float lightIntensity;
 	float3 lightDir;
@@ -149,6 +152,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
 
 //Calculate normal for model
+	input.tangent = normalize(input.tangent);
+	input.binormal = normalize(input.binormal);
+	input.normal = normalize(input.normal);
+
 	normal = GetNormalValue(GetNormal(), input.tangent, input.binormal, input.normal);
 
 //Calculate other PBR values
@@ -161,44 +168,50 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	albedo = pow(albedo, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
 
 //SPECULAR IBL	
-	float NdotV = max(dot(normal, input.viewDirection), 0.0);
+	float3 WorldPos = input.position.xyz;
+	float3 Normal = input.normal * GetNormal();
+
+	float3 N = normalize(Normal);
+    float3 V = input.viewDirection;
 	float3 R = reflect(-input.viewDirection, input.normal);
+
+	float NdotV = max(dot(N, V), 0.0);
 	float3 prefilteredColor = GetPrefilteredColor(roughness, R);
-	float2 enviroBRDF = specularLUT.Sample(SampleType, float2(max(NdotV, 0.0f), max(NdotV, 0.0f))).rg;
+	float2 envBRDF = specularLUT.Sample(SampleType, float2(NdotV, roughness)).rg;
 
 //FRESNEL EQUATION
 	float3 F0 = float3(0.04, 0.04, 0.04);
-	float F = FresnelSchlick(F0, albedo, metalness, NdotV, 5.0);
 	F0 = lerp(F0, albedo, metalness);
+	float3 F = FresnelSchlickRoughness(NdotV, F0, roughness);
 //////////////////
 //DIFFUSE IRRADIANCE
-	float3 irradiance = irradianceMap.Sample(SampleType, GetNormalValue(GetNormal(), input.tangent, input.binormal, input.diffuseLookUp)).rgb;
-	float3 diffuse = irradiance * albedo;
-	//float3 ambient = 0.03 * albedo;
+	float3 irradiance = irradianceMap.Sample(SampleType, N).rgb;
+	float3 diffuse = irradiance * albedo;	
 
-	float3 kS = FresnelSchlickRoughness(max(NdotV, 0.0), F0, roughness);
-	float3 kD = float3(1.0, 1.0, 1.0) - kS;
+	float3 kS = F;
+	float3 kD = 1.0 - kS;
 	kD *= (1.0 - metalness);
 
 //AMBIENT CALCULATIONS
-	specular =  prefilteredColor * (kS * enviroBRDF.x + enviroBRDF.y);
+	specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 	float3 ambient = (kD * diffuse + specular);// * ao;
 
 //MULTIPLE DIRECTIONAL LIGHT PASS
 	float4 finalColor = float4(ambient, 1.0f); //Base of output color is ambient lighting
 
+#if NUM_LIGHTS_DIRECTIONAL > 0
 	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++)
 		accumulatedLightStrength += g_directionalLightDirectionStrength[i].w;
 
 	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++) //Iterate over number of directional lights
 	{
 		lightDir = normalize(g_directionalLightDirectionStrength[i].xyz);
-		lightIntensity = saturate(dot(normal, lightDir));	
+		lightIntensity = saturate(dot(Normal, lightDir));	
 
 	//Calculate multiple dot products
 		float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
-		float NdotH = max(dot(normal, halfV), 0.0);
-		float NdotL = max(dot(normal, lightDir), 0.0);
+		float NdotH = max(dot(Normal, halfV), 0.0);
+		float NdotL = max(dot(Normal, lightDir), 0.0);
 
 	//NORMAL DISTRUBUTION FUNCTION
 		float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
@@ -221,6 +234,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		//finalColor += float4(ambient + Lo, 1.0f);
 	}
 	//finalColor = saturate(finalColor);
+#endif
 
 //MULTIPLE POINT LIGHT PASS
 	accumulatedLightStrength = 0.0f;
@@ -391,24 +405,32 @@ float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp)
 
 	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
 }
+float get_a(float4 a)
+{
+	return a.w;
+}
 float get_x(float4 a)
 {
 	return a.r;
 }
 float lerp1(float a, float b, float alpha)
 {
+	alpha = saturate(alpha);
 	return lerp(a, b, alpha);
 }
 float2 lerp2(float2 a, float2 b, float alpha)
 {
+	alpha = saturate(alpha);
 	return lerp(a, b, alpha);
 }
 float3 lerp3(float3 a, float3 b, float alpha)
 {
+	alpha = saturate(alpha);
 	return lerp(a, b, alpha);
 }
 float4 lerp4(float4 a, float4 b, float alpha)
 {
+	alpha = saturate(alpha);
 	return lerp(a, b, alpha);
 }
 float multiply1(float a, float b)
@@ -460,5 +482,5 @@ float GetRoughness()
 }
 float3 GetNormal()
 {
-	return tex_3;
+	return float3(0.0f, 0.0f, 0.0f);
 }

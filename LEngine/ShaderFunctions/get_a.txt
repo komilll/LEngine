@@ -1,0 +1,4 @@
+float get_a(float4 a)
+{
+	return a.w;
+}

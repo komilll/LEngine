@@ -3,8 +3,10 @@
 #define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer
 {
+#if NUM_LIGHTS_DIRECTIONAL > 0
 	float4 g_directionalLightDirectionStrength[NUM_LIGHTS_DIRECTIONAL];
 	float4 g_directionalLightColor[NUM_LIGHTS_DIRECTIONAL];
+#endif
 #if NUM_LIGHTS_POINT > 0
 	float4 g_pointLightPositionWithRadius[NUM_LIGHTS_POINT];
 	float4 g_pointLightColorWithStrength[NUM_LIGHTS_POINT];

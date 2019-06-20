@@ -67,7 +67,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 		return false;
 
-	result = m_Model->Initialize(m_D3D->GetDevice(), "sphere.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "Deer.obj");
 	if(!result)
 		return false;
 
@@ -1338,7 +1338,7 @@ bool GraphicsClass::RenderGUI()
 			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0
 				&& m_shaderEditorManager->m_focusedBlock->GetFirstOutputNode())
 			{
-				RenderInputForMaterial(m_shaderEditorManager->m_focusedBlock, true, false);
+				RenderInputForMaterial(m_shaderEditorManager->m_focusedBlock, true, true);
 			}
 			else
 			{
@@ -2571,7 +2571,7 @@ GraphicsClass::EMaterialInputResult GraphicsClass::RenderInputForMaterial(UIShad
 
 			ImGui::ColorEdit3(hash.c_str(), out->m_valueThree, ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoSmallPreview);
 			ImGui::SameLine();
-			if (isActive | ImGui::ColorButton(hash.c_str(), { out->m_valueThree[0], out->m_valueThree[1], out->m_valueThree[2], 1.0f }))
+			if (ImGui::ColorButton(hash.c_str(), { out->m_valueThree[0], out->m_valueThree[1], out->m_valueThree[2], 1.0f }) || isActive)
 			{
 				ImGui::ColorPicker3(hash.c_str(), out->m_valueThree, ImGuiColorEditFlags_NoInputs);
 				if (!ImGui::IsItemHovered() && m_mouse->GetMouse()->GetLMBPressed() && !m_shaderEditorManager->m_wasLeftButtonUp)
@@ -2594,7 +2594,7 @@ GraphicsClass::EMaterialInputResult GraphicsClass::RenderInputForMaterial(UIShad
 
 			ImGui::ColorEdit4(hash.c_str(), out->m_valueFour, ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoSmallPreview);
 			ImGui::SameLine();
-			if (isActive | ImGui::ColorButton(hash.c_str(), { out->m_valueFour[0], out->m_valueFour[1], out->m_valueFour[2], out->m_valueFour[3] }))
+			if (ImGui::ColorButton(hash.c_str(), { out->m_valueFour[0], out->m_valueFour[1], out->m_valueFour[2], out->m_valueFour[3] }) || isActive)
 			{
 				ImGui::ColorPicker4(hash.c_str(), out->m_valueFour, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
 				if (!ImGui::IsItemHovered() && m_mouse->GetMouse()->GetLMBPressed() && !m_shaderEditorManager->m_wasLeftButtonUp)

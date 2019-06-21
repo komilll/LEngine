@@ -48,6 +48,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
 	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
 	m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
+	MoveCameraForward(1.60f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -67,7 +68,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 		return false;
 
-	result = m_Model->Initialize(m_D3D->GetDevice(), "Deer.obj");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "bunny.obj");
 	if(!result)
 		return false;
 
@@ -129,7 +130,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//m_pbrShader->SetMetalness(1.0f);
 
 	//Direction + strength (w)
-	m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 10.0f, -5.0f, 1.0f), 1.0f, 1.0f, 1.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 10.0f, -5.0f }, 15.0f, 1.0f, 1.0f, 1.0f);
 
 	//m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 10.0f), 1.0f, 0.0f, 0.0f);
 	//m_pbrShader->AddDirectionalLight(XMFLOAT4(-11.0f, -1.0f, 0.0f, 2.5f), 0.0f, 1.0f, 0.0f);
@@ -898,6 +899,16 @@ void GraphicsClass::PasteBlocks()
 	m_shaderEditorManager->PasteBlocks();
 }
 
+bool GraphicsClass::MouseAboveEditorPreview()
+{
+	return m_shaderEditorManager->MouseAbovePreview();
+}
+
+std::pair<float, float> GraphicsClass::GetCurrentMousePosition()
+{
+	return m_shaderEditorManager->GetCurrentMousePosition();
+}
+
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -1051,12 +1062,7 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	//m_Camera->SetRotation(-0.5f, 91.0f, 0);
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
-	//XMMATRIX rotationMatrix = XMMatrixIdentity();
-	//rotationMatrix = DirectX::XMMatrixMultiply(rotationMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	//rotationMatrix = DirectX::XMMatrixMultiply(rotationMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
-
-	//m_pbrShader->SetRotationMatrix(rotationMatrix);
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.05f, 0.0f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
@@ -1414,80 +1420,96 @@ bool GraphicsClass::RenderGUI()
 		goto Finished_drawing;
 	}
 
-	ImGui::Begin("BaseWindow");
-	
-	//Sliders - roughness/metalness in case of empty texture maps
-	ImGui::SliderFloat("Roughness", &m_pbrShader->m_roughness, 0.0f, 1.0f, "%.2f");
-	ImGui::SliderFloat("Metalness", &m_pbrShader->m_metalness, 0.0f, 1.0f, "%.2f");
-	//Color picker - in case of empty albedo
-	ImGui::ColorPicker3("Tint", m_pbrShader->m_tint);
+	ImGui::Begin("BaseWindow", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+	if (ImGui::CollapsingHeader("Post-process stack"))
+	{
+		if (ImGui::TreeNode("SSAO"))
+		{
+			ImGui::Checkbox("Use SSAO", &m_postprocessSSAO);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("Vignette"))
+		{
+			ImGui::Checkbox("Use Vignette", &m_postprocessVignette);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("LUT"))
+		{
+			//TODO Add LUT options
+			ImGui::Checkbox("Use LUT", &m_postprocessLUT);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("Bloom"))
+		{
+			ImGui::Checkbox("Use Bloom", &m_postprocessBloom);
+
+			//BLOOM settings
+			ImGui::SliderFloat("Weight 0", &m_bloomSettings.weights[0], 0.0f, 1.0f, "%.5f");
+			ImGui::SliderFloat("Weight 1", &m_bloomSettings.weights[1], 0.0f, 1.0f, "%.5f");
+			ImGui::SliderFloat("Weight 2", &m_bloomSettings.weights[2], 0.0f, 1.0f, "%.5f");
+			ImGui::SliderFloat("Weight 3", &m_bloomSettings.weights[3], 0.0f, 1.0f, "%.5f");
+			ImGui::SliderFloat("Weight 4", &m_bloomSettings.weights[4], 0.0f, 1.0f, "%.5f");
+			ImGui::ColorPicker3("Intensity Bloom", m_bloomSettings.intensity);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("Chromatic Aberration"))
+		{
+			ImGui::Checkbox("Use Chromatic Aberration", &m_postprocessChromaticAberration);
+			//CHROMATIC ABERRATION settings
+			ImGui::SliderFloat("R offset", &m_chromaticOffset.red, -0.01f, 0.01f, "%.5f");
+			ImGui::SliderFloat("G offset", &m_chromaticOffset.green, -0.01f, 0.01f, "%.5f");
+			ImGui::SliderFloat("B offset", &m_chromaticOffset.blue, -0.01f, 0.01f, "%.5f");
+			ImGui::SliderFloat("Intensity CA", &m_chromaticIntensity, 0.001f, 2.0f, "%.3f");
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("Grain"))
+		{
+			ImGui::Checkbox("Use Grain", &m_postprocessGrain);
+
+			//GRAIN settings
+			ImGui::SliderFloat("Intensity Grain", &m_grainSettings.intensity, 0.0f, 1.0f, "%.2f");
+			ImGui::SliderFloat("Size Grain", &m_grainSettings.size, 0.01f, 10.0f, "%.2f");
+
+			if (ImGui::BeginCombo("Type Grain", CURRENT_GRAIN_TYPE))
+			{
+				constexpr int count = (int)GrainType::Count;
+				for (int i = 0; i < count; ++i)
+				{
+					bool isSelected = (i == (int)m_grainSettings.type);
+					if (ImGui::Selectable(GrainTypeArray[i], isSelected))
+					{
+						CURRENT_GRAIN_TYPE = GrainTypeArray[i];
+						m_grainSettings.type = (GrainType)i;
+					}
+					if (isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+			ImGui::Checkbox("Has color", &m_grainSettings.hasColor);
+			ImGui::TreePop();
+		}
+	}
+
 	//SSAO radius/bias slider
 		//ImGui::SliderFloat("SSAO Radius", &m_GBufferShaderSSAO->m_radiusSize, 0.0f, 5.0f, "%.2f");
 		//ImGui::SliderFloat("SSAO Bias", &m_GBufferShaderSSAO->m_bias, 0.0f, 0.1f, "%.3f");
 
-	//BLOOM settings
-	ImGui::SliderFloat("Bloom weight 0", &m_bloomSettings.weights[0], 0.0f, 1.0f, "%.5f");
-	ImGui::SliderFloat("Bloom weight 1", &m_bloomSettings.weights[1], 0.0f, 1.0f, "%.5f");
-	ImGui::SliderFloat("Bloom weight 2", &m_bloomSettings.weights[2], 0.0f, 1.0f, "%.5f");
-	ImGui::SliderFloat("Bloom weight 3", &m_bloomSettings.weights[3], 0.0f, 1.0f, "%.5f");
-	ImGui::SliderFloat("Bloom weight 4", &m_bloomSettings.weights[4], 0.0f, 1.0f, "%.5f");
-	ImGui::ColorPicker3("Bloom intensity", m_bloomSettings.intensity);
-
-	ImGui::Spacing();
-
-	//CHROMATIC ABERRATION settings
-	ImGui::SliderFloat("Chromatic red offset", &m_chromaticOffset.red, -0.01f, 0.01f, "%.5f");
-	ImGui::SliderFloat("Chromatic green offset", &m_chromaticOffset.green, -0.01f, 0.01f, "%.5f");
-	ImGui::SliderFloat("Chromatic blue offset", &m_chromaticOffset.blue, -0.01f, 0.01f, "%.5f");
-	ImGui::SliderFloat("Chromatic intensity", &m_chromaticIntensity, 0.001f, 2.0f, "%.3f");
-
-	ImGui::Spacing();
-
-	//GRAIN settings
-	ImGui::SliderFloat("Grain intensity", &m_grainSettings.intensity, 0.0f, 1.0f, "%.2f");
-	ImGui::SliderFloat("Grain size", &m_grainSettings.size, 0.01f, 10.0f, "%.2f");
-
-	if (ImGui::BeginCombo("Grain type", CURRENT_GRAIN_TYPE))
-	{
-		constexpr int count = (int)GrainType::Count;
-		for (int i = 0; i < count; ++i)
-		{
-			bool isSelected = (i == (int)m_grainSettings.type);
-			if (ImGui::Selectable(GrainTypeArray[i], isSelected))
-			{
-				CURRENT_GRAIN_TYPE = GrainTypeArray[i];
-				m_grainSettings.type = (GrainType)i;
-			}
-			if (isSelected)
-			{
-				ImGui::SetItemDefaultFocus();
-			}
-		}
-
-		ImGui::EndCombo();
-	}
-	ImGui::Checkbox("Grain has color", &m_grainSettings.hasColor);
-
-	ImGui::Spacing();
-	ImGui::Spacing();
-	ImGui::Spacing();
-
 	m_internalTextureViewIndex = 0;
-
-	//Post-process stack bools
-	ImGui::Checkbox("Use SSAO", &m_postprocessSSAO);
-	ImGui::Checkbox("Use Bloom", &m_postprocessBloom);
-	ImGui::Checkbox("Use Vignette", &m_postprocessVignette);
-	ImGui::Checkbox("Use LUT", &m_postprocessLUT);
-	ImGui::Checkbox("Use Chromatic Aberration", &m_postprocessChromaticAberration);
-	ImGui::Checkbox("Use Grain", &m_postprocessGrain);
 	
-	//Roughness map input
-	RenderTextureViewImGui(m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView, "Roughness map:");
-	RenderTextureViewImGui(m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView, "Metalness map:");
-	RenderTextureViewImGui(m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView, "Normal map:");
-	RenderTextureViewImGui(m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView, "Albedo map:");
-
 	//Finish ImGui and render
 	ImGui::End();
 
@@ -2376,7 +2398,7 @@ bool GraphicsClass::RenderGBufferPosition(RenderTextureClass *targetTex, GBuffer
 	//Render test buddha
 	m_Model->Render(m_D3D->GetDeviceContext());
 
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.15f, 0.0f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.05f, 0.0f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 	result = shaderToExecute->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);

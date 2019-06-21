@@ -75,6 +75,7 @@ private:
 	bool CreateSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 
 	bool is_number(const std::string& s);
+	void LoadNewIndex(std::string line, int& vIndex, int& vtIndex, int& vnIndex);
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;

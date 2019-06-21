@@ -13,6 +13,22 @@ TextureCube environmentMap_3 : register(t4);
 TextureCube environmentMap_4 : register(t5);
 TextureCube environmentMap_5 : register(t6);
 SamplerState SampleType : register(s0);
+SamplerState BrdfLutSampleType : register(s1)
+{
+	Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	MipLODBias = 0.0f;
+	MaxAnisotropy = 1;
+	ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	BorderColor[0] = 0;
+	BorderColor[1] = 0;
+	BorderColor[2] = 0;
+	BorderColor[3] = 0;
+	MinLOD = 0;
+	MaxLOD = D3D11_FLOAT32_MAX;
+};
 Texture2D additionalTexture_0 : register(t7);
 static float4 tex_0;
 Texture2D additionalTexture_1 : register(t8);
@@ -22,7 +38,9 @@ static float4 tex_2;
 Texture2D additionalTexture_3 : register(t10);
 static float4 tex_3;
 Texture2D additionalTexture_4 : register(t11);
-static float4 tex_6;
+static float4 tex_14;
+Texture2D additionalTexture_5 : register(t12);
+static float4 tex_22;
 
 #define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
@@ -125,10 +143,11 @@ float substract(float a, float b);
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
-	tex_6 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.823048, 0.125694));
+	tex_14 = additionalTexture_1.Sample(SampleType, input.tex);
+	tex_22 = additionalTexture_2.Sample(SampleType, input.tex);
+	tex_1 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.017, 0.2134));
+	tex_2 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.1, 0.05));
+	tex_3 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.05, 0.005));
 
 //Calculated values
 	float3 specular;
@@ -177,7 +196,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	float NdotV = max(dot(N, V), 0.0);
 	float3 prefilteredColor = GetPrefilteredColor(roughness, R);
-	float2 envBRDF = specularLUT.Sample(SampleType, float2(NdotV, roughness)).rg;
+	float2 envBRDF = specularLUT.Sample(BrdfLutSampleType, float2(NdotV, roughness)).rg;
 
 //FRESNEL EQUATION
 	float3 F0 = float3(0.04, 0.04, 0.04);
@@ -223,13 +242,14 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 		specular = numerator / max(denominator, 0.001);
 
-		float3 tint = float3(1.0, 0.0, 0.0);
+		//float3 tint = float3(1.0, 0.0, 0.0);
 		//albedo *= lerp(float3(1.0, 1.0, 1.0), tint, metalness);
 
 		float currentLightStrength = g_directionalLightDirectionStrength[i].w;
 		float lightPercentage = 1.0f;//currentLightStrength / accumulatedLightStrength;
-		float3 Lo = (kD * albedo / PI + specular) * NdotL * lightPercentage * g_directionalLightColor[i].xyz;
+		float3 Lo = (kD * albedo / PI + specular) * NdotL * lightPercentage * g_directionalLightColor[i].xyz * currentLightStrength;
 
+		//return float4(Lo, 1.0f);
 		finalColor += float4(Lo, 1.0f);
 		//finalColor += float4(ambient + Lo, 1.0f);
 	}
@@ -277,6 +297,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
 	//return float4(ambient, 1.0);
+	//return float4(diffuse, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)
@@ -464,23 +485,46 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float2 H = float2(0.823048f, 0.125694f);
+	float4 M = float4(0.490566f, 0.490561f, 0.490561f, 1.0f);
+	float4 N = float4(1.0f, 0.99999f, 0.99999f, 1.0f);
+	float2 E = float2(0.017f, 0.2134f);
+	float out_G = get_x(tex_1);
+	float2 F = float2(0.1f, 0.05f);
+	float out_H = get_x(tex_2);
+	float out_J = multiply1(out_G, out_H);
+	float2 X = float2(0.05f, 0.005f);
+	float out_I = get_x(tex_3);
+	float out_K = multiply1(out_J, out_I);
+	float4 out_L = lerp4(M, N, out_K);
+	float4 out_P = multiply4(out_L, tex_14);
 
-	return tex_6;
+	return out_P;
 }
 float GetMetalness()
 {
-	float out_E = get_x(tex_1);
+	float V = 1.0f;
 
-	return out_E;
+	return V;
 }
 float GetRoughness()
 {
-	float out_F = get_x(tex_2);
+	float Q = 0.3f;
+	float R = 0.1f;
+	float2 E = float2(0.017f, 0.2134f);
+	float out_G = get_x(tex_1);
+	float2 F = float2(0.1f, 0.05f);
+	float out_H = get_x(tex_2);
+	float out_J = multiply1(out_G, out_H);
+	float2 X = float2(0.05f, 0.005f);
+	float out_I = get_x(tex_3);
+	float out_K = multiply1(out_J, out_I);
+	float out_U = get_a(tex_14);
+	float out_T = multiply1(out_K, out_U);
+	float out_S = lerp1(Q, R, out_T);
 
-	return out_F;
+	return out_S;
 }
 float3 GetNormal()
 {
-	return float3(0.0f, 0.0f, 0.0f);
+	return tex_22;
 }

@@ -155,6 +155,9 @@ public:
 	void CopyBlocks();
 	void PasteBlocks();
 
+	bool MouseAboveEditorPreview();
+	std::pair<float, float> GetCurrentMousePosition();
+
 private:
 	bool Render();
 	bool RenderScene();
@@ -330,7 +333,7 @@ private:
 	//////////////////////////////
 	// Post-process using flags //
 	//////////////////////////////
-	bool m_postprocessSSAO = true;
+	bool m_postprocessSSAO = false;
 	bool m_postprocessBloom = false;
 	bool m_postprocessVignette = false;
 	bool m_postprocessLUT = false;

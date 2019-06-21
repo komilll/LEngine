@@ -46,6 +46,9 @@ public:
 	void SetPickingColorElement(UIShaderEditorOutput* out);
 	UIShaderEditorOutput* GetPickingColorElement();
 
+	bool MouseAbovePreview();
+	std::pair<float, float> GetCurrentMousePosition();
+
 	//SAVE MATERIAL TO FILE
 	bool SaveMaterial(std::string filename);
 	bool IsWorkingOnSavedMaterial();
@@ -91,7 +94,6 @@ private:
 	void GenerateVariableNames();
 	void GenerateTexVariableName(UIShaderEditorBlock* block, int index);
 
-	std::pair<float, float> GetCurrentMousePosition();
 	UIBase::RectangleVertices GetMarkingBounds();
 	void TryToMarkManyBlocks(float minX, float maxX, float minY, float maxY);
 	void TryToMarkManyBlocks(UIBase::RectangleVertices bounds);

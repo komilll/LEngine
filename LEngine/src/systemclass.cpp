@@ -328,23 +328,62 @@ void SystemClass::ShutdownWindows()
 void SystemClass::HandleInput()
 {
 	XMVECTOR cameraMovement{ 0, 0, 0 };
-	XMVECTOR cameraRotation{0, 0, 0};
-	float movementPerTick = 0.3f;
-	float rotatePerTick = 0.2f;
+	XMVECTOR cameraRotation{ 0, 0, 0 };
+	constexpr float movementPerTick = 0.3f;
+	constexpr float rotatePerTick = 0.2f;
+	constexpr float previewRotateScale = 50.0f;
 
-	if (m_Input->IsKeyDown(VK_W))
-		m_Graphics->MoveCameraForward(movementPerTick);
-	if (m_Input->IsKeyDown(VK_S))
-		m_Graphics->MoveCameraBackward(movementPerTick);
-	if (m_Input->IsKeyDown(VK_A))
-		m_Graphics->MoveCameraLeft(movementPerTick);
-	if (m_Input->IsKeyDown(VK_D))
-		m_Graphics->MoveCameraRight(movementPerTick);
-	if (m_Input->IsKeyDown(VK_E))
-		m_Graphics->MoveCameraUp(movementPerTick);
-	if (m_Input->IsKeyDown(VK_Q))
-		m_Graphics->MoveCameraDown(movementPerTick);
+	static bool lmbPressed = false;
+	static std::pair<float, float> pos;
 
+	if (!m_Graphics->RENDER_MATERIAL_EDITOR)
+	{
+		lmbPressed = false;
+
+		if (m_Input->IsKeyDown(VK_W))
+			m_Graphics->MoveCameraForward(movementPerTick);
+		if (m_Input->IsKeyDown(VK_S))
+			m_Graphics->MoveCameraBackward(movementPerTick);
+		if (m_Input->IsKeyDown(VK_A))
+			m_Graphics->MoveCameraLeft(movementPerTick);
+		if (m_Input->IsKeyDown(VK_D))
+			m_Graphics->MoveCameraRight(movementPerTick);
+		if (m_Input->IsKeyDown(VK_E))
+			m_Graphics->MoveCameraUp(movementPerTick);
+		if (m_Input->IsKeyDown(VK_Q))
+			m_Graphics->MoveCameraDown(movementPerTick);
+	}
+	else if (m_Graphics->MouseAboveEditorPreview())
+	{
+		if (m_Mouse->GetLMBPressed())
+		{
+			if (!lmbPressed)
+			{
+				lmbPressed = true;
+				pos = m_Graphics->GetCurrentMousePosition();
+			}
+			else
+			{
+				float xDiff = m_Graphics->GetCurrentMousePosition().first - pos.first;
+				float yDiff = m_Graphics->GetCurrentMousePosition().second - pos.second;
+
+				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -xDiff * rotatePerTick * previewRotateScale, 0 });
+				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ yDiff * rotatePerTick * previewRotateScale, 0, 0 });
+				m_Graphics->RotateCamera(cameraRotation);
+
+				pos = m_Graphics->GetCurrentMousePosition();
+			}
+		}
+		else
+		{
+			lmbPressed = false;
+		}
+
+		if ((float)m_Mouse->GetMouseScroll() > 0.0f)
+			m_Graphics->MoveCameraForward(movementPerTick);
+		else if ((float)m_Mouse->GetMouseScroll() < 0.0f)
+			m_Graphics->MoveCameraBackward(movementPerTick);
+	}
 
 	//Handle deleting blocks in Shader Editor
 	if (m_Input->IsKeyDown(VK_DELETE))

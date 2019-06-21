@@ -132,7 +132,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 				}
 				else if (type == "vt")
 				{
-					input >> x >> y >> z;
+					input >> x >> y;
 					texPosition.push_back(DirectX::XMFLOAT2(std::stof(x), std::stof(y)));
 				}
 				else if (type == "vn")
@@ -143,7 +143,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 			}
 
 			vertices = new VertexType[m_vertexCount = vertexPosition.size()];
-
 			for (int i = 0; i < m_vertexCount; i++)
 			{
 				vertices[i].position = vertexPosition.at(i);
@@ -153,7 +152,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 		if (std::ifstream input{ modelFilename, std::ios::binary })
 		{
 			std::string line = "";
-			bool canEnter = false;
+			int left = 0;
 			
 			int vIndex = 0;
 			int vtIndex = 0;
@@ -166,20 +165,21 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 
 				if (line == "f")
 				{
-					canEnter = true;
+					left = 3;
 					if (texPosition.size() == 0)
 						vtIndex = -1;
 				}
-				else if (canEnter)
+				else if (left > 0)
 				{
+					left--;
 					SetIndices(line, vIndex, vtIndex, vnIndex);
 					indicesVec.push_back(vIndex);
-					if (texPosition.size() > 0)
+					if (texPosition.size() > 0 && m_vertexCount > vIndex && texPosition.size() > vtIndex)
 					{
 						vertices[vIndex].tex = texPosition.at(vtIndex);
 						texIndices.push_back(vtIndex);
 					}
-					if (normalPosition.size() > 0)
+					if (normalPosition.size() > 0 && m_vertexCount > vIndex && normalPosition.size() > vnIndex)
 					{
 						vertices[vIndex].normal = normalPosition.at(vnIndex);
 						normalIndices.push_back(vnIndex);
@@ -708,4 +708,9 @@ bool ModelClass::is_number(const std::string & s)
 {
 	return !s.empty() && std::find_if(s.begin(),
 		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
+void ModelClass::LoadNewIndex(std::string line, int & vIndex, int & vtIndex, int & vnIndex)
+{
+
 }

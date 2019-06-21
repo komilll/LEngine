@@ -28,11 +28,14 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		
 		if (m_mouse->GetMouseScroll() != 0.0f && !WillRenderChoosingWindow())
 		{
-			m_scale += (float)m_mouse->GetMouseScroll() * 0.1f;
-			if (m_scale > 1.0f)
-				m_scale = 1.0f;
-			else if (m_scale < 0.1f)
-				m_scale = 0.1f;
+			if (!MouseAbovePreview())
+			{
+				m_scale += (float)m_mouse->GetMouseScroll() * 0.1f;
+				if (m_scale > 1.0f)
+					m_scale = 1.0f;
+				else if (m_scale < 0.1f)
+					m_scale = 0.1f;
+			}
 
 			for (const auto& line : m_lines)
 				line->SetScale(m_scale);
@@ -83,7 +86,7 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		//User can start dragging only one block at the time - dragging multiple blocks is not available
 		for (const auto& block : m_blocks)
 		{
-			if (block->MouseOnArea(m_mouse) && m_mouse->GetLMBPressed())
+			if (block->MouseOnArea(m_mouse) && !MouseAbovePreview() && m_mouse->GetLMBPressed())
 			{
 				if (!m_mouseHoveredImGui)
 				{
@@ -123,11 +126,13 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 			return;
 		}
 	}
+	static bool startedAbovePreview = false;
 	//No blocks interaction/screen movement - try to mark many elements (to further movement/deleting/copying)
 	if (m_mouse->GetLMBPressed() && !m_mouseHoveredImGui) //Start marking area
 	{
 		if (!m_alreadyMarkingArea)
 		{
+			startedAbovePreview = MouseAbovePreview();
 			m_alreadyMarkingArea = true;
 			std::pair<float, float> tmpMousePos = GetCurrentMousePosition();
 			m_mouseDragStartX = tmpMousePos.first;
@@ -135,15 +140,25 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		}
 		else
 		{
-			float newWidth = 0.007f / m_scale;
-			m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { GetMarkingBounds() }, false, true, newWidth);
+			if (startedAbovePreview)
+			{
+				m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { GetMarkingBounds() }, false, true, 0.0f);
+			}
+			else
+			{
+				float newWidth = 0.007f / m_scale;
+				m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { GetMarkingBounds() }, false, true, newWidth);
+			}
 		}
 	}
 	else if (m_alreadyMarkingArea) //Stop marking area
 	{
-		TryToMarkManyBlocks(GetMarkingBounds());
 		m_alreadyMarkingArea = false;
-		m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { -10000.0f, -10000.0f, -10000.0f, -10000.0f }, false, true);
+		if (!startedAbovePreview)
+		{
+			TryToMarkManyBlocks(GetMarkingBounds());
+			m_markingArea->InitializeModelGeneric(m_D3D->GetDevice(), { -10000.0f, -10000.0f, -10000.0f, -10000.0f }, false, true);
+		}
 		return;
 	}
 }
@@ -1687,6 +1702,16 @@ void ShaderEditorManager::SetPickingColorElement(UIShaderEditorOutput* out)
 UIShaderEditorOutput* ShaderEditorManager::GetPickingColorElement()
 {
 	return m_pickingColorObject;
+}
+
+bool ShaderEditorManager::MouseAbovePreview()
+{
+	std::pair<float, float> mousePosCurrent = GetCurrentMousePosition();
+	if (mousePosCurrent.first < -0.5f && mousePosCurrent.second > 0.5f)
+	{
+		return true;
+	}
+	return false;
 }
 
 void ShaderEditorManager::AddShaderBlock(UIShaderEditorBlock* block, int inCount, int outCount)

@@ -13,3 +13,19 @@ TextureCube environmentMap_3 : register(t4);
 TextureCube environmentMap_4 : register(t5);
 TextureCube environmentMap_5 : register(t6);
 SamplerState SampleType : register(s0);
+SamplerState BrdfLutSampleType : register(s1)
+{
+	Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	MipLODBias = 0.0f;
+	MaxAnisotropy = 1;
+	ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	BorderColor[0] = 0;
+	BorderColor[1] = 0;
+	BorderColor[2] = 0;
+	BorderColor[3] = 0;
+	MinLOD = 0;
+	MaxLOD = D3D11_FLOAT32_MAX;
+};

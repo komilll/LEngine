@@ -31,8 +31,6 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 
 bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
 {
-	m_position = XMFLOAT4(0, 0, 0, 0);
-
 	switch (shape)
 	{
 		case ModelClass::ShapeSize::RECTANGLE:
@@ -80,15 +78,40 @@ void ModelClass::SetPosition(float x, float y, float z)
 
 void ModelClass::SetPosition(XMFLOAT3 position)
 {
-	m_position.x = position.x;
-	m_position.y = position.y;
-	m_position.z = position.z;
-	m_position.w = 1.0f;
+	m_position[0] = position.x;
+	m_position[1] = position.y;
+	m_position[2] = position.z;
+	m_position[3] = 1.0f;
 }
 
 XMFLOAT4 ModelClass::GetPosition()
 {
-	return m_position;
+	return{ m_position[0], m_position[1], m_position[2], m_position[3] };
+}
+
+XMFLOAT3 ModelClass::GetScale()
+{
+	return{ m_scale[0], m_scale[1], m_scale[2] };
+}
+
+XMFLOAT3 ModelClass::GetRotation()
+{
+	return{ m_rotation[0], m_rotation[1], m_rotation[2] };
+}
+
+float* ModelClass::GetPositionRef()
+{
+	return &m_position[0];
+}
+
+float* ModelClass::GetScaleRef()
+{
+	return &m_scale[0];
+}
+
+float* ModelClass::GetRotationRef()
+{
+	return &m_rotation[0];
 }
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)

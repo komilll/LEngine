@@ -1062,9 +1062,13 @@ bool GraphicsClass::RenderScene()
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	//m_Camera->SetRotation(-0.5f, 91.0f, 0);
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.05f, 0.0f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_Model->GetPosition().x, m_Model->GetPosition().y, m_Model->GetPosition().z));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
+	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Model->GetRotation().x * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Model->GetRotation().y * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(m_Model->GetRotation().z * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(m_Model->GetScale().x, m_Model->GetScale().y, m_Model->GetScale().z));
 
 	//METALNESS / ROUGHNESS presentation
 	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -1270,41 +1274,42 @@ bool GraphicsClass::RenderGUI()
 	{
 		ImGui::SetNextWindowPos({ 1042, 24 });
 		ImGui::SetNextWindowSize({ 226, 659 });
-		ImGui::Begin("Materials explorer", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
-
-		float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+		ImGui::Begin("Scene manager", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+		if (ImGui::CollapsingHeader("Materials explorer"))
 		{
-			int materialIndex = 0;
-			for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
+			float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 			{
-				std::string tmp;
-				int i{ 0 };
-				for (const auto& c : name)
+				int materialIndex = 0;
+				for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
 				{
-					tmp += c;
-					i++;
-					if (i % 8 == 0)
+					std::string tmp;
+					int i{ 0 };
+					for (const auto& c : name)
 					{
-						i = 0;
-						tmp += "\n";
+						tmp += c;
+						i++;
+						if (i % 8 == 0)
+						{
+							i = 0;
+							tmp += "\n";
+						}
 					}
+					if (ImGui::Button(tmp.c_str(), ImVec2{ 64, 64 }))
+					{
+						m_shaderEditorManager->LoadMaterial(materialIndex);
+						m_shaderEditorManager->m_refreshModel = true;
+					}
+					//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
+					float lastButtonPos = ImGui::GetItemRectMax().x;
+					float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
+					if (nextButtonPos < windowLineWidth)
+					{
+						ImGui::SameLine();
+					}
+					materialIndex++;
 				}
-				if (ImGui::Button(tmp.c_str(), ImVec2{ 64, 64 }))
-				{
-					m_shaderEditorManager->LoadMaterial(materialIndex);
-					m_shaderEditorManager->m_refreshModel = true;
-				}
-				//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
-				float lastButtonPos = ImGui::GetItemRectMax().x;
-				float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
-				if (nextButtonPos < windowLineWidth)
-				{
-					ImGui::SameLine();
-				}
-				materialIndex++;
 			}
 		}
-
 		m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
 		ImGui::End();
 	}
@@ -1421,6 +1426,10 @@ bool GraphicsClass::RenderGUI()
 	}
 
 	ImGui::Begin("BaseWindow", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+	ImGui::InputFloat3("Position", m_Model->GetPositionRef(), "%.2f");
+	ImGui::SliderFloat3("Scale", m_Model->GetScaleRef(), 0.0f, 5.0f, "%.2f");
+	ImGui::SliderFloat3("Rotation", m_Model->GetRotationRef(), 0.0f, 180.0f, "%.1f");
+
 	if (ImGui::CollapsingHeader("Post-process stack"))
 	{
 		if (ImGui::TreeNode("SSAO"))
@@ -1625,7 +1634,7 @@ bool GraphicsClass::RenderSkybox()
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
 	m_skyboxModel->Render(m_D3D->GetDeviceContext());
-	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_skyboxModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_skyboxModel->GetIndexCount(), worldMatrix, /*viewMatrix*/ XMMatrixIdentity(), projectionMatrix);
 
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
@@ -2398,9 +2407,11 @@ bool GraphicsClass::RenderGBufferPosition(RenderTextureClass *targetTex, GBuffer
 	//Render test buddha
 	m_Model->Render(m_D3D->GetDeviceContext());
 
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0.0f, -0.05f, 0.0f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_Model->GetPosition().x, m_Model->GetPosition().y, m_Model->GetPosition().z));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Model->GetRotation().x * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Model->GetRotation().y * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(m_Model->GetRotation().z * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(m_Model->GetScale().x, m_Model->GetScale().y, m_Model->GetScale().z));
 	result = shaderToExecute->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 		return false;

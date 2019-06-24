@@ -55,6 +55,12 @@ public:
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 position);
 	XMFLOAT4 GetPosition();
+	XMFLOAT3 GetScale();
+	XMFLOAT3 GetRotation();
+
+	float* GetPositionRef();
+	float* GetScaleRef();
+	float* GetRotationRef();
 
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
@@ -79,7 +85,9 @@ private:
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
-	XMFLOAT4 m_position;
+	float m_position[4]{ 0.0f, 0.0f, 0.0f, 0.0f};
+	float m_scale[3] { 1.0f, 1.0f, 1.0f };
+	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
 };
 
 #endif

@@ -329,8 +329,8 @@ void SystemClass::HandleInput()
 {
 	XMVECTOR cameraMovement{ 0, 0, 0 };
 	XMVECTOR cameraRotation{ 0, 0, 0 };
-	constexpr float movementPerTick = 0.3f;
-	constexpr float rotatePerTick = 0.2f;
+	constexpr float movementPerTick = 0.1f;
+	constexpr float rotatePerTick = 0.75f;
 	constexpr float previewRotateScale = 50.0f;
 
 	static bool lmbPressed = false;

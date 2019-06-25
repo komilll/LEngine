@@ -43,6 +43,7 @@
 #include "VignetteShader.h"
 #include "LUTShader.h"
 #include "ShaderEditorManager.h"
+#include "json11.hpp"
 
 /////////////
 // GLOBALS //
@@ -213,9 +214,15 @@ private:
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
 	static float lerp(float a, float b, float val);
 
+	//Saving/Loading scene
+	void SaveScene(const std::string name);
+	void LoadScene(const std::string name);
+
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
+	std::vector<ModelClass*> m_sceneModels;
+	ModelClass* m_selectedModel;
 	ModelClass* m_Model;
 	ModelClass* m_cubeModel;
 	ModelClass* m_skyboxModel;

@@ -1,0 +1,2 @@
+{"modelName": "", "primitiveModel": [0, 0, 0, 0, 0, false, false, 0, 0, 0, 0], "sceneName": "Bunny"}
+{"modelName": "", "primitiveModel": [0, 0, 0, 0, 0, false, false, 0, 0, 0, 0], "sceneName": "Second Bunny"}

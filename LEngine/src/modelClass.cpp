@@ -31,6 +31,7 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 
 bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
 {
+	m_primitiveModel.SetRectangle(left, right, top, bottom, withTex, isEmpty, borderWidth);
 	switch (shape)
 	{
 		case ModelClass::ShapeSize::RECTANGLE:
@@ -46,6 +47,7 @@ bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, 
 
 bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
+	m_primitiveModel.SetSquare(centerX, centerY, size, isEmpty, withTex);
 	return CreateSquare(device, centerX, centerY, size, isEmpty, withTex);
 }
 
@@ -112,6 +114,21 @@ float* ModelClass::GetScaleRef()
 float* ModelClass::GetRotationRef()
 {
 	return &m_rotation[0];
+}
+
+std::string ModelClass::GetModelFilename() const
+{
+	return m_modelFilename;
+}
+
+std::string ModelClass::GetSaveData() const
+{
+	json11::Json obj = json11::Json::object{
+		{"modelName", m_modelFilename},
+		{"sceneName", m_name},
+		{"primitiveModel", m_primitiveModel }
+	};
+	return obj.dump();
 }
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)

@@ -17,6 +17,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include "json11.hpp"
 
 using namespace DirectX;
 
@@ -35,8 +36,11 @@ private:
 		XMFLOAT3 binormal;
 	};
 public:
-	enum ShapeSize {
-		TRIANGLE, RECTANGLE
+	enum class ShapeSize : int
+	{
+		TRIANGLE = 0,
+		RECTANGLE = 1,
+		SQUARE = 2
 	};
 
 public:
@@ -62,6 +66,9 @@ public:
 	float* GetScaleRef();
 	float* GetRotationRef();
 
+	std::string GetModelFilename() const;
+	std::string GetSaveData() const;
+
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
 	void ShutdownBuffers();
@@ -82,12 +89,62 @@ private:
 
 	bool is_number(const std::string& s);
 	void LoadNewIndex(std::string line, int& vIndex, int& vtIndex, int& vnIndex);
+
+public:
+	std::string m_name;
+	bool m_selected;
+
 private:
+	std::string m_modelFilename;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	float m_position[4]{ 0.0f, 0.0f, 0.0f, 0.0f};
 	float m_scale[3] { 1.0f, 1.0f, 1.0f };
 	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
+
+	struct PrimitiveModel
+	{
+	public:
+		/*ModelClass::ShapeSize*/ int shape;
+		float left;
+		float right;
+		float top; 
+		float bottom;
+		bool withTex;
+		bool isEmpty;
+		float borderWidth;
+
+		float centerX; 
+		float centerY; 
+		float size;
+
+		PrimitiveModel() {};
+
+		void SetRectangle(float Left, float Right, float Top, float Bottom, bool WithTex, bool IsEmpty, float BorderWidth)
+		{
+			shape = static_cast<int>(ModelClass::ShapeSize::RECTANGLE);
+			left = Left;
+			right = Right;
+			top = Top;
+			bottom = Bottom;
+			withTex = WithTex;
+			isEmpty = IsEmpty;
+			borderWidth = BorderWidth;
+		}
+		void SetSquare(float CenterX, float CenterY, float Size, bool IsEmpty, bool WithTex) 
+		{
+			shape = static_cast<int>(ModelClass::ShapeSize::SQUARE);
+			centerX = CenterX;
+			centerY = CenterY;
+			size = Size;
+			isEmpty = IsEmpty;
+			withTex = WithTex;
+		}
+
+		json11::Json to_json() const { 
+			return json11::Json::array { shape, left, right, top, bottom, withTex, isEmpty, borderWidth, centerX, centerY, size }; }
+	};
+	PrimitiveModel m_primitiveModel;
 };
 
 #endif

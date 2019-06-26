@@ -68,18 +68,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 		return false;
 
-	result = m_Model->Initialize(m_D3D->GetDevice(), "bunny.obj");
-	if(!result)
-		return false;
+	//result = m_Model->Initialize(m_D3D->GetDevice(), "bunny.obj");
+	//if(!result)
+	//	return false;
 
-	m_Model->m_name = "Bunny";
-	m_sceneModels.push_back(m_Model);
+	//m_Model->m_name = "Bunny";
+	//m_sceneModels.push_back(m_Model);
 
-	ModelClass* secondBunny = new ModelClass;
-	if (!secondBunny->Initialize(m_D3D->GetDevice(), "bunny.obj"))
-		return false;
-	secondBunny->m_name = "Second Bunny";
-	m_sceneModels.push_back(secondBunny);
+	//ModelClass* secondBunny = new ModelClass;
+	//if (!secondBunny->Initialize(m_D3D->GetDevice(), "bunny.obj"))
+	//	return false;
+	//secondBunny->m_name = "Second Bunny";
+	//m_sceneModels.push_back(secondBunny);
 
 	result = m_cubeModel->Initialize(m_D3D->GetDevice(), "cube.obj");
 	if (!result)
@@ -618,7 +618,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
 
-	SaveScene("test.txt");
+	LoadScene("test.txt");
 	return true;
 }
 
@@ -654,7 +654,13 @@ void GraphicsClass::Shutdown()
 bool GraphicsClass::Frame()
 {
 	bool result;
-
+	static int timer = 0;
+	timer++;
+	if (timer % 300 == 0)
+	{
+		timer = 0;
+		SaveScene("test.txt");
+	}
 
 	// Render the graphics scene.
 	//m_rotationY += 0.01f;
@@ -1457,6 +1463,17 @@ bool GraphicsClass::RenderGUI()
 		ImGui::InputFloat3("Position", m_selectedModel->GetPositionRef(), "%.2f");
 		ImGui::SliderFloat3("Scale", m_selectedModel->GetScaleRef(), 0.0f, 5.0f, "%.2f");
 		ImGui::SliderFloat3("Rotation", m_selectedModel->GetRotationRef(), 0.0f, 180.0f, "%.1f");
+		if (ImGui::Button("Load model"))
+		{
+			m_selectedModel->LoadModel();
+		}
+	}
+	else
+	{
+		if (ImGui::Button("Add model"))
+		{
+			m_sceneModels.push_back(std::move(ModelClass::LoadModel(m_D3D->GetDevice())));
+		}
 	}
 
 	if (ImGui::CollapsingHeader("Post-process stack"))
@@ -2809,4 +2826,38 @@ void GraphicsClass::SaveScene(const std::string name)
 
 void GraphicsClass::LoadScene(const std::string name)
 {
+	std::string line;
+	std::string err;
+	if (ifstream input{ "Scenes/" + name, std::ios_base::binary })
+	{
+		while (getline(input, line))
+		{
+			const auto json = json11::Json::parse(line, err);
+			const std::string modelName = json["modelName"].string_value();
+			if (modelName != "")
+			{
+				ModelClass* model = new ModelClass;
+				if (model->Initialize(m_D3D->GetDevice(), (modelName + ".obj").c_str()))
+				{
+					const std::string sceneName = json["sceneName"].string_value();
+					const json11::Json::array position = json["position"].array_items();
+					const json11::Json::array scale = json["scale"].array_items();
+					const json11::Json::array rotation = json["rotation"].array_items();
+					model->m_name = sceneName;
+					if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
+					{
+						model->SetPosition(position.at(0).number_value(), position.at(1).number_value(), position.at(2).number_value());
+						model->SetScale(scale.at(0).number_value(), scale.at(1).number_value(), scale.at(2).number_value());
+						model->SetRotation(rotation.at(0).number_value(), rotation.at(1).number_value(), rotation.at(2).number_value());
+					}
+					m_sceneModels.push_back(std::move(model));
+					continue;
+				}
+				else
+				{
+					delete model;
+				}
+			}
+		}
+	}
 }

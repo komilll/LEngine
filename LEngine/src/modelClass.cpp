@@ -23,6 +23,8 @@ ModelClass::~ModelClass()
 
 bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 {
+	m_device = device;
+	m_modelFilename = modelFilename;
 	if(!InitializeBuffers(device, modelFilename))
 		return false;
 
@@ -31,6 +33,7 @@ bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
 
 bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
 {
+	m_device = device;
 	m_primitiveModel.SetRectangle(left, right, top, bottom, withTex, isEmpty, borderWidth);
 	switch (shape)
 	{
@@ -47,6 +50,7 @@ bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, 
 
 bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
+	m_device = device;
 	m_primitiveModel.SetSquare(centerX, centerY, size, isEmpty, withTex);
 	return CreateSquare(device, centerX, centerY, size, isEmpty, withTex);
 }
@@ -84,6 +88,20 @@ void ModelClass::SetPosition(XMFLOAT3 position)
 	m_position[1] = position.y;
 	m_position[2] = position.z;
 	m_position[3] = 1.0f;
+}
+
+void ModelClass::SetScale(float x, float y, float z)
+{
+	m_scale[0] = x;
+	m_scale[1] = y;
+	m_scale[2] = z;
+}
+
+void ModelClass::SetRotation(float x, float y, float z)
+{
+	m_rotation[0] = x;
+	m_rotation[1] = y;
+	m_rotation[2] = z;
 }
 
 XMFLOAT4 ModelClass::GetPosition()
@@ -125,10 +143,33 @@ std::string ModelClass::GetSaveData() const
 {
 	json11::Json obj = json11::Json::object{
 		{"modelName", m_modelFilename},
-		{"sceneName", m_name},
-		{"primitiveModel", m_primitiveModel }
+		{"sceneName", m_name}, 
+		{"position", json11::Json::array{m_position[0], m_position[1], m_position[2]}},
+		{"scale", json11::Json::array{m_scale[0], m_scale[1], m_scale[2]}},
+		{"rotation", json11::Json::array{m_rotation[0], m_rotation[1], m_rotation[2]}}
 	};
 	return obj.dump();
+}
+
+void ModelClass::LoadData()
+{
+
+}
+
+ModelClass* ModelClass::LoadModel(ID3D11Device * d3d)
+{
+	ModelClass* model = new ModelClass();
+	model->Initialize(d3d, model->LoadModelCalculatePath().c_str());
+	model->m_name = "Test_Name";
+	return model;
+}
+
+void ModelClass::LoadModel()
+{
+	if (m_device)
+	{
+		Initialize(m_device, LoadModelCalculatePath().c_str());
+	}
 }
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)
@@ -753,4 +794,60 @@ bool ModelClass::is_number(const std::string & s)
 void ModelClass::LoadNewIndex(std::string line, int & vIndex, int & vtIndex, int & vnIndex)
 {
 
+}
+
+std::string ModelClass::LoadModelCalculatePath()
+{
+	PWSTR pszFilePath;
+	wchar_t* wFilePath = 0;
+	IFileOpenDialog *pFileOpen;
+	const COMDLG_FILTERSPEC objSpec = { L"OBJ (Wavefront .obj)", L"*.obj" };
+	const COMDLG_FILTERSPEC rgSpec[] = { objSpec };
+
+	// Create the FileOpenDialog object.
+	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+		IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+
+	if (SUCCEEDED(hr))
+		hr = pFileOpen->SetFileTypes(1, rgSpec);
+
+	if (SUCCEEDED(hr))
+	{
+		// Show the Open dialog box.
+		hr = pFileOpen->Show(NULL);
+
+		// Get the file name from the dialog box.
+		if (SUCCEEDED(hr))
+		{
+			IShellItem *pItem;
+			hr = pFileOpen->GetResult(&pItem);
+			if (SUCCEEDED(hr))
+			{
+				hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+				// Display the file name to the user.
+				if (SUCCEEDED(hr))
+				{
+					wFilePath = pszFilePath;
+
+					//LoadNewTextureFromFile(wFilePath); -- INLINED
+					//if (onlyPreview == false)
+					//	BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, *m_externalTexture, *m_externalTextureView);
+
+					CoTaskMemFree(pszFilePath);
+				}
+				pItem->Release();
+			}
+		}
+		pFileOpen->Release();
+	}
+
+	if (wFilePath != NULL)
+	{
+		std::wstring ws(wFilePath);
+		std::string str(ws.begin(), ws.end());
+		return str;
+	}
+
+	return "";
 }

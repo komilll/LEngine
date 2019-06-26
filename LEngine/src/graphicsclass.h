@@ -159,6 +159,8 @@ public:
 	bool MouseAboveEditorPreview();
 	std::pair<float, float> GetCurrentMousePosition();
 
+	void SaveScene(const std::string name);
+
 private:
 	bool Render();
 	bool RenderScene();
@@ -215,7 +217,6 @@ private:
 	static float lerp(float a, float b, float val);
 
 	//Saving/Loading scene
-	void SaveScene(const std::string name);
 	void LoadScene(const std::string name);
 
 private:

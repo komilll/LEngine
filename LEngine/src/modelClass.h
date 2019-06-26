@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cctype>
 #include "json11.hpp"
+#include <shlobj.h>
 
 using namespace DirectX;
 
@@ -58,6 +59,9 @@ public:
 
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 position);
+	void SetScale(float x, float y, float z);
+	void SetRotation(float x, float y, float z);
+
 	XMFLOAT4 GetPosition();
 	XMFLOAT3 GetScale();
 	XMFLOAT3 GetRotation();
@@ -68,6 +72,9 @@ public:
 
 	std::string GetModelFilename() const;
 	std::string GetSaveData() const;
+	void LoadData();
+	static ModelClass* LoadModel(ID3D11Device* d3d);
+	void LoadModel();
 
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
@@ -89,6 +96,7 @@ private:
 
 	bool is_number(const std::string& s);
 	void LoadNewIndex(std::string line, int& vIndex, int& vtIndex, int& vnIndex);
+	std::string LoadModelCalculatePath();
 
 public:
 	std::string m_name;
@@ -96,6 +104,7 @@ public:
 
 private:
 	std::string m_modelFilename;
+	ID3D11Device* m_device;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	float m_position[4]{ 0.0f, 0.0f, 0.0f, 0.0f};

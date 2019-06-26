@@ -145,8 +145,12 @@ bool SystemClass::Frame()
 			MessageHandler(m_hwnd, WM_KEYUP, 17, -1);
 	}
 
-	if(m_Input->IsKeyDown(VK_ESCAPE))
+	if (m_Input->IsKeyDown(VK_ESCAPE))
+	{
+		if (m_Graphics)
+			m_Graphics->SaveScene("test.txt");
 		return false;
+	}
 
 	if (m_Input->IsKeyDown(VK_TAB))
 	{

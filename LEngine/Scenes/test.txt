@@ -1,1 +1,0 @@
-{"modelName": "ö:\\Users\\Kamil\\Documents\\Visual Studio 2015\\Projects\\LEngine\\LEngine\\bunny.obj", "position": [0, 0, 0], "rotation": [180, 60, 45], "scale": [1, 3.190000057220459, 2.0799999237060547], "sceneName": "Test_Name"}

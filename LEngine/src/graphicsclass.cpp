@@ -1463,16 +1463,33 @@ bool GraphicsClass::RenderGUI()
 		ImGui::InputFloat3("Position", m_selectedModel->GetPositionRef(), "%.2f");
 		ImGui::SliderFloat3("Scale", m_selectedModel->GetScaleRef(), 0.0f, 5.0f, "%.2f");
 		ImGui::SliderFloat3("Rotation", m_selectedModel->GetRotationRef(), 0.0f, 180.0f, "%.1f");
+		if (ImGui::InputText("Name", const_cast<char*>(m_selectedModel->m_name.data()), 30))
+		{
+			m_selectedModel->SaveVisibleName();
+		}
 		if (ImGui::Button("Load model"))
 		{
 			m_selectedModel->LoadModel();
+		}
+		if (ImGui::Button("Delete model"))
+		{
+			m_sceneModels.erase(std::find(m_sceneModels.begin(), m_sceneModels.end(), m_selectedModel));
+			if (m_selectedModel)
+			{
+				delete m_selectedModel;
+				m_selectedModel = nullptr;
+			}
 		}
 	}
 	else
 	{
 		if (ImGui::Button("Add model"))
 		{
-			m_sceneModels.push_back(std::move(ModelClass::LoadModel(m_D3D->GetDevice())));
+			ModelClass* model = new ModelClass;
+			if (model->Initialize(m_D3D->GetDevice(), model->LoadModelCalculatePath().c_str()))
+			{
+				m_sceneModels.push_back(std::move(model));
+			}
 		}
 	}
 

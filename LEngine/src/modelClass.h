@@ -19,6 +19,7 @@
 #include <cctype>
 #include "json11.hpp"
 #include <shlobj.h>
+#include <sstream>
 
 using namespace DirectX;
 
@@ -70,11 +71,14 @@ public:
 	float* GetScaleRef();
 	float* GetRotationRef();
 
+	std::string GetName() const;
 	std::string GetModelFilename() const;
 	std::string GetSaveData() const;
 	void LoadData();
 	static ModelClass* LoadModel(ID3D11Device* d3d);
 	void LoadModel();
+	std::string LoadModelCalculatePath();
+	void SaveVisibleName();
 
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
@@ -96,13 +100,13 @@ private:
 
 	bool is_number(const std::string& s);
 	void LoadNewIndex(std::string line, int& vIndex, int& vtIndex, int& vnIndex);
-	std::string LoadModelCalculatePath();
 
 public:
 	std::string m_name;
 	bool m_selected;
 
 private:
+	std::string m_savedName;
 	std::string m_modelFilename;
 	ID3D11Device* m_device;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

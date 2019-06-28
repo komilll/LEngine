@@ -134,6 +134,11 @@ float* ModelClass::GetRotationRef()
 	return &m_rotation[0];
 }
 
+std::string ModelClass::GetName() const
+{
+	return m_savedName;
+}
+
 std::string ModelClass::GetModelFilename() const
 {
 	return m_modelFilename;
@@ -143,7 +148,7 @@ std::string ModelClass::GetSaveData() const
 {
 	json11::Json obj = json11::Json::object{
 		{"modelName", m_modelFilename},
-		{"sceneName", m_name}, 
+		{"sceneName", m_savedName}, 
 		{"position", json11::Json::array{m_position[0], m_position[1], m_position[2]}},
 		{"scale", json11::Json::array{m_scale[0], m_scale[1], m_scale[2]}},
 		{"rotation", json11::Json::array{m_rotation[0], m_rotation[1], m_rotation[2]}}
@@ -800,6 +805,7 @@ std::string ModelClass::LoadModelCalculatePath()
 {
 	PWSTR pszFilePath;
 	wchar_t* wFilePath = 0;
+	std::wstringstream ss;
 	IFileOpenDialog *pFileOpen;
 	const COMDLG_FILTERSPEC objSpec = { L"OBJ (Wavefront .obj)", L"*.obj" };
 	const COMDLG_FILTERSPEC rgSpec[] = { objSpec };
@@ -828,7 +834,7 @@ std::string ModelClass::LoadModelCalculatePath()
 				// Display the file name to the user.
 				if (SUCCEEDED(hr))
 				{
-					wFilePath = pszFilePath;
+					ss << pszFilePath;
 
 					//LoadNewTextureFromFile(wFilePath); -- INLINED
 					//if (onlyPreview == false)
@@ -842,12 +848,25 @@ std::string ModelClass::LoadModelCalculatePath()
 		pFileOpen->Release();
 	}
 
-	if (wFilePath != NULL)
+	if (ss)
 	{
-		std::wstring ws(wFilePath);
-		std::string str(ws.begin(), ws.end());
-		return str;
+		const std::wstring ws = ss.str();
+		const std::string str(ws.begin(), ws.end());
+
+		const std::size_t found = str.find_last_of("/\\");
+		return str.substr(found + 1);;
 	}
 
 	return "";
+}
+
+void ModelClass::SaveVisibleName()
+{
+	//Really bad but needed due to using string.data() in ImGui in graphicsclass.cpp
+	m_savedName = "";
+	m_name.resize(30);
+	for (int i = 0; i < strlen(m_name.data()); ++i)
+	{
+		m_savedName += m_name.data()[i];
+	}
 }

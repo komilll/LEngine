@@ -29,6 +29,7 @@ using namespace DirectX;
 class ModelClass
 {
 private:
+	struct Bounds;
 	struct VertexType
 	{
 		XMFLOAT3 position;
@@ -61,15 +62,18 @@ public:
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 position);
 	void SetScale(float x, float y, float z);
+	void SetScale(XMFLOAT3 scale);
 	void SetRotation(float x, float y, float z);
 
-	XMFLOAT4 GetPosition();
-	XMFLOAT3 GetScale();
-	XMFLOAT3 GetRotation();
+	XMFLOAT4 GetPosition() const;
+	XMFLOAT3 GetPositionXYZ() const;
+	XMFLOAT3 GetScale() const;
+	XMFLOAT3 GetRotation() const;
 
 	float* GetPositionRef();
 	float* GetScaleRef();
 	float* GetRotationRef();
+	ModelClass::Bounds& GetBounds() { return bounds; };
 
 	std::string GetName() const;
 	std::string GetModelFilename() const;
@@ -100,6 +104,7 @@ private:
 
 	bool is_number(const std::string& s);
 	void LoadNewIndex(std::string line, int& vIndex, int& vtIndex, int& vnIndex);
+	void CalculateAxisBound(float & min, float & max, std::vector<float>& elements) const;
 
 public:
 	std::string m_name;
@@ -114,6 +119,41 @@ private:
 	float m_position[4]{ 0.0f, 0.0f, 0.0f, 0.0f};
 	float m_scale[3] { 1.0f, 1.0f, 1.0f };
 	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
+
+	struct Bounds {
+	public:
+		float minX;
+		float maxX;
+		float minY;
+		float maxY;
+		float minZ;
+		float maxZ;
+
+		float GetSizeX() const {
+			return (maxX - minX);
+		}
+		float GetSizeY() const {
+			return (maxY - minY);
+		}
+		float GetSizeZ() const {
+			return (maxZ - minZ);
+		}
+
+		float GetCenterX() const {
+			return minX + (maxX - minX) * 0.5f;
+		}
+		float GetCenterY() const {
+			return minY + (maxY - minY) * 0.5f;
+		}
+		float GetCenterZ() const {
+			return minZ + (maxZ - minZ) * 0.5f;
+		}
+
+		XMFLOAT3 GetCenter() const {
+			return{ GetCenterX(), GetCenterY(), GetCenterZ() };
+		}
+	};
+	Bounds bounds;
 
 	struct PrimitiveModel
 	{

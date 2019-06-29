@@ -178,6 +178,12 @@
     <None Include="uitexture.vs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="modelpicker.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="modelpicker.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\UITick.h">
@@ -330,6 +336,9 @@
     <ClInclude Include="src\json11.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ModelPickerShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -471,6 +480,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\json11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelPickerShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

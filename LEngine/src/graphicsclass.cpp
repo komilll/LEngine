@@ -619,6 +619,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma endregion
 
 	LoadScene("test.txt");
+	m_modelPicker = new ModelPicker(m_D3D->GetDevice(), *m_D3D->GetHWND(), input, m_directionalLight->GetPosition(), tempMatrixView, tempMatrixProj);
 	return true;
 }
 
@@ -1103,6 +1104,12 @@ bool GraphicsClass::RenderScene()
 		model->Render(m_D3D->GetDeviceContext());
 		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
+			return false;
+
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
 			return false;
 	}
 

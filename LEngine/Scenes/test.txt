@@ -1,0 +1,1 @@
+{"modelName": "bunny.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [5, 5, 5], "sceneName": ""}

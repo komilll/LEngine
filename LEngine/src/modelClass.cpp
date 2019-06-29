@@ -97,6 +97,11 @@ void ModelClass::SetScale(float x, float y, float z)
 	m_scale[2] = z;
 }
 
+void ModelClass::SetScale(XMFLOAT3 scale)
+{
+	SetScale(scale.x, scale.y, scale.z);
+}
+
 void ModelClass::SetRotation(float x, float y, float z)
 {
 	m_rotation[0] = x;
@@ -104,17 +109,22 @@ void ModelClass::SetRotation(float x, float y, float z)
 	m_rotation[2] = z;
 }
 
-XMFLOAT4 ModelClass::GetPosition()
+XMFLOAT4 ModelClass::GetPosition() const
 {
 	return{ m_position[0], m_position[1], m_position[2], m_position[3] };
 }
 
-XMFLOAT3 ModelClass::GetScale()
+XMFLOAT3 ModelClass::GetPositionXYZ() const
+{
+	return{ m_position[0], m_position[1], m_position[2] };
+}
+
+XMFLOAT3 ModelClass::GetScale() const
 {
 	return{ m_scale[0], m_scale[1], m_scale[2] };
 }
 
-XMFLOAT3 ModelClass::GetRotation()
+XMFLOAT3 ModelClass::GetRotation() const
 {
 	return{ m_rotation[0], m_rotation[1], m_rotation[2] };
 }
@@ -200,6 +210,10 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 #pragma region Read and save data from file
 	if (!ReadBinary(modelFilename, verticesVector, indicesVec))
 	{
+		std::vector<float> positionAxis_X;
+		std::vector<float> positionAxis_Y;
+		std::vector<float> positionAxis_Z;
+
 		if (std::ifstream input{ modelFilename, std::ios::binary })
 		{
 			std::string x, y, z;
@@ -214,7 +228,14 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 				if (type == "v")
 				{
 					input >> x >> y >> z;
-					vertexPosition.push_back(DirectX::XMFLOAT3(std::stof(x), std::stof(y), std::stof(z)));
+					const float xPos = std::stof(x);
+					const float yPos = std::stof(y);
+					const float zPos = std::stof(z);
+
+					vertexPosition.push_back(DirectX::XMFLOAT3(xPos, yPos, zPos));
+					positionAxis_X.emplace_back(xPos);
+					positionAxis_Y.emplace_back(yPos);
+					positionAxis_Z.emplace_back(zPos);
 				}
 				else if (type == "vt")
 				{
@@ -234,6 +255,11 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 				vertices[i].position = vertexPosition.at(i);
 			}
 		}
+
+		CalculateAxisBound(bounds.minX, bounds.maxX, positionAxis_X);
+		CalculateAxisBound(bounds.minY, bounds.maxY, positionAxis_Y);
+		CalculateAxisBound(bounds.minZ, bounds.maxZ, positionAxis_Z);
+
 			////////// FEEDING INDICES WITH DATA /////////
 		if (std::ifstream input{ modelFilename, std::ios::binary })
 		{
@@ -541,6 +567,14 @@ void ModelClass::SaveBinary(const char* modelFilename, std::vector<VertexType> &
 	for (const auto& val : vertexIndices)
 		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
 
+	//Save bounds AABB
+	output.write(reinterpret_cast<const char*>(&bounds.maxX), sizeof(bounds.maxX));
+	output.write(reinterpret_cast<const char*>(&bounds.maxY), sizeof(bounds.maxY));
+	output.write(reinterpret_cast<const char*>(&bounds.maxZ), sizeof(bounds.maxZ));
+	output.write(reinterpret_cast<const char*>(&bounds.minX), sizeof(bounds.minX));
+	output.write(reinterpret_cast<const char*>(&bounds.minZ), sizeof(bounds.minY));
+	output.write(reinterpret_cast<const char*>(&bounds.minY), sizeof(bounds.minZ));
+
 	output.clear();
 	output.close();
 }
@@ -573,6 +607,14 @@ bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &
 		input.read(reinterpret_cast<char*>(&valIndices), sizeof(valIndices));
 		vertexIndices.push_back(valIndices);
 	}
+
+	//Load bounds AABB
+	input.read(reinterpret_cast<char*>(&bounds.maxX), sizeof(bounds.maxX));
+	input.read(reinterpret_cast<char*>(&bounds.maxY), sizeof(bounds.maxY));
+	input.read(reinterpret_cast<char*>(&bounds.maxZ), sizeof(bounds.maxZ));
+	input.read(reinterpret_cast<char*>(&bounds.minX), sizeof(bounds.minX));
+	input.read(reinterpret_cast<char*>(&bounds.minZ), sizeof(bounds.minY));
+	input.read(reinterpret_cast<char*>(&bounds.minY), sizeof(bounds.minZ));
 
 	input.clear();
 	input.close();
@@ -799,6 +841,17 @@ bool ModelClass::is_number(const std::string & s)
 void ModelClass::LoadNewIndex(std::string line, int & vIndex, int & vtIndex, int & vnIndex)
 {
 
+}
+
+void ModelClass::CalculateAxisBound(float & min, float & max, std::vector<float>& elements) const
+{
+	if (elements.size() > 0)
+	{
+		std::vector<float>::iterator maxIt = std::max_element(elements.begin(), elements.end());
+		std::vector<float>::iterator minIt = std::min_element(elements.begin(), elements.end());		
+		max = elements.at(std::distance(elements.begin(), maxIt));
+		min = elements.at(std::distance(elements.begin(), minIt));
+	}
 }
 
 std::string ModelClass::LoadModelCalculatePath()

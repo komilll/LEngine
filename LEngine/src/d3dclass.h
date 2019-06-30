@@ -19,6 +19,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <exception>
+#include "BaseShaderClass.h"
 using namespace DirectX;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +72,11 @@ public:
 	void TurnZBufferOn();
 	void TurnZBufferOff();
 
+	void DisableDepthTesting();
+	void EnableDepthTesting();
+
 	void ResetViewport();
+	BaseShaderClass::vertexInputType GetBaseInputType();
 
 	WindowSize GetWindowSize();
 

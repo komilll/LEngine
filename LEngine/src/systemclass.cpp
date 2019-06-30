@@ -356,6 +356,11 @@ void SystemClass::HandleInput()
 			m_Graphics->MoveCameraUp(movementPerTick);
 		if (m_Input->IsKeyDown(VK_Q))
 			m_Graphics->MoveCameraDown(movementPerTick);
+
+		if (m_Mouse->GetLMBPressed())
+		{
+			m_Graphics->TryRayPick();
+		}
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())
 	{

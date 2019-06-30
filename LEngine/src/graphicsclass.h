@@ -124,36 +124,31 @@ private:
 	class ModelPicker
 	{
 	public:
-		ModelPicker(ID3D11Device* device, HWND hwnd, BaseShaderClass::vertexInputType input, XMFLOAT3 lightPosition, XMMATRIX& lightViewM, XMMATRIX& lightProjM)
+		ModelPicker(D3DClass* d3d)
 		{
 			m_colorShader = new ModelPickerShader;
-			m_colorShader->Initialize(device, hwnd, L"modelpicker.vs", L"modelpicker.ps", input);			
-			//m_colorShader->SetLightPosition(lightPosition);
-			//m_colorShader->SetLightViewProjection(lightViewM, lightProjM);
+			m_colorShader->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"modelpicker.vs", L"modelpicker.ps", d3d->GetBaseInputType());
 
 			m_axisX = new ModelClass;
-			m_axisX->Initialize(device, modelName.c_str());			
-			m_axisX->SetScale({scale.x - 0.001f, scale.y - 0.001f, scale.z - 0.001f });
+			m_axisX->Initialize(d3d, modelName.c_str());
+			m_axisX->SetScale({ scale.x - 0.001f, scale.y - 0.001f, scale.z - 0.001f });
 
 			m_axisY = new ModelClass;
-			m_axisY->Initialize(device, modelName.c_str());
+			m_axisY->Initialize(d3d, modelName.c_str());
 			m_axisY->SetScale(scale);
 
 			m_axisZ = new ModelClass;
-			m_axisZ->Initialize(device, modelName.c_str());
+			m_axisZ->Initialize(d3d, modelName.c_str());
 			m_axisZ->SetScale({ scale.x - 0.001f, scale.y, scale.z });
 		}
 
 		bool Render(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix, ModelClass* mainModel)
 		{
 			{
-				const float pos = mainModel->GetPositionXYZ().x;
-				const float center = mainModel->GetBounds().GetCenterX();
-				const float size = mainModel->GetBounds().GetSizeX();
+				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x,
+					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
+					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
 
-				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + m_axisX->GetBounds().GetSizeX() * 0.5f /*+ mainModel->GetBounds().GetCenterX()*//* + mainModel->GetBounds().GetSizeX()*/,
-					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() ,
-					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() };
 				m_colorShader->ChangeColor(1.0f, 0.0f, 0.0f);
 				XMMATRIX view = viewMatrix;
 				XMMATRIX proj = projectionMatrix;
@@ -166,40 +161,76 @@ private:
 					return false;
 			}
 
-			//{
-			//	const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
-			//		mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY(),
-			//		mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeX() };
-			//	m_colorShader->ChangeColor(0.0f, 1.0f, 0.0f);
-			//	XMMATRIX view = viewMatrix;
-			//	XMMATRIX proj = projectionMatrix;
-			//	XMMATRIX yMatrix = worldMatrix;
-			//	yMatrix = XMMatrixMultiply(yMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
-			//	yMatrix = XMMatrixMultiply(yMatrix, XMMatrixRotationY(0.0174532925f * 90.0f));
-			//	yMatrix = XMMatrixMultiply(yMatrix, XMMatrixTranslation(position.x, position.y, position.z));
-			//	m_axisY->Render(deviceContext);
-			//	if (!m_colorShader->Render(deviceContext, m_axisY->GetIndexCount(), yMatrix, view, proj))
-			//		return false;
-			//}
+			{
+				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f,
+					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
+					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x };
 
-			//{
-			//	const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
-			//		mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeX(),
-			//		mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ()};
-			//	m_colorShader->ChangeColor(0.0f, 0.0f, 1.0f);
-			//	XMMATRIX view = viewMatrix;
-			//	XMMATRIX proj = projectionMatrix;
-			//	XMMATRIX zMatrix = worldMatrix;
-			//	zMatrix = XMMatrixMultiply(zMatrix, DirectX::XMMatrixScaling(m_axisZ->GetScale().x, m_axisZ->GetScale().y, m_axisZ->GetScale().z));
-			//	zMatrix = XMMatrixMultiply(zMatrix, XMMatrixRotationZ(0.0174532925f * 90.0f));
-			//	zMatrix = XMMatrixMultiply(zMatrix, XMMatrixTranslation(position.x, position.y, position.z));
-			//	m_axisZ->Render(deviceContext);
-			//	if (!m_colorShader->Render(deviceContext, m_axisZ->GetIndexCount(), zMatrix, view, proj))
-			//		return false;
-			//}
+				m_colorShader->ChangeColor(0.0f, 1.0f, 0.0f);
+				XMMATRIX view = viewMatrix;
+				XMMATRIX proj = projectionMatrix;
+				XMMATRIX yMatrix = worldMatrix;
+				yMatrix = XMMatrixMultiply(yMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
+				yMatrix = XMMatrixMultiply(yMatrix, XMMatrixRotationY(0.0174532925f * 90.0f));
+				yMatrix = XMMatrixMultiply(yMatrix, XMMatrixTranslation(position.x, position.y, position.z));
+				m_axisY->Render(deviceContext);
+				if (!m_colorShader->Render(deviceContext, m_axisY->GetIndexCount(), yMatrix, view, proj))
+					return false;
+			}
+
+			{
+				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f,
+					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x,
+					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+
+				m_colorShader->ChangeColor(0.0f, 0.0f, 1.0f);
+				XMMATRIX view = viewMatrix;
+				XMMATRIX proj = projectionMatrix;
+				XMMATRIX zMatrix = worldMatrix;
+				zMatrix = XMMatrixMultiply(zMatrix, DirectX::XMMatrixScaling(m_axisZ->GetScale().x, m_axisZ->GetScale().y, m_axisZ->GetScale().z));
+				zMatrix = XMMatrixMultiply(zMatrix, XMMatrixRotationZ(0.0174532925f * 90.0f));
+				zMatrix = XMMatrixMultiply(zMatrix, XMMatrixTranslation(position.x, position.y, position.z));
+				m_axisZ->Render(deviceContext);
+				if (!m_colorShader->Render(deviceContext, m_axisZ->GetIndexCount(), zMatrix, view, proj))
+					return false;
+			}
 
 			return true;
 		}
+
+		XMFLOAT3 ModelPicker::GetMinBounds(ModelClass* mainModel, XMMATRIX& worldMatrix) {
+			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x,
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+			XMMATRIX xMatrix = worldMatrix;
+			xMatrix = XMMatrixMultiply(xMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
+			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixRotationX(0.0174532925f * 90.0f));
+			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixTranslation(position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]));
+
+			XMVECTOR vec = XMVector4Transform(position, xMatrix);
+			return{ position.m128_f32[0], position.m128_f32[1], position.m128_f32[2] };
+		}
+
+		XMFLOAT3 ModelPicker::GetMaxBounds(ModelClass* mainModel, XMMATRIX& worldMatrix) {
+			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f + m_axisX->GetBounds().GetSizeX() * 1.5f * scale.x,
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+			XMMATRIX xMatrix = worldMatrix;
+			xMatrix = XMMatrixMultiply(xMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
+			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixRotationX(0.0174532925f * 90.0f));
+			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixTranslation(position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]));
+
+			XMVECTOR vec = XMVector4Transform(position, xMatrix);
+			return{ position.m128_f32[0], position.m128_f32[1], position.m128_f32[2] };
+		}
+
+	private:
+		XMFLOAT3 BaseBounds(ModelClass* mainModel) {
+			return XMFLOAT3{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f,
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+		}
+
 
 	public:
 		ModelClass* m_axisX;
@@ -208,8 +239,9 @@ private:
 	private:
 		ModelPickerShader* m_colorShader;
 		const std::string modelName = "cube_test.obj";
-		const float scaleMult = 1.0f;
-		const XMFLOAT3 scale = { 1.0f * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
+		const float scaleMult = 0.5f;
+		const float pickerLength = 0.5f;
+		const XMFLOAT3 scale = { pickerLength * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
 	};
 
 public:
@@ -252,6 +284,7 @@ public:
 	std::pair<float, float> GetCurrentMousePosition();
 
 	void SaveScene(const std::string name);
+	void TryRayPick();
 
 private:
 	bool Render();

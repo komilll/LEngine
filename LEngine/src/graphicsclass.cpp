@@ -64,7 +64,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Initialize the model object.
-	result = m_skyboxModel->Initialize(m_D3D->GetDevice(), "sphere.obj");
+	result = m_skyboxModel->Initialize(m_D3D, "sphere.obj", false);
 	if (!result)
 		return false;
 
@@ -81,7 +81,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//secondBunny->m_name = "Second Bunny";
 	//m_sceneModels.push_back(secondBunny);
 
-	result = m_cubeModel->Initialize(m_D3D->GetDevice(), "cube.obj");
+	result = m_cubeModel->Initialize(m_D3D, "cube.obj");
 	if (!result)
 		return false;
 
@@ -105,19 +105,20 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 #pragma region PBR Shader loading
 	//Create input format for vertex data
-	std::vector <LPCSTR> names;
-	names.push_back("position");
-	names.push_back("texcoord");
-	names.push_back("normal");
-	names.push_back("tangent");
-	names.push_back("binormal");
-	std::vector <DXGI_FORMAT> formats;
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	BaseShaderClass::vertexInputType input(names, formats);
+	BaseShaderClass::vertexInputType input = m_D3D->GetBaseInputType();
+	//std::vector <LPCSTR> names;
+	//names.push_back("position");
+	//names.push_back("texcoord");
+	//names.push_back("normal");
+	//names.push_back("tangent");
+	//names.push_back("binormal");
+	//std::vector <DXGI_FORMAT> formats;
+	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	//formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
+	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	//BaseShaderClass::vertexInputType input(names, formats);
 
 	if (!(m_pbrShader = new ShaderPBRGenerated))
 		return false;
@@ -619,7 +620,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma endregion
 
 	LoadScene("test.txt");
-	m_modelPicker = new ModelPicker(m_D3D->GetDevice(), *m_D3D->GetHWND(), input, m_directionalLight->GetPosition(), tempMatrixView, tempMatrixProj);
+	m_modelPicker = new ModelPicker(m_D3D);
 	return true;
 }
 
@@ -1105,12 +1106,6 @@ bool GraphicsClass::RenderScene()
 		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
-
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
-			return false;
 	}
 
 	if (DRAW_SKYBOX)
@@ -1285,6 +1280,18 @@ bool GraphicsClass::RenderScene()
 		m_bloomShader->m_bloomTexture = nullptr;
 		m_bloomShader->m_bloomTextureView = nullptr;
 	}
+
+	//Draw model picker
+	m_D3D->TurnZBufferOff();
+	for (ModelClass* const& model : m_sceneModels)
+	{
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
+			return false;
+	}
+	m_D3D->TurnZBufferOn();
 
 	return true;
 }
@@ -1493,7 +1500,7 @@ bool GraphicsClass::RenderGUI()
 		if (ImGui::Button("Add model"))
 		{
 			ModelClass* model = new ModelClass;
-			if (model->Initialize(m_D3D->GetDevice(), model->LoadModelCalculatePath().c_str()))
+			if (model->Initialize(m_D3D, model->LoadModelCalculatePath().c_str()))
 			{
 				m_sceneModels.push_back(std::move(model));
 			}
@@ -2848,6 +2855,76 @@ void GraphicsClass::SaveScene(const std::string name)
 	}
 }
 
+void GraphicsClass::TryRayPick()
+{
+	//Go to [-1, 1] coordinates
+	float x = GetCurrentMousePosition().first;
+	float y = GetCurrentMousePosition().second;
+	//x = 2.0f * x - 1.0f;
+	//y = 2.0f * y;
+
+	XMMATRIX viewMatrix;
+	XMMATRIX projectionMatrix;
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_Camera->GetViewMatrix(viewMatrix);
+	XMMATRIX unviewMatrix = DirectX::XMMatrixMultiply(viewMatrix, projectionMatrix);
+	unviewMatrix = DirectX::XMMatrixInverse(nullptr, unviewMatrix);
+	
+	XMVECTOR mouseWorldspace = XMVector4Transform({x, y, 0.0f, 1}, unviewMatrix);
+	XMVECTOR cameraPos = unviewMatrix.r[2];
+
+	XMVECTOR rayDirVector = XMVector4Normalize(mouseWorldspace - cameraPos);
+	XMFLOAT3 rayDir = { rayDirVector.m128_f32[0], rayDirVector.m128_f32[1], rayDirVector.m128_f32[2] };
+	XMFLOAT3 origin = { cameraPos.m128_f32[0], cameraPos.m128_f32[1], cameraPos.m128_f32[2] };
+
+	//Try to raycast objects AABB
+	XMFLOAT3 dirfrac = { 1.0f / rayDir.x, 1.0f / rayDir.y, 1.0f / rayDir.z };
+
+	for (const auto& model : m_sceneModels)
+	{
+		XMFLOAT3 lb = { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
+		XMFLOAT3 rt = { model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
+
+		//XMMATRIX world;
+		//m_D3D->GetWorldMatrix(world);
+		//XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, world);
+
+		//m_D3D->GetWorldMatrix(world);
+		//XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, world);
+
+		//XMFLOAT3 center = { model->GetBounds().GetCenter() };
+
+		const float t1 = (lb.x - origin.x)*dirfrac.x;
+		const float t2 = (rt.x - origin.x)*dirfrac.x;
+		const float t3 = (lb.y - origin.y)*dirfrac.y;
+		const float t4 = (rt.y - origin.y)*dirfrac.y;
+		const float t5 = (lb.z - origin.z)*dirfrac.z;
+		const float t6 = (rt.z - origin.z)*dirfrac.z;
+
+		const float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+		const float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+
+		// if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+		if (tmax < 0)
+		{
+			//t = tmax;
+			continue;
+		}
+
+		// if tmin > tmax, ray doesn't intersect AABB
+		if (tmin > tmax)
+		{
+			//t = tmax;
+			continue;
+		}
+
+		static int i = 0;
+		i++;
+		//t = tmin;
+		//return true;
+	}
+}
+
 void GraphicsClass::LoadScene(const std::string name)
 {
 	std::string line;
@@ -2861,7 +2938,7 @@ void GraphicsClass::LoadScene(const std::string name)
 			if (modelName != "")
 			{
 				ModelClass* model = new ModelClass;
-				if (model->Initialize(m_D3D->GetDevice(), (modelName + ".obj").c_str()))
+				if (model->Initialize(m_D3D, (modelName + ".obj").c_str()))
 				{
 					const std::string sceneName = json["sceneName"].string_value();
 					const json11::Json::array position = json["position"].array_items();

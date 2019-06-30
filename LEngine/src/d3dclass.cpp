@@ -292,8 +292,11 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_NEVER;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	depthStencilDesc.DepthEnable = false;
+	depthStencilDesc.StencilEnable = false;
 	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilStateZBufferOff);
 	if (FAILED(result))
 	{
@@ -647,9 +650,49 @@ void D3DClass::TurnZBufferOff()
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilStateZBufferOff, 1);
 }
 
+void D3DClass::DisableDepthTesting()
+{
+	ID3D11DepthStencilState* stencil;
+	D3D11_DEPTH_STENCIL_DESC desc;
+	
+	m_deviceContext->OMGetDepthStencilState(&stencil, 0);
+	stencil->GetDesc(&desc);
+
+	desc.DepthEnable = static_cast<BOOL>(false);
+	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	desc.DepthFunc = D3D11_COMPARISON_NEVER;
+	desc.StencilEnable = static_cast<BOOL>(false);
+
+	m_deviceContext->OMSetDepthStencilState(stencil, 1);
+}
+
+void D3DClass::EnableDepthTesting()
+{
+	ID3D11DepthStencilState* stencil;
+	D3D11_DEPTH_STENCIL_DESC desc;
+
+	m_deviceContext->OMGetDepthStencilState(&stencil, 0);
+	stencil->GetDesc(&desc);
+
+	desc.DepthEnable = static_cast<BOOL>(true);
+	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	desc.DepthFunc = D3D11_COMPARISON_LESS;
+	desc.StencilEnable = static_cast<BOOL>(true);
+
+	m_deviceContext->OMSetDepthStencilState(stencil, 1);
+}
+
 void D3DClass::ResetViewport()
 {
 	m_deviceContext->RSSetViewports(1, &m_viewport);
+}
+
+BaseShaderClass::vertexInputType D3DClass::GetBaseInputType()
+{
+	static std::vector<LPCSTR> names{ "position", "texcoord", "normal", "tangent", "binormal" };
+	static std::vector<DXGI_FORMAT> formats{ DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
+
+	return{ names, formats };
 }
 
 D3DClass::WindowSize D3DClass::GetWindowSize()

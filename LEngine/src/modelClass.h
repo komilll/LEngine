@@ -20,6 +20,8 @@
 #include "json11.hpp"
 #include <shlobj.h>
 #include <sstream>
+#include "ModelPickerShader.h"
+#include "d3dclass.h"
 
 using namespace DirectX;
 
@@ -51,7 +53,7 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device* device, const char* modelFilename);
+	bool Initialize(D3DClass * d3d, const char* modelFilename, bool pickable = true);
 	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false, float borderWidth = 0.007f);
 	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 	void Shutdown();
@@ -79,7 +81,7 @@ public:
 	std::string GetModelFilename() const;
 	std::string GetSaveData() const;
 	void LoadData();
-	static ModelClass* LoadModel(ID3D11Device* d3d);
+	static ModelClass* LoadModel(D3DClass * d3d);
 	void LoadModel();
 	std::string LoadModelCalculatePath();
 	void SaveVisibleName();
@@ -119,6 +121,7 @@ private:
 	float m_position[4]{ 0.0f, 0.0f, 0.0f, 0.0f};
 	float m_scale[3] { 1.0f, 1.0f, 1.0f };
 	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
+	D3DClass* m_D3D;
 
 	struct Bounds {
 	public:
@@ -199,5 +202,4 @@ private:
 	};
 	PrimitiveModel m_primitiveModel;
 };
-
 #endif

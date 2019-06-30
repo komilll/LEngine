@@ -21,11 +21,12 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D11Device* device, const char* modelFilename)
+bool ModelClass::Initialize(D3DClass* d3d, const char * modelFilename, bool pickable)
 {
-	m_device = device;
+	m_D3D = d3d;
+	m_device = d3d->GetDevice();
 	m_modelFilename = modelFilename;
-	if(!InitializeBuffers(device, modelFilename))
+	if (!InitializeBuffers(m_device, modelFilename))
 		return false;
 
 	return true;
@@ -171,7 +172,7 @@ void ModelClass::LoadData()
 
 }
 
-ModelClass* ModelClass::LoadModel(ID3D11Device * d3d)
+ModelClass* ModelClass::LoadModel(D3DClass * d3d)
 {
 	ModelClass* model = new ModelClass();
 	model->Initialize(d3d, model->LoadModelCalculatePath().c_str());
@@ -183,7 +184,7 @@ void ModelClass::LoadModel()
 {
 	if (m_device)
 	{
-		Initialize(m_device, LoadModelCalculatePath().c_str());
+		Initialize(m_D3D, LoadModelCalculatePath().c_str());
 	}
 }
 
@@ -206,6 +207,11 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	std::vector<int> texIndices;
 	std::vector<int> normalIndices;
 	std::vector<unsigned long> indicesVec;
+
+	std::string filename = modelFilename;
+	const std::size_t lastPos = filename.find(".obj");
+	filename.erase(lastPos + 4);
+	modelFilename = filename.c_str();
 
 #pragma region Read and save data from file
 	if (!ReadBinary(modelFilename, verticesVector, indicesVec))
@@ -585,40 +591,36 @@ bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &
 	newFilename = newFilename.substr(0, newFilename.find("."));
 	newFilename += ".modelclass";
 
-	std::ifstream input("Models/" + newFilename, std::ios::binary);
-
-	if (input.fail())
-		return false;
-
-	VertexType valVertex;
-	long valIndices = 0;
-	int sizeVertices = 0;
-	int sizeIndices = 0;
-	input.read(reinterpret_cast<char*>(&sizeVertices), sizeof(sizeVertices));
-	input.read(reinterpret_cast<char*>(&sizeIndices), sizeof(sizeIndices));
-
-	for (int i = 0; i < sizeVertices; i++)
+	if (std::ifstream input{ "Models/" + newFilename, std::ios::binary })
 	{
-		input.read(reinterpret_cast<char*>(&valVertex), sizeof(valVertex));
-		vertexType.push_back(valVertex);
-	}
-	for (int i = 0; i < sizeIndices; i++)
-	{
-		input.read(reinterpret_cast<char*>(&valIndices), sizeof(valIndices));
-		vertexIndices.push_back(valIndices);
-	}
+		VertexType valVertex;
+		long valIndices = 0;
+		int sizeVertices = 0;
+		int sizeIndices = 0;
+		input.read(reinterpret_cast<char*>(&sizeVertices), sizeof(sizeVertices));
+		input.read(reinterpret_cast<char*>(&sizeIndices), sizeof(sizeIndices));
 
-	//Load bounds AABB
-	input.read(reinterpret_cast<char*>(&bounds.maxX), sizeof(bounds.maxX));
-	input.read(reinterpret_cast<char*>(&bounds.maxY), sizeof(bounds.maxY));
-	input.read(reinterpret_cast<char*>(&bounds.maxZ), sizeof(bounds.maxZ));
-	input.read(reinterpret_cast<char*>(&bounds.minX), sizeof(bounds.minX));
-	input.read(reinterpret_cast<char*>(&bounds.minZ), sizeof(bounds.minY));
-	input.read(reinterpret_cast<char*>(&bounds.minY), sizeof(bounds.minZ));
+		for (int i = 0; i < sizeVertices; i++)
+		{
+			input.read(reinterpret_cast<char*>(&valVertex), sizeof(valVertex));
+			vertexType.push_back(valVertex);
+		}
+		for (int i = 0; i < sizeIndices; i++)
+		{
+			input.read(reinterpret_cast<char*>(&valIndices), sizeof(valIndices));
+			vertexIndices.push_back(valIndices);
+		}
 
-	input.clear();
-	input.close();
-	return true;
+		//Load bounds AABB
+		input.read(reinterpret_cast<char*>(&bounds.maxX), sizeof(bounds.maxX));
+		input.read(reinterpret_cast<char*>(&bounds.maxY), sizeof(bounds.maxY));
+		input.read(reinterpret_cast<char*>(&bounds.maxZ), sizeof(bounds.maxZ));
+		input.read(reinterpret_cast<char*>(&bounds.minX), sizeof(bounds.minX));
+		input.read(reinterpret_cast<char*>(&bounds.minZ), sizeof(bounds.minY));
+		input.read(reinterpret_cast<char*>(&bounds.minY), sizeof(bounds.minZ));
+		return true;
+	}
+	return false;
 }
 
 /////// SHAPES DRAWING ///////

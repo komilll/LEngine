@@ -47,8 +47,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Set the initial position of the camera.
 	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
 	//m_Camera->SetPosition(0.0f, 5.0f, -15.0f); //SHADOWMAPPING
-	m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
-	MoveCameraForward(1.60f);
+	//m_Camera->SetPosition(0.0f, 0.0f, -2.0f); //SINGLE SPHERE
+	//MoveCameraForward(1.60f);
 	
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -1019,7 +1019,7 @@ bool GraphicsClass::Render()
 
 	if (ENABLE_GUI)
 	{
-		RenderGUI();
+		//RenderGUI();
 	}
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
@@ -1106,6 +1106,9 @@ bool GraphicsClass::RenderScene()
 		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
+
+		XMFLOAT3 lb = { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
+		XMFLOAT3 rt = { model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
 	}
 
 	if (DRAW_SKYBOX)
@@ -2860,6 +2863,15 @@ void GraphicsClass::TryRayPick()
 	//Go to [-1, 1] coordinates
 	float x = GetCurrentMousePosition().first;
 	float y = GetCurrentMousePosition().second;
+	if (x > 1.0f)
+		x = 1.0f;
+	else if (x < -1.0f)
+		x = -1.0f;
+
+	if (y > 1.0f)
+		y = 1.0f;
+	else if (y < -1.0f)
+		y = -1.0f;
 	//x = 2.0f * x - 1.0f;
 	//y = 2.0f * y;
 
@@ -2867,16 +2879,27 @@ void GraphicsClass::TryRayPick()
 	XMMATRIX projectionMatrix;
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_Camera->GetViewMatrix(viewMatrix);
-	XMMATRIX unviewMatrix = DirectX::XMMatrixMultiply(viewMatrix, projectionMatrix);
+	XMMATRIX unviewMatrix = DirectX::XMMatrixMultiply(projectionMatrix, viewMatrix);
 	unviewMatrix = DirectX::XMMatrixInverse(nullptr, unviewMatrix);
 	
-	XMVECTOR mouseWorldspace = XMVector4Transform({x, y, 0.0f, 1}, unviewMatrix);
-	XMVECTOR cameraPos = unviewMatrix.r[2];
+	XMVECTOR mouseWorldspace = XMVector4Transform({x, y, 0.0f, 1.0f}, unviewMatrix);
+	XMVECTOR cameraPos = unviewMatrix.r[3];
+	XMFLOAT3 dest = { mouseWorldspace.m128_f32[0], mouseWorldspace.m128_f32[1], mouseWorldspace.m128_f32[2] };
+	float w = mouseWorldspace.m128_f32[3];
+	dest.x *= w;
+	dest.y *= w;
+	dest.z *= w;
 
-	XMVECTOR rayDirVector = XMVector4Normalize(mouseWorldspace - cameraPos);
+	XMFLOAT3 origin = m_Camera->GetPosition();
+
+	XMVECTOR rayDirVector = XMVector4Normalize({ dest.x - origin.x, dest.y - origin.y, dest.z - origin.z });
 	XMFLOAT3 rayDir = { rayDirVector.m128_f32[0], rayDirVector.m128_f32[1], rayDirVector.m128_f32[2] };
-	XMFLOAT3 origin = { cameraPos.m128_f32[0], cameraPos.m128_f32[1], cameraPos.m128_f32[2] };
 
+	//ModelClass* model = new ModelClass;
+	//model->Initialize(m_D3D, dest, {});
+	//m_sceneModels.push_back(std::move(model));
+
+	//return;
 	//Try to raycast objects AABB
 	XMFLOAT3 dirfrac = { 1.0f / rayDir.x, 1.0f / rayDir.y, 1.0f / rayDir.z };
 

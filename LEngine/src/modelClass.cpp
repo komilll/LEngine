@@ -32,6 +32,44 @@ bool ModelClass::Initialize(D3DClass* d3d, const char * modelFilename, bool pick
 	return true;
 }
 
+bool ModelClass::Initialize(D3DClass * d3d, XMFLOAT3 origin, XMFLOAT3 destination)
+{
+	if (!d3d)
+	{
+		return false;
+	}
+	m_D3D = d3d;
+	m_device = d3d->GetDevice();
+	Initialize(d3d->GetDevice(), ShapeSize::RECTANGLE, -0.25f, 0.25f, 0.25f, -0.25f, true, false);
+	SetPosition(origin);
+	return true;
+	//std::vector<VertexType> verticesVector;
+	//VertexType point{};
+
+	//point.position = origin;
+	//verticesVector.push_back(point);
+	//point.position = XMFLOAT3{ origin.x + 0.1f, origin.y, origin.z };
+	//verticesVector.push_back(point);
+	//point.position = XMFLOAT3{ origin.x + 0.05f, origin.y + 0.1f, origin.z };
+	//verticesVector.push_back(point);
+
+	//constexpr int verticesCount = 3;
+	//VertexType* vertices = new VertexType[verticesCount];
+	//unsigned long* indices = new unsigned long[verticesCount];
+	//for (int i = 0; i < verticesCount; i++)
+	//	indices[i] = i;
+
+	//m_indexCount = verticesCount;
+
+	//if (indices != 0)
+	//{
+	//	if (CreateBuffers(m_device, vertices, indices, verticesCount, verticesCount) == false)
+	//		return false;
+	//}
+
+	//return true;
+}
+
 bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
 {
 	m_device = device;

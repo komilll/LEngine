@@ -1019,7 +1019,7 @@ bool GraphicsClass::Render()
 
 	if (ENABLE_GUI)
 	{
-		//RenderGUI();
+		RenderGUI();
 	}
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
@@ -1083,6 +1083,7 @@ bool GraphicsClass::RenderScene()
 		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
+	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
 	for (ModelClass* const& model : m_sceneModels)
 	{
 		//model->Render(m_D3D->GetDeviceContext());
@@ -1106,10 +1107,8 @@ bool GraphicsClass::RenderScene()
 		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
-
-		XMFLOAT3 lb = { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
-		XMFLOAT3 rt = { model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
 	}
+	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_FRONT);
 
 	if (DRAW_SKYBOX)
 	{
@@ -1285,16 +1284,16 @@ bool GraphicsClass::RenderScene()
 	}
 
 	//Draw model picker
-	m_D3D->TurnZBufferOff();
-	for (ModelClass* const& model : m_sceneModels)
-	{
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
-			return false;
-	}
-	m_D3D->TurnZBufferOn();
+	//m_D3D->TurnZBufferOff();
+	//for (ModelClass* const& model : m_sceneModels)
+	//{
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//	if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
+	//		return false;
+	//}
+	//m_D3D->TurnZBufferOn();
 
 	return true;
 }
@@ -2899,7 +2898,19 @@ void GraphicsClass::TryRayPick()
 	//model->Initialize(m_D3D, dest, {});
 	//m_sceneModels.push_back(std::move(model));
 
-	//return;
+	//XMFLOAT3 lb = { m_sceneModels.at(0)->GetBounds().minX - m_sceneModels.at(0)->GetBounds().GetSizeX() + m_sceneModels.at(0)->GetPosition().x, m_sceneModels.at(0)->GetBounds().minY + m_sceneModels.at(0)->GetPosition().y,
+	//	m_sceneModels.at(0)->GetBounds().minZ + m_sceneModels.at(0)->GetPosition().z * 6.0f };
+
+	//ModelClass* model = new ModelClass;
+	//model->Initialize(m_D3D, dest, {});
+	//m_sceneModels.push_back(std::move(model));
+
+	//ModelClass* model = new ModelClass;
+	//ModelClass::Bounds bounds = m_sceneModels.at(0)->GetBounds();
+	//model->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, bounds.minX, bounds.maxX, bounds.maxY, bounds.minY);
+	//m_sceneModels.push_back(std::move(model));
+
+	return;
 	//Try to raycast objects AABB
 	XMFLOAT3 dirfrac = { 1.0f / rayDir.x, 1.0f / rayDir.y, 1.0f / rayDir.z };
 
@@ -2975,6 +2986,7 @@ void GraphicsClass::LoadScene(const std::string name)
 						model->SetRotation(rotation.at(0).number_value(), rotation.at(1).number_value(), rotation.at(2).number_value());
 					}
 					m_sceneModels.push_back(std::move(model));
+					CreateAABB(model);
 					continue;
 				}
 				else
@@ -2983,5 +2995,52 @@ void GraphicsClass::LoadScene(const std::string name)
 				}
 			}
 		}
+	}
+}
+
+void GraphicsClass::CreateAABB(ModelClass * baseModel)
+{
+	const ModelClass::Bounds bounds = baseModel->GetBounds();
+	//Front
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.minZ }, { bounds.minX, bounds.maxY, bounds.minZ }, { bounds.maxX, bounds.minY, bounds.minZ },
+		{ bounds.maxX, bounds.maxY, bounds.minZ });
+		m_sceneModels.push_back(std::move(model));
+	}
+	//Back
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.maxZ }, { bounds.minX, bounds.maxY, bounds.maxZ }, { bounds.maxX, bounds.minY, bounds.maxZ },
+		{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		m_sceneModels.push_back(std::move(model));
+	}
+	//Right
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.maxX, bounds.minY, bounds.minZ }, { bounds.maxX, bounds.maxY, bounds.minZ }, { bounds.maxX, bounds.minY, bounds.maxZ },
+			{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		m_sceneModels.push_back(std::move(model));
+	}
+	//Left
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.minZ }, { bounds.minX, bounds.maxY, bounds.minZ }, { bounds.minX, bounds.minY, bounds.maxZ },
+		{ bounds.minX, bounds.maxY, bounds.maxZ });
+		m_sceneModels.push_back(std::move(model));
+	}
+	//Top
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.maxY, bounds.minZ }, { bounds.minX, bounds.maxY, bounds.maxZ }, { bounds.maxX, bounds.maxY, bounds.minZ },
+		{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		m_sceneModels.push_back(std::move(model));
+	}
+	//Bottom
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.minZ }, { bounds.minX, bounds.minY, bounds.maxZ }, { bounds.maxX, bounds.minY, bounds.minZ },
+		{ bounds.maxX, bounds.minY, bounds.maxZ });
+		m_sceneModels.push_back(std::move(model));
 	}
 }

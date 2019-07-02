@@ -31,7 +31,6 @@ using namespace DirectX;
 class ModelClass
 {
 private:
-	struct Bounds;
 	struct VertexType
 	{
 		XMFLOAT3 position;
@@ -41,6 +40,40 @@ private:
 		XMFLOAT3 binormal;
 	};
 public:
+	struct Bounds {
+	public:
+		float minX;
+		float maxX;
+		float minY;
+		float maxY;
+		float minZ;
+		float maxZ;
+
+		float GetSizeX() const {
+			return (maxX - minX);
+		}
+		float GetSizeY() const {
+			return (maxY - minY);
+		}
+		float GetSizeZ() const {
+			return (maxZ - minZ);
+		}
+
+		float GetCenterX() const {
+			return minX + (maxX - minX) * 0.5f;
+		}
+		float GetCenterY() const {
+			return minY + (maxY - minY) * 0.5f;
+		}
+		float GetCenterZ() const {
+			return minZ + (maxZ - minZ) * 0.5f;
+		}
+
+		XMFLOAT3 GetCenter() const {
+			return{ GetCenterX(), GetCenterY(), GetCenterZ() };
+		}
+	};
+
 	enum class ShapeSize : int
 	{
 		TRIANGLE = 0,
@@ -56,6 +89,7 @@ public:
 	bool Initialize(D3DClass * d3d, const char* modelFilename, bool pickable = true);
 	bool Initialize(D3DClass* d3d, XMFLOAT3 origin, XMFLOAT3 destination);
 	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false, float borderWidth = 0.007f);
+	bool Initialize(ID3D11Device* device, XMFLOAT3 leftMin, XMFLOAT3 leftMax, XMFLOAT3 rightMin, XMFLOAT3 rightMax);
 	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
@@ -124,39 +158,6 @@ private:
 	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
 	D3DClass* m_D3D;
 
-	struct Bounds {
-	public:
-		float minX;
-		float maxX;
-		float minY;
-		float maxY;
-		float minZ;
-		float maxZ;
-
-		float GetSizeX() const {
-			return (maxX - minX);
-		}
-		float GetSizeY() const {
-			return (maxY - minY);
-		}
-		float GetSizeZ() const {
-			return (maxZ - minZ);
-		}
-
-		float GetCenterX() const {
-			return minX + (maxX - minX) * 0.5f;
-		}
-		float GetCenterY() const {
-			return minY + (maxY - minY) * 0.5f;
-		}
-		float GetCenterZ() const {
-			return minZ + (maxZ - minZ) * 0.5f;
-		}
-
-		XMFLOAT3 GetCenter() const {
-			return{ GetCenterX(), GetCenterY(), GetCenterZ() };
-		}
-	};
 	Bounds bounds;
 
 	struct PrimitiveModel

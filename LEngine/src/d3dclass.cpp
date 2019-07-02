@@ -46,6 +46,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_RASTERIZER_DESC skyboxRasterDesc;
+	D3D11_RASTERIZER_DESC rasterDescNoCulling;
 	D3D11_BLEND_DESC blendStateDesc;
 	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
@@ -361,6 +362,24 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
+	rasterDescNoCulling.AntialiasedLineEnable = false;
+	rasterDescNoCulling.CullMode = D3D11_CULL_NONE;
+	rasterDescNoCulling.DepthBias = 0;
+	rasterDescNoCulling.DepthBiasClamp = 0.0f;
+	rasterDescNoCulling.DepthClipEnable = true;
+	rasterDescNoCulling.FillMode = D3D11_FILL_SOLID;
+	rasterDescNoCulling.FrontCounterClockwise = false;
+	rasterDescNoCulling.MultisampleEnable = false;
+	rasterDescNoCulling.ScissorEnable = false;
+	rasterDescNoCulling.SlopeScaledDepthBias = 0.0f;
+
+	// Create the rasterizer state from the description we just filled out.
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterStateNoCulling);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Now set the rasterizer state.
 	m_deviceContext->RSSetState(m_rasterState);
 	
@@ -615,6 +634,10 @@ void D3DClass::ChangeRasterizerCulling(D3D11_CULL_MODE cullMode)
 	else if (cullMode = D3D11_CULL_FRONT)
 	{
 		m_deviceContext->RSSetState(m_rasterStateSkybox);
+	}
+	else if (cullMode == D3D11_CULL_NONE)
+	{
+		m_deviceContext->RSSetState(m_rasterStateNoCulling);
 	}
 }
 

@@ -87,6 +87,82 @@ bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, 
 	return false;
 }
 
+bool ModelClass::Initialize(ID3D11Device * device, XMFLOAT3 leftMin, XMFLOAT3 leftMax, XMFLOAT3 rightMin, XMFLOAT3 rightMax)
+{
+	m_device = device;
+	VertexType* vertices;
+	unsigned long* indices;
+
+	int verticesCount = 6;
+
+	float widthLeft = 0.007f;
+	float widthTop = widthLeft * 16.0f / 9.0f;
+	float zWidth = 0.00f;
+
+	vertices = new VertexType[verticesCount];
+	////First triangle
+	//vertices[0].position = leftMax;  // Top left.	
+	//vertices[1].position = rightMin;  // Bottom right.
+	//vertices[2].position = leftMin;  // Bottom left.
+	////Second triangle
+	//vertices[3].position = leftMax;  // Top left.
+	//vertices[4].position = rightMax;  // Top right.
+	//vertices[5].position = rightMin;  // Bottom right.
+
+	//verticesCount = 24;
+	//vertices = new VertexType[verticesCount];
+	////// LEFT //////
+	//First triangle
+	vertices[0].position = XMFLOAT3(leftMax.x - widthLeft, leftMax.y + widthTop, leftMax.z + zWidth);  // Top left.
+	vertices[1].position = XMFLOAT3(leftMin.x, leftMin.y - widthTop, leftMin.z);  // Bottom right.
+	vertices[2].position = XMFLOAT3(leftMin.x - widthLeft, leftMin.y - widthTop, leftMin.z + zWidth);  // Bottom left.
+	//Second triangle
+	vertices[3].position = XMFLOAT3(leftMax.x - widthLeft, leftMax.y + widthTop, leftMax.z + zWidth);  // Top left.
+	vertices[4].position = XMFLOAT3(leftMax.x, leftMax.y + widthTop, leftMax.z);  // Top right.
+	vertices[5].position = XMFLOAT3(leftMin.x, leftMin.y - widthTop, leftMin.z);  // Bottom right.
+	////// TOP //////
+	//First triangle
+	//vertices[6].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.	
+	//vertices[7].position = XMFLOAT3(right + widthLeft, top, 0.0f);  // Bottom right.
+	//vertices[8].position = XMFLOAT3(left - widthLeft, top, 0.0f);  // Bottom left.
+	////Second triangle
+	//vertices[9].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.
+	//vertices[10].position = XMFLOAT3(right + widthLeft, top + widthTop, 0.0f);  // Top right.
+	//vertices[11].position = XMFLOAT3(right + widthLeft, top, 0.0f);  // Bottom right.
+	//////// RIGHT //////
+	////First triangle
+	//vertices[12].position = XMFLOAT3(right, top + widthTop, 0.0f);  // Top left.	
+	//vertices[13].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+	//vertices[14].position = XMFLOAT3(right, bottom - widthTop, 0.0f);  // Bottom left.
+	////Second triangle
+	//vertices[15].position = XMFLOAT3(right, top + widthTop, 0.0f);  // Top left.
+	//vertices[16].position = XMFLOAT3(right + widthLeft, top + widthTop, 0.0f);  // Top right.
+	//vertices[17].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+	//////// BOTTOM //////
+	////First triangle
+	//vertices[18].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.	
+	//vertices[19].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+	//vertices[20].position = XMFLOAT3(left - widthLeft, bottom - widthTop, 0.0f);  // Bottom left.
+	////Second triangle
+	//vertices[21].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.
+	//vertices[22].position = XMFLOAT3(right + widthLeft, bottom, 0.0f);  // Top right.
+	//vertices[23].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+
+	indices = new unsigned long[verticesCount];
+	for (int i = 0; i < verticesCount; i++)
+		indices[i] = i;
+
+	m_indexCount = verticesCount;
+
+	if (indices != 0)
+	{
+		if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
+			return false;
+	}
+
+	return true;
+}
+
 bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
 	m_device = device;

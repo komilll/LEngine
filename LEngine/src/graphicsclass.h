@@ -343,6 +343,7 @@ private:
 
 	//Saving/Loading scene
 	void LoadScene(const std::string name);
+	void CreateAABB(ModelClass* baseModel);
 
 private:
 	D3DClass* m_D3D;

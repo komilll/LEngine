@@ -95,6 +95,7 @@ private:
 
 	ID3D11RasterizerState* m_rasterState;
 	ID3D11RasterizerState* m_rasterStateSkybox;
+	ID3D11RasterizerState* m_rasterStateNoCulling;
 
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilState* m_depthStencilStateSkybox;

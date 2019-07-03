@@ -367,14 +367,14 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	rasterDescNoCulling.DepthBias = 0;
 	rasterDescNoCulling.DepthBiasClamp = 0.0f;
 	rasterDescNoCulling.DepthClipEnable = true;
-	rasterDescNoCulling.FillMode = D3D11_FILL_SOLID;
+	rasterDescNoCulling.FillMode = D3D11_FILL_WIREFRAME;
 	rasterDescNoCulling.FrontCounterClockwise = false;
 	rasterDescNoCulling.MultisampleEnable = false;
 	rasterDescNoCulling.ScissorEnable = false;
 	rasterDescNoCulling.SlopeScaledDepthBias = 0.0f;
 
 	// Create the rasterizer state from the description we just filled out.
-	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterStateNoCulling);
+	result = m_device->CreateRasterizerState(&rasterDescNoCulling, &m_rasterStateNoCulling);
 	if (FAILED(result))
 	{
 		return false;
@@ -631,7 +631,7 @@ void D3DClass::ChangeRasterizerCulling(D3D11_CULL_MODE cullMode)
 	{
 		m_deviceContext->RSSetState(m_rasterState);
 	}
-	else if (cullMode = D3D11_CULL_FRONT)
+	else if (cullMode == D3D11_CULL_FRONT)
 	{
 		m_deviceContext->RSSetState(m_rasterStateSkybox);
 	}

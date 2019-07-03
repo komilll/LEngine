@@ -295,24 +295,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_shadowQuadModel = new ModelClass;
 	m_shadowQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f);
 	
-	m_colorShader = new SingleColorClass;
-	if (!m_colorShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"singleColor.vs", L"singleColor.ps", input))
-		return false;
-
-	XMMATRIX tempMatrixView, tempMatrixProj;
-	m_directionalLight->GetViewMatrix(tempMatrixView);
-	m_directionalLight->GetProjectionMatrix(tempMatrixProj);
-	m_colorShader->SetLightPosition(m_directionalLight->GetPosition());
-	m_colorShader->SetLightViewProjection(tempMatrixView, tempMatrixProj);
-
-	m_singleColorShader = new SingleColorClass;
-	if (!m_singleColorShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"singleColorNoShadow.vs", L"singleColorNoShadow.ps", input))
-		return false;
-
-	m_singleColorShader->SetLightPosition(m_directionalLight->GetPosition());
-	m_singleColorShader->SetLightViewProjection(tempMatrixView, tempMatrixProj);
-
-
 	ifstream skyboxFile;
 	skyboxFile.open("Skyboxes/cubemap.dds");
 	if (skyboxFile.fail())
@@ -621,6 +603,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	LoadScene("test.txt");
 	m_modelPicker = new ModelPicker(m_D3D);
+
+	m_singleColorShader = new ModelPickerShader;
+	if (!m_singleColorShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"modelpicker.vs", L"modelpicker.ps", m_D3D->GetBaseInputType()))
+		return false;
+
 	return true;
 }
 
@@ -1083,7 +1070,9 @@ bool GraphicsClass::RenderScene()
 		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
+	//m_D3D->TurnZBufferOff();
+	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
+
 	for (ModelClass* const& model : m_sceneModels)
 	{
 		//model->Render(m_D3D->GetDeviceContext());
@@ -1094,21 +1083,39 @@ bool GraphicsClass::RenderScene()
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 		
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
-		//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
-		//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
 		m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
 		model->Render(m_D3D->GetDeviceContext());
 		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
+
+		m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
+		for (const auto& wireframe : model->GetWireframeList())
+		{
+			m_Camera->GetViewMatrix(viewMatrix);
+			m_D3D->GetWorldMatrix(worldMatrix);
+			m_D3D->GetProjectionMatrix(projectionMatrix);
+
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+			wireframe->Render(m_D3D->GetDeviceContext());
+			result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+			if (!result)
+				return false;
+		}
+		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
-	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_FRONT);
+	//m_D3D->TurnZBufferOn();
 
 	if (DRAW_SKYBOX)
 	{
@@ -1294,6 +1301,23 @@ bool GraphicsClass::RenderScene()
 	//		return false;
 	//}
 	//m_D3D->TurnZBufferOn();
+
+	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
+	return true;
+	m_D3D->TurnZBufferOff();
+	m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
+	for (const auto& model : m_sceneModels)
+	{
+		for (const auto& wireframe : model->GetWireframeList())
+		{
+			wireframe->Render(m_D3D->GetDeviceContext());
+			result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+			if (!result)
+				return false;
+		}
+	}
+	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	m_D3D->TurnZBufferOn();
 
 	return true;
 }
@@ -1505,6 +1529,7 @@ bool GraphicsClass::RenderGUI()
 			if (model->Initialize(m_D3D, model->LoadModelCalculatePath().c_str()))
 			{
 				m_sceneModels.push_back(std::move(model));
+				CreateAABB(model);
 			}
 		}
 	}
@@ -2880,8 +2905,8 @@ void GraphicsClass::TryRayPick()
 	m_Camera->GetViewMatrix(viewMatrix);
 	XMMATRIX unviewMatrix = DirectX::XMMatrixMultiply(projectionMatrix, viewMatrix);
 	unviewMatrix = DirectX::XMMatrixInverse(nullptr, unviewMatrix);
-	
-	XMVECTOR mouseWorldspace = XMVector4Transform({x, y, 0.0f, 1.0f}, unviewMatrix);
+
+	XMVECTOR mouseWorldspace = XMVector4Transform({ x, y, 0.0f, 1.0f }, unviewMatrix);
 	XMVECTOR cameraPos = unviewMatrix.r[3];
 	XMFLOAT3 dest = { mouseWorldspace.m128_f32[0], mouseWorldspace.m128_f32[1], mouseWorldspace.m128_f32[2] };
 	float w = mouseWorldspace.m128_f32[3];
@@ -2901,16 +2926,22 @@ void GraphicsClass::TryRayPick()
 	//XMFLOAT3 lb = { m_sceneModels.at(0)->GetBounds().minX - m_sceneModels.at(0)->GetBounds().GetSizeX() + m_sceneModels.at(0)->GetPosition().x, m_sceneModels.at(0)->GetBounds().minY + m_sceneModels.at(0)->GetPosition().y,
 	//	m_sceneModels.at(0)->GetBounds().minZ + m_sceneModels.at(0)->GetPosition().z * 6.0f };
 
-	//ModelClass* model = new ModelClass;
-	//model->Initialize(m_D3D, dest, {});
-	//m_sceneModels.push_back(std::move(model));
-
+	//{
+	//	ModelClass* model = new ModelClass;
+	//	model->Initialize(m_D3D, origin, {});
+	//	m_sceneModels.push_back(std::move(model));
+	//}
+	//{
+	//	ModelClass* model = new ModelClass;
+	//	model->Initialize(m_D3D, dest, {});
+	//	m_sceneModels.push_back(std::move(model));
+	//}
 	//ModelClass* model = new ModelClass;
 	//ModelClass::Bounds bounds = m_sceneModels.at(0)->GetBounds();
 	//model->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, bounds.minX, bounds.maxX, bounds.maxY, bounds.minY);
 	//m_sceneModels.push_back(std::move(model));
 
-	return;
+	//return;
 	//Try to raycast objects AABB
 	XMFLOAT3 dirfrac = { 1.0f / rayDir.x, 1.0f / rayDir.y, 1.0f / rayDir.z };
 
@@ -3000,7 +3031,12 @@ void GraphicsClass::LoadScene(const std::string name)
 
 void GraphicsClass::CreateAABB(ModelClass * baseModel)
 {
-	const ModelClass::Bounds bounds = baseModel->GetBounds();
+	baseModel->CreateWireframe();
+	//CreateAABBBox(baseModel->GetBounds());
+}
+
+void GraphicsClass::CreateAABBBox(const ModelClass::Bounds bounds)
+{
 	//Front
 	{
 		ModelClass* model = new ModelClass;
@@ -3019,7 +3055,7 @@ void GraphicsClass::CreateAABB(ModelClass * baseModel)
 	{
 		ModelClass* model = new ModelClass;
 		model->Initialize(m_D3D->GetDevice(), { bounds.maxX, bounds.minY, bounds.minZ }, { bounds.maxX, bounds.maxY, bounds.minZ }, { bounds.maxX, bounds.minY, bounds.maxZ },
-			{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		{ bounds.maxX, bounds.maxY, bounds.maxZ });
 		m_sceneModels.push_back(std::move(model));
 	}
 	//Left

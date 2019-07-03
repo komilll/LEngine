@@ -89,10 +89,13 @@ public:
 	bool Initialize(D3DClass * d3d, const char* modelFilename, bool pickable = true);
 	bool Initialize(D3DClass* d3d, XMFLOAT3 origin, XMFLOAT3 destination);
 	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false, float borderWidth = 0.007f);
-	bool Initialize(ID3D11Device* device, XMFLOAT3 leftMin, XMFLOAT3 leftMax, XMFLOAT3 rightMin, XMFLOAT3 rightMax);
+	bool Initialize(ID3D11Device* device, XMFLOAT3 leftMin, XMFLOAT3 leftMax, XMFLOAT3 rightMin, XMFLOAT3 rightMax);	
+	bool InitializeWireframe(ID3D11Device* device, XMFLOAT3 min, XMFLOAT3 max);
 	bool InitializeSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
+	void Render(ID3D11DeviceContext* deviceContext);
+	void CreateWireframe();
+	const std::vector<ModelClass*>& GetWireframeList() const;
 
 	int GetIndexCount();
 
@@ -159,6 +162,7 @@ private:
 	D3DClass* m_D3D;
 
 	Bounds bounds;
+	std::vector<ModelClass*> m_wireframeModels;
 
 	struct PrimitiveModel
 	{

@@ -81,6 +81,7 @@ public:
 		Up = 0,
 		Down = 1
 	};
+
 private:
 	enum class GrainType : int
 	{
@@ -344,6 +345,7 @@ private:
 	//Saving/Loading scene
 	void LoadScene(const std::string name);
 	void CreateAABB(ModelClass* baseModel);
+	void CreateAABBBox(const ModelClass::Bounds bounds);
 
 private:
 	D3DClass* m_D3D;
@@ -389,8 +391,7 @@ private:
 	RenderTextureClass* m_skyboxDownsampled;
 	RenderTextureClass* m_skyboxBlurHorizontal;
 	RenderTextureClass* m_skyboxBlurVertical;
-	SingleColorClass* m_colorShader;
-	SingleColorClass* m_singleColorShader;
+	ModelPickerShader* m_singleColorShader;
 	SkyboxShaderClass* m_convoluteShader;
 	ModelClass* m_convoluteQuadModel;
 

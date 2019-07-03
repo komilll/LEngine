@@ -100,53 +100,86 @@ bool ModelClass::Initialize(ID3D11Device * device, XMFLOAT3 leftMin, XMFLOAT3 le
 	float zWidth = 0.00f;
 
 	vertices = new VertexType[verticesCount];
-	////First triangle
-	//vertices[0].position = leftMax;  // Top left.	
-	//vertices[1].position = rightMin;  // Bottom right.
-	//vertices[2].position = leftMin;  // Bottom left.
-	////Second triangle
-	//vertices[3].position = leftMax;  // Top left.
-	//vertices[4].position = rightMax;  // Top right.
-	//vertices[5].position = rightMin;  // Bottom right.
-
-	//verticesCount = 24;
-	//vertices = new VertexType[verticesCount];
-	////// LEFT //////
 	//First triangle
-	vertices[0].position = XMFLOAT3(leftMax.x - widthLeft, leftMax.y + widthTop, leftMax.z + zWidth);  // Top left.
-	vertices[1].position = XMFLOAT3(leftMin.x, leftMin.y - widthTop, leftMin.z);  // Bottom right.
-	vertices[2].position = XMFLOAT3(leftMin.x - widthLeft, leftMin.y - widthTop, leftMin.z + zWidth);  // Bottom left.
+	vertices[0].position = leftMax;  // Top left.	
+	vertices[1].position = rightMin;  // Bottom right.
+	vertices[2].position = leftMin;  // Bottom left.
 	//Second triangle
-	vertices[3].position = XMFLOAT3(leftMax.x - widthLeft, leftMax.y + widthTop, leftMax.z + zWidth);  // Top left.
-	vertices[4].position = XMFLOAT3(leftMax.x, leftMax.y + widthTop, leftMax.z);  // Top right.
-	vertices[5].position = XMFLOAT3(leftMin.x, leftMin.y - widthTop, leftMin.z);  // Bottom right.
-	////// TOP //////
-	//First triangle
-	//vertices[6].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.	
-	//vertices[7].position = XMFLOAT3(right + widthLeft, top, 0.0f);  // Bottom right.
-	//vertices[8].position = XMFLOAT3(left - widthLeft, top, 0.0f);  // Bottom left.
-	////Second triangle
-	//vertices[9].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.
-	//vertices[10].position = XMFLOAT3(right + widthLeft, top + widthTop, 0.0f);  // Top right.
-	//vertices[11].position = XMFLOAT3(right + widthLeft, top, 0.0f);  // Bottom right.
-	//////// RIGHT //////
-	////First triangle
-	//vertices[12].position = XMFLOAT3(right, top + widthTop, 0.0f);  // Top left.	
-	//vertices[13].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
-	//vertices[14].position = XMFLOAT3(right, bottom - widthTop, 0.0f);  // Bottom left.
-	////Second triangle
-	//vertices[15].position = XMFLOAT3(right, top + widthTop, 0.0f);  // Top left.
-	//vertices[16].position = XMFLOAT3(right + widthLeft, top + widthTop, 0.0f);  // Top right.
-	//vertices[17].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
-	//////// BOTTOM //////
-	////First triangle
-	//vertices[18].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.	
-	//vertices[19].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
-	//vertices[20].position = XMFLOAT3(left - widthLeft, bottom - widthTop, 0.0f);  // Bottom left.
-	////Second triangle
-	//vertices[21].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.
-	//vertices[22].position = XMFLOAT3(right + widthLeft, bottom, 0.0f);  // Top right.
-	//vertices[23].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+	vertices[3].position = leftMax;  // Top left.
+	vertices[4].position = rightMax;  // Top right.
+	vertices[5].position = rightMin;  // Bottom right.
+
+	indices = new unsigned long[verticesCount];
+	for (int i = 0; i < verticesCount; i++)
+		indices[i] = i;
+
+	m_indexCount = verticesCount;
+
+	if (indices != 0)
+	{
+		if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
+			return false;
+	}
+
+	return true;
+}
+
+bool ModelClass::InitializeWireframe(ID3D11Device * device, XMFLOAT3 min, XMFLOAT3 max)
+{
+	m_device = device;
+	VertexType* vertices;
+	unsigned long* indices;
+
+	constexpr int verticesCount = 6;
+	constexpr float zWidth = 0.00f;
+
+	const float left = min.x;
+	const float right = max.x;
+	const float top = max.y;
+	const float bottom = min.y;
+	const float zMin = min.z;
+	const float zMax = max.z;
+
+	vertices = new VertexType[verticesCount];
+	//if (left == right && zMin == zMax) //Vertical line (no Z)
+	{
+		constexpr float widthLeft = 0.003f;
+		constexpr float widthTop = widthLeft * 16.0f / 9.0f;
+		//First triangle
+		vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.	
+		vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+		vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
+		//Second triangle
+		vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.
+		vertices[4].position = XMFLOAT3(right, top + widthTop, zMax);  // Top right.
+		vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+	}
+	//else if (top == bottom && zMin == zMax) //Horizontal line (no Z)
+	//{
+	//	constexpr float widthLeft = 0.003f;
+	//	constexpr float widthTop = widthLeft * 16.0f / 9.0f;
+	//	//First triangle
+	//	vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMin);  // Top left.	
+	//	vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+	//	vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
+	//	 //Second triangle
+	//	vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMin);  // Top left.
+	//	vertices[4].position = XMFLOAT3(right, top + widthTop, zMin);  // Top right.
+	//	vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+	//}
+	//else if (left == right) //Vertical line (with Z)
+	//{
+	//	constexpr float widthLeft = 0.003f;
+	//	constexpr float widthTop = widthLeft * 16.0f / 9.0f;
+	//	//First triangle
+	//	vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.	
+	//	vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+	//	vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
+	//	//Second triangle
+	//	vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.
+	//	vertices[4].position = XMFLOAT3(right, top + widthTop, zMax);  // Top right.
+	//	vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+	//}
 
 	indices = new unsigned long[verticesCount];
 	for (int i = 0; i < verticesCount; i++)
@@ -185,6 +218,57 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 	RenderBuffers(deviceContext);
 
 	return;
+}
+
+void ModelClass::CreateWireframe()
+{
+	//Front
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.minZ }, { bounds.minX, bounds.maxY, bounds.minZ }, { bounds.maxX, bounds.minY, bounds.minZ },
+		{ bounds.maxX, bounds.maxY, bounds.minZ });
+		m_wireframeModels.push_back(std::move(model));
+	}
+	//Back
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.maxZ }, { bounds.minX, bounds.maxY, bounds.maxZ }, { bounds.maxX, bounds.minY, bounds.maxZ },
+		{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		m_wireframeModels.push_back(std::move(model));
+	}
+	//Right
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.maxX, bounds.minY, bounds.minZ }, { bounds.maxX, bounds.maxY, bounds.minZ }, { bounds.maxX, bounds.minY, bounds.maxZ },
+		{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		m_wireframeModels.push_back(std::move(model));
+	}
+	//Left
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.minZ }, { bounds.minX, bounds.maxY, bounds.minZ }, { bounds.minX, bounds.minY, bounds.maxZ },
+		{ bounds.minX, bounds.maxY, bounds.maxZ });
+		m_wireframeModels.push_back(std::move(model));
+	}
+	//Top
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.maxY, bounds.minZ }, { bounds.minX, bounds.maxY, bounds.maxZ }, { bounds.maxX, bounds.maxY, bounds.minZ },
+		{ bounds.maxX, bounds.maxY, bounds.maxZ });
+		m_wireframeModels.push_back(std::move(model));
+	}
+	//Bottom
+	{
+		ModelClass* model = new ModelClass;
+		model->Initialize(m_D3D->GetDevice(), { bounds.minX, bounds.minY, bounds.minZ }, { bounds.minX, bounds.minY, bounds.maxZ }, { bounds.maxX, bounds.minY, bounds.minZ },
+		{ bounds.maxX, bounds.minY, bounds.maxZ });
+		m_wireframeModels.push_back(std::move(model));
+	}
+}
+
+const std::vector<ModelClass*>& ModelClass::GetWireframeList() const
+{
+	return m_wireframeModels;
 }
 
 int ModelClass::GetIndexCount()

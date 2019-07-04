@@ -1291,32 +1291,15 @@ bool GraphicsClass::RenderScene()
 	}
 
 	//Draw model picker
-	//m_D3D->TurnZBufferOff();
-	//for (ModelClass* const& model : m_sceneModels)
-	//{
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-	//	if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
-	//		return false;
-	//}
-	//m_D3D->TurnZBufferOn();
-
-	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
-	return true;
 	m_D3D->TurnZBufferOff();
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
-	for (const auto& model : m_sceneModels)
+	for (ModelClass* const& model : m_sceneModels)
 	{
-		for (const auto& wireframe : model->GetWireframeList())
-		{
-			wireframe->Render(m_D3D->GetDeviceContext());
-			result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-			if (!result)
-				return false;
-		}
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
+			return false;
 	}
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->TurnZBufferOn();
 
 	return true;
@@ -2896,75 +2879,83 @@ void GraphicsClass::TryRayPick()
 		y = 1.0f;
 	else if (y < -1.0f)
 		y = -1.0f;
-	//x = 2.0f * x - 1.0f;
-	//y = 2.0f * y;
 
-	XMMATRIX viewMatrix;
-	XMMATRIX projectionMatrix;
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_Camera->GetViewMatrix(viewMatrix);
-	XMMATRIX unviewMatrix = DirectX::XMMatrixMultiply(projectionMatrix, viewMatrix);
-	unviewMatrix = DirectX::XMMatrixInverse(nullptr, unviewMatrix);
+	//OLD SYSTEM
+	//XMMATRIX viewMatrix;
+	//XMMATRIX projectionMatrix;
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//XMMATRIX unviewMatrix = DirectX::XMMatrixMultiply(projectionMatrix, viewMatrix);
+	//unviewMatrix = DirectX::XMMatrixInverse(nullptr, unviewMatrix);
 
-	XMVECTOR mouseWorldspace = XMVector4Transform({ x, y, 0.0f, 1.0f }, unviewMatrix);
-	XMVECTOR cameraPos = unviewMatrix.r[3];
-	XMFLOAT3 dest = { mouseWorldspace.m128_f32[0], mouseWorldspace.m128_f32[1], mouseWorldspace.m128_f32[2] };
-	float w = mouseWorldspace.m128_f32[3];
-	dest.x *= w;
-	dest.y *= w;
-	dest.z *= w;
+	//XMVECTOR mouseWorldspace = XMVector4Transform({ x, y, 0.0f, 1.0f }, unviewMatrix);
+	////XMVECTOR cameraPos = unviewMatrix.r[3];
+	//XMFLOAT3 dest = { mouseWorldspace.m128_f32[0], mouseWorldspace.m128_f32[1], mouseWorldspace.m128_f32[2] };
+	//float w = mouseWorldspace.m128_f32[3];
+	//dest.x *= w;
+	//dest.y *= w;
+	//dest.z *= w;
 
-	XMFLOAT3 origin = m_Camera->GetPosition();
+	//XMFLOAT3 origin = m_Camera->GetPosition();
 
-	XMVECTOR rayDirVector = XMVector4Normalize({ dest.x - origin.x, dest.y - origin.y, dest.z - origin.z });
-	XMFLOAT3 rayDir = { rayDirVector.m128_f32[0], rayDirVector.m128_f32[1], rayDirVector.m128_f32[2] };
-
-	//ModelClass* model = new ModelClass;
-	//model->Initialize(m_D3D, dest, {});
-	//m_sceneModels.push_back(std::move(model));
-
-	//XMFLOAT3 lb = { m_sceneModels.at(0)->GetBounds().minX - m_sceneModels.at(0)->GetBounds().GetSizeX() + m_sceneModels.at(0)->GetPosition().x, m_sceneModels.at(0)->GetBounds().minY + m_sceneModels.at(0)->GetPosition().y,
-	//	m_sceneModels.at(0)->GetBounds().minZ + m_sceneModels.at(0)->GetPosition().z * 6.0f };
-
-	//{
-	//	ModelClass* model = new ModelClass;
-	//	model->Initialize(m_D3D, origin, {});
-	//	m_sceneModels.push_back(std::move(model));
-	//}
-	//{
-	//	ModelClass* model = new ModelClass;
-	//	model->Initialize(m_D3D, dest, {});
-	//	m_sceneModels.push_back(std::move(model));
-	//}
-	//ModelClass* model = new ModelClass;
-	//ModelClass::Bounds bounds = m_sceneModels.at(0)->GetBounds();
-	//model->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, bounds.minX, bounds.maxX, bounds.maxY, bounds.minY);
-	//m_sceneModels.push_back(std::move(model));
-
-	//return;
-	//Try to raycast objects AABB
-	XMFLOAT3 dirfrac = { 1.0f / rayDir.x, 1.0f / rayDir.y, 1.0f / rayDir.z };
+	//XMVECTOR rayDirVector = XMVector4Normalize({ dest.x - origin.x, dest.y - origin.y, dest.z - origin.z });
+	//XMFLOAT3 rayDir = { rayDirVector.m128_f32[0], rayDirVector.m128_f32[1], rayDirVector.m128_f32[2] };
 
 	for (const auto& model : m_sceneModels)
 	{
-		XMFLOAT3 lb = { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
-		XMFLOAT3 rt = { model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
+		//NEW SYSTEM
+		float pointX, pointY;
+		XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
+		XMVECTOR origin, rayOrigin, direction, rayDirection;
+		bool intersect, result;
 
-		//XMMATRIX world;
-		//m_D3D->GetWorldMatrix(world);
-		//XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, world);
+		pointX = x;
+		pointY = y;
 
-		//m_D3D->GetWorldMatrix(world);
-		//XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, world);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+		pointX = pointX / projectionMatrix.r[0].m128_f32[0];
+		pointY = pointY / projectionMatrix.r[1].m128_f32[1];
 
-		//XMFLOAT3 center = { model->GetBounds().GetCenter() };
+		m_Camera->GetViewMatrix(viewMatrix);
+		inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
 
-		const float t1 = (lb.x - origin.x)*dirfrac.x;
-		const float t2 = (rt.x - origin.x)*dirfrac.x;
-		const float t3 = (lb.y - origin.y)*dirfrac.y;
-		const float t4 = (rt.y - origin.y)*dirfrac.y;
-		const float t5 = (lb.z - origin.z)*dirfrac.z;
-		const float t6 = (rt.z - origin.z)*dirfrac.z;
+		direction = { 
+			(pointX * inverseViewMatrix.r[0].m128_f32[0]) + (pointY * inverseViewMatrix.r[1].m128_f32[0]) + inverseViewMatrix.r[2].m128_f32[0],
+			(pointX * inverseViewMatrix.r[0].m128_f32[1]) + (pointY * inverseViewMatrix.r[1].m128_f32[1]) + inverseViewMatrix.r[2].m128_f32[1],
+			(pointX * inverseViewMatrix.r[0].m128_f32[2]) + (pointY * inverseViewMatrix.r[1].m128_f32[2]) + inverseViewMatrix.r[2].m128_f32[2] 
+		};
+
+		origin = { m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z };
+
+		m_D3D->GetWorldMatrix(worldMatrix);
+		translateMatrix = XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z);
+		worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
+
+		inverseWorldMatrix = XMMatrixInverse(nullptr, worldMatrix);
+
+		rayOrigin = XMVector3TransformCoord(origin, inverseWorldMatrix);
+		rayDirection = XMVector3TransformNormal(direction, inverseWorldMatrix);
+
+		rayDirection = XMVector3Normalize(rayDirection);
+
+		XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
+
+		//XMFLOAT3 lb = { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
+		//XMFLOAT3 rt = { model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
+
+		XMMATRIX wMatrix;
+		m_D3D->GetWorldMatrix(wMatrix);
+		XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, wMatrix, ModelPicker::Axis::X);
+
+		m_D3D->GetWorldMatrix(wMatrix);
+		XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, wMatrix, ModelPicker::Axis::X);
+
+		const float t1 = (lb.x - origin.m128_f32[0])*dirfrac.x;
+		const float t2 = (rt.x - origin.m128_f32[0])*dirfrac.x;
+		const float t3 = (lb.y - origin.m128_f32[1])*dirfrac.y;
+		const float t4 = (rt.y - origin.m128_f32[1])*dirfrac.y;
+		const float t5 = (lb.z - origin.m128_f32[2])*dirfrac.z;
+		const float t6 = (rt.z - origin.m128_f32[2])*dirfrac.z;
 
 		const float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
 		const float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));

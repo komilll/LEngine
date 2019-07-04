@@ -125,6 +125,10 @@ private:
 	class ModelPicker
 	{
 	public:
+		enum class Axis {
+			X, Y, Z
+		};
+
 		ModelPicker(D3DClass* d3d)
 		{
 			m_colorShader = new ModelPickerShader;
@@ -145,10 +149,9 @@ private:
 
 		bool Render(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix, ModelClass* mainModel)
 		{
+
 			{
-				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x,
-					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
-					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+				const XMFLOAT3 position = GetPosition(mainModel, Axis::X);
 
 				m_colorShader->ChangeColor(1.0f, 0.0f, 0.0f);
 				XMMATRIX view = viewMatrix;
@@ -163,9 +166,7 @@ private:
 			}
 
 			{
-				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f,
-					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
-					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x };
+				const XMFLOAT3 position = GetPosition(mainModel, Axis::Z);
 
 				m_colorShader->ChangeColor(0.0f, 1.0f, 0.0f);
 				XMMATRIX view = viewMatrix;
@@ -180,9 +181,7 @@ private:
 			}
 
 			{
-				const XMFLOAT3 position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f,
-					mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x,
-					mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+				const XMFLOAT3 position = GetPosition(mainModel, Axis::Y);
 
 				m_colorShader->ChangeColor(0.0f, 0.0f, 1.0f);
 				XMMATRIX view = viewMatrix;
@@ -199,10 +198,11 @@ private:
 			return true;
 		}
 
-		XMFLOAT3 ModelPicker::GetMinBounds(ModelClass* mainModel, XMMATRIX& worldMatrix) {
-			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f + m_axisX->GetBounds().GetSizeX() * 0.5f * scale.x,
-				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
-				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+		XMFLOAT3 ModelPicker::GetMinBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) {			
+
+			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() - m_axisY->GetBounds().GetSizeY() * 0.5f,
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() - m_axisY->GetBounds().GetSizeZ() * 0.5f };
 			XMMATRIX xMatrix = worldMatrix;
 			xMatrix = XMMatrixMultiply(xMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
 			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixRotationX(0.0174532925f * 90.0f));
@@ -212,10 +212,11 @@ private:
 			return{ position.m128_f32[0], position.m128_f32[1], position.m128_f32[2] };
 		}
 
-		XMFLOAT3 ModelPicker::GetMaxBounds(ModelClass* mainModel, XMMATRIX& worldMatrix) {
-			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f + m_axisX->GetBounds().GetSizeX() * 1.5f * scale.x,
-				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
-				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+		XMFLOAT3 ModelPicker::GetMaxBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) {
+			const float length = m_axisX->GetBounds().GetSizeX() * scale.x;
+			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + (axis == Axis::X ? length : 0.0f),
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + (axis == Axis::Y ? length : 0.0f) + m_axisY->GetBounds().GetSizeY() * 0.5f,
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + (axis == Axis::Z ? length : 0.0f) + m_axisY->GetBounds().GetSizeZ() * 0.5f };
 			XMMATRIX xMatrix = worldMatrix;
 			xMatrix = XMMatrixMultiply(xMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
 			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixRotationX(0.0174532925f * 90.0f));
@@ -226,10 +227,11 @@ private:
 		}
 
 	private:
-		XMFLOAT3 BaseBounds(ModelClass* mainModel) {
-			return XMFLOAT3{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + mainModel->GetBounds().GetSizeX() * 0.5f,
-				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + mainModel->GetBounds().GetSizeY() * 0.5f,
-				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + mainModel->GetBounds().GetSizeZ() * 0.5f };
+		XMFLOAT3 GetPosition(ModelClass* mainModel, Axis axis) {
+			const float length = m_axisX->GetBounds().GetSizeX() * scale.x * 0.5f;
+			return{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + (axis == Axis::X ? length : 0.0f),
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + (axis == Axis::Y ? length : 0.0f),
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + (axis == Axis::Z ? length : 0.0f) };
 		}
 
 
@@ -240,8 +242,8 @@ private:
 	private:
 		ModelPickerShader* m_colorShader;
 		const std::string modelName = "cube_test.obj";
-		const float scaleMult = 0.5f;
-		const float pickerLength = 0.5f;
+		const float scaleMult = 0.15f;
+		const float pickerLength = 0.35f;
 		const XMFLOAT3 scale = { pickerLength * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
 	};
 

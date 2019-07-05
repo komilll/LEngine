@@ -76,6 +76,20 @@ class GraphicsClass
 public:
 	bool RENDER_MATERIAL_EDITOR = true;
 
+	struct ModelPickerBools
+	{
+	public:
+		bool xAxis{ false };
+		bool yAxis{ false };
+		bool zAxis{ false };
+
+		void Reset() {
+			xAxis = false;
+			yAxis = false;
+			zAxis = false;
+		}
+	};
+
 	enum class ShaderWindowDirection : int
 	{
 		Up = 0,
@@ -198,32 +212,68 @@ private:
 			return true;
 		}
 
-		XMFLOAT3 ModelPicker::GetMinBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) {			
+		XMFLOAT3 GetMinBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) 
+		{
+			const XMFLOAT3 basePosition{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY(),
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() };
 
-			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
-				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() - m_axisY->GetBounds().GetSizeY() * 0.5f,
-				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() - m_axisY->GetBounds().GetSizeZ() * 0.5f };
-			XMMATRIX xMatrix = worldMatrix;
-			xMatrix = XMMatrixMultiply(xMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
-			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixRotationX(0.0174532925f * 90.0f));
-			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixTranslation(position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]));
+			float lengthX{ 0.0f };
+			float lengthY{ 0.0f };
+			float lengthZ{ 0.0f };
 
-			XMVECTOR vec = XMVector4Transform(position, xMatrix);
-			return{ position.m128_f32[0], position.m128_f32[1], position.m128_f32[2] };
+			if (axis == Axis::X)
+			{
+				//lengthX = 0.0f;
+				lengthY = m_axisX->GetBounds().GetSizeY() * 0.5f * scale.y;
+				lengthZ = m_axisX->GetBounds().GetSizeZ() * 0.5f * scale.z;
+			}
+			else if (axis == Axis::Y)
+			{
+				lengthX = m_axisY->GetBounds().GetSizeY() * 0.5f * scale.y;
+				//lengthY = 0.0f;
+				lengthZ = m_axisY->GetBounds().GetSizeZ() * 0.5f * scale.z;
+			}
+			else if (axis == Axis::Z)
+			{
+				lengthX = m_axisZ->GetBounds().GetSizeZ() * 0.5f * scale.z;
+				lengthY = m_axisZ->GetBounds().GetSizeY() * 0.5f * scale.y;
+				//lengthZ = 0.0f;
+			}
+
+			return{ basePosition.x - lengthX, basePosition.y - lengthY, basePosition.z - lengthZ };
 		}
 
-		XMFLOAT3 ModelPicker::GetMaxBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) {
-			const float length = m_axisX->GetBounds().GetSizeX() * scale.x;
-			const XMVECTOR position = { mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + (axis == Axis::X ? length : 0.0f),
-				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + (axis == Axis::Y ? length : 0.0f) + m_axisY->GetBounds().GetSizeY() * 0.5f,
-				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + (axis == Axis::Z ? length : 0.0f) + m_axisY->GetBounds().GetSizeZ() * 0.5f };
-			XMMATRIX xMatrix = worldMatrix;
-			xMatrix = XMMatrixMultiply(xMatrix, DirectX::XMMatrixScaling(m_axisX->GetScale().x, m_axisX->GetScale().y, m_axisX->GetScale().z));
-			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixRotationX(0.0174532925f * 90.0f));
-			xMatrix = XMMatrixMultiply(xMatrix, XMMatrixTranslation(position.m128_f32[0], position.m128_f32[1], position.m128_f32[2]));
+		XMFLOAT3 GetMaxBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) 
+		{
+			const XMFLOAT3 basePosition	{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
+				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY(),
+				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() };
 
-			XMVECTOR vec = XMVector4Transform(position, xMatrix);
-			return{ position.m128_f32[0], position.m128_f32[1], position.m128_f32[2] };
+			float lengthX{ 0.0f };
+			float lengthY{ 0.0f };
+			float lengthZ{ 0.0f };
+
+			if (axis == Axis::X)
+			{
+				lengthX = m_axisX->GetBounds().GetSizeX() * 1.0f * scale.x;
+				lengthY = m_axisX->GetBounds().GetSizeY() * 0.5f * scale.y;
+				lengthZ = m_axisX->GetBounds().GetSizeZ() * 0.5f * scale.z;
+			}
+			else if (axis == Axis::Y)
+			{
+				lengthX = m_axisY->GetBounds().GetSizeY() * 0.5f * scale.y;
+				lengthY = m_axisY->GetBounds().GetSizeX() * 1.0f * scale.x;
+				lengthZ = m_axisY->GetBounds().GetSizeZ() * 0.5f * scale.z;
+			}
+			else if (axis == Axis::Z)
+			{
+				lengthX = m_axisZ->GetBounds().GetSizeZ() * 0.5f * scale.z;
+				lengthY = m_axisZ->GetBounds().GetSizeY() * 0.5f * scale.y;
+				lengthZ = m_axisZ->GetBounds().GetSizeX() * 1.0f * scale.x;
+			}
+
+			return{ basePosition.x + lengthX, basePosition.y + lengthY, basePosition.z + lengthZ };
 		}
 
 	private:
@@ -241,7 +291,7 @@ private:
 		ModelClass* m_axisZ;
 	private:
 		ModelPickerShader* m_colorShader;
-		const std::string modelName = "cube_test.obj";
+		const std::string modelName = "modelPicker.obj";
 		const float scaleMult = 0.15f;
 		const float pickerLength = 0.35f;
 		const XMFLOAT3 scale = { pickerLength * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
@@ -348,6 +398,8 @@ private:
 	void LoadScene(const std::string name);
 	void CreateAABB(ModelClass* baseModel);
 	void CreateAABBBox(const ModelClass::Bounds bounds);
+	bool TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac);
+	bool TryPickModelPickerArrow(ModelClass* model, const ModelPicker::Axis axis, XMFLOAT3&& origin, XMFLOAT3 dirfrac);
 
 private:
 	D3DClass* m_D3D;
@@ -468,6 +520,9 @@ private:
 
 	//POST-PROCESS STACK
 	PostProcessShader* m_postProcessShader;
+
+	//Model-picker
+	ModelPickerBools m_modelPickerBools;
 
 	//////////////////////////////
 	// Post-process using flags //

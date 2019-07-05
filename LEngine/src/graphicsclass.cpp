@@ -2940,42 +2940,19 @@ void GraphicsClass::TryRayPick()
 
 		XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
 
-		//XMFLOAT3 lb = { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
-		//XMFLOAT3 rt = { model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
-
-		XMMATRIX wMatrix;
-		m_D3D->GetWorldMatrix(wMatrix);
-		XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, wMatrix, ModelPicker::Axis::X);
-
-		m_D3D->GetWorldMatrix(wMatrix);
-		XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, wMatrix, ModelPicker::Axis::X);
-
-		const float t1 = (lb.x - origin.m128_f32[0])*dirfrac.x;
-		const float t2 = (rt.x - origin.m128_f32[0])*dirfrac.x;
-		const float t3 = (lb.y - origin.m128_f32[1])*dirfrac.y;
-		const float t4 = (rt.y - origin.m128_f32[1])*dirfrac.y;
-		const float t5 = (lb.z - origin.m128_f32[2])*dirfrac.z;
-		const float t6 = (rt.z - origin.m128_f32[2])*dirfrac.z;
-
-		const float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
-		const float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
-
-		// if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
-		if (tmax < 0)
+		m_modelPickerBools.Reset();
+		if (TryPickModelPickerArrow(model, ModelPicker::Axis::X, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
 		{
-			//t = tmax;
-			continue;
+			m_modelPickerBools.xAxis = true;
 		}
-
-		// if tmin > tmax, ray doesn't intersect AABB
-		if (tmin > tmax)
+		else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Y, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
 		{
-			//t = tmax;
-			continue;
+			m_modelPickerBools.yAxis = true;
 		}
-
-		static int i = 0;
-		i++;
+		else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Z, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
+		{
+			m_modelPickerBools.zAxis = true;
+		}
 		//t = tmin;
 		//return true;
 	}
@@ -3070,4 +3047,45 @@ void GraphicsClass::CreateAABBBox(const ModelClass::Bounds bounds)
 		{ bounds.maxX, bounds.minY, bounds.maxZ });
 		m_sceneModels.push_back(std::move(model));
 	}
+}
+
+bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac)
+{
+	assert(lb.x <= rt.x);
+	assert(lb.y <= rt.y);
+	assert(lb.z <= rt.z);
+
+	const float t1 = (lb.x - origin.x)*dirfrac.x;
+	const float t2 = (rt.x - origin.x)*dirfrac.x;
+	const float t3 = (lb.y - origin.y)*dirfrac.y;
+	const float t4 = (rt.y - origin.y)*dirfrac.y;
+	const float t5 = (lb.z - origin.z)*dirfrac.z;
+	const float t6 = (rt.z - origin.z)*dirfrac.z;
+
+	const float tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6));
+	const float tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6));
+
+	// if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+	if (tmax < 0)
+	{
+		return false;
+	}
+
+	// if tmin > tmax, ray doesn't intersect AABB
+	if (tmin > tmax)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker::Axis axis, XMFLOAT3&& origin, XMFLOAT3 dirfrac)
+{
+	XMMATRIX wMatrix;
+	m_D3D->GetWorldMatrix(wMatrix);
+	XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, wMatrix, axis);
+	m_D3D->GetWorldMatrix(wMatrix);
+	XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, wMatrix, axis);
+
+	return TestAABBIntersection(lb, rt, origin, dirfrac);
 }

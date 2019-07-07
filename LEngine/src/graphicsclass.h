@@ -31,6 +31,9 @@
 #include <ScreenGrab.h>
 #include <iostream>
 #include <fstream>
+#include <numeric>
+#include <vector>
+#include <chrono>
 #include <WICTextureLoader.h>
 #include "ConvoluteShaderClass.h"
 #include "ShadowMapClass.h"
@@ -68,6 +71,8 @@ const int MAX_TEXTURE_INPUT = 4;
 static const char* GrainTypeArray[] = { "Small", "Unregular", "Unregular white" };
 static const char* CURRENT_GRAIN_TYPE = GrainTypeArray[0];
 
+constexpr float MODEL_DRAG_SPEED = 1.0f;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: GraphicsClass
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +93,15 @@ public:
 			yAxis = false;
 			zAxis = false;
 		}
+	};
+
+	struct ModelPickerPosition {
+	public:
+		float x{ 0.0f };
+		float y{ 0.0f };
+
+		ModelPickerPosition() = default;
+		ModelPickerPosition(float xPosition, float yPosition) : x(xPosition), y(yPosition) {}
 	};
 
 	enum class ShaderWindowDirection : int
@@ -212,7 +226,7 @@ private:
 			return true;
 		}
 
-		XMFLOAT3 GetMinBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) 
+		XMFLOAT3 GetMinBounds(ModelClass* mainModel, Axis axis) const
 		{
 			const XMFLOAT3 basePosition{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
 				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY(),
@@ -244,7 +258,7 @@ private:
 			return{ basePosition.x - lengthX, basePosition.y - lengthY, basePosition.z - lengthZ };
 		}
 
-		XMFLOAT3 GetMaxBounds(ModelClass* mainModel, XMMATRIX& worldMatrix, Axis axis) 
+		XMFLOAT3 GetMaxBounds(ModelClass* mainModel, Axis axis) const
 		{
 			const XMFLOAT3 basePosition	{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX(),
 				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY(),
@@ -276,6 +290,16 @@ private:
 			return{ basePosition.x + lengthX, basePosition.y + lengthY, basePosition.z + lengthZ };
 		}
 
+		XMFLOAT2 GetMinScreenspace(GraphicsClass* graphics, ModelClass* model, const Axis axis) const
+		{
+			return WorldToScreenspace(graphics, GetMinBounds(model, axis));
+		}
+
+		XMFLOAT2 GetMaxScreenspace(GraphicsClass* graphics, ModelClass* model, const Axis axis) const
+		{
+			return WorldToScreenspace(graphics, GetMaxBounds(model, axis));
+		}
+
 	private:
 		XMFLOAT3 GetPosition(ModelClass* mainModel, Axis axis) {
 			const float length = m_axisX->GetBounds().GetSizeX() * scale.x * 0.5f;
@@ -284,6 +308,39 @@ private:
 				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + (axis == Axis::Z ? length : 0.0f) };
 		}
 
+		XMFLOAT2 WorldToScreenspace(GraphicsClass* graphics, const XMFLOAT3 worldPos) const
+		{
+			XMMATRIX worldMatrix;
+			XMMATRIX viewMatrix;
+			XMMATRIX projectionMatrix;
+			XMVECTOR pos = { worldPos.x, worldPos.y, worldPos.z };
+			graphics->m_D3D->GetWorldMatrix(worldMatrix);
+			graphics->m_Camera->GetViewMatrix(viewMatrix);
+			graphics->m_D3D->GetProjectionMatrix(projectionMatrix);
+
+			//Transform to view space (camera space)
+			worldMatrix = XMMatrixMultiply(worldMatrix, viewMatrix);
+			worldMatrix = XMMatrixMultiply(worldMatrix, projectionMatrix);
+			pos = XMVector3Transform(pos, worldMatrix);
+
+			//Perspective projection
+			XMFLOAT2 screen = { pos.m128_f32[0], pos.m128_f32[1] };
+			screen.x /= pos.m128_f32[2]; //Divide by camera.z
+			screen.y /= pos.m128_f32[2]; //Divide by camera.z
+			//screen.y *= 2.0f;
+
+			if (std::abs(screen.x) > graphics->m_screenWidth || std::abs(screen.y) > graphics->m_screenHeight)
+				return{ static_cast<float>(graphics->m_screenWidth), static_cast<float>(graphics->m_screenHeight) };
+
+			constexpr float canvasWidth = 2.0f;
+			constexpr float canvasHeight = 2.0f;
+
+			screen.x = (screen.x + 1.0f) / 2.0f;
+			//screen.x = (screen.x + canvasWidth / 2.0f) / canvasWidth;
+			screen.y = (screen.y + canvasHeight / 2.0f) / canvasHeight;
+
+			return screen;
+		}
 
 	public:
 		ModelClass* m_axisX;
@@ -338,6 +395,8 @@ public:
 
 	void SaveScene(const std::string name);
 	void TryRayPick();
+	void UpdateRayPick();
+	void ResetRayPick();
 
 private:
 	bool Render();
@@ -523,6 +582,7 @@ private:
 
 	//Model-picker
 	ModelPickerBools m_modelPickerBools;
+	ModelPickerPosition m_modelPickerPosition;
 
 	//////////////////////////////
 	// Post-process using flags //
@@ -540,4 +600,15 @@ private:
 	int m_exitCount = 0;
 	int m_convolutionFace = 0;
 };
+
+template <typename T>
+T clamp(const T val, const T min, const T max)
+{
+	if (val > max)
+		return max;
+	if (val < min)
+		return min;
+
+	return val;
+}
 #endif

@@ -357,9 +357,23 @@ void SystemClass::HandleInput()
 		if (m_Input->IsKeyDown(VK_Q))
 			m_Graphics->MoveCameraDown(movementPerTick);
 
+		static bool previousFrameLMBPressed = false;
 		if (m_Mouse->GetLMBPressed())
 		{
-			m_Graphics->TryRayPick();
+			if (!previousFrameLMBPressed)
+			{
+				previousFrameLMBPressed = true;
+				m_Graphics->TryRayPick();
+			}
+			else
+			{
+				m_Graphics->UpdateRayPick();
+			}
+		}
+		else if (previousFrameLMBPressed)
+		{
+			previousFrameLMBPressed = false;
+			m_Graphics->ResetRayPick();
 		}
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())

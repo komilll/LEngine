@@ -230,13 +230,33 @@ void MouseClass::CalculateMouseMovement()
 	m_lastMousePoint = currentMousePos;
 }
 
+bool MouseClass::SetCursorPosition(XMFLOAT2 screenPos, bool clamped)
+{
+	if (clamped)
+	{
+		screenPos.x = (screenPos.x * 2.0f) - 1.0f;
+		screenPos.y = (screenPos.y * 2.0f) - 1.0f;
+	}
+	RECT desktop;
+	HWND hwnd = ::GetDesktopWindow();
+	::GetWindowRect(hwnd, &desktop);
+	POINT oldPoint;
+	GetCursorPos(&oldPoint);
+	
+	POINT point = { static_cast<LONG>(desktop.right * 0.5), static_cast<LONG>(desktop.bottom * 0.5) };
+	point.x += static_cast<LONG>(screenPos.x * (GetD3D()->GetWindowSize().x * 0.5f));
+	point.y += static_cast<LONG>(screenPos.y * (GetD3D()->GetWindowSize().y * 0.5f));
+
+	return SetCursorPos(point.x, oldPoint.y);
+}
+
 POINT MouseClass::CalculateMousePosition()
 {
 	POINT p;
 	if (!GetCursorPos(&p))
 	{
 		return{ 0,0 };
-	}
+	}	
 
 	//float mouseX{ 0 };
 	//float mouseY{ 0 };

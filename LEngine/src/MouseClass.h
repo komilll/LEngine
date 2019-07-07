@@ -26,6 +26,7 @@ public:
 	///<summary> Return [-1, 1] </summary>
 	void GetMouseLocationScreenSpace(float &mouseX, float &mouseY);
 	bool SetMouseLocation(int mouseX, int mouseY);
+	bool SetCursorPosition(XMFLOAT2 screenPos, bool clamped = false);
 	std::pair<float, float> GetMouseMovementFrame();
 
 	bool GetLMBPressed();

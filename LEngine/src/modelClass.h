@@ -72,6 +72,47 @@ public:
 		XMFLOAT3 GetCenter() const {
 			return{ GetCenterX(), GetCenterY(), GetCenterZ() };
 		}
+
+		float BoundingBoxSizeX(XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix)
+		{
+			float min;
+			float max;
+			{
+				XMMATRIX w = worldMatrix;
+				XMMATRIX v = viewMatrix;
+				XMMATRIX p = projectionMatrix;
+				XMVECTOR clipSpacePos = XMVector4Transform({ minX, GetCenterY(), GetCenterZ(), 1.0f }, w);
+				clipSpacePos = XMVector4Transform(clipSpacePos, v);
+				clipSpacePos = XMVector4Transform(clipSpacePos, p);
+
+				clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
+				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
+				XMFLOAT3 ndcSpacePos{ clipSpacePos.m128_f32[0],clipSpacePos.m128_f32[1], clipSpacePos.m128_f32[2] };
+				ndcSpacePos.x = (ndcSpacePos.x + 1.0f) * 0.5f;
+				ndcSpacePos.y = (ndcSpacePos.x + 1.0f) * 0.5f;
+
+				min = ndcSpacePos.x;
+			}
+			{
+				XMMATRIX w = worldMatrix;
+				XMMATRIX v = viewMatrix;
+				XMMATRIX p = projectionMatrix;
+				XMVECTOR clipSpacePos = XMVector4Transform({ maxX, GetCenterY(), GetCenterZ(), 1.0f }, w);
+				clipSpacePos = XMVector4Transform(clipSpacePos, v);
+				clipSpacePos = XMVector4Transform(clipSpacePos, p);
+
+				clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
+				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
+				XMFLOAT3 ndcSpacePos{ clipSpacePos.m128_f32[0],clipSpacePos.m128_f32[1], clipSpacePos.m128_f32[2] };
+				ndcSpacePos.x = (ndcSpacePos.x + 1.0f) * 0.5f;
+				ndcSpacePos.y = (ndcSpacePos.x + 1.0f) * 0.5f;
+
+				max = ndcSpacePos.x;
+			}
+			return max - min;
+		}
 	};
 
 	enum class ShapeSize : int

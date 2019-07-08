@@ -73,10 +73,11 @@ public:
 			return{ GetCenterX(), GetCenterY(), GetCenterZ() };
 		}
 
-		float BoundingBoxSizeX(XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix)
+		XMFLOAT3 BoundingBoxSize(XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix)
 		{
-			float min;
-			float max;
+			XMFLOAT3 min{};
+			XMFLOAT3 max{};
+			//X axis
 			{
 				XMMATRIX w = worldMatrix;
 				XMMATRIX v = viewMatrix;
@@ -84,15 +85,9 @@ public:
 				XMVECTOR clipSpacePos = XMVector4Transform({ minX, GetCenterY(), GetCenterZ(), 1.0f }, w);
 				clipSpacePos = XMVector4Transform(clipSpacePos, v);
 				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-
 				clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
-				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
-				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
-				XMFLOAT3 ndcSpacePos{ clipSpacePos.m128_f32[0],clipSpacePos.m128_f32[1], clipSpacePos.m128_f32[2] };
-				ndcSpacePos.x = (ndcSpacePos.x + 1.0f) * 0.5f;
-				ndcSpacePos.y = (ndcSpacePos.x + 1.0f) * 0.5f;
 
-				min = ndcSpacePos.x;
+				min.x = (clipSpacePos.m128_f32[0] + 1.0f) * 0.5f;
 			}
 			{
 				XMMATRIX w = worldMatrix;
@@ -101,17 +96,57 @@ public:
 				XMVECTOR clipSpacePos = XMVector4Transform({ maxX, GetCenterY(), GetCenterZ(), 1.0f }, w);
 				clipSpacePos = XMVector4Transform(clipSpacePos, v);
 				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-
 				clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
-				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
-				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
-				XMFLOAT3 ndcSpacePos{ clipSpacePos.m128_f32[0],clipSpacePos.m128_f32[1], clipSpacePos.m128_f32[2] };
-				ndcSpacePos.x = (ndcSpacePos.x + 1.0f) * 0.5f;
-				ndcSpacePos.y = (ndcSpacePos.x + 1.0f) * 0.5f;
 
-				max = ndcSpacePos.x;
+				max.x = (clipSpacePos.m128_f32[0] + 1.0f) * 0.5f;
 			}
-			return max - min;
+			//Y axis
+			{
+				XMMATRIX w = worldMatrix;
+				XMMATRIX v = viewMatrix;
+				XMMATRIX p = projectionMatrix;
+				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), minY, GetCenterZ(), 1.0f }, w);
+				clipSpacePos = XMVector4Transform(clipSpacePos, v);
+				clipSpacePos = XMVector4Transform(clipSpacePos, p);
+				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+
+				min.y = (clipSpacePos.m128_f32[1] + 1.0f) * 0.5f;
+			}
+			{
+				XMMATRIX w = worldMatrix;
+				XMMATRIX v = viewMatrix;
+				XMMATRIX p = projectionMatrix;
+				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), maxY, GetCenterZ(), 1.0f }, w);
+				clipSpacePos = XMVector4Transform(clipSpacePos, v);
+				clipSpacePos = XMVector4Transform(clipSpacePos, p);
+				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+
+				max.y = (clipSpacePos.m128_f32[1] + 1.0f) * 0.5f;
+			}
+			//Z Axis
+			{
+				XMMATRIX w = worldMatrix;
+				XMMATRIX v = viewMatrix;
+				XMMATRIX p = projectionMatrix;
+				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), GetCenterY(), minZ, 1.0f }, w);
+				clipSpacePos = XMVector4Transform(clipSpacePos, v);
+				clipSpacePos = XMVector4Transform(clipSpacePos, p);
+				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
+
+				min.z = (clipSpacePos.m128_f32[2] + 1.0f) * 0.5f;
+			}
+			{
+				XMMATRIX w = worldMatrix;
+				XMMATRIX v = viewMatrix;
+				XMMATRIX p = projectionMatrix;
+				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), GetCenterY(), maxZ, 1.0f }, w);
+				clipSpacePos = XMVector4Transform(clipSpacePos, v);
+				clipSpacePos = XMVector4Transform(clipSpacePos, p);
+				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
+
+				max.z = (clipSpacePos.m128_f32[2] + 1.0f) * 0.5f;
+			}
+			return { max.x - min.x, max.y - min.y, max.z - min.z };
 		}
 	};
 

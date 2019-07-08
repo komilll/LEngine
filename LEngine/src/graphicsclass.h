@@ -394,9 +394,17 @@ public:
 	std::pair<float, float> GetCurrentMousePosition();
 
 	void SaveScene(const std::string name);
+
+#pragma region Model picker
+public:
 	void TryRayPick();
 	void UpdateRayPick();
 	void ResetRayPick();
+
+private:
+	float CalculateMouseArrowDotProduct(ModelClass* const model, const ModelPicker::Axis axis, const XMFLOAT2 mouseNormalized);
+	void CreateModelPickerMVP(ModelClass* const model, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix);
+#pragma endregion
 
 private:
 	bool Render();

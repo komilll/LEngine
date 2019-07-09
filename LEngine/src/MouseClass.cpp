@@ -223,6 +223,15 @@ D3DClass * MouseClass::GetD3D()
 	return m_d3d;
 }
 
+void MouseClass::SetVisibility(BOOL visible)
+{
+	if (m_visible != visible)
+	{
+		m_visible = visible;
+		ShowCursor(visible);
+	}
+}
+
 void MouseClass::CalculateMouseMovement()
 {
 	POINT currentMousePos = CalculateMousePosition();
@@ -245,9 +254,9 @@ bool MouseClass::SetCursorPosition(XMFLOAT2 screenPos, bool clamped)
 	
 	POINT point = { static_cast<LONG>(desktop.right * 0.5), static_cast<LONG>(desktop.bottom * 0.5) };
 	point.x += static_cast<LONG>(screenPos.x * (GetD3D()->GetWindowSize().x * 0.5f));
-	point.y += static_cast<LONG>(screenPos.y * (GetD3D()->GetWindowSize().y * 0.5f));
+	point.y -= static_cast<LONG>(screenPos.y * (GetD3D()->GetWindowSize().y * 0.5f));
 
-	return SetCursorPos(point.x, oldPoint.y);
+	return SetCursorPos(point.x, point.y);
 }
 
 POINT MouseClass::CalculateMousePosition()

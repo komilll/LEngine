@@ -2866,6 +2866,20 @@ void GraphicsClass::SaveScene(const std::string name)
 }
 
 static std::pair<float, float> savedMousePos{};
+void GraphicsClass::TryPickObjects()
+{
+	for (const auto& model : m_sceneModels)
+	{
+		const auto result = RaycastToModel(model);
+		const XMFLOAT3 lb = model->GetBounds().GetMinBounds(model);
+		const XMFLOAT3 rt = model->GetBounds().GetMinBounds(model);
+		if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac))
+		{
+			m_selectedModel = model;
+			return;
+		}
+	}
+}
 void GraphicsClass::TryRayPick()
 {
 	for (const auto& model : m_sceneModels)
@@ -2874,69 +2888,29 @@ void GraphicsClass::TryRayPick()
 		{
 			return;
 		}
-		//Go to [-1, 1] coordinates
-		float x = GetCurrentMousePosition().first;
-		float y = GetCurrentMousePosition().second;
-		if (x > 1.0f)
-			x = 1.0f;
-		else if (x < -1.0f)
-			x = -1.0f;
 
-		if (y > 1.0f)
-			y = 1.0f;
-		else if (y < -1.0f)
-			y = -1.0f;
-
-		float pointX, pointY;
-		XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
-		XMVECTOR origin, rayOrigin, direction, rayDirection;
-		bool intersect, result;
-
-		pointX = x;
-		pointY = y;
-
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-		pointX = pointX / projectionMatrix.r[0].m128_f32[0];
-		pointY = pointY / projectionMatrix.r[1].m128_f32[1];
-
-		m_Camera->GetViewMatrix(viewMatrix);
-		inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
-
-		direction = {
-			(pointX * inverseViewMatrix.r[0].m128_f32[0]) + (pointY * inverseViewMatrix.r[1].m128_f32[0]) + inverseViewMatrix.r[2].m128_f32[0],
-			(pointX * inverseViewMatrix.r[0].m128_f32[1]) + (pointY * inverseViewMatrix.r[1].m128_f32[1]) + inverseViewMatrix.r[2].m128_f32[1],
-			(pointX * inverseViewMatrix.r[0].m128_f32[2]) + (pointY * inverseViewMatrix.r[1].m128_f32[2]) + inverseViewMatrix.r[2].m128_f32[2]
-		};
-
-		origin = { m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z };
-
-		m_D3D->GetWorldMatrix(worldMatrix);
-		translateMatrix = XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z);
-		worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
-
-		inverseWorldMatrix = XMMatrixInverse(nullptr, worldMatrix);
-
-		rayOrigin = XMVector3TransformCoord(origin, inverseWorldMatrix);
-		rayDirection = XMVector3TransformNormal(direction, inverseWorldMatrix);
-
-		rayDirection = XMVector3Normalize(rayDirection);
-
-		XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
-
-		if (TryPickModelPickerArrow(model, ModelPicker::Axis::X, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
-		{
-			m_modelPickerBools.xAxis = true;
-		}
-		else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Y, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
-		{
-			m_modelPickerBools.yAxis = true;
-		}
-		else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Z, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
-		{
-			m_modelPickerBools.zAxis = true;
-		}
+		//if (TryPickModelPickerArrow(model, ModelPicker::Axis::X, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
+		//{
+		//	m_modelPickerBools.xAxis = true;
+		//	m_mouse->GetMouse()->SetVisibility(FALSE);
+		//	savedMousePos = GetCurrentMousePosition();
+		//	return;
+		//}
+		//else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Y, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
+		//{
+		//	m_modelPickerBools.yAxis = true;
+		//	m_mouse->GetMouse()->SetVisibility(FALSE);
+		//	savedMousePos = GetCurrentMousePosition();
+		//	return;
+		//}
+		//else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Z, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
+		//{
+		//	m_modelPickerBools.zAxis = true;
+		//	m_mouse->GetMouse()->SetVisibility(FALSE);
+		//	savedMousePos = GetCurrentMousePosition();
+		//	return;
+		//}
 	}
-	savedMousePos = GetCurrentMousePosition();
 }
 
 void GraphicsClass::UpdateRayPick()
@@ -2946,8 +2920,10 @@ void GraphicsClass::UpdateRayPick()
 		return;
 	}
 
-	XMFLOAT2 mouse = { GetCurrentMousePosition().first - savedMousePos.first, GetCurrentMousePosition().second - savedMousePos.second };
-	XMFLOAT2 mouseNormalized = { XMVector2Normalize({ mouse.x, mouse.y }).m128_f32[0], XMVector2Normalize({ mouse.x, mouse.y }).m128_f32[1] };
+	const XMFLOAT2 mouse = { GetCurrentMousePosition().first - savedMousePos.first, GetCurrentMousePosition().second - savedMousePos.second };
+	const XMFLOAT2 mouseNormalized = { XMVector2Normalize({ mouse.x, mouse.y }).m128_f32[0], XMVector2Normalize({ mouse.x, mouse.y }).m128_f32[1] };
+	const float mouseLength = std::sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
+
 	if (std::isnan(mouse.x) || std::isnan(mouse.y))
 	{
 		return;
@@ -2969,20 +2945,20 @@ void GraphicsClass::UpdateRayPick()
 		if (m_modelPickerBools.xAxis)
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::X, mouseNormalized);
-			const float sizeX = model->GetBounds().GetSizeX() * (mouse.x * 0.5f / boundsScreenSize.x);
-			model->SetPosition(model->GetPosition().x + sizeX * dot * (mouse.x > 0.0f ? 1.0f : -1.0f), model->GetPosition().y, model->GetPosition().z);
+			const float sizeX = model->GetBounds().GetSizeX() * (mouseLength * 0.5f / boundsScreenSize.x);
+			model->SetPosition(model->GetPosition().x + std::abs(sizeX * dot) * (mouse.x > 0.0f ? 1.0f : -1.0f), model->GetPosition().y, model->GetPosition().z);
 		}
 		else if (m_modelPickerBools.yAxis)
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::Y, mouseNormalized);
-			const float sizeY = model->GetBounds().GetSizeY() * (mouse.y * 0.5f / boundsScreenSize.y);
-			model->SetPosition(model->GetPosition().x, model->GetPosition().y + sizeY * dot * (mouse.y > 0.0f ? 1.0f : -1.0f), model->GetPosition().z);
+			const float sizeY = model->GetBounds().GetSizeY() * (mouseLength * 0.5f / boundsScreenSize.y);
+			model->SetPosition(model->GetPosition().x, model->GetPosition().y + std::abs(sizeY * dot) * (mouse.y > 0.0f ? 1.0f : -1.0f), model->GetPosition().z);
 		}
 		else if (m_modelPickerBools.zAxis)
 		{
-			//const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::Z, mouseNormalized);
-			//const float sizeZ = model->GetBounds().GetSizeZ() * (mouse.x * 0.5f / boundsScreenSize.z);
-			//model->SetPosition(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z + sizeZ * dot);
+			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::Z, mouseNormalized);
+			const float sizeZ = model->GetBounds().GetSizeZ() * (mouseLength * 0.1f / boundsScreenSize.z);
+			model->SetPosition(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z + sizeZ * dot);
 		}
 	}
 	savedMousePos = GetCurrentMousePosition();
@@ -2990,23 +2966,12 @@ void GraphicsClass::UpdateRayPick()
 
 void GraphicsClass::ResetRayPick()
 {
-	m_modelPickerBools.Reset();
-
-	//XMFLOAT2 min = m_modelPicker->GetMinScreenspace(this, m_sceneModels[0], ModelPicker::Axis::X);
-	//XMFLOAT2 max = m_modelPicker->GetMaxScreenspace(this, m_sceneModels[0], ModelPicker::Axis::X);
-
-	//max.y *= -1.0f;
-
-	//XMFLOAT2 screenPos = { min.x + m_modelPickerPosition.x * (max.x - min.x), min.y + m_modelPickerPosition.y * (max.y - min.y) };
-	//screenPos.x = clamp(screenPos.x, 0.0f, 1.0f);
-	//screenPos.y = clamp(screenPos.y, 0.0f, 1.0f);
-
-	//max.x = clamp(max.x, 0.0f, 1.0f);
-	//max.y = clamp(max.y, 0.0f, 1.0f);
-
-	//const float mousePos = GetCurrentMousePosition().first;
-
-	//m_mouse->GetMouse()->SetCursorPosition(max, true);
+	if (m_modelPickerBools.xAxis || m_modelPickerBools.yAxis || m_modelPickerBools.zAxis)
+	{
+		m_modelPickerBools.Reset();
+		m_mouse->GetMouse()->SetCursorPosition(m_modelPicker->WorldToScreenspace(this, m_sceneModels[0]->GetBounds().GetCenter(), m_sceneModels[0]), false);
+		m_mouse->GetMouse()->SetVisibility(TRUE);
+	}
 }
 
 float GraphicsClass::CalculateMouseArrowDotProduct(ModelClass * const model, const ModelPicker::Axis axis, const XMFLOAT2 mouseNormalized)
@@ -3035,6 +3000,60 @@ void GraphicsClass::CreateModelPickerMVP(ModelClass* const model, XMMATRIX & wor
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 }
 
+GraphicsClass::MouseRaycastResult GraphicsClass::RaycastToModel(ModelClass* const model)
+{
+	//Go to [-1, 1] coordinates
+	float x = GetCurrentMousePosition().first;
+	float y = GetCurrentMousePosition().second;
+	if (x > 1.0f)
+		x = 1.0f;
+	else if (x < -1.0f)
+		x = -1.0f;
+
+	if (y > 1.0f)
+		y = 1.0f;
+	else if (y < -1.0f)
+		y = -1.0f;
+
+	float pointX, pointY;
+	XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
+	XMVECTOR origin, rayOrigin, direction, rayDirection;
+	bool intersect, result;
+
+	pointX = x;
+	pointY = y;
+
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+	pointX = pointX / projectionMatrix.r[0].m128_f32[0];
+	pointY = pointY / projectionMatrix.r[1].m128_f32[1];
+
+	m_Camera->GetViewMatrix(viewMatrix);
+	inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
+
+	direction = {
+		(pointX * inverseViewMatrix.r[0].m128_f32[0]) + (pointY * inverseViewMatrix.r[1].m128_f32[0]) + inverseViewMatrix.r[2].m128_f32[0],
+		(pointX * inverseViewMatrix.r[0].m128_f32[1]) + (pointY * inverseViewMatrix.r[1].m128_f32[1]) + inverseViewMatrix.r[2].m128_f32[1],
+		(pointX * inverseViewMatrix.r[0].m128_f32[2]) + (pointY * inverseViewMatrix.r[1].m128_f32[2]) + inverseViewMatrix.r[2].m128_f32[2]
+	};
+
+	origin = { m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z };
+
+	m_D3D->GetWorldMatrix(worldMatrix);
+	translateMatrix = XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z);
+	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
+
+	inverseWorldMatrix = XMMatrixInverse(nullptr, worldMatrix);
+
+	rayOrigin = XMVector3TransformCoord(origin, inverseWorldMatrix);
+	rayDirection = XMVector3TransformNormal(direction, inverseWorldMatrix);
+
+	rayDirection = XMVector3Normalize(rayDirection);
+
+	XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
+
+	return MouseRaycastResult{ {origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac };
+}
+
 void GraphicsClass::LoadScene(const std::string name)
 {
 	std::string line;
@@ -3054,6 +3073,7 @@ void GraphicsClass::LoadScene(const std::string name)
 					const json11::Json::array position = json["position"].array_items();
 					const json11::Json::array scale = json["scale"].array_items();
 					const json11::Json::array rotation = json["rotation"].array_items();
+					const std::string materialName = json["material"].string_value();
 					model->m_name = sceneName;
 					if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
 					{
@@ -3080,7 +3100,7 @@ void GraphicsClass::CreateAABB(ModelClass * baseModel)
 	//CreateAABBBox(baseModel->GetBounds());
 }
 
-void GraphicsClass::CreateAABBBox(const ModelClass::Bounds bounds)
+void GraphicsClass::CreateAABBBox(const Bounds bounds)
 {
 	//Front
 	{

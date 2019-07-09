@@ -81,6 +81,15 @@ class GraphicsClass
 public:
 	bool RENDER_MATERIAL_EDITOR = true;
 
+	struct MouseRaycastResult
+	{
+	public:
+		XMFLOAT3 origin{};
+		XMFLOAT3 dirfrac{};
+
+		MouseRaycastResult(XMFLOAT3 Origin, XMFLOAT3 Dirfrac) : origin(Origin), dirfrac(Dirfrac) {}
+	};
+
 	struct ModelPickerBools
 	{
 	public:
@@ -177,7 +186,6 @@ private:
 
 		bool Render(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix, ModelClass* mainModel)
 		{
-
 			{
 				const XMFLOAT3 position = GetPosition(mainModel, Axis::X);
 
@@ -292,12 +300,67 @@ private:
 
 		XMFLOAT2 GetMinScreenspace(GraphicsClass* graphics, ModelClass* model, const Axis axis) const
 		{
-			return WorldToScreenspace(graphics, GetMinBounds(model, axis));
+			return WorldToScreenspace(graphics, GetMinBounds(model, axis), model);
 		}
 
 		XMFLOAT2 GetMaxScreenspace(GraphicsClass* graphics, ModelClass* model, const Axis axis) const
 		{
-			return WorldToScreenspace(graphics, GetMaxBounds(model, axis));
+			return WorldToScreenspace(graphics, GetMaxBounds(model, axis), model);
+		}
+
+		XMFLOAT2 WorldToScreenspace(GraphicsClass* graphics, const XMFLOAT3 worldPos, ModelClass* const model) const
+		{
+			//XMMATRIX worldMatrix;
+			//XMMATRIX viewMatrix;
+			//XMMATRIX projectionMatrix;
+			//XMVECTOR pos = { worldPos.x, worldPos.y, worldPos.z };
+			//graphics->m_D3D->GetWorldMatrix(worldMatrix);
+			//graphics->m_Camera->GetViewMatrix(viewMatrix);
+			//graphics->m_D3D->GetProjectionMatrix(projectionMatrix);
+
+			////Transform to view space (camera space)
+			//worldMatrix = XMMatrixMultiply(worldMatrix, viewMatrix);
+			//worldMatrix = XMMatrixMultiply(worldMatrix, projectionMatrix);
+			//pos = XMVector3Transform(pos, worldMatrix);
+
+			////Perspective projection
+			//XMFLOAT2 screen = { pos.m128_f32[0], pos.m128_f32[1] };
+			//screen.x /= pos.m128_f32[2]; //Divide by camera.z
+			//screen.y /= pos.m128_f32[2]; //Divide by camera.z
+			//							 //screen.y *= 2.0f;
+
+			//if (std::abs(screen.x) > graphics->m_screenWidth || std::abs(screen.y) > graphics->m_screenHeight)
+			//	return{ static_cast<float>(graphics->m_screenWidth), static_cast<float>(graphics->m_screenHeight) };
+
+			//constexpr float canvasWidth = 2.0f;
+			//constexpr float canvasHeight = 2.0f;
+
+			//screen.x = (screen.x + 1.0f) / 2.0f;
+			////screen.x = (screen.x + canvasWidth / 2.0f) / canvasWidth;
+			//screen.y = (screen.y + canvasHeight / 2.0f) / canvasHeight;
+
+			//return screen;
+
+			XMMATRIX worldMatrix;
+			XMMATRIX viewMatrix;
+			XMMATRIX projectionMatrix;
+			graphics->m_D3D->GetWorldMatrix(worldMatrix);
+			graphics->m_Camera->GetViewMatrix(viewMatrix);
+			graphics->m_D3D->GetProjectionMatrix(projectionMatrix);
+
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+			XMVECTOR clipSpacePos = XMVector4Transform({ worldPos.x, worldPos.y, worldPos.z, 1.0f }, worldMatrix);
+			clipSpacePos = XMVector4Transform(clipSpacePos, viewMatrix);
+			clipSpacePos = XMVector4Transform(clipSpacePos, projectionMatrix);
+			clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
+			clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+
+			return{ clipSpacePos.m128_f32[0], clipSpacePos.m128_f32[1] };
 		}
 
 	private:
@@ -306,40 +369,6 @@ private:
 			return{ mainModel->GetPositionXYZ().x + mainModel->GetBounds().GetCenterX() + (axis == Axis::X ? length : 0.0f),
 				mainModel->GetPositionXYZ().y + mainModel->GetBounds().GetCenterY() + (axis == Axis::Y ? length : 0.0f),
 				mainModel->GetPositionXYZ().z + mainModel->GetBounds().GetCenterZ() + (axis == Axis::Z ? length : 0.0f) };
-		}
-
-		XMFLOAT2 WorldToScreenspace(GraphicsClass* graphics, const XMFLOAT3 worldPos) const
-		{
-			XMMATRIX worldMatrix;
-			XMMATRIX viewMatrix;
-			XMMATRIX projectionMatrix;
-			XMVECTOR pos = { worldPos.x, worldPos.y, worldPos.z };
-			graphics->m_D3D->GetWorldMatrix(worldMatrix);
-			graphics->m_Camera->GetViewMatrix(viewMatrix);
-			graphics->m_D3D->GetProjectionMatrix(projectionMatrix);
-
-			//Transform to view space (camera space)
-			worldMatrix = XMMatrixMultiply(worldMatrix, viewMatrix);
-			worldMatrix = XMMatrixMultiply(worldMatrix, projectionMatrix);
-			pos = XMVector3Transform(pos, worldMatrix);
-
-			//Perspective projection
-			XMFLOAT2 screen = { pos.m128_f32[0], pos.m128_f32[1] };
-			screen.x /= pos.m128_f32[2]; //Divide by camera.z
-			screen.y /= pos.m128_f32[2]; //Divide by camera.z
-			//screen.y *= 2.0f;
-
-			if (std::abs(screen.x) > graphics->m_screenWidth || std::abs(screen.y) > graphics->m_screenHeight)
-				return{ static_cast<float>(graphics->m_screenWidth), static_cast<float>(graphics->m_screenHeight) };
-
-			constexpr float canvasWidth = 2.0f;
-			constexpr float canvasHeight = 2.0f;
-
-			screen.x = (screen.x + 1.0f) / 2.0f;
-			//screen.x = (screen.x + canvasWidth / 2.0f) / canvasWidth;
-			screen.y = (screen.y + canvasHeight / 2.0f) / canvasHeight;
-
-			return screen;
 		}
 
 	public:
@@ -397,6 +426,7 @@ public:
 
 #pragma region Model picker
 public:
+	void TryPickObjects();
 	void TryRayPick();
 	void UpdateRayPick();
 	void ResetRayPick();
@@ -404,6 +434,7 @@ public:
 private:
 	float CalculateMouseArrowDotProduct(ModelClass* const model, const ModelPicker::Axis axis, const XMFLOAT2 mouseNormalized);
 	void CreateModelPickerMVP(ModelClass* const model, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix);
+	MouseRaycastResult RaycastToModel(ModelClass* const model);
 #pragma endregion
 
 private:
@@ -464,7 +495,7 @@ private:
 	//Saving/Loading scene
 	void LoadScene(const std::string name);
 	void CreateAABB(ModelClass* baseModel);
-	void CreateAABBBox(const ModelClass::Bounds bounds);
+	void CreateAABBBox(const Bounds bounds);
 	bool TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac);
 	bool TryPickModelPickerArrow(ModelClass* model, const ModelPicker::Axis axis, XMFLOAT3&& origin, XMFLOAT3 dirfrac);
 

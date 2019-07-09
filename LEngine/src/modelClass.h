@@ -28,6 +28,47 @@ using namespace DirectX;
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: ModelClass
 ////////////////////////////////////////////////////////////////////////////////
+class ModelClass;
+
+class Bounds
+{
+public:
+	float minX;
+	float maxX;
+	float minY;
+	float maxY;
+	float minZ;
+	float maxZ;
+
+	float GetSizeX() const {
+		return (maxX - minX);
+	}
+	float GetSizeY() const {
+		return (maxY - minY);
+	}
+	float GetSizeZ() const {
+		return (maxZ - minZ);
+	}
+
+	float GetCenterX() const {
+		return minX + (maxX - minX) * 0.5f;
+	}
+	float GetCenterY() const {
+		return minY + (maxY - minY) * 0.5f;
+	}
+	float GetCenterZ() const {
+		return minZ + (maxZ - minZ) * 0.5f;
+	}
+
+	XMFLOAT3 GetCenter() const {
+		return{ GetCenterX(), GetCenterY(), GetCenterZ() };
+	}
+
+	XMFLOAT3 BoundingBoxSize(XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix);
+	XMFLOAT3 GetMinBounds(ModelClass* const model) const;
+	XMFLOAT3 GetMaxBounds(ModelClass* const model) const;
+};
+
 class ModelClass
 {
 private:
@@ -40,114 +81,8 @@ private:
 		XMFLOAT3 binormal;
 	};
 public:
-	struct Bounds {
-	public:
-		float minX;
-		float maxX;
-		float minY;
-		float maxY;
-		float minZ;
-		float maxZ;
-
-		float GetSizeX() const {
-			return (maxX - minX);
-		}
-		float GetSizeY() const {
-			return (maxY - minY);
-		}
-		float GetSizeZ() const {
-			return (maxZ - minZ);
-		}
-
-		float GetCenterX() const {
-			return minX + (maxX - minX) * 0.5f;
-		}
-		float GetCenterY() const {
-			return minY + (maxY - minY) * 0.5f;
-		}
-		float GetCenterZ() const {
-			return minZ + (maxZ - minZ) * 0.5f;
-		}
-
-		XMFLOAT3 GetCenter() const {
-			return{ GetCenterX(), GetCenterY(), GetCenterZ() };
-		}
-
-		XMFLOAT3 BoundingBoxSize(XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix)
-		{
-			XMFLOAT3 min{};
-			XMFLOAT3 max{};
-			//X axis
-			{
-				XMMATRIX w = worldMatrix;
-				XMMATRIX v = viewMatrix;
-				XMMATRIX p = projectionMatrix;
-				XMVECTOR clipSpacePos = XMVector4Transform({ minX, GetCenterY(), GetCenterZ(), 1.0f }, w);
-				clipSpacePos = XMVector4Transform(clipSpacePos, v);
-				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-				clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
-
-				min.x = (clipSpacePos.m128_f32[0] + 1.0f) * 0.5f;
-			}
-			{
-				XMMATRIX w = worldMatrix;
-				XMMATRIX v = viewMatrix;
-				XMMATRIX p = projectionMatrix;
-				XMVECTOR clipSpacePos = XMVector4Transform({ maxX, GetCenterY(), GetCenterZ(), 1.0f }, w);
-				clipSpacePos = XMVector4Transform(clipSpacePos, v);
-				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-				clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
-
-				max.x = (clipSpacePos.m128_f32[0] + 1.0f) * 0.5f;
-			}
-			//Y axis
-			{
-				XMMATRIX w = worldMatrix;
-				XMMATRIX v = viewMatrix;
-				XMMATRIX p = projectionMatrix;
-				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), minY, GetCenterZ(), 1.0f }, w);
-				clipSpacePos = XMVector4Transform(clipSpacePos, v);
-				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
-
-				min.y = (clipSpacePos.m128_f32[1] + 1.0f) * 0.5f;
-			}
-			{
-				XMMATRIX w = worldMatrix;
-				XMMATRIX v = viewMatrix;
-				XMMATRIX p = projectionMatrix;
-				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), maxY, GetCenterZ(), 1.0f }, w);
-				clipSpacePos = XMVector4Transform(clipSpacePos, v);
-				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-				clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
-
-				max.y = (clipSpacePos.m128_f32[1] + 1.0f) * 0.5f;
-			}
-			//Z Axis
-			{
-				XMMATRIX w = worldMatrix;
-				XMMATRIX v = viewMatrix;
-				XMMATRIX p = projectionMatrix;
-				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), GetCenterY(), minZ, 1.0f }, w);
-				clipSpacePos = XMVector4Transform(clipSpacePos, v);
-				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
-
-				min.z = (clipSpacePos.m128_f32[2] + 1.0f) * 0.5f;
-			}
-			{
-				XMMATRIX w = worldMatrix;
-				XMMATRIX v = viewMatrix;
-				XMMATRIX p = projectionMatrix;
-				XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), GetCenterY(), maxZ, 1.0f }, w);
-				clipSpacePos = XMVector4Transform(clipSpacePos, v);
-				clipSpacePos = XMVector4Transform(clipSpacePos, p);
-				clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
-
-				max.z = (clipSpacePos.m128_f32[2] + 1.0f) * 0.5f;
-			}
-			return { max.x - min.x, max.y - min.y, max.z - min.z };
-		}
+	enum class Axis {
+		X, Y, Z
 	};
 
 	enum class ShapeSize : int
@@ -229,6 +164,7 @@ public:
 private:
 	std::string m_savedName;
 	std::string m_modelFilename;
+	std::string m_materialName;
 	ID3D11Device* m_device;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;

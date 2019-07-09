@@ -357,6 +357,11 @@ void SystemClass::HandleInput()
 		if (m_Input->IsKeyDown(VK_Q))
 			m_Graphics->MoveCameraDown(movementPerTick);
 
+		if (m_Mouse->GetLMBPressed())
+		{
+			m_Graphics->TryPickObjects();
+		}
+
 		static bool previousFrameLMBPressed = false;
 		if (m_Mouse->GetLMBPressed())
 		{

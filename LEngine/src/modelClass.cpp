@@ -360,7 +360,8 @@ std::string ModelClass::GetSaveData() const
 		{"sceneName", m_savedName}, 
 		{"position", json11::Json::array{m_position[0], m_position[1], m_position[2]}},
 		{"scale", json11::Json::array{m_scale[0], m_scale[1], m_scale[2]}},
-		{"rotation", json11::Json::array{m_rotation[0], m_rotation[1], m_rotation[2]}}
+		{"rotation", json11::Json::array{m_rotation[0], m_rotation[1], m_rotation[2]}},
+		{"material", m_materialName}
 	};
 	return obj.dump();
 }
@@ -410,6 +411,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	const std::size_t lastPos = filename.find(".obj");
 	filename.erase(lastPos + 4);
 	modelFilename = filename.c_str();
+	m_modelFilename = filename.c_str();
 
 #pragma region Read and save data from file
 	if (!ReadBinary(modelFilename, verticesVector, indicesVec))
@@ -1122,4 +1124,104 @@ void ModelClass::SaveVisibleName()
 	{
 		m_savedName += m_name.data()[i];
 	}
+}
+
+XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
+{
+	XMFLOAT3 min{};
+	XMFLOAT3 max{};
+	//X axis
+	{
+		XMMATRIX w = worldMatrix;
+		XMMATRIX v = viewMatrix;
+		XMMATRIX p = projectionMatrix;
+		XMVECTOR clipSpacePos = XMVector4Transform({ minX, GetCenterY(), GetCenterZ(), 1.0f }, w);
+		clipSpacePos = XMVector4Transform(clipSpacePos, v);
+		clipSpacePos = XMVector4Transform(clipSpacePos, p);
+		clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
+
+		min.x = (clipSpacePos.m128_f32[0] + 1.0f) * 0.5f;
+	}
+	{
+		XMMATRIX w = worldMatrix;
+		XMMATRIX v = viewMatrix;
+		XMMATRIX p = projectionMatrix;
+		XMVECTOR clipSpacePos = XMVector4Transform({ maxX, GetCenterY(), GetCenterZ(), 1.0f }, w);
+		clipSpacePos = XMVector4Transform(clipSpacePos, v);
+		clipSpacePos = XMVector4Transform(clipSpacePos, p);
+		clipSpacePos.m128_f32[0] /= clipSpacePos.m128_f32[3];
+
+		max.x = (clipSpacePos.m128_f32[0] + 1.0f) * 0.5f;
+	}
+	//Y axis
+	{
+		XMMATRIX w = worldMatrix;
+		XMMATRIX v = viewMatrix;
+		XMMATRIX p = projectionMatrix;
+		XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), minY, GetCenterZ(), 1.0f }, w);
+		clipSpacePos = XMVector4Transform(clipSpacePos, v);
+		clipSpacePos = XMVector4Transform(clipSpacePos, p);
+		clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+
+		min.y = (clipSpacePos.m128_f32[1] + 1.0f) * 0.5f;
+	}
+	{
+		XMMATRIX w = worldMatrix;
+		XMMATRIX v = viewMatrix;
+		XMMATRIX p = projectionMatrix;
+		XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), maxY, GetCenterZ(), 1.0f }, w);
+		clipSpacePos = XMVector4Transform(clipSpacePos, v);
+		clipSpacePos = XMVector4Transform(clipSpacePos, p);
+		clipSpacePos.m128_f32[1] /= clipSpacePos.m128_f32[3];
+
+		max.y = (clipSpacePos.m128_f32[1] + 1.0f) * 0.5f;
+	}
+	//Z Axis
+	{
+		XMMATRIX w = worldMatrix;
+		XMMATRIX v = viewMatrix;
+		XMMATRIX p = projectionMatrix;
+		XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), GetCenterY(), minZ, 1.0f }, w);
+		clipSpacePos = XMVector4Transform(clipSpacePos, v);
+		clipSpacePos = XMVector4Transform(clipSpacePos, p);
+		clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
+
+		//min.z = (clipSpacePos.m128_f32[2] + 1.0f) * 0.5f;
+		min.z = clipSpacePos.m128_f32[2];
+	}
+	{
+		XMMATRIX w = worldMatrix;
+		XMMATRIX v = viewMatrix;
+		XMMATRIX p = projectionMatrix;
+		XMVECTOR clipSpacePos = XMVector4Transform({ GetCenterX(), GetCenterY(), maxZ, 1.0f }, w);
+		clipSpacePos = XMVector4Transform(clipSpacePos, v);
+		clipSpacePos = XMVector4Transform(clipSpacePos, p);
+		clipSpacePos.m128_f32[2] /= clipSpacePos.m128_f32[3];
+
+		//max.z = (clipSpacePos.m128_f32[2] + 1.0f) * 0.5f;
+		max.z = clipSpacePos.m128_f32[2];
+	}
+	return{ max.x - min.x, max.y - min.y, max.z - min.z };
+}
+
+XMFLOAT3 Bounds::GetMinBounds(ModelClass * const model) const
+{
+	const XMFLOAT3 basePosition{ model->GetPositionXYZ().x + GetCenterX(), model->GetPositionXYZ().y + GetCenterY(), model->GetPositionXYZ().z + GetCenterZ() };
+
+	const float lengthX{ GetSizeX() * 0.5f * model->GetScale().x };
+	const float lengthY{ GetSizeY() * 0.5f * model->GetScale().y };
+	const float lengthZ{ GetSizeZ() * 0.5f * model->GetScale().z };
+
+	return{ basePosition.x - lengthX, basePosition.y - lengthY, basePosition.z - lengthZ };
+}
+
+XMFLOAT3 Bounds::GetMaxBounds(ModelClass * const model) const
+{
+	const XMFLOAT3 basePosition{ model->GetPositionXYZ().x + GetCenterX(), model->GetPositionXYZ().y + GetCenterY(), model->GetPositionXYZ().z + GetCenterZ() };
+
+	const float lengthX{ GetSizeX() * 0.5f * model->GetScale().x };
+	const float lengthY{ GetSizeY() * 0.5f * model->GetScale().y };
+	const float lengthZ{ GetSizeZ() * 0.5f * model->GetScale().z };
+
+	return{ basePosition.x + lengthX, basePosition.y + lengthY, basePosition.z + lengthZ };
 }

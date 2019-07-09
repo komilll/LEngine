@@ -1,1 +1,1 @@
-{"modelName": "bunny.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj.obj", "position": [0.36159753799438477, -0.047332338988780975, 0], "rotation": [0, 0, 0], "scale": [1, 1.1100000143051147, 1], "sceneName": ""}
+{"material": "", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}

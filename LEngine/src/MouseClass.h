@@ -10,6 +10,8 @@
 #include "inputclass.h"
 #include <utility>
 
+#include <windows.h>
+
 class MouseClass
 {
 public:
@@ -42,6 +44,8 @@ public:
 	
 	D3DClass* GetD3D();
 
+	void SetVisibility(BOOL visible);
+
 private:
 	void CalculateMouseMovement();
 	POINT CalculateMousePosition();
@@ -64,4 +68,5 @@ private:
 	float m_mouseSpeedSlowdown = 4.0f;
 
 	D3DClass* m_d3d;
+	BOOL m_visible{ TRUE };
 };

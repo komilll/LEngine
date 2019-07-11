@@ -22,6 +22,7 @@
 #include <sstream>
 #include "ModelPickerShader.h"
 #include "d3dclass.h"
+#include "MaterialPrefab.h"
 
 using namespace DirectX;
 
@@ -135,6 +136,9 @@ public:
 	std::string LoadModelCalculatePath();
 	void SaveVisibleName();
 
+	MaterialPrefab* const GetMaterial() const { return m_material; };
+	void SetMaterial(MaterialPrefab* const material);
+
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
 	void ShutdownBuffers();
@@ -172,6 +176,8 @@ private:
 	float m_scale[3] { 1.0f, 1.0f, 1.0f };
 	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
 	D3DClass* m_D3D;
+
+	MaterialPrefab* m_material;
 
 	Bounds bounds;
 	std::vector<ModelClass*> m_wireframeModels;

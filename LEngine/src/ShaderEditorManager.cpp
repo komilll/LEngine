@@ -1357,7 +1357,7 @@ void ShaderEditorManager::LoadAllMaterialsToArray()
 				file.erase(file.begin() + posNormal, file.end());
 				m_materialNames.push_back(file);
 
-				m_materials.push_back({file});
+				m_materials.push_back({file, m_D3D});
 			}
 		}
 	}

@@ -1126,6 +1126,11 @@ void ModelClass::SaveVisibleName()
 	}
 }
 
+void ModelClass::SetMaterial(MaterialPrefab * const material)
+{
+	m_material = material;
+}
+
 XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
 	XMFLOAT3 min{};

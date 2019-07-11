@@ -343,6 +343,10 @@ void SystemClass::HandleInput()
 	if (!m_Graphics->RENDER_MATERIAL_EDITOR)
 	{
 		lmbPressed = false;
+		if (m_Graphics->ImGuiHovered())
+		{
+			return;
+		}
 
 		if (m_Input->IsKeyDown(VK_W))
 			m_Graphics->MoveCameraForward(movementPerTick);
@@ -356,11 +360,6 @@ void SystemClass::HandleInput()
 			m_Graphics->MoveCameraUp(movementPerTick);
 		if (m_Input->IsKeyDown(VK_Q))
 			m_Graphics->MoveCameraDown(movementPerTick);
-
-		if (m_Mouse->GetLMBPressed())
-		{
-			m_Graphics->TryPickObjects();
-		}
 
 		static bool previousFrameLMBPressed = false;
 		if (m_Mouse->GetLMBPressed())
@@ -379,6 +378,11 @@ void SystemClass::HandleInput()
 		{
 			previousFrameLMBPressed = false;
 			m_Graphics->ResetRayPick();
+		}
+
+		if (m_Mouse->GetLMBPressed())
+		{
+			m_Graphics->TryPickObjects();
 		}
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())

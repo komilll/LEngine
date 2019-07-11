@@ -42,7 +42,7 @@ static float4 tex_14;
 Texture2D additionalTexture_5 : register(t12);
 static float4 tex_22;
 
-#define NUM_LIGHTS_DIRECTIONAL 0
+#define NUM_LIGHTS_DIRECTIONAL 1
 #define NUM_LIGHTS_POINT 0
 cbuffer LightingBuffer
 {
@@ -242,13 +242,14 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 		specular = numerator / max(denominator, 0.001);
 
-		float3 tint = float3(1.0, 0.0, 0.0);
+		//float3 tint = float3(1.0, 0.0, 0.0);
 		//albedo *= lerp(float3(1.0, 1.0, 1.0), tint, metalness);
 
 		float currentLightStrength = g_directionalLightDirectionStrength[i].w;
 		float lightPercentage = 1.0f;//currentLightStrength / accumulatedLightStrength;
-		float3 Lo = (kD * albedo / PI + specular) * NdotL * lightPercentage * g_directionalLightColor[i].xyz;
+		float3 Lo = (kD * albedo / PI + specular) * NdotL * lightPercentage * g_directionalLightColor[i].xyz * currentLightStrength;
 
+		//return float4(Lo, 1.0f);
 		finalColor += float4(Lo, 1.0f);
 		//finalColor += float4(ambient + Lo, 1.0f);
 	}
@@ -296,6 +297,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
 	//return float4(ambient, 1.0);
+	//return float4(diffuse, 1.0);
 }
 
 float GeometrySchlickGGX(float NdotV, float k)

@@ -423,6 +423,7 @@ public:
 	std::pair<float, float> GetCurrentMousePosition();
 
 	void SaveScene(const std::string name);
+	bool ImGuiHovered() const { return m_shaderEditorManager->IsMouseHoveredOnImGui(); };
 
 #pragma region Model picker
 public:
@@ -622,6 +623,9 @@ private:
 	//Model-picker
 	ModelPickerBools m_modelPickerBools;
 	ModelPickerPosition m_modelPickerPosition;
+
+	//Materials
+	std::map<std::string, MaterialPrefab*> m_materialList;
 
 	//////////////////////////////
 	// Post-process using flags //

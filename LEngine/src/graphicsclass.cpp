@@ -127,14 +127,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Load textures for PBR shader
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
-		return false;
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
-		return false;
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
-		return false;
-	if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
-		return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
+	//	return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
+	//	return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
+	//	return false;
+	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
+	//	return false;
 	
 	//m_pbrShader->SetRoughness(0.32f);
 	//m_pbrShader->SetMetalness(1.0f);
@@ -171,6 +171,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, "Debug Menu", 0.5f, TextEngine::Align::CENTER);
 
 	//Roughness slider
+/*	
 	m_roughnessSlider = new UISlider;
 	if (!m_roughnessSlider->Initialize(m_D3D, -0.73f, -0.52f, 0.6f, 0.05f))
 		return false;
@@ -211,7 +212,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_texturePreviewAlbedo = new UITexturePreview;
 	m_texturePreviewAlbedo->Initialize(m_D3D, -0.58f, -0.510f, 0.1f, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
 	AddText(-0.94f, -0.350f, "Albedo:", 0.35f);
-
+*/
 	ID3D11Resource* tmp = nullptr;
 	for (int i = 0; i < MAX_TEXTURE_INPUT; i++)
 	{
@@ -1075,6 +1076,15 @@ bool GraphicsClass::RenderScene()
 
 	for (ModelClass* const& model : m_sceneModels)
 	{
+		if (!model->GetMaterial())
+		{
+			if (m_materialList.find("pbr") == m_materialList.end())
+			{
+				m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+			}
+			model->SetMaterial(m_materialList.at("pbr"));
+			continue;
+		}
 		//model->Render(m_D3D->GetDeviceContext());
 		////XMVECTOR light_ = XMVector3Rotate(XMVECTOR{ -1.0f, 0.0, -1.0f, 0.0f }, XMVECTOR{ m_Camera->GetRotation().x / 3.14f, m_Camera->GetRotation().y / 3.14f, m_Camera->GetRotation().z / 3.14f, 0.0f });
 		//m_pbrShader->m_lightDirection = XMFLOAT4(light_.m128_f32[0], 0.0, light_.m128_f32[2], 1.2f);
@@ -1089,9 +1099,11 @@ bool GraphicsClass::RenderScene()
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
-		m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
+		//m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
+		model->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
 		model->Render(m_D3D->GetDeviceContext());
-		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		//result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		result = model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
 
@@ -1292,12 +1304,13 @@ bool GraphicsClass::RenderScene()
 
 	//Draw model picker
 	m_D3D->TurnZBufferOff();
-	for (ModelClass* const& model : m_sceneModels)
+	//for (ModelClass* const& model : m_sceneModels)
+	if (m_selectedModel)
 	{
 		m_Camera->GetViewMatrix(viewMatrix);
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
-		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, model))
+		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, m_selectedModel))
 			return false;
 	}
 	m_D3D->TurnZBufferOn();
@@ -1365,6 +1378,7 @@ bool GraphicsClass::RenderGUI()
 				}
 			}
 		}
+		m_shaderEditorManager->ResetMouseHoveredOnImGui();
 		m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
 		ImGui::End();
 	}
@@ -1503,6 +1517,60 @@ bool GraphicsClass::RenderGUI()
 				m_selectedModel = nullptr;
 			}
 		}
+
+
+		//if (ImGui::BeginCombo("Type Grain", CURRENT_GRAIN_TYPE))
+		//{
+		//	const int count = (int)GrainType::Count;
+		//	for (int i = 0; i < count; ++i)
+		//	{
+		//		bool isSelected = (i == (int)m_grainSettings.type);
+		//		if (ImGui::Selectable(GrainTypeArray[i], isSelected))
+		//		{
+		//			CURRENT_GRAIN_TYPE = GrainTypeArray[i];
+		//			m_grainSettings.type = (GrainType)i;
+		//		}
+		//		if (isSelected)
+		//		{
+		//			ImGui::SetItemDefaultFocus();
+		//		}
+		//	}
+
+		//	ImGui::EndCombo();
+		//}
+
+		if (m_selectedModel->GetMaterial())
+		{
+			if (ImGui::BeginCombo("Model material", m_selectedModel->GetMaterial()->GetName().c_str()))
+			{
+				for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
+				{
+					if (ImGui::Selectable(name.c_str()))
+					{
+						if (m_materialList.find(name) == m_materialList.end()) //Material not found, create new one
+						{
+							m_materialList.insert({ name, new MaterialPrefab{ name, m_D3D } });
+						}
+						m_selectedModel->SetMaterial(m_materialList.at(name));
+						break;
+					}
+				}
+				if (!m_shaderEditorManager->IsMouseHoveredOnImGui())
+				{
+					m_shaderEditorManager->ResetMouseHoveredOnImGui();
+					m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
+				}
+				ImGui::EndCombo();
+			}
+		}
+		else
+		{
+			if (m_materialList.find("pbr") == m_materialList.end())
+			{
+				m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+			}
+			m_selectedModel->SetMaterial(m_materialList.at("pbr"));
+		}
 	}
 	else
 	{
@@ -1511,6 +1579,12 @@ bool GraphicsClass::RenderGUI()
 			ModelClass* model = new ModelClass;
 			if (model->Initialize(m_D3D, model->LoadModelCalculatePath().c_str()))
 			{
+				if (m_materialList.find("pbr") == m_materialList.end())
+				{
+					m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+				}
+				m_selectedModel->SetMaterial(m_materialList.at("pbr"));
+
 				m_sceneModels.push_back(std::move(model));
 				CreateAABB(model);
 			}
@@ -1607,6 +1681,11 @@ bool GraphicsClass::RenderGUI()
 	m_internalTextureViewIndex = 0;
 	
 	//Finish ImGui and render
+	if (!m_shaderEditorManager->IsMouseHoveredOnImGui())
+	{
+		m_shaderEditorManager->ResetMouseHoveredOnImGui();
+		m_shaderEditorManager->UpdateMouseHoveredOnImGui(ImGui::IsWindowHovered() || ImGui::IsWindowFocused());
+	}
 	ImGui::End();
 
 Finished_drawing:
@@ -2868,48 +2947,71 @@ void GraphicsClass::SaveScene(const std::string name)
 static std::pair<float, float> savedMousePos{};
 void GraphicsClass::TryPickObjects()
 {
+	if (m_shaderEditorManager->IsMouseHoveredOnImGui())
+	{
+		return;
+	}
+	if (m_modelPickerBools.xAxis || m_modelPickerBools.yAxis || m_modelPickerBools.zAxis)
+	{
+		return;
+	}
+
 	for (const auto& model : m_sceneModels)
 	{
 		const auto result = RaycastToModel(model);
 		const XMFLOAT3 lb = model->GetBounds().GetMinBounds(model);
-		const XMFLOAT3 rt = model->GetBounds().GetMinBounds(model);
+		const XMFLOAT3 rt = model->GetBounds().GetMaxBounds(model);
+
 		if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac))
 		{
+			if (m_selectedModel)
+			{
+				for (const auto& model : m_sceneModels)
+					model->m_selected = false;
+			}
 			m_selectedModel = model;
+			model->m_selected = true;
 			return;
 		}
 	}
+
+	m_selectedModel = nullptr;
 }
 void GraphicsClass::TryRayPick()
 {
-	for (const auto& model : m_sceneModels)
+	//for (const auto& model : m_sceneModels)
 	{
 		if (m_modelPickerBools.xAxis || m_modelPickerBools.yAxis || m_modelPickerBools.zAxis)
 		{
 			return;
 		}
+		if (!m_selectedModel)
+		{
+			return;
+		}
 
-		//if (TryPickModelPickerArrow(model, ModelPicker::Axis::X, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
-		//{
-		//	m_modelPickerBools.xAxis = true;
-		//	m_mouse->GetMouse()->SetVisibility(FALSE);
-		//	savedMousePos = GetCurrentMousePosition();
-		//	return;
-		//}
-		//else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Y, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
-		//{
-		//	m_modelPickerBools.yAxis = true;
-		//	m_mouse->GetMouse()->SetVisibility(FALSE);
-		//	savedMousePos = GetCurrentMousePosition();
-		//	return;
-		//}
-		//else if (TryPickModelPickerArrow(model, ModelPicker::Axis::Z, { origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac))
-		//{
-		//	m_modelPickerBools.zAxis = true;
-		//	m_mouse->GetMouse()->SetVisibility(FALSE);
-		//	savedMousePos = GetCurrentMousePosition();
-		//	return;
-		//}
+		const auto result = RaycastToModel(m_selectedModel);
+		if (TryPickModelPickerArrow(m_selectedModel, ModelPicker::Axis::X, { result.origin.x, result.origin.y, result.origin.z }, result.dirfrac))
+		{
+			m_modelPickerBools.xAxis = true;
+			m_mouse->GetMouse()->SetVisibility(FALSE);
+			savedMousePos = GetCurrentMousePosition();
+			return;
+		}
+		else if (TryPickModelPickerArrow(m_selectedModel, ModelPicker::Axis::Y, { result.origin.x, result.origin.y, result.origin.z }, result.dirfrac))
+		{
+			m_modelPickerBools.yAxis = true;
+			m_mouse->GetMouse()->SetVisibility(FALSE);
+			savedMousePos = GetCurrentMousePosition();
+			return;
+		}
+		else if (TryPickModelPickerArrow(m_selectedModel, ModelPicker::Axis::Z, { result.origin.x, result.origin.y, result.origin.z }, result.dirfrac))
+		{
+			m_modelPickerBools.zAxis = true;
+			m_mouse->GetMouse()->SetVisibility(FALSE);
+			savedMousePos = GetCurrentMousePosition();
+			return;
+		}
 	}
 }
 
@@ -2937,7 +3039,8 @@ void GraphicsClass::UpdateRayPick()
 	XMMATRIX viewMatrix;
 	XMMATRIX projectionMatrix;
 
-	for (const auto& model : m_sceneModels)
+	//for (const auto& model : m_sceneModels)
+	if (const auto model = m_selectedModel)
 	{
 		CreateModelPickerMVP(model, worldMatrix, viewMatrix, projectionMatrix);
 		const XMFLOAT3 boundsScreenSize = model->GetBounds().BoundingBoxSize(worldMatrix, viewMatrix, projectionMatrix);
@@ -2968,9 +3071,12 @@ void GraphicsClass::ResetRayPick()
 {
 	if (m_modelPickerBools.xAxis || m_modelPickerBools.yAxis || m_modelPickerBools.zAxis)
 	{
-		m_modelPickerBools.Reset();
-		m_mouse->GetMouse()->SetCursorPosition(m_modelPicker->WorldToScreenspace(this, m_sceneModels[0]->GetBounds().GetCenter(), m_sceneModels[0]), false);
-		m_mouse->GetMouse()->SetVisibility(TRUE);
+		if (m_selectedModel)
+		{
+			m_modelPickerBools.Reset();
+			m_mouse->GetMouse()->SetCursorPosition(m_modelPicker->WorldToScreenspace(this, m_selectedModel->GetBounds().GetCenter(), m_selectedModel), false);
+			m_mouse->GetMouse()->SetVisibility(TRUE);
+		}
 	}
 }
 
@@ -3075,6 +3181,7 @@ void GraphicsClass::LoadScene(const std::string name)
 					const json11::Json::array rotation = json["rotation"].array_items();
 					const std::string materialName = json["material"].string_value();
 					model->m_name = sceneName;
+					model->SaveVisibleName();
 					if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
 					{
 						model->SetPosition(position.at(0).number_value(), position.at(1).number_value(), position.at(2).number_value());

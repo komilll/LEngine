@@ -38,6 +38,7 @@ public:
 	void DeleteCurrentShaderBlock();
 	void ResetMouseHoveredOnImGui();
 	void UpdateMouseHoveredOnImGui(bool hovered);
+	bool IsMouseHoveredOnImGui() const { return m_mouseHoveredImGui; };
 	void SetRefToClickedOutside(bool* clickedOutside);
 
 	void CopyBlocks();

@@ -53,6 +53,7 @@ public:
 	//SAVE MATERIAL TO FILE
 	bool SaveMaterial(std::string filename);
 	bool IsWorkingOnSavedMaterial();
+	const std::string GetCurrentMaterialName() const;
 
 	//LOAD MATERIAL FROM FILE
 	bool LoadMaterial(std::string filename);

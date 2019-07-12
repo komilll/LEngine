@@ -1008,6 +1008,11 @@ bool ShaderEditorManager::IsWorkingOnSavedMaterial()
 	return m_currentMaterialName.size() > 0;
 }
 
+const std::string ShaderEditorManager::GetCurrentMaterialName() const
+{
+	return m_currentMaterialName;
+}
+
 bool ShaderEditorManager::LoadMaterial(std::string filename)
 {
 	if (filename == "")

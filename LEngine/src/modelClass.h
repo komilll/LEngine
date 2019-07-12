@@ -95,6 +95,7 @@ public:
 
 public:
 	ModelClass();
+	ModelClass(D3DClass * d3d, const char* modelFilename, XMFLOAT3 position = { 0.0f, 0.0f, 0.0f }, bool pickable = true);
 	ModelClass(const ModelClass&);
 	~ModelClass();
 

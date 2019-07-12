@@ -10,6 +10,14 @@ ModelClass::ModelClass()
 	m_indexBuffer = 0;
 }
 
+ModelClass::ModelClass(D3DClass * d3d, const char * modelFilename, XMFLOAT3 position, bool pickable)
+{
+	m_vertexBuffer = 0;
+	m_indexBuffer = 0;
+	Initialize(d3d, modelFilename, pickable);
+	SetPosition(position);
+}
+
 
 ModelClass::ModelClass(const ModelClass& other)
 {

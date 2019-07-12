@@ -441,6 +441,7 @@ private:
 private:
 	bool Render();
 	bool RenderScene();
+	bool RenderMaterialPreview();
 	bool RenderGUI();
 	void ReinitializeMainModel();
 	void RefreshModelTick();
@@ -492,6 +493,7 @@ private:
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
 	static float lerp(float a, float b, float val);
+	inline static __int64 GetTimeMillis();
 
 	//Saving/Loading scene
 	void LoadScene(const std::string name);
@@ -508,6 +510,7 @@ private:
 	ModelClass* m_Model;
 	ModelClass* m_cubeModel;
 	ModelClass* m_skyboxModel;
+	ModelClass* m_spherePreviewModel;
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRGenerated* m_pbrShader;
 	SkyboxShaderClass* m_skyboxShader;
@@ -654,4 +657,5 @@ T clamp(const T val, const T min, const T max)
 
 	return val;
 }
+
 #endif

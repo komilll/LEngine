@@ -1,33 +1,27 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: cameraclass.h
-////////////////////////////////////////////////////////////////////////////////
 #ifndef _CAMERACLASS_H_
 #define _CAMERACLASS_H_
 
-
-//////////////
-// INCLUDES //
-//////////////
 #include <DirectXMath.h>
 using namespace DirectX;
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: CameraClass
-////////////////////////////////////////////////////////////////////////////////
+namespace Camera
+{
+	constexpr XMVECTOR up{ 0.0f, 1.0f, 0.0f, 0.0f };
+	constexpr XMVECTOR right{ 1.0f, 0.0f, 0.0f, 0.0f };
+	constexpr XMVECTOR forward{ 0.0f, 0.0f, 1.0f, 0.0f };
+};
+
 class CameraClass
 {
 public:
-	CameraClass();
-	CameraClass(const CameraClass&);
-	~CameraClass();
-
-	void SetPosition(float, float, float);
-	void SetRotation(float, float, float);
-
+	void SetPosition(float x, float y, float z);
+	void SetPosition(XMFLOAT3 position);
 	void AddPosition(float rightLeft, float backForward, float upDown);
+	XMFLOAT3 GetPosition() const;
 
-	XMFLOAT3 GetPosition();
-	XMFLOAT3 GetRotation();
+	void SetRotation(float pitch, float yaw, float roll);
+	void SetRotation(XMFLOAT3 rotation);
+	XMFLOAT3 GetRotation() const;
 
 	void Render();
 	void RenderPreview(const XMVECTOR modelPosition);
@@ -35,12 +29,18 @@ public:
 	void GetViewPreviewMatrix(XMMATRIX& viewPreviewMatrix);
 
 private:
-	float m_positionX, m_positionY, m_positionZ;
-	float m_rotationX, m_rotationY, m_rotationZ;
+	float m_positionX{ 0.0f };
+	float m_positionY{ 0.0f };
+	float m_positionZ{ 0.0f };
+	float m_rotationX{ 0.0f };
+	float m_rotationY{ 0.0f };
+	float m_rotationZ{ 0.0f };
 	XMMATRIX m_viewMatrix;
 	XMMATRIX m_viewPreviewMatrix;
 
-	float m_storedLeftRight, m_storedBackForward, m_storedUpDown;
+	float m_storedLeftRight{ 0.0f };
+	float m_storedBackForward{ 0.0f };
+	float m_storedUpDown{ 0.0f };
 };
 
 #endif

@@ -35,7 +35,6 @@
 #include <vector>
 #include <chrono>
 #include <WICTextureLoader.h>
-#include "ConvoluteShaderClass.h"
 #include "ShadowMapClass.h"
 #include "LightClass.h"
 #include "SingleColorClass.h"

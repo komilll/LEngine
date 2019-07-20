@@ -1,34 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: d3dclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "d3dclass.h"
 
-
-D3DClass::D3DClass()
-{
-	m_swapChain = 0;
-	m_device = 0;
-	m_deviceContext = 0;
-	m_renderTargetView = 0;
-	m_depthStencilBuffer = 0;
-	m_depthStencilState = 0;
-	m_depthStencilView = 0;
-	m_rasterState = 0;
-}
-
-
-D3DClass::D3DClass(const D3DClass& other)
-{
-}
-
-
-D3DClass::~D3DClass()
-{
-}
-
-
-bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, 
-						  float screenDepth, float screenNear)
+bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
 	HRESULT result;
 	IDXGIFactory* factory;
@@ -445,6 +417,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 void D3DClass::Shutdown()
 {
+	//TODO Improve shutting down objects or remove completely
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
 	if(m_swapChain)
 	{
@@ -505,22 +478,10 @@ void D3DClass::Shutdown()
 
 void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 {
-	float color[4];
-
-
-	// Setup the color to clear the buffer to.
-	color[0] = red;
-	color[1] = green;
-	color[2] = blue;
-	color[3] = alpha;
-
-	// Clear the back buffer.
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView, color);
-    
-	// Clear the depth buffer.
+	std::array<float, 4> color{ red, green, blue, alpha };
+	// Clear the back buffer and depth buffer
+	m_deviceContext->ClearRenderTargetView(m_renderTargetView, static_cast<FLOAT*>(&color[0]));	
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-	return;
 }
 
 
@@ -531,15 +492,7 @@ void D3DClass::EndScene()
 	{
 		// Lock to screen refresh rate.
 		if (m_swapChain)
-		{
-			try {
-				m_swapChain->Present(1, 0);
-			}
-			catch (const std::exception& ex)
-			{
-
-			}
-		}
+			m_swapChain->Present(1, 0);
 	}
 	else
 	{
@@ -552,77 +505,53 @@ void D3DClass::EndScene()
 }
 
 
-ID3D11Device* D3DClass::GetDevice()
+ID3D11Device* D3DClass::GetDevice() const
 {
 	return m_device;
 }
 
 
-ID3D11DeviceContext* D3DClass::GetDeviceContext()
+ID3D11DeviceContext* D3DClass::GetDeviceContext() const
 {
 	return m_deviceContext;
 }
 
-HWND * D3DClass::GetHWND()
+HWND * D3DClass::GetHWND() const
 {
 	return m_hwnd;
 }
 
-
-void D3DClass::GetProjectionMatrix(XMMATRIX& projectionMatrix)
+void D3DClass::GetProjectionMatrix(XMMATRIX& projectionMatrix) const
 {
 	projectionMatrix = m_projectionMatrix;
-	return;
 }
 
-
-void D3DClass::GetWorldMatrix(XMMATRIX& worldMatrix)
+void D3DClass::GetWorldMatrix(XMMATRIX& worldMatrix) const
 {
 	worldMatrix = m_worldMatrix;
-	return;
 }
 
-
-void D3DClass::GetOrthoMatrix(XMMATRIX& orthoMatrix)
+void D3DClass::GetOrthoMatrix(XMMATRIX& orthoMatrix) const
 {
 	orthoMatrix = m_orthoMatrix;
-	return;
 }
 
-
-void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
+void D3DClass::GetVideoCardInfo(char* cardName, int& memory) const
 {
 	strcpy_s(cardName, 128, m_videoCardDescription);
 	memory = m_videoCardMemory;
-	return;
 }
 
-void D3DClass::EnableAlphaBlending()
+void D3DClass::EnableAlphaBlending() const
 {
-	float blendFactor[4];
-
-	// Setup the blend factor.
-	blendFactor[0] = 0.0f;
-	blendFactor[1] = 0.0f;
-	blendFactor[2] = 0.0f;
-	blendFactor[3] = 0.0f;
-
-	// Turn on the alpha blending.
-	m_deviceContext->OMSetBlendState(m_enableAlphaBlending, blendFactor, 0xffffffff);
+	constexpr std::array<float, 4> blendFactor{ 0.0f, 0.0f, 0.0f, 0.0f };
+	m_deviceContext->OMSetBlendState(m_enableAlphaBlending, static_cast<const FLOAT*>(&blendFactor[0]), 0xffffffff);
 }
 
-void D3DClass::DisableAlphaBlending()
+void D3DClass::DisableAlphaBlending() const
 {
-	float blendFactor[4];
-
-	// Setup the blend factor.
-	blendFactor[0] = 0.0f;
-	blendFactor[1] = 0.0f;
-	blendFactor[2] = 0.0f;
-	blendFactor[3] = 0.0f;
-
-	// Turn on the alpha blending.
-	m_deviceContext->OMSetBlendState(m_disableAlphaBlending, blendFactor, 0xffffffff);
+	constexpr std::array<float, 4> blendFactor{ 0.0f, 0.0f, 0.0f, 0.0f };
+	m_deviceContext->OMSetBlendState(m_disableAlphaBlending, static_cast<const FLOAT*>(&blendFactor[0]), 0xffffffff);
 }
 
 void D3DClass::ChangeRasterizerCulling(D3D11_CULL_MODE cullMode)
@@ -653,27 +582,27 @@ void D3DClass::ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFun
 	}
 }
 
-ID3D11DepthStencilView * D3DClass::GetDepthStencilView()
+ID3D11DepthStencilView * D3DClass::GetDepthStencilView() const
 {
 	return m_depthStencilView;
 }
 
-void D3DClass::SetBackBufferRenderTarget()
+void D3DClass::SetBackBufferRenderTarget() const
 {
 	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView());
 }
 
-void D3DClass::TurnZBufferOn()
+void D3DClass::TurnZBufferOn() const
 {
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 }
 
-void D3DClass::TurnZBufferOff()
+void D3DClass::TurnZBufferOff() const
 {
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilStateZBufferOff, 1);
 }
 
-void D3DClass::DisableDepthTesting()
+void D3DClass::DisableDepthTesting() const
 {
 	ID3D11DepthStencilState* stencil;
 	D3D11_DEPTH_STENCIL_DESC desc;
@@ -689,7 +618,7 @@ void D3DClass::DisableDepthTesting()
 	m_deviceContext->OMSetDepthStencilState(stencil, 1);
 }
 
-void D3DClass::EnableDepthTesting()
+void D3DClass::EnableDepthTesting() const
 {
 	ID3D11DepthStencilState* stencil;
 	D3D11_DEPTH_STENCIL_DESC desc;

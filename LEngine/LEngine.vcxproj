@@ -179,7 +179,6 @@
     <ClInclude Include="src\BloomShaderClass.h" />
     <ClInclude Include="src\BlurShaderClass.h" />
     <ClInclude Include="src\cameraclass.h" />
-    <ClInclude Include="src\ConvoluteShaderClass.h" />
     <ClInclude Include="src\d3dclass.h" />
     <ClInclude Include="src\GBufferShader.h" />
     <ClInclude Include="src\graphicsclass.h" />
@@ -231,7 +230,6 @@
     <ClCompile Include="src\BloomShaderClass.cpp" />
     <ClCompile Include="src\BlurShaderClass.cpp" />
     <ClCompile Include="src\cameraclass.cpp" />
-    <ClCompile Include="src\ConvoluteShaderClass.cpp" />
     <ClCompile Include="src\d3dclass.cpp" />
     <ClCompile Include="src\GBufferShader.cpp" />
     <ClCompile Include="src\graphicsclass.cpp" />

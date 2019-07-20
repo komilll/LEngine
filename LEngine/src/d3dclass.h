@@ -1,30 +1,18 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: d3dclass.h
-////////////////////////////////////////////////////////////////////////////////
 #ifndef _D3DCLASS_H_
 #define _D3DCLASS_H_
 
-
-/////////////
-// LINKING //
-/////////////
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
 
-//////////////
-// INCLUDES //
-//////////////
 #include <dxgi.h>
 #include <d3dcommon.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <exception>
 #include "BaseShaderClass.h"
+#include <array>
 using namespace DirectX;
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: D3DClass
-////////////////////////////////////////////////////////////////////////////////
 class D3DClass
 {
 private:
@@ -37,43 +25,38 @@ private:
 	};
 
 public:
-	D3DClass();
-	D3DClass(const D3DClass&);
-	~D3DClass();
-
-	bool Initialize(int, int, bool, HWND, bool, float, float);
+	bool Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear);
 	void Shutdown();
 	
-	void BeginScene(float, float, float, float);
+	void BeginScene(float red, float green, float blue, float alpha);
 	void EndScene();
 
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
-	HWND* GetHWND();
+	ID3D11Device* GetDevice() const;
+	ID3D11DeviceContext* GetDeviceContext() const;
+	HWND* GetHWND() const;
+	ID3D11DepthStencilView* GetDepthStencilView() const;
 
 	//Get MVP matrices
-	void GetProjectionMatrix(XMMATRIX&);
-	void GetWorldMatrix(XMMATRIX&);
-	void GetOrthoMatrix(XMMATRIX&);
+	void GetProjectionMatrix(XMMATRIX&) const;
+	void GetWorldMatrix(XMMATRIX&) const;
+	void GetOrthoMatrix(XMMATRIX&) const;
 
-	void GetVideoCardInfo(char*, int&);
+	void GetVideoCardInfo(char* cardName, int& memory) const;
 
 	//Enable/Disable alpha blending for translucent 
-	void EnableAlphaBlending();
-	void DisableAlphaBlending();
+	void EnableAlphaBlending() const;
+	void DisableAlphaBlending() const;
 
 	void ChangeRasterizerCulling(D3D11_CULL_MODE cullMode);
-
 	void ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFunc);
 
-	ID3D11DepthStencilView* GetDepthStencilView();
-	void SetBackBufferRenderTarget();
+	void SetBackBufferRenderTarget() const;
 
-	void TurnZBufferOn();
-	void TurnZBufferOff();
+	void TurnZBufferOn() const;
+	void TurnZBufferOff() const;
 
-	void DisableDepthTesting();
-	void EnableDepthTesting();
+	void DisableDepthTesting() const;
+	void EnableDepthTesting() const;
 
 	void ResetViewport();
 	BaseShaderClass::vertexInputType GetBaseInputType();

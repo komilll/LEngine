@@ -30,12 +30,15 @@ public:
 	XMFLOAT3 GetRotation();
 
 	void Render();
-	void GetViewMatrix(XMMATRIX&);
+	void RenderPreview(const XMVECTOR modelPosition);
+	void GetViewMatrix(XMMATRIX& viewMatrix);
+	void GetViewPreviewMatrix(XMMATRIX& viewPreviewMatrix);
 
 private:
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;
 	XMMATRIX m_viewMatrix;
+	XMMATRIX m_viewPreviewMatrix;
 
 	float m_storedLeftRight, m_storedBackForward, m_storedUpDown;
 };

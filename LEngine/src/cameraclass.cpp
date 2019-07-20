@@ -113,9 +113,27 @@ void CameraClass::Render()
 	return;
 }
 
+void CameraClass::RenderPreview(const XMVECTOR modelPosition)
+{
+	XMVECTOR up = { 0.0f, 1.0f, 0.0f, 0.0f };
+	XMVECTOR position = { m_positionX, m_positionY, m_positionZ, 0.0f };
+	XMVECTOR target = modelPosition;
+
+	// Create the rotation matrix from the yaw, pitch, and roll values.
+	//target = XMVector3Normalize(target);
+
+	//target = { m_positionX + target.m128_f32[0] , m_positionY + target.m128_f32[1], m_positionZ + target.m128_f32[2], 0.0f };
+	m_viewPreviewMatrix = XMMatrixLookAtLH(position, target, up);
+}
 
 void CameraClass::GetViewMatrix(XMMATRIX& viewMatrix)
 {
 	viewMatrix = m_viewMatrix;
+	return;
+}
+
+void CameraClass::GetViewPreviewMatrix(XMMATRIX & viewPreviewMatrix)
+{
+	viewPreviewMatrix = m_viewPreviewMatrix;
 	return;
 }

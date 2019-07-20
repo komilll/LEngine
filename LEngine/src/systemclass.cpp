@@ -401,7 +401,8 @@ void SystemClass::HandleInput()
 
 				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -xDiff * rotatePerTick * previewRotateScale, 0 });
 				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ yDiff * rotatePerTick * previewRotateScale, 0, 0 });
-				m_Graphics->RotateCamera(cameraRotation);
+				//m_Graphics->RotateCamera(cameraRotation);
+				m_Graphics->AddPreviewCameraRotation(xDiff * 10.0f, yDiff * 10.0f);
 
 				pos = m_Graphics->GetCurrentMousePosition();
 			}

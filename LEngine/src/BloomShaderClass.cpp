@@ -25,19 +25,15 @@ bool BloomShaderClass::SetShaderParameters(ID3D11DeviceContext * deviceContext, 
 	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
 		return false;
 
-	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	BloomIntensity* dataPtr2;
-	unsigned int bufferNmber;
-
 	/////// VERTEX BUFFERS ///////
-
+		//-------------
 	/////// PIXEL BUFFERS ///////
-	result = deviceContext->Map(m_bloomIntensityBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	const HRESULT result = deviceContext->Map(m_bloomIntensityBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 		return false;
 
-	dataPtr2 = (BloomIntensity*)mappedResource.pData;
+	BloomIntensity* dataPtr2 = static_cast<BloomIntensity*>(mappedResource.pData);
 	dataPtr2->intensity = m_bloomIntensity;
 	dataPtr2->padding = 0.0f;
 
@@ -48,7 +44,7 @@ bool BloomShaderClass::SetShaderParameters(ID3D11DeviceContext * deviceContext, 
 	return true;
 }
 
-void BloomShaderClass::SetBloomIntensity(XMFLOAT3 bloomIntensity)
+void BloomShaderClass::SetBloomIntensity(const XMFLOAT3 bloomIntensity)
 {
 	m_bloomIntensity = bloomIntensity;
 }

@@ -1,31 +1,18 @@
 #include "BlurShaderClass.h"
 
-BlurShaderClass::BlurShaderClass()
-{
-	BaseShaderClass::BaseShaderClass();
-
-	for (int i = 0; i < NUMBER_OF_WEIGHTS; ++i)
-	{
-		m_weights[i] = 1;
-	}
-}
-
-void BlurShaderClass::SetTextureSize(float size)
+void BlurShaderClass::SetTextureSize(const float size)
 {
 	m_size = size;
 }
 
-void BlurShaderClass::SetTextureResourceView(ID3D11ShaderResourceView * shaderResource)
+void BlurShaderClass::SetTextureResourceView(ID3D11ShaderResourceView *const shaderResource)
 {
 	m_shaderResource = shaderResource;
 }
 
-void BlurShaderClass::SetWeights(float weights[NUMBER_OF_WEIGHTS])
+void BlurShaderClass::SetWeights(std::array<float, k_numberOfWeights> weights)
 {
-	for (int i = 0; i < NUMBER_OF_WEIGHTS; ++i)
-	{
-		m_weights[i] = weights[i];
-	}
+	m_weights = weights;
 }
 
 bool BlurShaderClass::CreateBufferAdditionals(ID3D11Device *& device)
@@ -58,10 +45,7 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 		return false;
 
 	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ScreenSizeBuffer* dataPtr2;
-	BlurWeightsBuffer* dataPtr3;
-	unsigned int bufferNumber;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;	
 
 	/////// VERTEX BUFFERS ///////
 	//Screen size buffer
@@ -69,12 +53,12 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 	if (FAILED(result))
 		return false;
 
-	dataPtr2 = (ScreenSizeBuffer*)mappedResource.pData;
+	ScreenSizeBuffer* dataPtr2 = static_cast<ScreenSizeBuffer*>(mappedResource.pData);
 	dataPtr2->size = m_size;
 	dataPtr2->padding = XMFLOAT3{ 0,0,0 };
 
 	deviceContext->Unmap(m_screenSizeBuffer, 0);
-	bufferNumber = 1;
+	unsigned int bufferNumber{ 1 };
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_screenSizeBuffer);
 
 	/////// PIXEL BUFFERS ///////
@@ -82,9 +66,9 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 	if (FAILED(result))
 		return false;
 
-	dataPtr3 = (BlurWeightsBuffer*)mappedResource.pData;
+	BlurWeightsBuffer* dataPtr3 = static_cast<BlurWeightsBuffer*>(mappedResource.pData);
 	dataPtr3->weights = XMFLOAT4{ m_weights[0], m_weights[1], m_weights[2], m_weights[3] };
-	dataPtr3->lastWeightAndpadding = XMFLOAT4{ m_weights[4], -1, -1, -1 };
+	dataPtr3->lastWeightAndpadding = XMFLOAT4{ m_weights[5], -1, -1, -1 };
 
 	deviceContext->Unmap(m_weightsBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &m_weightsBuffer);
@@ -114,7 +98,7 @@ bool BlurShaderClass::CreateSamplerState(ID3D11Device * device)
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	// Create the texture sampler state.
-	HRESULT result = device->CreateSamplerState(&samplerDesc, &m_samplerState);
+	const HRESULT result = device->CreateSamplerState(&samplerDesc, &m_samplerState);
 	if (FAILED(result))
 		return false;
 

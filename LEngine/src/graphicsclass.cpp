@@ -63,8 +63,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_cubeModel)
 		return false;
 
-	m_spherePreviewModel = new ModelClass;
-	if (!m_spherePreviewModel)
+	m_previewData.model = new ModelClass;
+	if (!m_previewData.model)
 		return false;
 
 	//Initialize the model object.
@@ -72,9 +72,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 		return false;
 
-	result = m_spherePreviewModel->Initialize(m_D3D, "sphere.obj", false);
+	result = m_previewData.model->Initialize(m_D3D, "sphere.obj", false);
 	if (!result)
 		return false;
+	CreateAABB(m_previewData.model);
+	m_previewData.model->SetPosition(0.0f, 0.0f, 2.0f);
+	m_previewData.baseSize.x = m_previewData.model->GetBounds().GetSizeX();
+	m_previewData.baseSize.y = m_previewData.model->GetBounds().GetSizeY();
+	m_previewData.worldPos = m_previewData.model->GetPositionXYZ();
+	m_previewData.bounds = m_previewData.model->GetBounds();
 
 	//result = m_Model->Initialize(m_D3D->GetDevice(), "bunny.obj");
 	//if(!result)
@@ -610,29 +616,29 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
 
-	constexpr int rowCount = 10;
-	//LoadScene("test.txt");
-	for (int i = 0; i < rowCount; ++i)
-	{
-		for (int j = 0; j < rowCount; ++j)
-		{
-			ModelClass* model = new ModelClass;
-			//model->Initialize(m_D3D, "bunny.obj", false);
-			//model->SetPosition(0.25f * i, 0.25f * j, 10.0f);
-			m_sceneModels.push_back(std::move(model));
-		}
-	}
+	//constexpr int rowCount = 10;
+	LoadScene("test.txt");
+	//for (int i = 0; i < rowCount; ++i)
+	//{
+	//	for (int j = 0; j < rowCount; ++j)
+	//	{
+	//		ModelClass* model = new ModelClass;
+	//		//model->Initialize(m_D3D, "bunny.obj", false);
+	//		//model->SetPosition(0.25f * i, 0.25f * j, 10.0f);
+	//		m_sceneModels.push_back(std::move(model));
+	//	}
+	//}
 
-	auto start = GetTimeMillis();
-	for (const auto& model : m_sceneModels)
-	{ 
-		model->Initialize(m_D3D, "bunny.obj", false);
-	}
-	auto end = GetTimeMillis();
-	if (ofstream out{ "measure.txt" })
-	{
-		out << (end - start);
-	}
+	//auto start = GetTimeMillis();
+	//for (const auto& model : m_sceneModels)
+	//{ 
+	//	model->Initialize(m_D3D, "bunny.obj", false);
+	//}
+	//auto end = GetTimeMillis();
+	//if (ofstream out{ "measure.txt" })
+	//{
+	//	out << (end - start);
+	//}
 
 	m_modelPicker = new ModelPicker(m_D3D);
 
@@ -734,6 +740,16 @@ void GraphicsClass::MoveCameraDown(float val)
 void GraphicsClass::RotateCamera(XMVECTOR rotation)
 {
 	m_Camera->SetRotation(m_Camera->GetRotation().x + rotation.m128_f32[0], m_Camera->GetRotation().y + rotation.m128_f32[1], m_Camera->GetRotation().z + rotation.m128_f32[2]);
+}
+
+void GraphicsClass::AddPreviewCameraRotation(float x, float y)
+{
+	if (m_previewData.model)
+	{
+		m_previewData.screenPos.x += x;
+		m_previewData.screenPos.y += y;
+		m_previewData.model->SetPosition(cos(m_previewData.screenPos.x) * m_previewData.worldPos.z, cos(m_previewData.screenPos.y) * 0.0f, sin(m_previewData.screenPos.x) * m_previewData.worldPos.z);
+	}
 }
 
 void GraphicsClass::UpdateUI()
@@ -873,10 +889,10 @@ TextEngine::FontData * GraphicsClass::AddText(float && posX, float && posY, std:
 void GraphicsClass::ChangeRenderWindow()
 {
 	RENDER_MATERIAL_EDITOR = !RENDER_MATERIAL_EDITOR;
-	if (m_spherePreviewModel)
-	{
-		m_spherePreviewModel->SetPosition(0.0f, 0.0f, 2.0f);
-	}
+	//if (m_spherePreviewModel)
+	//{
+	//	m_spherePreviewModel->SetPosition(0.0f, 0.0f, 2.0f);
+	//}
 	if (!RENDER_MATERIAL_EDITOR)
 	{
 		ReinitializeMainModel();
@@ -1353,37 +1369,24 @@ bool GraphicsClass::RenderMaterialPreview()
 	}
 	MaterialPrefab* const material = m_materialList.at(materialName);
 
-
-
-
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix;
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
-
-	m_Camera->Render();
 
 	//RENDER MAIN SCENE MODEL
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	if (RENDER_MATERIAL_EDITOR)
+	ModelClass* const& model = m_previewData.model;
+	XMFLOAT3 tmp = m_Camera->GetPosition();
+	m_Camera->SetPosition(0.0f, m_previewData.yCameraPos, 0.0f);
 	{
-		m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-	}
-	else
-	{
-		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-	}
-
-	//for (ModelClass* const& model : m_sceneModels)
-	ModelClass* const& model = m_spherePreviewModel;
-	{
-		m_Camera->GetViewMatrix(viewMatrix);
+		m_Camera->RenderPreview({ model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z });
+		m_Camera->GetViewPreviewMatrix(viewMatrix);
+		//m_Camera->Render();
+		//m_Camera->GetViewMatrix(viewMatrix);
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
@@ -1399,6 +1402,7 @@ bool GraphicsClass::RenderMaterialPreview()
 		if (!result)
 			return false;
 	}
+	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
 
 	if (DRAW_SKYBOX)
 	{
@@ -1625,6 +1629,35 @@ bool GraphicsClass::RenderGUI()
 			ImGui::SetNextWindowSize({ 318, 541 });
 			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor", (bool*)0, 
 				ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+			if (ImGui::Button("Change preview model"))
+			{
+				ModelClass* model = new ModelClass;
+				if (model->Initialize(m_D3D, model->LoadModelCalculatePath().c_str()))
+				{
+					if (m_materialList.find("pbr") == m_materialList.end())
+					{
+						m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+					}
+					model->SetMaterial(m_materialList.at("pbr"));
+
+					CreateAABB(model);
+					if (m_previewData.model)
+					{
+						delete m_previewData.model;
+					}
+					m_previewData.model = model;
+					CreateAABB(m_previewData.model);
+					const Bounds oldBounds = m_previewData.bounds;
+					m_previewData.bounds = m_previewData.model->GetBounds();
+
+					const XMFLOAT2 size = { m_previewData.model->GetBounds().GetSizeX(), m_previewData.model->GetBounds().GetSizeY() };
+					const float multiplier = min(size.x / m_previewData.baseSize.x, size.y / m_previewData.baseSize.y);
+
+					const float yPosDiff = (oldBounds.GetSizeY() - m_previewData.bounds.GetSizeY()) * 0.5f;
+					m_previewData.yCameraPos = yPosDiff;
+					m_previewData.worldPos = XMFLOAT3{ 0.0f, 0.0f, /*multiplier * m_previewData.worldPos.z*/ 2.0f };
+				}
+			}
 			if (ImGui::Button("Generate shader"))
 			{
 				m_shaderEditorManager->GenerateCodeToFile();
@@ -1772,7 +1805,7 @@ bool GraphicsClass::RenderGUI()
 		//	ImGui::EndCombo();
 		//}
 
-		if (m_selectedModel->GetMaterial())
+		if (m_selectedModel && m_selectedModel->GetMaterial())
 		{
 			if (ImGui::BeginCombo("Model material", m_selectedModel->GetMaterial()->GetName().c_str()))
 			{
@@ -1796,7 +1829,7 @@ bool GraphicsClass::RenderGUI()
 				ImGui::EndCombo();
 			}
 		}
-		else
+		else if (m_selectedModel)
 		{
 			if (m_materialList.find("pbr") == m_materialList.end())
 			{
@@ -1816,7 +1849,7 @@ bool GraphicsClass::RenderGUI()
 				{
 					m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
 				}
-				m_selectedModel->SetMaterial(m_materialList.at("pbr"));
+				model->SetMaterial(m_materialList.at("pbr"));
 
 				m_sceneModels.push_back(std::move(model));
 				CreateAABB(model);

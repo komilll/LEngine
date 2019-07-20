@@ -3,30 +3,29 @@
 #define _BLURSHADERCLASS_H_
 
 #include "BaseShaderClass.h"
+#include <array>
 
 class BlurShaderClass : public BaseShaderClass
 {
-	static const int NUMBER_OF_WEIGHTS = 5;
-
 public:
+	static const int k_numberOfWeights{ 5 };
+
 	struct ScreenSizeBuffer
 	{
-		float size;
-		XMFLOAT3 padding;
+		float size{ 0.0f };
+		XMFLOAT3 padding{ 0.0f, 0.0f, 0.0f };
 	};
 
 	struct BlurWeightsBuffer
 	{
-		XMFLOAT4 weights;
-		XMFLOAT4 lastWeightAndpadding;
+		XMFLOAT4 weights{};
+		XMFLOAT4 lastWeightAndpadding{};
 	};
 
 public:
-	BlurShaderClass();
-
-	void SetTextureSize(float size);
-	void SetTextureResourceView(ID3D11ShaderResourceView* shaderResource);
-	void SetWeights(float weights[NUMBER_OF_WEIGHTS]);
+	void SetTextureSize(const float size);
+	void SetTextureResourceView(ID3D11ShaderResourceView* const shaderResource);
+	void SetWeights(std::array<float, k_numberOfWeights> weights);
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
@@ -39,7 +38,7 @@ private:
 	ID3D11ShaderResourceView* m_shaderResource;
 
 	float m_size = 0;
-	float m_weights[NUMBER_OF_WEIGHTS];
+	std::array<float, k_numberOfWeights> m_weights{ 1 };
 };
 
 #endif // !_BLURSHADERCLASS_H_

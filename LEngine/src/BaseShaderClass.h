@@ -16,14 +16,8 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <algorithm>
 using namespace std;
 using namespace DirectX;
-
-////////////////////////////////////////////////////////////////////////////////
-// Class name: ColorShaderClass
-////////////////////////////////////////////////////////////////////////////////
-
 
 class BaseShaderClass
 {
@@ -32,12 +26,20 @@ public:
 	using vertexInputMap = std::map<LPCSTR, int>;
 	struct vertexInputType
 	{
+	public:
 		std::vector<LPCSTR> &name;
 		std::vector<DXGI_FORMAT> &format;
 
-		vertexInputType(std::vector<LPCSTR> &n, std::vector<DXGI_FORMAT> &f) : name(n), format(f) { }
-		vertexInputType vertexInputType::operator=(const vertexInputType &ref);
-		vertexInputType();
+		vertexInputType() : name(std::vector<LPCSTR>{}), format(std::vector<DXGI_FORMAT>{})
+		{
+		}
+		vertexInputType(std::vector<LPCSTR> &n, std::vector<DXGI_FORMAT> &f) : name(n), format(f) 
+		{ 
+		}
+		vertexInputType vertexInputType::operator=(const vertexInputType &ref)
+		{
+			return vertexInputType(ref.name, ref.format);
+		}
 
 		void SaveData(std::vector<LPCSTR> &n, std::vector<DXGI_FORMAT> &f)
 		{
@@ -50,10 +52,10 @@ protected:
 	class SamplerType
 	{
 	public:
-		bool isVectorSampler;
-		UINT startSlot;
-		UINT numSamplers;
-		ID3D11SamplerState* samplerStates;
+		bool isVectorSampler{ false };
+		UINT startSlot{ 0 };
+		UINT numSamplers{ 0 };
+		ID3D11SamplerState* samplerStates{ nullptr };
 
 		SamplerType(bool isVectorSampler_, UINT startSlot_, UINT numSamplers_, ID3D11SamplerState* &samplerStates_) {
 			isVectorSampler = isVectorSampler_;
@@ -73,15 +75,11 @@ private:
 
 //////// METHODS ////////
 public:
-	BaseShaderClass();
-	BaseShaderClass(const BaseShaderClass&);
-	~BaseShaderClass();
-
 	bool Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&);
 	static bool LoadTexture(ID3D11Device * device, const wchar_t* filename, ID3D11Resource *&m_texture, ID3D11ShaderResourceView *&m_textureView, bool isDDS = true);
-	static bool LoadTexture(ID3D11Device* device, const ID3D11Resource *& inTexture, ID3D11Resource *& outTexture, ID3D11ShaderResourceView *& outTextureView);
+	static bool LoadTexture(ID3D11Device* device, ID3D11Resource *& inTexture, ID3D11Resource *& outTexture, ID3D11ShaderResourceView *& outTextureView);
 	void AddSampler(bool isVectorSampler, UINT startSlot, UINT numSapmlers, ID3D11SamplerState* &samplerStates);
 
 protected:
@@ -94,19 +92,19 @@ private:
 	bool CreateInputLayout(ID3D11Device* device, ID3D10Blob* vertexShaderBuffer, vertexInputType vertexInput);
 	bool CreateBuffers(ID3D11Device * device);
 	bool InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename, vertexInputType vertexInput);
-	void OutputShaderErrorMessage(ID3D10Blob*, HWND, CHAR*);	
+	void OutputShaderErrorMessage(ID3D10Blob*, HWND, CHAR*) const;	
 	void ShutdownShader();
 
 //////// VARIABLES ////////
 protected:
-	ID3D11VertexShader* m_vertexShader;
-	ID3D11PixelShader* m_pixelShader;
-	ID3D11InputLayout* m_layout;
-	ID3D11SamplerState* m_samplerState;
+	ID3D11VertexShader* m_vertexShader{ nullptr };
+	ID3D11PixelShader* m_pixelShader{ nullptr };
+	ID3D11InputLayout* m_layout{ nullptr };
+	ID3D11SamplerState* m_samplerState{ nullptr };
 	std::vector<SamplerType*> m_samplers;
 	std::vector<ID3D11Buffer*> m_buffers;
 
 private:
-	ID3D11Buffer* m_matrixBuffer;
+	ID3D11Buffer* m_matrixBuffer{ nullptr };
 };
 #endif

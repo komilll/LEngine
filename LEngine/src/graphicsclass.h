@@ -81,6 +81,16 @@ class GraphicsClass
 public:
 	bool RENDER_MATERIAL_EDITOR = true;
 
+	struct PreviewModelData
+	{
+		ModelClass* model{ nullptr };
+		XMFLOAT2 screenPos{ 0.0f, 0.0f };
+		XMFLOAT3 worldPos{ 0.0f, 0.0f, 0.0f };
+		XMFLOAT2 baseSize{ 0.0f, 0.0f };
+		Bounds bounds;
+		float yCameraPos{ 0.0f };
+	};
+
 	struct MouseRaycastResult
 	{
 	public:
@@ -140,7 +150,7 @@ private:
 	{
 		//float weights[5] = { 0.481f, 0.417f, 0.272f, 0.08f, 0.0f };
 		//float weights[5] = { 1.0f, 0.9f, 0.55f, 0.18f, 0.1f };
-		float weights[5] = { 0.5f, 0.1456f, 0.11538f, 0.10714f, 0.06319f };
+		std::array<float, BlurShaderClass::k_numberOfWeights> weights { 0.5f, 0.1456f, 0.11538f, 0.10714f, 0.06319f };
 		float intensity[3] = { 0.2126f, 0.7152f, 0.0722f };
 	};
 
@@ -398,6 +408,7 @@ public:
 	void MoveCameraUp(float val);
 	void MoveCameraDown(float val);
 	void RotateCamera(XMVECTOR rotation);
+	void AddPreviewCameraRotation(float x, float y);
 
 	void UpdateUI();
 	void UpdateShaderEditorMouseOnly();
@@ -510,7 +521,7 @@ private:
 	ModelClass* m_Model;
 	ModelClass* m_cubeModel;
 	ModelClass* m_skyboxModel;
-	ModelClass* m_spherePreviewModel;
+	PreviewModelData m_previewData;
 	ShaderSpecularClass* m_specularShader;
 	ShaderPBRGenerated* m_pbrShader;
 	SkyboxShaderClass* m_skyboxShader;

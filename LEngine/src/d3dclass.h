@@ -58,10 +58,10 @@ public:
 	void DisableDepthTesting() const;
 	void EnableDepthTesting() const;
 
-	void ResetViewport();
-	BaseShaderClass::vertexInputType GetBaseInputType();
+	void ResetViewport() const;
+	BaseShaderClass::vertexInputType GetBaseInputType() const;
 
-	WindowSize GetWindowSize();
+	WindowSize GetWindowSize() const;
 
 private:
 	bool m_vsync_enabled;

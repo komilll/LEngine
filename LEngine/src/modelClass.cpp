@@ -3,13 +3,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "modelclass.h"
 
-
-ModelClass::ModelClass()
-{
-	m_vertexBuffer = 0;
-	m_indexBuffer = 0;
-}
-
 ModelClass::ModelClass(D3DClass * d3d, const char * modelFilename, XMFLOAT3 position, bool pickable)
 {
 	m_vertexBuffer = 0;
@@ -17,17 +10,6 @@ ModelClass::ModelClass(D3DClass * d3d, const char * modelFilename, XMFLOAT3 posi
 	Initialize(d3d, modelFilename, pickable);
 	SetPosition(position);
 }
-
-
-ModelClass::ModelClass(const ModelClass& other)
-{
-}
-
-
-ModelClass::~ModelClass()
-{
-}
-
 
 bool ModelClass::Initialize(D3DClass* d3d, const char * modelFilename, bool pickable)
 {
@@ -51,31 +33,6 @@ bool ModelClass::Initialize(D3DClass * d3d, XMFLOAT3 origin, XMFLOAT3 destinatio
 	Initialize(d3d->GetDevice(), ShapeSize::RECTANGLE, -0.25f, 0.25f, 0.25f, -0.25f, true, false);
 	SetPosition(origin);
 	return true;
-	//std::vector<VertexType> verticesVector;
-	//VertexType point{};
-
-	//point.position = origin;
-	//verticesVector.push_back(point);
-	//point.position = XMFLOAT3{ origin.x + 0.1f, origin.y, origin.z };
-	//verticesVector.push_back(point);
-	//point.position = XMFLOAT3{ origin.x + 0.05f, origin.y + 0.1f, origin.z };
-	//verticesVector.push_back(point);
-
-	//constexpr int verticesCount = 3;
-	//VertexType* vertices = new VertexType[verticesCount];
-	//unsigned long* indices = new unsigned long[verticesCount];
-	//for (int i = 0; i < verticesCount; i++)
-	//	indices[i] = i;
-
-	//m_indexCount = verticesCount;
-
-	//if (indices != 0)
-	//{
-	//	if (CreateBuffers(m_device, vertices, indices, verticesCount, verticesCount) == false)
-	//		return false;
-	//}
-
-	//return true;
 }
 
 bool ModelClass::Initialize(ID3D11Device * device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex, bool isEmpty, float borderWidth)
@@ -135,11 +92,6 @@ bool ModelClass::Initialize(ID3D11Device * device, XMFLOAT3 leftMin, XMFLOAT3 le
 bool ModelClass::InitializeWireframe(ID3D11Device * device, XMFLOAT3 min, XMFLOAT3 max)
 {
 	m_device = device;
-	VertexType* vertices;
-	unsigned long* indices;
-
-	constexpr int verticesCount = 6;
-	constexpr float zWidth = 0.00f;
 
 	const float left = min.x;
 	const float right = max.x;
@@ -148,60 +100,24 @@ bool ModelClass::InitializeWireframe(ID3D11Device * device, XMFLOAT3 min, XMFLOA
 	const float zMin = min.z;
 	const float zMax = max.z;
 
-	vertices = new VertexType[verticesCount];
-	//if (left == right && zMin == zMax) //Vertical line (no Z)
-	{
-		constexpr float widthLeft = 0.003f;
-		constexpr float widthTop = widthLeft * 16.0f / 9.0f;
-		//First triangle
-		vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.	
-		vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
-		vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
-		//Second triangle
-		vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.
-		vertices[4].position = XMFLOAT3(right, top + widthTop, zMax);  // Top right.
-		vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
-	}
-	//else if (top == bottom && zMin == zMax) //Horizontal line (no Z)
-	//{
-	//	constexpr float widthLeft = 0.003f;
-	//	constexpr float widthTop = widthLeft * 16.0f / 9.0f;
-	//	//First triangle
-	//	vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMin);  // Top left.	
-	//	vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
-	//	vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
-	//	 //Second triangle
-	//	vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMin);  // Top left.
-	//	vertices[4].position = XMFLOAT3(right, top + widthTop, zMin);  // Top right.
-	//	vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
-	//}
-	//else if (left == right) //Vertical line (with Z)
-	//{
-	//	constexpr float widthLeft = 0.003f;
-	//	constexpr float widthTop = widthLeft * 16.0f / 9.0f;
-	//	//First triangle
-	//	vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.	
-	//	vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
-	//	vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
-	//	//Second triangle
-	//	vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.
-	//	vertices[4].position = XMFLOAT3(right, top + widthTop, zMax);  // Top right.
-	//	vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
-	//}
+	constexpr float widthLeft = 0.003f;
+	constexpr float widthTop = widthLeft * 16.0f / 9.0f;
 
-	indices = new unsigned long[verticesCount];
-	for (int i = 0; i < verticesCount; i++)
-		indices[i] = i;
-
+	constexpr int verticesCount = 6;
 	m_indexCount = verticesCount;
+	constexpr std::array<unsigned long, 6> indices{ 0, 1, 2, 3, 4, 5 };
+	std::array<VertexType, 6> vertices;
 
-	if (indices != 0)
-	{
-		if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
-			return false;
-	}
+	//First triangle
+	vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.	
+	vertices[1].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
+	vertices[2].position = XMFLOAT3(left - widthLeft, bottom - widthTop, zMin);  // Bottom left.
+	//Second triangle
+	vertices[3].position = XMFLOAT3(left - widthLeft, top + widthTop, zMax);  // Top left.
+	vertices[4].position = XMFLOAT3(right, top + widthTop, zMax);  // Top right.
+	vertices[5].position = XMFLOAT3(right, bottom - widthTop, zMin);  // Bottom right.
 
-	return true;
+	return CreateBuffers(device, &vertices[0], &indices[0], verticesCount, verticesCount);
 }
 
 bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
@@ -213,19 +129,13 @@ bool ModelClass::InitializeSquare(ID3D11Device * device, float centerX, float ce
 
 void ModelClass::Shutdown()
 {
-	// Shutdown the vertex and index buffers.
 	ShutdownBuffers();
-
-	return;
 }
 
 
 void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 {
-	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
-
-	return;
 }
 
 void ModelClass::CreateWireframe()
@@ -279,76 +189,72 @@ const std::vector<ModelClass*>& ModelClass::GetWireframeList() const
 	return m_wireframeModels;
 }
 
-int ModelClass::GetIndexCount()
+int ModelClass::GetIndexCount() const
 {
 	return m_indexCount;
 }
 
-void ModelClass::SetPosition(float x, float y, float z)
+void ModelClass::SetPosition(const float x, const float y, const float z)
 {
 	SetPosition(XMFLOAT3{ x, y, z });
 }
 
-void ModelClass::SetPosition(XMFLOAT3 position)
+void ModelClass::SetPosition(const XMFLOAT3 position)
 {
-	m_position[0] = position.x;
-	m_position[1] = position.y;
-	m_position[2] = position.z;
-	m_position[3] = 1.0f;
+	m_position.x = position.x;
+	m_position.y = position.y;
+	m_position.z = position.z;
+	m_position.w = 1.0f;
 }
 
 void ModelClass::SetScale(float x, float y, float z)
 {
-	m_scale[0] = x;
-	m_scale[1] = y;
-	m_scale[2] = z;
+	m_scale = { x, y, z };
 }
 
 void ModelClass::SetScale(XMFLOAT3 scale)
 {
-	SetScale(scale.x, scale.y, scale.z);
+	m_scale = scale;
 }
 
 void ModelClass::SetRotation(float x, float y, float z)
 {
-	m_rotation[0] = x;
-	m_rotation[1] = y;
-	m_rotation[2] = z;
+	m_rotation = { x, y, z };
 }
 
 XMFLOAT4 ModelClass::GetPosition() const
 {
-	return{ m_position[0], m_position[1], m_position[2], m_position[3] };
+	return{ m_position.x, m_position.y, m_position.z, m_position.w };
 }
 
 XMFLOAT3 ModelClass::GetPositionXYZ() const
 {
-	return{ m_position[0], m_position[1], m_position[2] };
+	return{ m_position.x, m_position.y, m_position.z };
 }
 
 XMFLOAT3 ModelClass::GetScale() const
 {
-	return{ m_scale[0], m_scale[1], m_scale[2] };
+	return m_scale;
 }
 
 XMFLOAT3 ModelClass::GetRotation() const
 {
-	return{ m_rotation[0], m_rotation[1], m_rotation[2] };
+	return m_rotation;
 }
 
 float* ModelClass::GetPositionRef()
 {
-	return &m_position[0];
+	return &m_position.x;
 }
 
 float* ModelClass::GetScaleRef()
 {
-	return &m_scale[0];
+	return &m_scale.x;
 }
 
 float* ModelClass::GetRotationRef()
 {
-	return &m_rotation[0];
+	return &m_rotation.x;
 }
 
 std::string ModelClass::GetName() const
@@ -366,37 +272,31 @@ std::string ModelClass::GetSaveData() const
 	json11::Json obj = json11::Json::object{
 		{"modelName", m_modelFilename},
 		{"sceneName", m_savedName}, 
-		{"position", json11::Json::array{m_position[0], m_position[1], m_position[2]}},
-		{"scale", json11::Json::array{m_scale[0], m_scale[1], m_scale[2]}},
-		{"rotation", json11::Json::array{m_rotation[0], m_rotation[1], m_rotation[2]}},
+		{"position", json11::Json::array{m_position.x, m_position.y, m_position.z}},
+		{"scale", json11::Json::array{m_scale.x, m_scale.y, m_scale.z}},
+		{"rotation", json11::Json::array{m_rotation.x, m_rotation.y, m_rotation.z}},
 		{"material", m_materialName}
 	};
 	return obj.dump();
-}
-
-void ModelClass::LoadData()
-{
-
 }
 
 ModelClass* ModelClass::LoadModel(D3DClass * d3d)
 {
 	ModelClass* model = new ModelClass();
 	model->Initialize(d3d, model->LoadModelCalculatePath().c_str());
-	model->m_name = "Test_Name";
+	model->m_name = "Model";
 	return model;
 }
 
 void ModelClass::LoadModel()
 {
-	if (m_device)
-	{
-		Initialize(m_D3D, LoadModelCalculatePath().c_str());
-	}
+	assert(m_D3D, "D3DClass was null on changing model");
+	Initialize(m_D3D, LoadModelCalculatePath().c_str());
 }
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)
 {
+	//TODO Optimize whole method to improve model loading times
 	std::vector<VertexType> verticesVector(0);
 	VertexType* vertices{ nullptr };
 	unsigned long* indices;
@@ -560,6 +460,8 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 
 void ModelClass::ShutdownBuffers()
 {
+	//TODO Upgrade or remove completely
+
 	// Release the index buffer.
 	if(m_indexBuffer)
 	{
@@ -580,14 +482,12 @@ void ModelClass::ShutdownBuffers()
 
 void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
-	unsigned int stride = sizeof(VertexType);
-	unsigned int offset = 0;
+	constexpr unsigned int stride = sizeof(VertexType);
+	constexpr unsigned int offset = 0;
 
 	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	return;
 }
 
 void ModelClass::SetIndices(std::string input, int & vertexIndex, int & textureIndex, int & normalIndex)
@@ -618,111 +518,10 @@ void ModelClass::SetIndices(std::string input, int & vertexIndex, int & textureI
 	}
 }
 
-void ModelClass::CalculateDataForNormalMapping(VertexType* &vertices)
+bool ModelClass::CreateBuffers(ID3D11Device* device, const VertexType *vertices, const unsigned long *indices, int vertexCount, int indexCount)
 {
-	int faceCount = m_vertexCount / 3;
-	int index = 0;
-
-	VertexType vertex1, vertex2, vertex3;
-	XMFLOAT3 tangent, binormal, normal;
-
-	for (int i = 0; i < faceCount; i++)
-	{
-		vertex1 = vertices[index++];
-		vertex2 = vertices[index++];
-		vertex3 = vertices[index++];
-
-		CalculateTangentBinormal(vertex1, vertex2, vertex3, tangent, binormal);
-		CalculateNormal(tangent, binormal, normal);
-
-		vertices[index - 1].normal = normal;
-		vertices[index - 1].tangent = tangent;
-		vertices[index - 1].binormal = binormal;
-
-		vertices[index - 2].normal = normal;
-		vertices[index - 2].tangent = tangent;
-		vertices[index - 2].binormal = binormal;
-
-		vertices[index - 3].normal = normal;
-		vertices[index - 3].tangent = tangent;
-		vertices[index - 3].binormal = binormal;
-	}
-}
-
-void ModelClass::CalculateTangentBinormal(VertexType vertex1, VertexType vertex2, VertexType vertex3, XMFLOAT3 & tangent, XMFLOAT3 & binormal)
-{
-	float vector1[3], vector2[3];
-	float tuVector[2], tvVector[2];
-	float den;
-	float length;
-
-	// Calculate the two vectors for this face.
-	vector1[0] = vertex2.position.x - vertex1.position.x;
-	vector1[1] = vertex2.position.y - vertex1.position.y;
-	vector1[2] = vertex2.position.z - vertex1.position.z;
-
-	vector2[0] = vertex3.position.x - vertex1.position.x;
-	vector2[1] = vertex3.position.y - vertex1.position.y;
-	vector2[2] = vertex3.position.z - vertex1.position.z;
-
-	// Calculate the tu and tv texture space vectors.
-	tuVector[0] = vertex2.tex.x - vertex1.tex.x;
-	tvVector[0] = vertex2.tex.y - vertex1.tex.y;
-
-	tuVector[1] = vertex3.tex.x - vertex1.tex.x;
-	tvVector[1] = vertex3.tex.y - vertex1.tex.y;
-
-	// Calculate the denominator of the tangent/binormal equation.
-	den = 1.0f / (tuVector[0] * tvVector[1] - tuVector[1] * tvVector[0]);
-
-	// Calculate the cross products and multiply by the coefficient to get the tangent and binormal.
-	tangent.x = (tvVector[1] * vector1[0] - tvVector[0] * vector2[0]) * den;
-	tangent.y = (tvVector[1] * vector1[1] - tvVector[0] * vector2[1]) * den;
-	tangent.z = (tvVector[1] * vector1[2] - tvVector[0] * vector2[2]) * den;
-
-	binormal.x = (tuVector[0] * vector2[0] - tuVector[1] * vector1[0]) * den;
-	binormal.y = (tuVector[0] * vector2[1] - tuVector[1] * vector1[1]) * den;
-	binormal.z = (tuVector[0] * vector2[2] - tuVector[1] * vector1[2]) * den;
-
-	// Calculate the length of this normal.
-	length = sqrt((tangent.x * tangent.x) + (tangent.y * tangent.y) + (tangent.z * tangent.z));
-
-	// Normalize the normal and then store it
-	tangent.x = tangent.x / length;
-	tangent.y = tangent.y / length;
-	tangent.z = tangent.z / length;
-
-	// Calculate the length of this normal.
-	length = sqrt((binormal.x * binormal.x) + (binormal.y * binormal.y) + (binormal.z * binormal.z));
-
-	// Normalize the normal and then store it
-	binormal.x = binormal.x / length;
-	binormal.y = binormal.y / length;
-	binormal.z = binormal.z / length;
-}
-
-void ModelClass::CalculateNormal(XMFLOAT3 & tangent, XMFLOAT3 & binormal, XMFLOAT3 & normal)
-{
-	float length;
-
-	// Calculate the cross product of the tangent and binormal which will give the normal vector.
-	normal.x = (tangent.y * binormal.z) - (tangent.z * binormal.y);
-	normal.y = (tangent.z * binormal.x) - (tangent.x * binormal.z);
-	normal.z = (tangent.x * binormal.y) - (tangent.y * binormal.x);
-
-	// Calculate the length of the normal.
-	length = sqrt((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
-
-	// Normalize the normal.
-	normal.x = normal.x / length;
-	normal.y = normal.y / length;
-	normal.z = normal.z / length;
-}
-
-bool ModelClass::CreateBuffers(ID3D11Device* device, VertexType * &vertices, unsigned long * &indices, int vertexCount, int indexCount)
-{
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData;
 	//Create vertex buffer description
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * vertexCount;
@@ -735,12 +534,13 @@ bool ModelClass::CreateBuffers(ID3D11Device* device, VertexType * &vertices, uns
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 	//Try to create vertex buffer and store it in varaible
-	HRESULT result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
+	if (FAILED(device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer)))
 	{
 		return false;
 	}
 
+	D3D11_BUFFER_DESC indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA indexData;
 	//Create index buffer description
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * indexCount;
@@ -753,8 +553,7 @@ bool ModelClass::CreateBuffers(ID3D11Device* device, VertexType * &vertices, uns
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 	//Try to create index buffer and store it in varaible
-	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	if (FAILED(result))
+	if (FAILED(device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer)))
 	{
 		return false;
 	}
@@ -769,28 +568,26 @@ void ModelClass::SaveBinary(const char* modelFilename, std::vector<VertexType> &
 	newFilename = newFilename.substr(0, newFilename.find("."));
 	newFilename += ".modelclass";
 
-	std::ofstream output("Models/" + newFilename, std::ios::binary);
+	if (std::ofstream output{ "Models/" + newFilename, std::ios::binary })
+	{
+		const int vertSize = vertexType.size();
+		output.write(reinterpret_cast<const char*>(&vertSize), sizeof(vertSize));
+		const int indSize = vertexIndices.size();
+		output.write(reinterpret_cast<const char*>(&indSize), sizeof(indSize));
 
-	int size = vertexType.size();
-	output.write(reinterpret_cast<const char*>(&size), sizeof(size));
-	size = vertexIndices.size();
-	output.write(reinterpret_cast<const char*>(&size), sizeof(size));
+		for (const auto& val : vertexType)
+			output.write(reinterpret_cast<const char*>(&val), sizeof(val));
+		for (const auto& val : vertexIndices)
+			output.write(reinterpret_cast<const char*>(&val), sizeof(val));
 
-	for (const auto& val : vertexType)
-		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
-	for (const auto& val : vertexIndices)
-		output.write(reinterpret_cast<const char*>(&val), sizeof(val));
-
-	//Save bounds AABB
-	output.write(reinterpret_cast<const char*>(&bounds.maxX), sizeof(bounds.maxX));
-	output.write(reinterpret_cast<const char*>(&bounds.maxY), sizeof(bounds.maxY));
-	output.write(reinterpret_cast<const char*>(&bounds.maxZ), sizeof(bounds.maxZ));
-	output.write(reinterpret_cast<const char*>(&bounds.minX), sizeof(bounds.minX));
-	output.write(reinterpret_cast<const char*>(&bounds.minZ), sizeof(bounds.minY));
-	output.write(reinterpret_cast<const char*>(&bounds.minY), sizeof(bounds.minZ));
-
-	output.clear();
-	output.close();
+		//Save bounds AABB
+		output.write(reinterpret_cast<const char*>(&bounds.maxX), sizeof(bounds.maxX));
+		output.write(reinterpret_cast<const char*>(&bounds.maxY), sizeof(bounds.maxY));
+		output.write(reinterpret_cast<const char*>(&bounds.maxZ), sizeof(bounds.maxZ));
+		output.write(reinterpret_cast<const char*>(&bounds.minX), sizeof(bounds.minX));
+		output.write(reinterpret_cast<const char*>(&bounds.minZ), sizeof(bounds.minY));
+		output.write(reinterpret_cast<const char*>(&bounds.minY), sizeof(bounds.minZ));
+	}
 }
 
 bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices)
@@ -801,22 +598,26 @@ bool ModelClass::ReadBinary(const char* modelFilename, std::vector<VertexType> &
 
 	if (std::ifstream input{ "Models/" + newFilename, std::ios::binary })
 	{
-		VertexType valVertex;
-		long valIndices = 0;
-		int sizeVertices = 0;
-		int sizeIndices = 0;
+		int sizeVertices;
+		int sizeIndices;
 		input.read(reinterpret_cast<char*>(&sizeVertices), sizeof(sizeVertices));
 		input.read(reinterpret_cast<char*>(&sizeIndices), sizeof(sizeIndices));
 
-		for (int i = 0; i < sizeVertices; i++)
 		{
-			input.read(reinterpret_cast<char*>(&valVertex), sizeof(valVertex));
-			vertexType.push_back(valVertex);
+			VertexType valVertex;
+			for (int i = 0; i < sizeVertices; i++)
+			{
+				input.read(reinterpret_cast<char*>(&valVertex), sizeof(valVertex));
+				vertexType.push_back(valVertex);
+			}
 		}
-		for (int i = 0; i < sizeIndices; i++)
 		{
-			input.read(reinterpret_cast<char*>(&valIndices), sizeof(valIndices));
-			vertexIndices.push_back(valIndices);
+			long valIndices{ 0 };
+			for (int i = 0; i < sizeIndices; i++)
+			{
+				input.read(reinterpret_cast<char*>(&valIndices), sizeof(valIndices));
+				vertexIndices.push_back(valIndices);
+			}
 		}
 
 		//Load bounds AABB
@@ -925,50 +726,40 @@ bool ModelClass::CreateRectangle(ID3D11Device* device, float left, float right, 
 
 bool ModelClass::CreateTriangle(ID3D11Device * device, float left, float right, float top, float bottom)
 {
-	VertexType* vertices;
-	unsigned long* indices;
-
 	constexpr int verticesCount = 3;
+	m_indexCount = verticesCount;
 
-	vertices = new VertexType[verticesCount];
+	constexpr std::array<unsigned long, 3> indices{ 0, 1, 2 };
+	std::array<VertexType, 3> vertices;
+
 	//Only triangle
 	vertices[0].position = XMFLOAT3((left + right) / 2, top, 0.0f);  // Top	
 	vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
 	vertices[2].position = XMFLOAT3(left, bottom, 0.0f);  // Bottom left.
 
-	indices = new unsigned long[verticesCount];
-	for (int i = 0; i < verticesCount; i++)
-		indices[i] = i;
-
-	m_indexCount = verticesCount;
-
-	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
-		return false;
-
-	return true;
+	return CreateBuffers(device, &vertices[0], &indices[0], verticesCount, verticesCount);
 }
 
 bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float centerY, float size, bool isEmpty, bool withTex)
 {
-	VertexType* vertices;
-	unsigned long* indices;
+	constexpr int verticesCountEmpty = 24;
+	constexpr int verticesCountFilled = 6;
 
-	int verticesCount = isEmpty ? 24 : 6;
-	vertices = new VertexType[verticesCount];
+	const float left = centerX - size * 0.5f;
+	const float right = centerX + size * 0.5f;
+	const float top = centerY / 2 + size * 0.5f * (16.0f / 9.0f);
+	const float bottom = centerY / 2 - size * 0.5f * (16.0f / 9.0f);
 
-	float left = centerX - size * 0.5f;
-	float right = centerX + size * 0.5f;
-	float top = centerY / 2 + size * 0.5f;
-	float bottom = centerY / 2 - size * 0.5f;
-
-	top *= 16.0 / 9.0;
-	bottom *= 16.0 / 9.0;
-
-	float widthLeft = 0.003f;
-	float widthTop = widthLeft * 16.0f / 9.0f;
+	constexpr float widthLeft = 0.003f;
+	constexpr float widthTop = widthLeft * 16.0f / 9.0f;
 
 	if (isEmpty == false)
 	{
+		std::array<VertexType, verticesCountEmpty> vertices;
+		std::array<unsigned long, verticesCountEmpty> indices;
+		for (int i = 0; i < verticesCountEmpty; i++)
+			indices[i] = i;
+
 		//First triangle	
 		vertices[0].position = XMFLOAT3(left, top, 0.0f);  // Top left.	
 		vertices[1].position = XMFLOAT3(right, bottom, 0.0f);  // Bottom right.
@@ -989,9 +780,15 @@ bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float center
 			vertices[4].tex = XMFLOAT2(1.0, 0.0);  // Top right.
 			vertices[5].tex = XMFLOAT2(1.0, 1.0);  // Bottom right.
 		}
+		return CreateBuffers(device, &vertices[0], &indices[0], verticesCountEmpty, verticesCountEmpty);
 	}
 	else
 	{
+		std::array<VertexType, verticesCountFilled> vertices;
+		std::array<unsigned long, verticesCountFilled> indices;
+		for (int i = 0; i < verticesCountFilled; i++)
+			indices[i] = i;
+
 		////// LEFT //////
 		//First triangle
 		vertices[0].position = XMFLOAT3(left - widthLeft, top + widthTop, 0.0f);  // Top left.	
@@ -1028,29 +825,15 @@ bool ModelClass::CreateSquare(ID3D11Device * device, float centerX, float center
 		vertices[21].position = XMFLOAT3(left - widthLeft, bottom, 0.0f);  // Top left.
 		vertices[22].position = XMFLOAT3(right + widthLeft, bottom, 0.0f);  // Top right.
 		vertices[23].position = XMFLOAT3(right + widthLeft, bottom - widthTop, 0.0f);  // Bottom right.
+
+		return CreateBuffers(device, &vertices[0], &indices[0], verticesCountFilled, verticesCountFilled);
 	}
-
-	indices = new unsigned long[verticesCount];
-	for (int i = 0; i < verticesCount; i++)
-		indices[i] = i;
-
-	m_indexCount = verticesCount;
-
-	if (CreateBuffers(device, vertices, indices, verticesCount, verticesCount) == false)
-		return false;
-
-	return true;
 }
 
 bool ModelClass::is_number(const std::string & s)
 {
 	return !s.empty() && std::find_if(s.begin(),
 		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
-}
-
-void ModelClass::LoadNewIndex(std::string line, int & vIndex, int & vtIndex, int & vnIndex)
-{
-
 }
 
 void ModelClass::CalculateAxisBound(float & min, float & max, std::vector<float>& elements) const
@@ -1098,11 +881,6 @@ std::string ModelClass::LoadModelCalculatePath()
 				if (SUCCEEDED(hr))
 				{
 					ss << pszFilePath;
-
-					//LoadNewTextureFromFile(wFilePath); -- INLINED
-					//if (onlyPreview == false)
-					//	BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, *m_externalTexture, *m_externalTextureView);
-
 					CoTaskMemFree(pszFilePath);
 				}
 				pItem->Release();
@@ -1141,6 +919,8 @@ void ModelClass::SetMaterial(MaterialPrefab * const material)
 
 XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
+	//TODO Test if there is need to create local matrices for every scope
+
 	XMFLOAT3 min{};
 	XMFLOAT3 max{};
 	//X axis

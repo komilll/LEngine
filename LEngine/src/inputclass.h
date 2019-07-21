@@ -1,32 +1,21 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: inputclass.h
-////////////////////////////////////////////////////////////////////////////////
 #ifndef _INPUTCLASS_H_
 #define _INPUTCLASS_H_
 
+#include <array>
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: InputClass
-////////////////////////////////////////////////////////////////////////////////
 class InputClass
 {
 public:
-	InputClass();
-	InputClass(const InputClass&);
-	~InputClass();
+	void KeyDown(unsigned int keyIndex);
+	void KeyUp(unsigned int keyIndex);
 
-	void Initialize();
-
-	void KeyDown(unsigned int);
-	void KeyUp(unsigned int);
-
-	bool IsKeyDown(unsigned int);
-	bool IsLetterKeyDown();
-	bool IsNumberKeyDown();
-	bool IsAlphanumericKeyDown();
+	bool IsKeyDown(unsigned int keyIndex) const;
+	bool IsLetterKeyDown() const;
+	bool IsNumberKeyDown() const;
+	bool IsAlphanumericKeyDown() const;
 
 private:
-	bool m_keys[256];
+	std::array<bool, 256> m_keys{ false };
 };
 
 #endif

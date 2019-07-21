@@ -3,40 +3,41 @@
 #define _GBUFFERSHADER_H_
 
 #include "BaseShaderClass.h"
+#include <array>
 
 class GBufferShader : public BaseShaderClass 
 {
 public:
-	enum BufferType {
+	enum class BufferType {
 		POSITION, NORMAL, ALBEDO, SSAO_NOISE, SSAO
 	};
 
 private:
 	struct PositionBuffer
 	{
-		XMFLOAT3 position;
-		float padding;
+		XMFLOAT3 position{};
+		float padding{ 0.0f };
 	};
 
 	struct NormalBuffer
 	{
-		XMFLOAT3 normal;
-		float padding;
+		XMFLOAT3 normal{};
+		float padding{ 0.0f };
 	};
 
 	struct SSAONoiseBuffer
 	{
-		XMFLOAT2 noise;
-		XMFLOAT2 padding;
+		XMFLOAT2 noise{};
+		XMFLOAT2 padding{ 0.0f, 0.0f };
 	};
 
 	struct SSAOBuffer
 	{
-		float radiusSize;
-		float bias;
-		float padding_2;
-		float padding_3;
-		XMFLOAT3 kernelValues[64];
+		float radiusSize{ 0 };
+		float bias{ 0 };
+		float padding_2{ 0 };
+		float padding_3{ 0 };
+		std::array<XMFLOAT3, 64> kernelValues;
 	};
 
 public:
@@ -44,8 +45,8 @@ public:
 	ID3D11ShaderResourceView* m_diffuseColorTextureView;
 
 	void ChangeTextureType(BufferType newType);
-	void SetKernelValues(XMFLOAT3 kernelVal[64]);
-	void SetNoiseValues(XMFLOAT2 noiseVal[16]);
+	void SetKernelValues(std::array<XMFLOAT3, 64> kernelVal);
+	void SetNoiseValues(std::array<XMFLOAT2, 16> noiseVal);
 	void SetRadiusSize(float radiusSize);
 	float* GetRadiusSizeRef();
 
@@ -58,22 +59,22 @@ public:
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix) override;
 
 public:
-	float m_radiusSize = 1.0f;
-	float m_bias = 0.03f;
+	float m_radiusSize{ 1.0f };
+	float m_bias{ 0.03f };
 
 private:
 	BufferType m_bufferType;
-	XMFLOAT3 m_kernelValues[64];
-	XMFLOAT2 m_noiseValues[16];
+	std::array<XMFLOAT3, 64> m_kernelValues;
+	std::array<XMFLOAT2, 16> m_noiseValues;
 
-	ID3D11ShaderResourceView* m_positionView;
-	ID3D11ShaderResourceView* m_normalView;
-	ID3D11ShaderResourceView* m_noiseView;
+	ID3D11ShaderResourceView* m_positionView{ nullptr };
+	ID3D11ShaderResourceView* m_normalView{ nullptr };
+	ID3D11ShaderResourceView* m_noiseView{ nullptr };
 
-	ID3D11Buffer* m_positionBuffer;
-	ID3D11Buffer* m_normalBuffer;
-	ID3D11Buffer* m_ssaoNoiseBuffer;
-	ID3D11Buffer* m_ssaoBuffer = nullptr;
+	ID3D11Buffer* m_positionBuffer{ nullptr };
+	ID3D11Buffer* m_normalBuffer{ nullptr };
+	ID3D11Buffer* m_ssaoNoiseBuffer{ nullptr };
+	ID3D11Buffer* m_ssaoBuffer{ nullptr };
 };
 
 #endif // !_GBUFFERSHADER_H_

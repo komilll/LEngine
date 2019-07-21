@@ -3,17 +3,14 @@
 #define _LIGHTCLASS_H_
 
 #include <DirectXMath.h>
-
 using namespace DirectX;
 
 class LightClass
 {
 public:
-	LightClass();
-
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 position);
-	XMFLOAT3 GetPosition();
+	XMFLOAT3 GetPosition() const;
 
 	void SetLookAt(float x, float y, float z);
 	void SetLookAt(XMFLOAT3 lookAt);
@@ -21,8 +18,8 @@ public:
 	void GenerateViewMatrix();
 	void GenerateProjectionMatrix(float screenDepth, float screenNear);
 
-	void GetViewMatrix(XMMATRIX &viewMatrix);
-	void GetProjectionMatrix(XMMATRIX &projectionMatrix);
+	void GetViewMatrix(XMMATRIX &viewMatrix) const;
+	void GetProjectionMatrix(XMMATRIX &projectionMatrix) const;
 
 private:
 	XMFLOAT3 m_position{ 0,0,0 };

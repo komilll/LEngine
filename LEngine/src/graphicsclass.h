@@ -602,8 +602,8 @@ private:
 	RenderTextureClass* m_ssaoNoiseTexture;
 	RenderTextureClass* m_ssaoTexture;
 	RenderTextureClass* m_postSSAOTexture;
-	XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
-	XMFLOAT2 m_ssaoNoise[16];
+	//XMFLOAT3 m_ssaoKernel[SSAO_KERNEL_SIZE];
+	//XMFLOAT2 m_ssaoNoise[16];
 
 	//BLOOM
 	BloomShaderClass* m_bloomShader;

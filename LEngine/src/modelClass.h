@@ -1,13 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: modelclass.h
-////////////////////////////////////////////////////////////////////////////////
 #ifndef _MODELCLASS_H_
 #define _MODELCLASS_H_
 
-
-//////////////
-// INCLUDES //
-//////////////
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <vector>
@@ -26,9 +19,6 @@
 
 using namespace DirectX;
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: ModelClass
-////////////////////////////////////////////////////////////////////////////////
 class ModelClass;
 
 class Bounds
@@ -94,10 +84,8 @@ public:
 	};
 
 public:
-	ModelClass();
+	ModelClass() = default;
 	ModelClass(D3DClass * d3d, const char* modelFilename, XMFLOAT3 position = { 0.0f, 0.0f, 0.0f }, bool pickable = true);
-	ModelClass(const ModelClass&);
-	~ModelClass();
 
 	bool Initialize(D3DClass * d3d, const char* modelFilename, bool pickable = true);
 	bool Initialize(D3DClass* d3d, XMFLOAT3 origin, XMFLOAT3 destination);
@@ -110,7 +98,7 @@ public:
 	void CreateWireframe();
 	const std::vector<ModelClass*>& GetWireframeList() const;
 
-	int GetIndexCount();
+	int GetIndexCount() const;
 
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 position);
@@ -131,7 +119,6 @@ public:
 	std::string GetName() const;
 	std::string GetModelFilename() const;
 	std::string GetSaveData() const;
-	void LoadData();
 	static ModelClass* LoadModel(D3DClass * d3d);
 	void LoadModel();
 	std::string LoadModelCalculatePath();
@@ -145,10 +132,7 @@ private:
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	void SetIndices(std::string input, int &vertexIndex, int &textureIndex, int &normalIndex);
-	void CalculateDataForNormalMapping(VertexType* &vertices);
-	void CalculateTangentBinormal(VertexType vertex1, VertexType vertex2, VertexType vertex3, XMFLOAT3 &tangent, XMFLOAT3 &binormal);
-	void CalculateNormal(XMFLOAT3 &tangent, XMFLOAT3 &binormal, XMFLOAT3 &normal);
-	bool CreateBuffers(ID3D11Device* device, VertexType * &vertices, unsigned long * &indices, int vertexCount, int indexCount);
+	bool CreateBuffers(ID3D11Device* device, const VertexType *vertices, const unsigned long *indices, int vertexCount, int indexCount);
 	//Save and Load binary data format
 	void SaveBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
 	bool ReadBinary(const char* modelFilename, std::vector<VertexType> &vertexType, std::vector<unsigned long> &vertexIndices);
@@ -159,8 +143,7 @@ private:
 	bool CreateSquare(ID3D11Device* device, float centerX, float centerY, float size, bool isEmpty, bool withTex);
 
 	bool is_number(const std::string& s);
-	void LoadNewIndex(std::string line, int& vIndex, int& vtIndex, int& vnIndex);
-	void CalculateAxisBound(float & min, float & max, std::vector<float>& elements) const;
+	void CalculateAxisBound(float & min, float & max, std::vector<float>& elements) const;	
 
 public:
 	std::string m_name;
@@ -173,9 +156,9 @@ private:
 	ID3D11Device* m_device;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
-	float m_position[4]{ 0.0f, 0.0f, 0.0f, 0.0f};
-	float m_scale[3] { 1.0f, 1.0f, 1.0f };
-	float m_rotation[3]{ 0.0f, 0.0f, 0.0f };
+	XMFLOAT4 m_position { 0.0f, 0.0f, 0.0f, 0.0f};
+	XMFLOAT3 m_scale { 1.0f, 1.0f, 1.0f };
+	XMFLOAT3 m_rotation { 0.0f, 0.0f, 0.0f };
 	D3DClass* m_D3D;
 
 	MaterialPrefab* m_material;

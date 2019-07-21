@@ -1,1 +1,1 @@
-{"material": "", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}
+{"material": "", "modelName": "bunny.obj", "position": [-0.09105151891708374, 0.11587389558553696, -0.16663265228271484], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}

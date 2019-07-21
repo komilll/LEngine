@@ -1,62 +1,23 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: inputclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "inputclass.h"
 
-
-InputClass::InputClass()
+void InputClass::KeyDown(unsigned int keyIndex)
 {
+	m_keys[keyIndex] = true;
 }
 
 
-InputClass::InputClass(const InputClass& other)
+void InputClass::KeyUp(unsigned int keyIndex)
 {
+	m_keys[keyIndex] = false;
 }
 
 
-InputClass::~InputClass()
+bool InputClass::IsKeyDown(unsigned int keyIndex) const
 {
+	return m_keys[keyIndex];
 }
 
-
-void InputClass::Initialize()
-{
-	int i;
-	
-
-	// Initialize all the keys to being released and not pressed.
-	for(i=0; i<256; i++)
-	{
-		m_keys[i] = false;
-	}
-
-	return;
-}
-
-
-void InputClass::KeyDown(unsigned int input)
-{
-	// If a key is pressed then save that state in the key array.
-	m_keys[input] = true;
-	return;
-}
-
-
-void InputClass::KeyUp(unsigned int input)
-{
-	// If a key is released then clear that state in the key array.
-	m_keys[input] = false;
-	return;
-}
-
-
-bool InputClass::IsKeyDown(unsigned int key)
-{
-	// Return what state the key is in (pressed/not pressed).
-	return m_keys[key];
-}
-
-bool InputClass::IsLetterKeyDown()
+bool InputClass::IsLetterKeyDown() const
 {
 	for (unsigned int i = 65; i <= 90; ++i)
 	{
@@ -66,7 +27,7 @@ bool InputClass::IsLetterKeyDown()
 	return false;
 }
 
-bool InputClass::IsNumberKeyDown()
+bool InputClass::IsNumberKeyDown() const
 {
 	for (unsigned int i = 48; i <= 57; ++i)
 	{
@@ -76,7 +37,7 @@ bool InputClass::IsNumberKeyDown()
 	return false;
 }
 
-bool InputClass::IsAlphanumericKeyDown()
+bool InputClass::IsAlphanumericKeyDown() const
 {
 	return IsLetterKeyDown() || IsNumberKeyDown();
 }

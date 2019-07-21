@@ -10,7 +10,7 @@ class LUTShader : public BaseShaderClass
 {
 public:
 	void SetLUT(ID3D11Device* device, const wchar_t* filename, bool isDDS = false);
-	ID3D11ShaderResourceView* GetLUT();
+	ID3D11ShaderResourceView* GetLUT() const;
 
 protected:
 	virtual bool SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) override;
@@ -20,8 +20,8 @@ public:
 	ID3D11ShaderResourceView* m_screenResourceView;
 
 private:
-	ID3D11Resource* m_lut = nullptr;
-	ID3D11ShaderResourceView* m_lutView = nullptr;
+	ID3D11Resource* m_lut{ nullptr };
+	ID3D11ShaderResourceView* m_lutView{ nullptr };
 };
 
 #endif // !_POSTPROCESSSHADER_H_

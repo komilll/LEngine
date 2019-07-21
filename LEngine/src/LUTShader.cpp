@@ -2,13 +2,8 @@
 
 bool LUTShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
-
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	unsigned int bufferNumber;
-
 	/////// VERTEX BUFFERS ///////
 
 	/////// PIXEL BUFFERS ///////
@@ -16,7 +11,7 @@ bool LUTShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRI
 
 	/////// RESOURCES ///////
 	//Pixel shader resources
-	bufferNumber = 0;
+	unsigned int bufferNumber{ 0 };
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_screenResourceView);
 	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_lutView);
 	return true;
@@ -27,7 +22,7 @@ void LUTShader::SetLUT(ID3D11Device* device, const wchar_t * filename, bool isDD
 	BaseShaderClass::LoadTexture(device, filename, m_lut, m_lutView, isDDS);
 }
 
-ID3D11ShaderResourceView * LUTShader::GetLUT()
+ID3D11ShaderResourceView * LUTShader::GetLUT() const
 {
 	return m_lutView;
 }

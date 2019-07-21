@@ -5,16 +5,14 @@ void GBufferShader::ChangeTextureType(BufferType newType)
 	m_bufferType = newType;
 }
 
-void GBufferShader::SetKernelValues(XMFLOAT3 kernelVal[64])
+void GBufferShader::SetKernelValues(std::array<XMFLOAT3, 64> kernelVal)
 {
-	for (int i = 0; i < 64; i++)
-		m_kernelValues[i] = kernelVal[i];
+	m_kernelValues = kernelVal;
 }
 
-void GBufferShader::SetNoiseValues(XMFLOAT2 noiseVal[16])
+void GBufferShader::SetNoiseValues(std::array<XMFLOAT2, 16> noiseVal)
 {
-	for (int i = 0; i < 16; i++)
-		m_noiseValues[i] = noiseVal[i];
+	m_noiseValues = noiseVal;
 }
 
 void GBufferShader::SetRadiusSize(float radiusSize)
@@ -61,21 +59,6 @@ bool GBufferShader::CreateBufferAdditionals(ID3D11Device *& device)
 
 	switch (m_bufferType)
 	{
-		//case GBufferShader::BufferType::POSITION:
-		//	tempBufferDesc.ByteWidth = sizeof(PositionBuffer);
-		//	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_positionBuffer)))
-		//		return false;
-
-		//	m_buffers = { m_positionBuffer };
-		//	break;
-
-		//case GBufferShader::BufferType::NORMAL:
-		//	tempBufferDesc.ByteWidth = sizeof(NormalBuffer);
-		//	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_normalBuffer)))
-		//		return false;
-
-		//	m_buffers = { m_normalBuffer };
-		//	break;
 		case GBufferShader::BufferType::SSAO_NOISE:
 			tempBufferDesc.ByteWidth = sizeof(SSAONoiseBuffer);
 			if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_ssaoNoiseBuffer)))
@@ -99,20 +82,14 @@ bool GBufferShader::CreateBufferAdditionals(ID3D11Device *& device)
 
 bool GBufferShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	PositionBuffer* positionBuffer;
-	NormalBuffer* normalBuffer;
-	SSAONoiseBuffer* ssaoNoiseBuffer;
-	SSAOBuffer* ssaoBuffer;
-	unsigned int bufferNmber;
-
+	
 	/////// VERTEX BUFFERS ///////
 	//SSAO noise buffer
-	int bufferNumber = 1;
 	switch (m_bufferType)
 	{
 		case GBufferShader::BufferType::SSAO_NOISE:
@@ -120,16 +97,15 @@ bool GBufferShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMM
 			if (FAILED(result))
 				return false;
 
-			ssaoNoiseBuffer = (SSAONoiseBuffer*)mappedResource.pData;
+			SSAONoiseBuffer* ssaoNoiseBuffer = static_cast<SSAONoiseBuffer*>(mappedResource.pData);
 			ssaoNoiseBuffer->noise = XMFLOAT2{ 0, 0 };
 			ssaoNoiseBuffer->padding = XMFLOAT2{ 0, 0 };
 
 			deviceContext->Unmap(m_ssaoNoiseBuffer, 0);
-			deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_ssaoNoiseBuffer);
+			deviceContext->VSSetConstantBuffers(1, 1, &m_ssaoNoiseBuffer);
 			break;
 
 	}
-
 
 	/////// PIXEL BUFFERS ///////
 	switch (m_bufferType)
@@ -139,13 +115,12 @@ bool GBufferShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMM
 			if (FAILED(result))
 				return false;
 
-			ssaoBuffer = (SSAOBuffer*)mappedResource.pData;
+			SSAOBuffer* ssaoBuffer = static_cast<SSAOBuffer*>(mappedResource.pData);
 			ssaoBuffer->radiusSize = m_radiusSize;
 			ssaoBuffer->bias = m_bias;
 			ssaoBuffer->padding_2 = 0;
 			ssaoBuffer->padding_3 = 0;
-			for (int i = 0; i < 64; i++)
-				ssaoBuffer->kernelValues[i] = m_kernelValues[i];
+			ssaoBuffer->kernelValues = m_kernelValues;
 
 			deviceContext->Unmap(m_ssaoBuffer, 0);
 			deviceContext->PSSetConstantBuffers(0, 1, &m_ssaoBuffer);

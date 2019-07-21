@@ -496,6 +496,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
 	std::default_random_engine generator;
 	XMFLOAT3 tmpSample;
+	std::array<XMFLOAT3, 64> ssaoKernel;
+	std::array<XMFLOAT2, 16> ssaoNoise;
+
 	for (int i = 0; i < SSAO_KERNEL_SIZE; i++)
 	{
 		//Generate random vector3 ([-1, 1], [-1, 1], [0, 1])
@@ -529,15 +532,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		tmpSample.z *= scale;
 
 		//Pass value to array
-		m_ssaoKernel[i] = tmpSample;
+		ssaoKernel[i] = tmpSample;
 	}
 
-	XMFLOAT2 tmpNoise;
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 16; ++i)
 	{
-		tmpNoise.x = randomFloats(generator);
-		tmpNoise.y = randomFloats(generator);
-		m_ssaoNoise[i] = tmpNoise;
+		ssaoNoise[i] = { randomFloats(generator), randomFloats(generator) };
 	}
 
 	//Create SSAO noise texture
@@ -563,8 +563,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_ssaoNoiseTexture->Initialize(m_D3D->GetDevice(), SSAO_NOISE_SIZE, SSAO_NOISE_SIZE);
 	if (!m_ssaoNoiseTexture->LoadTexture(m_D3D->GetDevice(), L"ssaoNoise.dds", m_ssaoNoiseTexture->GetShaderResource(), m_ssaoNoiseTexture->GetShaderResourceView()))
 		return false;
-	m_GBufferShaderSSAO->SetKernelValues(m_ssaoKernel);
-	m_GBufferShaderSSAO->SetNoiseValues(m_ssaoNoise);
+	m_GBufferShaderSSAO->SetKernelValues(ssaoKernel);
+	m_GBufferShaderSSAO->SetNoiseValues(ssaoNoise);
 	//m_GBufferShader->LoadPositionTexture(m_positionBuffer->GetShaderResourceView());
 	//m_GBufferShader->LoadNormalTexture(m_normalBuffer->GetShaderResourceView());
 	//m_GBufferShader->LoadNoiseTexture(m_ssaoNoiseTexture->GetShaderResourceView());

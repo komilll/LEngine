@@ -634,12 +634,12 @@ void D3DClass::EnableDepthTesting() const
 	m_deviceContext->OMSetDepthStencilState(stencil, 1);
 }
 
-void D3DClass::ResetViewport()
+void D3DClass::ResetViewport() const
 {
 	m_deviceContext->RSSetViewports(1, &m_viewport);
 }
 
-BaseShaderClass::vertexInputType D3DClass::GetBaseInputType()
+BaseShaderClass::vertexInputType D3DClass::GetBaseInputType() const
 {
 	static std::vector<LPCSTR> names{ "position", "texcoord", "normal", "tangent", "binormal" };
 	static std::vector<DXGI_FORMAT> formats{ DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
@@ -647,7 +647,7 @@ BaseShaderClass::vertexInputType D3DClass::GetBaseInputType()
 	return{ names, formats };
 }
 
-D3DClass::WindowSize D3DClass::GetWindowSize()
+D3DClass::WindowSize D3DClass::GetWindowSize() const
 {
 	return D3DClass::WindowSize(m_windowSizeX, m_windowSizeY);
 }

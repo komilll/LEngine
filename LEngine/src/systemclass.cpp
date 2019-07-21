@@ -40,9 +40,6 @@ bool SystemClass::Initialize()
 		return false;
 	}
 
-	// Initialize the input object.
-	m_Input->Initialize();
-
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = new GraphicsClass;
 	if(!m_Graphics)

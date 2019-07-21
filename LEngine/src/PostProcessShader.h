@@ -40,7 +40,6 @@ public:
 	void SetSSAOBuffer(ID3D11ShaderResourceView *&ssaoBuffer);
 	void SetBloomBuffer(ID3D11ShaderResourceView *&bloomBuffer);
 	void SetLUTBuffer(ID3D11ShaderResourceView *&lutBuffer);
-	void SetChromaticAberrationBuffer(ID3D11ShaderResourceView *&chromaticAberrationBuffer);
 
 	void UseChromaticAberration(bool setActive);
 	void SetChromaticAberrationOffsets(float red, float green, float blue);
@@ -86,6 +85,7 @@ private:
 	float m_chromaticAberrationIntensity{ 1.0f };
 
 	//GRAIN
+	//TODO Use struct for grain
 	bool m_useGrain = false;
 	float m_grainIntensity{ 0.0f }; //Should use struct
 	float m_grainSize{ 0.0f };		//Should use struct

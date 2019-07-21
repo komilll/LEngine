@@ -87,6 +87,7 @@ public:
 	ModelClass() = default;
 	ModelClass(D3DClass * d3d, const char* modelFilename, XMFLOAT3 position = { 0.0f, 0.0f, 0.0f }, bool pickable = true);
 
+	//TODO Use constructors instead of "Initialize" methods
 	bool Initialize(D3DClass * d3d, const char* modelFilename, bool pickable = true);
 	bool Initialize(D3DClass* d3d, XMFLOAT3 origin, XMFLOAT3 destination);
 	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false, float borderWidth = 0.007f);

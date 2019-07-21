@@ -1,11 +1,6 @@
 #include "ModelPickerShader.h"
 
-ModelPickerShader::ModelPickerShader()
-{
-	BaseShaderClass::BaseShaderClass();
-}
-
-void ModelPickerShader::GetColor(XMFLOAT4 & color)
+void ModelPickerShader::GetColor(XMFLOAT4 & color) const
 {
 	color = m_tint;
 }
@@ -59,26 +54,20 @@ bool ModelPickerShader::CreateSamplerState(ID3D11Device * device)
 
 bool ModelPickerShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
-	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	AppearanceBuffer* dataPtr2;
-	unsigned int bufferNumber;
-
 	/////// PIXEL BUFFERS ///////
 	//Appearance buffer
-	result = deviceContext->Map(m_appearanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
+	if (FAILED(deviceContext->Map(m_appearanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		return false;
 
-	dataPtr2 = (AppearanceBuffer*)mappedResource.pData;
+	AppearanceBuffer* dataPtr2 = static_cast<AppearanceBuffer*>(mappedResource.pData);
 	dataPtr2->color = m_tint;
 
 	deviceContext->Unmap(m_appearanceBuffer, 0);
-	bufferNumber = 0;
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_appearanceBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &m_appearanceBuffer);
 
 	return true;
 }

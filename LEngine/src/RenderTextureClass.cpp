@@ -1,19 +1,10 @@
 #include "RenderTextureClass.h"
 
-RenderTextureClass::RenderTextureClass()
-{
-	m_texture2D = 0;
-	m_renderTargetView = 0;
-	m_shaderResourceView = 0;
-}
-
 bool RenderTextureClass::InitializeShadowMap(ID3D11Device * device, int textureWidth, int textureHeight)
 {
-	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 
+	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = textureWidth;
 	textureDesc.Height = textureHeight;
@@ -31,6 +22,7 @@ bool RenderTextureClass::InitializeShadowMap(ID3D11Device * device, int textureW
 	if (FAILED(result))
 		return false;
 
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -40,6 +32,7 @@ bool RenderTextureClass::InitializeShadowMap(ID3D11Device * device, int textureW
 	if (FAILED(result))
 		return false;
 
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -72,11 +65,9 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 
 bool RenderTextureClass::Initialize(ID3D11Device * device, int textureWidth, int textureHeight, int mipLevels)
 {
-	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 
+	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = textureWidth;
 	textureDesc.Height = textureHeight;
@@ -94,6 +85,7 @@ bool RenderTextureClass::Initialize(ID3D11Device * device, int textureWidth, int
 	if (FAILED(result))
 		return false;
 
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
@@ -104,6 +96,7 @@ bool RenderTextureClass::Initialize(ID3D11Device * device, int textureWidth, int
 	if (FAILED(result))
 		return false;
 
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -126,10 +119,6 @@ bool RenderTextureClass::Initialize(ID3D11Device * device, int textureWidth, int
 	return true;
 }
 
-void RenderTextureClass::Shutdown()
-{
-}
-
 void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView, bool withViewport)
 {
 	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, depthStencilView);
@@ -141,9 +130,9 @@ void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext * deviceContext, ID
 
 void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView, float red, float green, float blue, float alpha)
 {
-	float color[4]{ red, green, blue, alpha };
+	const std::array<float, 4> color{ red, green, blue, alpha };
 
-	deviceContext->ClearRenderTargetView(m_renderTargetView, color);
+	deviceContext->ClearRenderTargetView(m_renderTargetView, &color[0]);
 	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
@@ -154,13 +143,13 @@ void RenderTextureClass::SetViewport(ID3D11DeviceContext * deviceContext)
 
 bool RenderTextureClass::LoadTexture(ID3D11Device * device, const wchar_t * filename, ID3D11Resource *& m_texture, ID3D11ShaderResourceView *& m_textureView, bool isDDS)
 {
-	if (m_texture != nullptr)
+	if (m_texture)
 		m_texture->Release();
 
-	if (m_textureView != nullptr)
+	if (m_textureView)
 		m_textureView->Release();
 
-	HRESULT result = false;
+	HRESULT result;
 	//Import texture based on type - DDS or not
 	if (isDDS)
 		result = CreateDDSTextureFromFile(device, filename, &m_texture, &m_textureView);
@@ -169,17 +158,15 @@ bool RenderTextureClass::LoadTexture(ID3D11Device * device, const wchar_t * file
 
 	if (FAILED(result))
 	{
-		if (m_texture != nullptr)
+		if (m_texture)
 			m_texture->Release();
-		if (m_textureView != nullptr)
+		if (m_textureView)
 			m_textureView->Release();
 
 		m_texture = nullptr;
 		m_textureView = nullptr;
-
 		return false;
 	}
-
 	return true;
 }
 
@@ -203,18 +190,16 @@ ID3D11Resource *& RenderTextureClass::GetShaderResource()
 	return (ID3D11Resource*&)m_texture2D;
 }
 
-void RenderTextureClass::GetOrthoMatrix(XMMATRIX & orthoMatrix)
+void RenderTextureClass::GetOrthoMatrix(XMMATRIX & orthoMatrix) const
 {
 	orthoMatrix = m_orthoMatrix;
 }
 
 bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling)
 {
-	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 
+	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = textureWidth;
 	textureDesc.Height = textureHeight;
@@ -232,6 +217,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	if (FAILED(result))
 		return false;
 
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -241,6 +227,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	if (FAILED(result))
 		return false;
 
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -258,21 +245,21 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	m_viewport.MaxDepth = 1.0f;
 	m_viewport.TopLeftY = 0;
 
-	if (scaling == DOWNSCALE)
+	if (scaling == RenderTextureClass::Scaling::DOWNSCALE)
 	{
 		//m_viewport.Width = (float)textureWidth * 2.0f;
 		//m_viewport.TopLeftX = -textureWidth / 2;
 		m_viewport.Width = (float)textureWidth;
 		m_viewport.TopLeftX = 0;
 	}
-	else if (scaling == UPSCALE)
+	else if (scaling == RenderTextureClass::Scaling::UPSCALE)
 	{
 		//m_viewport.Width = (float)textureWidth * 1.8f;
 		//m_viewport.TopLeftX = -textureWidth / 2 + 26;
 		m_viewport.Width = (float)textureWidth;
 		m_viewport.TopLeftX = 0;
 	}
-	else if (scaling == NONE)
+	else if (scaling == RenderTextureClass::Scaling::NONE)
 	{
 		m_viewport.Width = (float)textureWidth;
 		m_viewport.TopLeftX = 0;
@@ -283,11 +270,9 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 
 bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling)
 {
-	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 
+	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = textureWidth;
 	textureDesc.Height = textureHeight;
@@ -305,6 +290,7 @@ bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWid
 	if (FAILED(result))
 		return false;
 
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
@@ -315,12 +301,13 @@ bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWid
 	if (FAILED(result))
 		return false;
 
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 	shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
 	shaderResourceViewDesc.TextureCube.MipLevels = 1;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 6; ++i)
 	{
 		shaderResourceViewDesc.Texture2DArray.FirstArraySlice = i;
 		result = device->CreateRenderTargetView(m_texture2D, &renderTargetViewDesc, &m_renderTargetViewSkybox[i]);

@@ -174,7 +174,6 @@
     <None Include="uiTexturePreview.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PostProcessShader.h" />
     <ClInclude Include="src\BaseShaderClass.h" />
     <ClInclude Include="src\BloomShaderClass.h" />
     <ClInclude Include="src\BlurShaderClass.h" />
@@ -199,6 +198,7 @@
     <ClInclude Include="src\ModelPickerShader.h" />
     <ClInclude Include="src\MouseClass.h" />
     <ClInclude Include="src\MouseClassContainer.h" />
+    <ClInclude Include="src\PostProcessShader.h" />
     <ClInclude Include="src\RenderTextureClass.h" />
     <ClInclude Include="src\ShaderEditorManager.h" />
     <ClInclude Include="src\ShaderPBRClass.h" />

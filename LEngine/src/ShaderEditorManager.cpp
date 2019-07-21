@@ -6,7 +6,6 @@ ShaderEditorManager::ShaderEditorManager(D3DClass * d3d, MouseClass * mouse)
 	m_mouse = mouse;
 	m_pbrBlock = new UIShaderPBRBlock();
 	m_pbrBlock->Initialize(d3d);
-	LoadFunctionsFromDirectory();
 	CreateChoosingWindowItemsArray();
 
 	m_blocks.reserve(64);
@@ -90,8 +89,7 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 			{
 				if (!m_mouseHoveredImGui)
 				{
-					ShaderEditorManager::ETryDragResult tmp = TryToResetFocusOnAllBlocks(block);
-					if (tmp == ShaderEditorManager::ETryDragResult::DoNotCreate)
+					if (TryToResetFocusOnAllBlocks(block) == ShaderEditorManager::ETryDragResult::DoNotCreate)
 					{
 						return;
 					}
@@ -116,8 +114,8 @@ void ShaderEditorManager::UpdateBlocks(bool mouseOnly)
 		if (m_mouse->GetMMBPressed())
 		{
 			m_draggingScreen = true;
-			float moveX = -m_mouse->GetMouseMovementFrame().first / m_D3D->GetWindowSize().x / m_scale;
-			float moveY = m_mouse->GetMouseMovementFrame().second / m_D3D->GetWindowSize().y / m_scale;
+			const float moveX = -m_mouse->GetMouseMovementFrame().first / m_D3D->GetWindowSize().x / m_scale;
+			const float moveY = m_mouse->GetMouseMovementFrame().second / m_D3D->GetWindowSize().y / m_scale;
 			for (const auto& block : m_blocks)
 			{
 				block->Move(moveX, moveY);
@@ -217,8 +215,8 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 	if (m_pbrBlock && m_pbrBlock->IsDragging())
 		return true;
 
-	UIShaderEditorOutput* out = nullptr;
-	UIShaderEditorBlock* currentBlock = nullptr;
+	UIShaderEditorOutput* out{ nullptr };
+	UIShaderEditorBlock* currentBlock{ nullptr };
 
 	//If pin is being dragged - consume input
 	for (const auto& block : m_blocks)
@@ -299,6 +297,7 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 
 void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutput * out)
 {
+	assert(in, "UIShaderEditorInput passed was null");
 	for (int i = m_lines.size() - 1; i >= 0; --i)
 	{
 		if (m_lines.at(i)->GetInput() == in)
@@ -369,15 +368,15 @@ void ShaderEditorManager::CreateChoosingWindowItemsArray()
 {
 	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions", false))
 	{
-		std::string tmp{};
+		std::string tmp;
 		for (const auto& c : file)
 		{
 			if (c == '.')
 				break;
 			tmp += ::toupper(c);
 		}
-		ChoosingWindowItems.push_back(new char());
-		strcpy(const_cast<char*>(ChoosingWindowItems.at(ChoosingWindowItems.size() - 1)), tmp.c_str());
+		ChoosingWindowItems.push_back(tmp.c_str());
+		//strcpy(const_cast<char*>(ChoosingWindowItems.at(ChoosingWindowItems.size() - 1)), tmp.c_str());
 	}
 	ChoosingWindowItemsOriginal._Construct(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
 
@@ -385,7 +384,7 @@ void ShaderEditorManager::CreateChoosingWindowItemsArray()
 	std::sort(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
 }
 
-bool ShaderEditorManager::CheckConnectionRules(UIShaderEditorInput * in, UIShaderEditorOutput * out)
+bool ShaderEditorManager::CheckConnectionRules(UIShaderEditorInput * in, UIShaderEditorOutput * out) const
 {
 	if (in->m_returnType == out->m_returnType)
 		return true;
@@ -436,9 +435,9 @@ bool ShaderEditorManager::TryCreateScalarBlocks(std::string name)
 	return false;
 }
 
-void ShaderEditorManager::CopyBlockValues(UIShaderEditorBlock * const src, UIShaderEditorBlock * const dst)
+void ShaderEditorManager::CopyBlockValues(UIShaderEditorBlock * const src, UIShaderEditorBlock * const dst) const
 {
-	std::wstring wLine = std::wstring(src->GetFirstOutputNode()->m_texturePath.begin(), src->GetFirstOutputNode()->m_texturePath.end());
+	const std::wstring wLine = std::wstring(src->GetFirstOutputNode()->m_texturePath.begin(), src->GetFirstOutputNode()->m_texturePath.end());
 	const wchar_t* path = wLine.c_str();
 	if (!BaseShaderClass::LoadTexture(m_D3D->GetDevice(), path, dst->GetFirstOutputNode()->m_connectedTexture, dst->GetFirstOutputNode()->m_connectedTextureView, true))
 	{
@@ -496,11 +495,13 @@ bool ShaderEditorManager::FindOutputNode(UIShaderEditorOutput * const out, std::
 
 std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 {
+	//Function generates HLSL code based on used shader editor block
+	//Uses literal value or call function (with conversion types if needed)
 	if (block->m_inputNodes.size() == 0)
 	{
 		if (block->GetFirstOutputNode())
 		{
-			std::string tmp = block->GenerateShaderCode();			
+			const std::string tmp = block->GenerateShaderCode();			
 			for (const auto& elem : m_usedVariableNamesInGenerator)
 			{
 				if (elem == tmp)
@@ -510,22 +511,25 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 			}
 			m_usedVariableNamesInGenerator.push_back(tmp);
 			if (tmp == "\t;\n")
-				tmp = "";
+			{
+				return "";
+			}
 			else if (m_originalGeneratorBlock == block)
 			{
-				tmp += ConvertReturnType(block->m_variableName, block->GetReturnType(), m_originalRequiredType);
-				return tmp;
+				return tmp + ConvertReturnType(block->m_variableName, block->GetReturnType(), m_originalRequiredType);
 			}
 			return tmp;
 		}
 		else
+		{
 			return "";
+		}
 	}
 
-	std::string toReturn{};
+	std::string toReturn;
 	for (const auto& in : block->m_inputNodes)
 	{
-		UIShaderEditorOutput* out = in->m_connectedOutputNode;
+		const UIShaderEditorOutput* const out = in->m_connectedOutputNode;
 		for (const auto& connectedBlock : m_blocks)
 		{
 			for (const auto& otherOut : connectedBlock->m_outputNodes)
@@ -553,27 +557,31 @@ std::string ShaderEditorManager::GenerateBlockCode(UIShaderEditorBlock * block)
 	return toReturn;
 }
 
-std::string ShaderEditorManager::GetTextureDeclarations()
+void ShaderEditorManager::FillTexturePathsArray()
 {
-	int count = 0;
 	m_generatedTextureAdresses.clear();
-	for (const auto& block : m_blocks) 
+	for (const auto& block : m_blocks)
 	{
 		if (block->GetFunctionName() == "texture")
 		{
-			count++;
 			m_generatedTextureAdresses.push_back(block->m_outputNodes[0]->m_texturePath);
 		}
 	}
+}
 
-	if (count > 0)
+std::string ShaderEditorManager::GetTextureDeclarations()
+{
+	FillTexturePathsArray();
+	if (m_generatedTextureAdresses.size() > 0)
 	{
-		int index = 0;
-		std::string toReturn{};
+		int index{ 0 };
+		std::string toReturn;
 		for (const auto& block : m_blocks)
 		{
-			if (block->GetFunctionName() == "texture" || block->GetFunctionName() == "sampletexture")
+			const std::string functionName = block->GetFunctionName();
+			if (functionName == "texture" || functionName == "sampletexture")
 			{
+				//TODO stringstream might be little slow
 				ostringstream ssBegin;
 				ostringstream ssEnd;
 				ssBegin << index;
@@ -589,12 +597,12 @@ std::string ShaderEditorManager::GetTextureDeclarations()
 	return "";
 }
 
-std::string ShaderEditorManager::GetTextureDefinitions()
+std::string ShaderEditorManager::GetTextureDefinitions() const
 {
-	std::string toReturn{};
+	std::string toReturn;
 	std::map<int, int> textureMap; //Index of block / index of texture
 
-	int index = 0;
+	int index{ 0 };
 	for (const auto& block : m_blocks)
 	{
 		if (block->GetFunctionName() == "texture")
@@ -602,7 +610,7 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 			ostringstream ss;
 			ss << index;
 			textureMap.insert({ block->GetBlockID(), index });
-			index++;
+			++index;
 			toReturn += "\t" + block->m_outputNodes[0]->m_variableName + " = additionalTexture_" + ss.str() + ".Sample(SampleType, input.tex);\n";
 		}
 	}
@@ -629,8 +637,8 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 					ss << index;
 					if (block->m_inputNodes.size() == 2 && block->m_inputNodes.at(1) && block->m_inputNodes.at(1)->m_connectedOutputNode)
 					{
-						float x_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[0];
-						float y_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[1];
+						const float x_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[0];
+						const float y_uv = block->m_inputNodes.at(1)->m_connectedOutputNode->m_valueTwo[1];
 
 						if (x_uv == 0.0f && y_uv == 0.0f)
 						{
@@ -642,12 +650,12 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 							stringstream secondVal;
 							firstVal << x_uv;
 							secondVal << y_uv;
-							if ((int)x_uv == x_uv)
+							if (static_cast<int>(x_uv) == x_uv)
 								firstVal.str() += ".0f";
 							else
 								firstVal.str() += "f";
 
-							if ((int)y_uv == y_uv)
+							if (static_cast<int>(y_uv) == y_uv)
 								secondVal.str() += ".0f";
 							else
 								secondVal.str() += "f";
@@ -668,24 +676,23 @@ std::string ShaderEditorManager::GetTextureDefinitions()
 	return toReturn;
 }
 
-std::string ShaderEditorManager::GetFunctionDeclarations()
+std::string ShaderEditorManager::GetFunctionDeclarations() const
 {
-	std::string toReturn{};
+	std::string toReturn;
 
 	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions"))
 	{
 		if (std::ifstream stream{ file, std::ios::binary })
 		{
-			int count = 0;
 			while (!stream.eof())
 			{
-				std::string line{};
+				std::string line;
 				getline(stream, line);
 				if (line == "")
 				{
 					continue;
 				}
-				std::string finLine{};
+				std::string finLine;
 				for (const char& c : line)
 				{
 					if (c != '\n' && c != '\r')
@@ -694,7 +701,6 @@ std::string ShaderEditorManager::GetFunctionDeclarations()
 				finLine += ";\n";
 				toReturn += finLine;
 
-				std::string previousLine = line;
 				bool finished = false;
 				while (!stream.eof() && !finished)
 				{
@@ -708,7 +714,6 @@ std::string ShaderEditorManager::GetFunctionDeclarations()
 							{
 								getline(stream, line);
 								finished = true;
-								count++;
 								break;
 							}
 						}
@@ -720,9 +725,9 @@ std::string ShaderEditorManager::GetFunctionDeclarations()
 	return toReturn;
 }
 
-std::string ShaderEditorManager::GetFunctionDefinitions()
+std::string ShaderEditorManager::GetFunctionDefinitions() const
 {
-	std::string toReturn{};
+	std::string toReturn;
 
 	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions"))
 	{
@@ -730,7 +735,7 @@ std::string ShaderEditorManager::GetFunctionDefinitions()
 		{
 			while (!stream.eof())
 			{
-				std::string line{};
+				std::string line;
 				getline(stream, line);
 				line += "\n";
 				toReturn += line;
@@ -741,12 +746,12 @@ std::string ShaderEditorManager::GetFunctionDefinitions()
 	return toReturn;
 }
 
-vector<std::string> ShaderEditorManager::GetFilenamesInDirectory(std::string dir, bool withDir)
+vector<std::string> ShaderEditorManager::GetFilenamesInDirectory(std::string dir, bool withDir) const
 {
 	vector<string> names;
-	string search_path{ dir + "/*.*" };
+	const string search_path{ dir + "/*.*" };
 	WIN32_FIND_DATA fd;
-	HANDLE hFind = ::FindFirstFile(search_path.c_str(), &fd);
+	const HANDLE hFind = ::FindFirstFile(search_path.c_str(), &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			// read all (real) files in current folder
@@ -764,7 +769,7 @@ vector<std::string> ShaderEditorManager::GetFilenamesInDirectory(std::string dir
 	return names;
 }
 
-std::string ShaderEditorManager::ConvertReturnType(std::string outName, std::string typeIn, std::string typeOut)
+std::string ShaderEditorManager::ConvertReturnType(std::string outName, std::string typeIn, std::string typeOut) const
 {
 	if (typeIn == typeOut)
 	{
@@ -794,7 +799,7 @@ std::string ShaderEditorManager::ConvertReturnType(std::string outName, std::str
 	return "ERROR";
 }
 
-std::vector<std::string> ShaderEditorManager::GetUsedTextures()
+std::vector<std::string> ShaderEditorManager::GetUsedTextures() const
 {
 	return m_usedTextures;
 }
@@ -809,25 +814,15 @@ void ShaderEditorManager::ShowFunctionChoosingWindow()
 	*m_focusOnChoosingWindowsShader = false;
 }
 
-void ShaderEditorManager::LoadFunctionsFromDirectory()
-{
-	//std::vector<std::string> names = GetFilenamesInDirectory("ShaderFunctions", false);
-	//
-	//for (int i = 0; i < names.size(); ++i)
-	//{
-	//	 strcpy(m_choosingWindowItems[i], names.at(i).c_str());
-	//}
-}
-
 void ShaderEditorManager::GeneratePBRClassCode(std::string filename)
 {
-	GetTextureDeclarations();
+	FillTexturePathsArray();
 	m_usedTextures.clear();
-	for (const auto& name : m_generatedTextureAdresses)
-	{
-		m_usedTextures.push_back(name);
-	}
+	m_usedTextures._Construct(m_generatedTextureAdresses.begin(), m_generatedTextureAdresses.end());
 	return;
+
+	//Workflow changed - saved texture adresses are store in txt files and passed to
+	//created generic cpp file instead of creating specialized cpp file every time
 
 	if (filename == "")
 	{
@@ -875,13 +870,13 @@ void ShaderEditorManager::GenerateVariableNames()
 			{
 				if (i + 65 <= 90)
 				{
-					char variableName = i + 65;
+					const char variableName = i + 65;
 					block->m_variableName = variableName;
 					block->SetOutputPinName(block->m_variableName);
 				}
 				else
 				{
-					char variableName = (i + 65) % 90 + 65;
+					const char variableName = (i + 65) % 90 + 65;
 					block->m_variableName = { variableName };
 					block->m_variableName += variableName;
 					block->SetOutputPinName(block->m_variableName);
@@ -903,12 +898,12 @@ void ShaderEditorManager::GenerateVariableNames()
 				std::string variableName{ "out_" };
 				if (i + 65 <= 90)
 				{
-					char variableChar = i + 65;
+					const char variableChar = i + 65;
 					variableName += variableChar;
 				}
 				else
 				{
-					char variableChar = (i + 65) % 90 + 65;
+					const char variableChar = (i + 65) % 90 + 65;
 					variableName += variableChar;
 					variableName += variableChar;
 				}
@@ -919,7 +914,7 @@ void ShaderEditorManager::GenerateVariableNames()
 	}
 }
 
-void ShaderEditorManager::GenerateTexVariableName(UIShaderEditorBlock* block, int index)
+void ShaderEditorManager::GenerateTexVariableName(UIShaderEditorBlock* block, int index) const
 {
 	ostringstream ss;
 	ss << index;
@@ -1193,7 +1188,7 @@ std::vector<UIShaderEditorBlock*>& ShaderEditorManager::GetMaterialInputs()
 	return m_materialInputs;
 }
 
-std::pair<float, float> ShaderEditorManager::GetCurrentMousePosition()
+std::pair<float, float> ShaderEditorManager::GetCurrentMousePosition() const
 {
 	float mouseX{ 0 };
 	float mouseY{ 0 };
@@ -1340,8 +1335,8 @@ void ShaderEditorManager::DestroyEditor()
 std::string ShaderEditorManager::GenerateMaterialName()
 {
 	std::string toReturn;
-	for (int i = 0; i < std::strlen(m_materialToSaveName.data()); ++i)
-		toReturn += ::tolower(m_materialToSaveName.data()[i]);
+	for (const auto& c : m_materialToSaveName)
+		toReturn += ::tolower(c);
 	return toReturn;
 }
 
@@ -1353,10 +1348,10 @@ void ShaderEditorManager::LoadAllMaterialsToArray()
 	std::vector<std::string> allFiles = GetFilenamesInDirectory("Materials", false);
 	for (auto& file : allFiles)
 	{
-		size_t posNormal = file.find(".material");
+		const size_t posNormal = file.find(".material");
 		if (posNormal != std::string::npos)
 		{
-			size_t posPins = file.find(".materialpins");
+			const size_t posPins = file.find(".materialpins");
 			if (posPins != std::string::npos)
 			{
 				file.erase(file.begin() + posNormal, file.end());
@@ -1384,16 +1379,16 @@ void ShaderEditorManager::LoadMaterialInputs()
 
 void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 {
-	std::string func{};
+	std::string func;
 
 	m_usedVariableNamesInGenerator.clear();
 	GenerateVariableNames();
 
 	for (int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
 	{
-		if (UIShaderEditorOutput* out = m_pbrBlock->m_inputNodes.at(i)->m_connectedOutputNode)
+		if (const UIShaderEditorOutput* const out = m_pbrBlock->m_inputNodes.at(i)->m_connectedOutputNode)
 		{
-			std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
+			const std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
 			std::string funcBody{ "\n{\n" };
 
 			for (const auto& block : m_blocks)
@@ -1418,7 +1413,7 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 		}
 		else
 		{
-			std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
+			const std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
 			func += funcName;
 			func += "\n{\n";
 
@@ -1447,37 +1442,38 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 	{
 		filename = "GeneratedShaders/" + filename + ".ps";
 	}
-	std::ofstream dst(filename, std::ios::binary);
+	if (std::ofstream dst{ filename, std::ios::binary })
+	{
+		if (std::ifstream src{ "ShaderEditor/base_textures_header.txt", std::ios::binary })
+		{
+			dst << src.rdbuf(); //base_textures_header
+		}
+		dst << GetTextureDeclarations(); //Get Texture2D ... declaration of variable
+		if (std::ifstream src{ "ShaderEditor/base_declarations.txt", std::ios::binary })
+		{
+			dst << src.rdbuf(); //base_declarations
+		}
+		dst << GetFunctionDeclarations();
+		if (std::ifstream src{ "ShaderEditor/base_body_start.txt", std::ios::binary })
+		{
+			dst << src.rdbuf(); //base_body_start
+		}
+		dst << GetTextureDefinitions();
+		if (std::ifstream src{ "ShaderEditor/base_body_continue.txt", std::ios::binary })
+		{
+			dst << src.rdbuf(); //base_body_continue
+		}
+		dst << GetFunctionDefinitions();
+		if (std::ifstream src{ "ShaderEditor/generated_header.txt", std::ios::binary })
+		{
+			dst << src.rdbuf(); //generated_header
+		}
 
-	if (std::ifstream src{ "ShaderEditor/base_textures_header.txt", std::ios::binary })
-	{
-		dst << src.rdbuf(); //base_textures_header
+		dst << func; //Get generated functions
 	}
-	dst << GetTextureDeclarations(); //Get Texture2D ... declaration of variable
-	if (std::ifstream src{ "ShaderEditor/base_declarations.txt", std::ios::binary })
-	{
-		dst << src.rdbuf(); //base_declarations
-	}
-	dst << GetFunctionDeclarations();
-	if (std::ifstream src{ "ShaderEditor/base_body_start.txt", std::ios::binary })
-	{
-		dst << src.rdbuf(); //base_body_start
-	}
-	dst << GetTextureDefinitions();
-	if (std::ifstream src{ "ShaderEditor/base_body_continue.txt", std::ios::binary })
-	{
-		dst << src.rdbuf(); //base_body_continue
-	}
-	dst << GetFunctionDefinitions();
-	if (std::ifstream src{ "ShaderEditor/generated_header.txt", std::ios::binary })
-	{
-		dst << src.rdbuf(); //generated_header
-	}
-	dst << func; //Get generated functions
-	dst.close();
 }
 
-bool ShaderEditorManager::WillRenderChoosingWindow()
+bool ShaderEditorManager::WillRenderChoosingWindow() const
 {
 	return m_choosingWindow;
 }
@@ -1490,13 +1486,13 @@ int * ShaderEditorManager::GetChoosingWindowHandler()
 void ShaderEditorManager::CreateBlock(std::string name)
 {
 	m_choosingWindow = false;
-	std::string line{};
-	std::string returnType{};
+	std::string line;
+	std::string returnType;
 	vector<std::string> argumentTypes{""};
-	std::string functionName{};
-	bool filledReturnType = false;
-	bool filledFunctionName = false;
-	bool argumentWaitForComma = false;
+	std::string functionName;
+	bool filledReturnType{ false };
+	bool filledFunctionName{ false };
+	bool argumentWaitForComma{ false };
 	int argumentIndex = 0;
 
 	for (char& c : name)
@@ -1541,26 +1537,26 @@ void ShaderEditorManager::CreateBlock(std::string name)
 					{
 						argumentWaitForComma = false;
 						argumentTypes.push_back({});
-						argumentIndex++;
+						++argumentIndex;
 					}
 					continue;
 				}
 				argumentTypes.at(argumentIndex) += c;
 			}
 		}
-		m_blockIDCounter++;
+		++m_blockIDCounter;
 		AddShaderBlock(new UIShaderEditorBlock({ { m_choosingWindowPosXScreenspace, m_choosingWindowPosYScreenspace }, functionName, returnType, argumentTypes, m_blockIDCounter }), argumentTypes.size(), 1);
 		m_blocks.at(m_blocks.size() - 1)->m_fileName = name;
 	}
 	LoadMaterialInputs();
 }
 
-float ShaderEditorManager::GetWindowPositionX()
+float ShaderEditorManager::GetWindowPositionX() const
 {
 	return m_choosingWindowPosX;
 }
 
-float ShaderEditorManager::GetWindowPositionY()
+float ShaderEditorManager::GetWindowPositionY() const
 {
 	return m_choosingWindowPosY;
 }
@@ -1574,15 +1570,14 @@ void ShaderEditorManager::SearchThroughChoosingWindow()
 {
 	ChoosingWindowItems._Construct(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
 
-	for (int i = ChoosingWindowItems.size() - 1; i >= 0; i--)
+	for (int i = ChoosingWindowItems.size() - 1; i >= 0; --i)
 	{
-		std::string str{ ChoosingWindowItems.at(i) };
-		std::string mainStr{};
+		std::string mainStr;
+		for (const auto& c : m_choosingWindowSearch)
+			mainStr += ::toupper(c);
 
-		for (int i = 0; i < std::strlen(m_choosingWindowSearch.data()); ++i)
-			mainStr += ::toupper(m_choosingWindowSearch.data()[i]);
-
-		std::size_t found = str.find(mainStr);
+		const std::string str{ ChoosingWindowItems.at(i) };
+		const std::size_t found = str.find(mainStr);
 
 		if (found == std::string::npos)
 		{
@@ -1709,9 +1704,9 @@ UIShaderEditorOutput* ShaderEditorManager::GetPickingColorElement()
 	return m_pickingColorObject;
 }
 
-bool ShaderEditorManager::MouseAbovePreview()
+bool ShaderEditorManager::MouseAbovePreview() const
 {
-	std::pair<float, float> mousePosCurrent = GetCurrentMousePosition();
+	const std::pair<float, float> mousePosCurrent = GetCurrentMousePosition();
 	if (mousePosCurrent.first < -0.5f && mousePosCurrent.second > 0.5f)
 	{
 		return true;

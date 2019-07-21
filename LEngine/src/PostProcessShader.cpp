@@ -20,10 +20,6 @@ void PostProcessShader::SetLUTBuffer(ID3D11ShaderResourceView *& lutBuffer)
 	m_lutBufferView = lutBuffer;
 }
 
-void PostProcessShader::SetChromaticAberrationBuffer(ID3D11ShaderResourceView *& chromaticAberrationBuffer)
-{
-}
-
 void PostProcessShader::UseChromaticAberration(bool setActive)
 {
 	m_chromaticAberration = setActive;
@@ -130,16 +126,11 @@ bool PostProcessShader::CreateBufferAdditionals(ID3D11Device *& device)
 
 bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	TextureBufferType* dataPtr2;
-	ChromaticAberrationBuffer* dataPtr3;
-	GrainSettings* dataPtr4;
-	unsigned int bufferNumber;
-
 	/////// VERTEX BUFFERS ///////
 
 	/////// PIXEL BUFFERS ///////
@@ -148,7 +139,7 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	if (FAILED(result))
 		return false;
 
-	dataPtr2 = (TextureBufferType*)mappedResource.pData;
+	TextureBufferType* dataPtr2 = static_cast<TextureBufferType*>(mappedResource.pData);
 	dataPtr2->hasSSAO = m_ssaoBufferView != nullptr;
 	dataPtr2->hasBloom = m_bloomBufferView != nullptr;
 	dataPtr2->hasLUT = m_lutBufferView != nullptr;
@@ -157,7 +148,7 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	dataPtr2->padding = XMFLOAT3{ 0,0,0 };
 
 	deviceContext->Unmap(m_textureBuffer, 0);
-	bufferNumber = 0;
+	unsigned int bufferNumber{ 0 };
 	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_textureBuffer);
 
 	//Chromatic aberration buffer
@@ -165,7 +156,7 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	if (FAILED(result))
 		return false;
 
-	dataPtr3 = (ChromaticAberrationBuffer*)mappedResource.pData;
+	ChromaticAberrationBuffer* dataPtr3 = static_cast<ChromaticAberrationBuffer*>(mappedResource.pData);
 	dataPtr3->red = m_chromaticAberrationOffset.x;
 	dataPtr3->green = m_chromaticAberrationOffset.y;
 	dataPtr3->blue = m_chromaticAberrationOffset.z;
@@ -179,7 +170,7 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	if (FAILED(result))
 		return false;
 
-	dataPtr4 = (GrainSettings*)mappedResource.pData;
+	GrainSettings* dataPtr4 = static_cast<GrainSettings*>(mappedResource.pData);
 	dataPtr4->intensity = m_grainIntensity;
 	dataPtr4->size = m_grainSize;
 	dataPtr4->hasColor = m_hasGrainColor;

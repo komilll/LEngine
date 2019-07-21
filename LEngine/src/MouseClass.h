@@ -15,10 +15,6 @@
 class MouseClass
 {
 public:
-	MouseClass();
-	MouseClass(const MouseClass&);
-	~MouseClass();
-
 	bool Initialize(D3DClass* d3d, HINSTANCE hInstance, HWND hwnd, int screenWidth, int screenHeight);
 	void Shutdown();
 	bool Frame();
@@ -27,17 +23,17 @@ public:
 	void GetMouseLocation(int &mouseX, int &mouseY);
 	///<summary> Return [-1, 1] </summary>
 	void GetMouseLocationScreenSpace(float &mouseX, float &mouseY);
-	bool SetMouseLocation(int mouseX, int mouseY);
 	bool SetCursorPosition(XMFLOAT2 screenPos, bool clamped = false);
-	std::pair<float, float> GetMouseMovementFrame();
+	std::pair<float, float> GetMouseMovementFrame() const;
 
-	bool GetLMBPressed();
 	void SetLMBPressed(bool enable);
-	bool GetRMBPressed();
 	void SetRMBPressed(bool enable);
-	bool GetMMBPressed();
 	void SetMMBPressed(bool enable);
-	int GetMouseScroll();
+
+	bool GetLMBPressed() const;
+	bool GetRMBPressed() const;
+	bool GetMMBPressed() const;
+	int GetMouseScroll() const;
 
 	POINT CurrentMouseLocation() const;
 	std::pair<float, float> MouseFrameMovement();
@@ -64,8 +60,6 @@ private:
 	POINT m_frameMovement;
 	int m_screenWidth, m_screenHeight;
 	float m_mouseX, m_mouseY;
-	float m_mouseMaxX, m_mouseMaxY;
-	float m_mouseSpeedSlowdown = 4.0f;
 
 	D3DClass* m_d3d;
 	BOOL m_visible{ TRUE };

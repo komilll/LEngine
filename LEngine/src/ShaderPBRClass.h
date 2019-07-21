@@ -48,12 +48,18 @@ private:
 	{
 		XMFLOAT4 direction;
 		XMFLOAT4 color;
+
+		DirectionalLight() = default;
+		DirectionalLight(XMFLOAT4 direction_, XMFLOAT4 color_) : direction(direction_), color(color_) {}
 	};
 
 	struct PointLight
 	{
 		XMFLOAT4 positionWithRadius;
 		XMFLOAT4 colorWithStrength;
+
+		PointLight() = default;
+		PointLight(XMFLOAT4 positionWithRadius_, XMFLOAT4 colorWithStrength_) : positionWithRadius(positionWithRadius_), colorWithStrength(colorWithStrength_) {}
 	};
 
 public:
@@ -64,7 +70,7 @@ public:
 	bool LoadEnvironmentMap(ID3D11ShaderResourceView *& shaderResourceView);
 	bool AddEnvironmentMapLevel(ID3D11ShaderResourceView *& shaderResourceView);
 	bool AddEnvironmentMapLevel(ID3D11Device *device, const wchar_t* filename);
-	int GetEnvironmentMipLevels();
+	int GetEnvironmentMipLevels() const;
 
 	bool LoadBrdfLut(ID3D11Device *device, const wchar_t* filename);
 
@@ -94,16 +100,16 @@ public:
 	ID3D11Resource* m_brdfLut;
 	ID3D11ShaderResourceView* m_brdfLutView;
 
-	XMFLOAT3 m_cameraPosition;
-	float m_roughness = 0;
-	float m_metalness = 0;
-	float m_tint[3] = { 1,1,1 };
+	XMFLOAT3 m_cameraPosition{ 0,0,0 };
+	float m_roughness{ 0 };
+	float m_metalness{ 0 };
+	std::array<float, 3> m_tint{ 1,1,1 };
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;
 	virtual bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&) override;
 
-private:
+protected:
 	std::vector<DirectionalLight> m_directionalLight;
 	std::vector<PointLight> m_pointLight;
 
@@ -117,8 +123,8 @@ private:
 	ID3D11Resource* m_environmentMapTexture;
 	ID3D11ShaderResourceView* m_environmentMapTextureView;
 
-	std::vector<ID3D11ShaderResourceView*> m_environmentMapViews{};
-	std::vector<ID3D11ShaderResourceView*> m_additionalMapViews{};
+	std::vector<ID3D11ShaderResourceView*> m_environmentMapViews;
+	std::vector<ID3D11ShaderResourceView*> m_additionalMapViews;
 };
 
 #endif // !_SHADERPBRCLASS_H_

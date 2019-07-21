@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <array>
 using namespace std;
 using namespace DirectX;
 

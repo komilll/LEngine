@@ -20,7 +20,6 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	D3D11_RASTERIZER_DESC skyboxRasterDesc;
 	D3D11_RASTERIZER_DESC rasterDescNoCulling;
 	D3D11_BLEND_DESC blendStateDesc;
-	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
 
 	m_windowSizeX = screenWidth;

@@ -38,8 +38,6 @@ bool SingleColorClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, X
 
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	unsigned int bufferNmber;
-
 	/////// VERTEX BUFFERS ///////
 	//Lighting buffer
 	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -53,7 +51,7 @@ bool SingleColorClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, X
 	dataPtr2->padding = 0;
 
 	deviceContext->Unmap(m_lightBuffer, 0);
-	int bufferNumber = 1;
+	unsigned int bufferNumber = 1;
 	deviceContext->VSSetConstantBuffers(bufferNumber++, 1, &m_lightBuffer);
 
 	/////// PIXEL BUFFERS ///////

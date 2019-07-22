@@ -109,7 +109,7 @@ void SkyboxShaderClass::SetUpVector(XMFLOAT3 vector)
 
 void SkyboxShaderClass::SetRightVector(float rightVectorSign)
 {
-	m_rightVectorDirection = rightVectorSign >= 0 ? 1 : -1;
+	m_rightVectorDirection = rightVectorSign >= 0.0f ? 1.0f : -1.0f;
 }
 
 void SkyboxShaderClass::SetRoughness(float roughness)

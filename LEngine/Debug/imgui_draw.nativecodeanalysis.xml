@@ -1,0 +1,855 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_rectpack.h</FILENAME>
+      <LINE>499</LINE>
+      <COLUMN>6</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'cur-&gt;next'. </DESCRIPTION>
+    <FUNCTION>stbrp__skyline_pack_rectangle</FUNCTION>
+    <DECORATED>?stbrp__skyline_pack_rectangle@@YA?AUstbrp__findresult@@PAUstbrp_context@@HH@Z</DECORATED>
+    <FUNCLINE>444</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>447</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>454</LINE>
+        <COLUMN>65</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>460</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>461</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>462</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>464</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>470</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>471</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>473</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>474</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>475</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>482</LINE>
+        <COLUMN>20</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'cur-&gt;next' may be NULL (Skip this loop)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>491</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>493</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'cur-&gt;x&lt;res.x+width' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>497</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'cur-&gt;x&lt;context-&gt;width')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>499</LINE>
+        <COLUMN>6</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume '!!((cur-&gt;x&lt;cur-&gt;next-&gt;x))' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>499</LINE>
+        <COLUMN>6</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'cur-&gt;next' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_rectpack.h</FILENAME>
+      <LINE>498</LINE>
+      <COLUMN>17</COLUMN>
+    </SFA>
+    <DEFECTCODE>28182</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer. 'cur' contains the same NULL value as 'cur-&gt;next' did. See line 499 for an earlier location where this can occur</DESCRIPTION>
+    <FUNCTION>stbrp__skyline_pack_rectangle</FUNCTION>
+    <DECORATED>?stbrp__skyline_pack_rectangle@@YA?AUstbrp__findresult@@PAUstbrp_context@@HH@Z</DECORATED>
+    <FUNCLINE>444</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>447</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>454</LINE>
+        <COLUMN>65</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>460</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>461</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>462</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>464</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>470</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>471</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>473</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>474</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>475</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>482</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>491</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>493</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>497</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>499</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>500</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'cur' may be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'cur-&gt;x&lt;context-&gt;width')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'cur' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_truetype.h</FILENAME>
+      <LINE>3906</LINE>
+      <COLUMN>15</COLUMN>
+    </SFA>
+    <DEFECTCODE>6385</DEFECTCODE>
+    <DESCRIPTION>Reading invalid data from 'buffer':  the readable size is '_Old_3`kernel_width' bytes, but '3' bytes may be read.</DESCRIPTION>
+    <FUNCTION>stbtt__h_prefilter</FUNCTION>
+    <DECORATED>?stbtt__h_prefilter@@YAXPAEHHHI@Z</DECORATED>
+    <FUNCLINE>3852</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3854</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'buffer' is a 8 byte array</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3855</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3856</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3857</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3858</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3858</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'j&lt;h')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3859</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3860</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3861</LINE>
+        <COLUMN>18</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3863</LINE>
+        <COLUMN>12</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3866</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Assume switch ( 'kernel_width' ) resolves to case 2: </MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3867</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3869</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3870</LINE>
+        <COLUMN>59</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3871</LINE>
+        <COLUMN>25</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'i&lt;w')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3905</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume '!!((pixels[i]==0))')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3906</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3907</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&lt;w')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3905</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume '!!((pixels[i]==0))')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3906</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>Invalid read from 'buffer[2]', (readable range is 0 to 1)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_truetype.h</FILENAME>
+      <LINE>3968</LINE>
+      <COLUMN>15</COLUMN>
+    </SFA>
+    <DEFECTCODE>6385</DEFECTCODE>
+    <DESCRIPTION>Reading invalid data from 'buffer':  the readable size is '_Old_3`kernel_width' bytes, but '3' bytes may be read.</DESCRIPTION>
+    <FUNCTION>stbtt__v_prefilter</FUNCTION>
+    <DECORATED>?stbtt__v_prefilter@@YAXPAEHHHI@Z</DECORATED>
+    <FUNCLINE>3914</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3916</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'buffer' is a 8 byte array</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3917</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3918</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3919</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3920</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3920</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'j&lt;w')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3921</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3922</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3923</LINE>
+        <COLUMN>18</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3925</LINE>
+        <COLUMN>12</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3928</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Assume switch ( 'kernel_width' ) resolves to case 2: </MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3929</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3931</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3932</LINE>
+        <COLUMN>59</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3933</LINE>
+        <COLUMN>41</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3966</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'i&lt;h')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3967</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume '&lt;branch condition&gt;')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3968</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3969</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3966</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3966</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&lt;h')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3967</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume '&lt;branch condition&gt;')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3968</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>Invalid read from 'buffer[2]', (readable range is 0 to 1)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_draw.cpp</FILENAME>
+      <LINE>692</LINE>
+      <COLUMN>46</COLUMN>
+    </SFA>
+    <DEFECTCODE>6255</DEFECTCODE>
+    <DESCRIPTION>_alloca indicates failure by raising a stack overflow exception.  Consider using _malloca instead.</DESCRIPTION>
+    <FUNCTION>ImDrawList::AddPolyline</FUNCTION>
+    <DECORATED>?AddPolyline@ImDrawList@@QAEXPBUImVec2@@HI_NM@Z</DECORATED>
+    <FUNCLINE>669</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_draw.cpp</FILENAME>
+      <LINE>883</LINE>
+      <COLUMN>46</COLUMN>
+    </SFA>
+    <DEFECTCODE>6255</DEFECTCODE>
+    <DESCRIPTION>_alloca indicates failure by raising a stack overflow exception.  Consider using _malloca instead.</DESCRIPTION>
+    <FUNCTION>ImDrawList::AddConvexPolyFilled</FUNCTION>
+    <DECORATED>?AddConvexPolyFilled@ImDrawList@@QAEXPBUImVec2@@HI@Z</DECORATED>
+    <FUNCLINE>857</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>

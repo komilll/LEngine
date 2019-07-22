@@ -31,7 +31,7 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 	data.SetIndex(m_data.size());
 	data.textEngineRef = this;
 	m_data.push_back(data);
-	return &data;
+	return &data; //TODO Return address of local variable of temporary
 }
 
 void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWidth, float screenHeight)

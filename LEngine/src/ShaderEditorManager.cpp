@@ -297,7 +297,7 @@ bool ShaderEditorManager::UpdatePinsOfAllBlocks()
 
 void ShaderEditorManager::DrawLine(UIShaderEditorInput * in, UIShaderEditorOutput * out)
 {
-	assert(in, "UIShaderEditorInput passed was null");
+	assert(in);
 	for (int i = m_lines.size() - 1; i >= 0; --i)
 	{
 		if (m_lines.at(i)->GetInput() == in)
@@ -460,9 +460,9 @@ void ShaderEditorManager::CopyBlockValues(UIShaderEditorBlock * const src, UISha
 void ShaderEditorManager::CopyCreatedBlocksConnections(std::vector<UIShaderEditorBlock*> src, std::vector<UIShaderEditorBlock*> dst)
 {
 	return;
-	for (int bIndex = 0; bIndex < src.size(); ++bIndex)
+	for (unsigned int bIndex = 0; bIndex < src.size(); ++bIndex)
 	{
-		for (int inIndex = 0; inIndex < src.at(bIndex)->m_inputNodes.size(); ++inIndex)
+		for (unsigned int inIndex = 0; inIndex < src.at(bIndex)->m_inputNodes.size(); ++inIndex)
 		{
 			if (src.at(bIndex) && src.at(bIndex)->m_inputNodes.at(inIndex) && src.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode)
 			{
@@ -619,7 +619,7 @@ std::string ShaderEditorManager::GetTextureDefinitions() const
 	{
 		if (block->GetFunctionName() == "sampletexture")
 		{
-			for (int i = 0; i < m_blocks.size(); ++i)
+			for (unsigned int i = 0; i < m_blocks.size(); ++i)
 			{
 				if (block->m_inputNodes.at(0)->m_connectedOutputNode && m_blocks.at(i)->GetFirstOutputNode() && 
 						block->m_inputNodes.at(0)->m_connectedOutputNode == m_blocks.at(i)->GetFirstOutputNode())
@@ -841,11 +841,11 @@ void ShaderEditorManager::GeneratePBRClassCode(std::string filename)
 	dst << "{\n";
 	dst << "\tID3D11Resource* resource{nullptr};\n\n";
 
-	for (int i = 0; i < m_generatedTextureAdresses.size(); ++i)
+	for (unsigned int i = 0; i < m_generatedTextureAdresses.size(); ++i)
 	{
 		dst << "\tm_additionalMapViews.push_back(nullptr);\n";
 	}
-	for (int i = 0; i < m_generatedTextureAdresses.size(); ++i)
+	for (unsigned int i = 0; i < m_generatedTextureAdresses.size(); ++i)
 	{
 		ostringstream ss;
 		ss << i;
@@ -857,7 +857,7 @@ void ShaderEditorManager::GeneratePBRClassCode(std::string filename)
 
 void ShaderEditorManager::GenerateVariableNames()
 {
-	for (int i = 0; i < m_blocks.size(); ++i)
+	for (unsigned int i = 0; i < m_blocks.size(); ++i)
 	{
 		const auto& block = m_blocks.at(i);
 		if (block->GetInputCount() == 0) //Variable
@@ -884,7 +884,7 @@ void ShaderEditorManager::GenerateVariableNames()
 			}
 		}
 	}
-	for (int i = 0; i < m_blocks.size(); ++i)
+	for (unsigned int i = 0; i < m_blocks.size(); ++i)
 	{
 		const auto& block = m_blocks.at(i);
 		if (block->GetInputCount() > 0) //Function
@@ -1063,7 +1063,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 				}
 				else if (block->m_fileName == "float2")
 				{
-					for (int i = 0; i < 2; ++i)
+					for (unsigned int i = 0; i < 2; ++i)
 					{
 						getline(input, line);
 						block->GetFirstOutputNode()->m_valueTwo[i] = ::atof(line.c_str());
@@ -1071,7 +1071,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 				}
 				else if (block->m_fileName == "float3")
 				{
-					for (int i = 0; i < 3; ++i)
+					for (unsigned int i = 0; i < 3; ++i)
 					{
 						getline(input, line);
 						block->GetFirstOutputNode()->m_valueThree[i] = ::atof(line.c_str());
@@ -1079,7 +1079,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 				}
 				else if (block->m_fileName == "float4")
 				{
-					for (int i = 0; i < 4; ++i)
+					for (unsigned int i = 0; i < 4; ++i)
 					{
 						getline(input, line);
 						block->GetFirstOutputNode()->m_valueFour[i] = ::atof(line.c_str());
@@ -1384,7 +1384,7 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 	m_usedVariableNamesInGenerator.clear();
 	GenerateVariableNames();
 
-	for (int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
+	for (unsigned int i = 0; i < m_pbrBlock->m_inputNodes.size(); ++i)
 	{
 		if (const UIShaderEditorOutput* const out = m_pbrBlock->m_inputNodes.at(i)->m_connectedOutputNode)
 		{
@@ -1553,12 +1553,12 @@ void ShaderEditorManager::CreateBlock(std::string name)
 
 float ShaderEditorManager::GetWindowPositionX() const
 {
-	return m_choosingWindowPosX;
+	return static_cast<float>(m_choosingWindowPosX);
 }
 
 float ShaderEditorManager::GetWindowPositionY() const
 {
-	return m_choosingWindowPosY;
+	return static_cast<float>(m_choosingWindowPosY);
 }
 
 void ShaderEditorManager::PressedOutsideOfChoosingWindow()

@@ -37,14 +37,14 @@ bool ShadowMapClass::CreateBufferAdditionals(ID3D11Device *& device)
 
 bool ShadowMapClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	LightBuffer* dataPtr2;
-	LightMatrixBuffer* dataPtr3;
-	unsigned int bufferNmber;
+	//HRESULT result;
+	//D3D11_MAPPED_SUBRESOURCE mappedResource;
+	//LightBuffer* dataPtr2;
+	//LightMatrixBuffer* dataPtr3;
+	//unsigned int bufferNmber;
 
 	/////// VERTEX BUFFERS ///////
 	//Lighting buffer

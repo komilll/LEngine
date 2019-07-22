@@ -290,7 +290,7 @@ ModelClass* ModelClass::LoadModel(D3DClass * d3d)
 
 void ModelClass::LoadModel()
 {
-	assert(m_D3D, "D3DClass was null on changing model");
+	assert(m_D3D);
 	Initialize(m_D3D, LoadModelCalculatePath().c_str());
 }
 
@@ -300,12 +300,9 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 	std::vector<VertexType> verticesVector(0);
 	VertexType* vertices{ nullptr };
 	unsigned long* indices;
-	HRESULT result;
 
 	/////////// GET VERTEX COUNT ////////
 	int m_vertexCount = 0;
-
-	char curChar;
 
 	///////// CORRECT VERTICES LOADING ////////
 	std::vector<DirectX::XMFLOAT3> vertexPosition;

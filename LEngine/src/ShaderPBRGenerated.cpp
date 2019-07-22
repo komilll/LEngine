@@ -225,7 +225,7 @@ void ShaderPBRGenerated::LoadGeneratedTextures(ID3D11Device *device)
 	{
 		m_additionalMapViews.push_back(nullptr);
 	}
-	for (int i = 0; i < m_materialNames.size(); ++i)
+	for (unsigned int i = 0; i < m_materialNames.size(); ++i)
 	{
 		std::wstring widestr = std::wstring(m_materialNames.at(i).begin(), m_materialNames.at(i).end());
 		const wchar_t* widecstr = widestr.c_str();

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>60</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::dump</FUNCTION>
+    <DECORATED>?dump@json11@@YAXNAAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>57</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>69</LINE>
+      <COLUMN>12</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::dump</FUNCTION>
+    <DECORATED>?dump@json11@@YAXHAAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>67</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>97</LINE>
+      <COLUMN>20</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::dump</FUNCTION>
+    <DECORATED>?dump@json11@@YAXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAV23@@Z</DECORATED>
+    <FUNCLINE>77</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>331</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::esc</FUNCTION>
+    <DECORATED>?esc@json11@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@D@Z</DECORATED>
+    <FUNCLINE>328</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>333</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::esc</FUNCTION>
+    <DECORATED>?esc@json11@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@D@Z</DECORATED>
+    <FUNCLINE>328</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>

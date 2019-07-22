@@ -1,48 +1,20 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: graphicsclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "graphicsclass.h"
-
-GraphicsClass::GraphicsClass()
-{
-	m_D3D = 0;
-	m_Camera = 0;
-	m_Model = 0;
-}
-
-
-GraphicsClass::GraphicsClass(const GraphicsClass& other)
-{
-}
-
-
-GraphicsClass::~GraphicsClass()
-{
-}
-
 
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
-	bool result;
-
 	//Save screen WIDTH x HEIGHT for internal usage
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
 
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
-	if(!m_D3D)
-		return false;
 
 	// Initialize the Direct3D object.
-	result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
-	if(!result)
+	if(!m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR))
 		return false;
 
 	// Create the camera object.
 	m_Camera = new CameraClass;
-	if(!m_Camera)
-		return false;
 
 	// Set the initial position of the camera.
 	//m_Camera->SetPosition(0.0f, 0.1f, -0.35f); //BUDDA
@@ -52,28 +24,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	
 	// Create the model object.
 	m_Model = new ModelClass;
-	if(!m_Model)
-		return false;
-
 	m_skyboxModel = new ModelClass;
-	if (!m_skyboxModel)
-		return false;
-
 	m_cubeModel = new ModelClass;
-	if (!m_cubeModel)
-		return false;
-
 	m_previewData.model = new ModelClass;
-	if (!m_previewData.model)
-		return false;
 
 	//Initialize the model object.
-	result = m_skyboxModel->Initialize(m_D3D, "sphere.obj", false);
-	if (!result)
+	if (!m_skyboxModel->Initialize(m_D3D, "sphere.obj", false))
 		return false;
 
-	result = m_previewData.model->Initialize(m_D3D, "sphere.obj", false);
-	if (!result)
+	if (!m_previewData.model->Initialize(m_D3D, "sphere.obj", false))
 		return false;
 	CreateAABB(m_previewData.model);
 	m_previewData.model->SetPosition(0.0f, 0.0f, 2.0f);
@@ -82,21 +41,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_previewData.worldPos = m_previewData.model->GetPositionXYZ();
 	m_previewData.bounds = m_previewData.model->GetBounds();
 
-	//result = m_Model->Initialize(m_D3D->GetDevice(), "bunny.obj");
-	//if(!result)
-	//	return false;
-
-	//m_Model->m_name = "Bunny";
-	//m_sceneModels.push_back(m_Model);
-
-	//ModelClass* secondBunny = new ModelClass;
-	//if (!secondBunny->Initialize(m_D3D->GetDevice(), "bunny.obj"))
-	//	return false;
-	//secondBunny->m_name = "Second Bunny";
-	//m_sceneModels.push_back(secondBunny);
-
-	result = m_cubeModel->Initialize(m_D3D, "cube.obj");
-	if (!result)
+	if (!m_cubeModel->Initialize(m_D3D, "cube.obj"))
 		return false;
 
 	//Create mouse container
@@ -120,51 +65,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma region PBR Shader loading
 	//Create input format for vertex data
 	BaseShaderClass::vertexInputType input = m_D3D->GetBaseInputType();
-	//std::vector <LPCSTR> names;
-	//names.push_back("position");
-	//names.push_back("texcoord");
-	//names.push_back("normal");
-	//names.push_back("tangent");
-	//names.push_back("binormal");
-	//std::vector <DXGI_FORMAT> formats;
-	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	//formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
-	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	//formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	//BaseShaderClass::vertexInputType input(names, formats);
 
-	if (!(m_pbrShader = new ShaderPBRGenerated))
-		return false;
-
+	m_pbrShader = new ShaderPBRGenerated;
 	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_used.vs", L"pbr_used.ps", input))
 		return false;
 
-	//Load textures for PBR shader
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Base_Color.dds", m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView))
-	//	return false;
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Normal.dds", m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView))
-	//	return false;
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Roughness.dds", m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView))
-	//	return false;
-	//if (!m_pbrShader->LoadTexture(m_D3D->GetDevice(), L"Metal_006_Metallic.dds", m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView))
-	//	return false;
-	
-	//m_pbrShader->SetRoughness(0.32f);
-	//m_pbrShader->SetMetalness(1.0f);
-
-	//Direction + strength (w)
 	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 10.0f, -5.0f }, 15.0f, 1.0f, 1.0f, 1.0f);
-
-	//m_pbrShader->AddDirectionalLight(XMFLOAT4(0.0f, 1.0f, 5.0f, 10.0f), 1.0f, 0.0f, 0.0f);
-	//m_pbrShader->AddDirectionalLight(XMFLOAT4(-11.0f, -1.0f, 0.0f, 2.5f), 0.0f, 1.0f, 0.0f);
-	//m_pbrShader->AddDirectionalLight(XMFLOAT4(-2.76f, 4.5f, 5.0f, 5.0f), 0.0f, 0.0f, 1.0f);
-	//m_pbrShader->AddDirectionalLight(XMFLOAT4(1.0f, 5.0f, 0.0f, 0.5f), 1.0f, 1.0f, 1.0f);
-
-	//m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 0.0f, -5.0f }, 10.0f, 1.0f, 0.0f, 0.0f, 0.7f);
-	//m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 15.0f, 5.0f }, 10.0f, 0.0f, 1.0f, 0.0f, 0.4f);
-	//m_pbrShader->AddPointLight(XMFLOAT3{ 0.0f, 5.0f, -10.0f}, 10.0f, 0.0f, 0.0f, 1.0f, 1.5f);
-	//m_pbrShader->AddPointLight(XMFLOAT3{ 5.0f , 0.0f, 12.0f}, 10.0f, 1.0f, 1.0f, 1.0f, 0.4f);
 	
 	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 0.0f, -1.0f }, 0.4f, 1.0f, 0.0f, 0.0f);
 	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 2.0f, 6.0f }, 0.7f, 0.0f, 1.0f, 0.0f);
@@ -184,111 +90,54 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/font.spritefont");
 	m_textEngine->WriteText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight, -0.75f, 0.85f, "Debug Menu", 0.5f, TextEngine::Align::CENTER);
 
-	//Roughness slider
-/*	
-	m_roughnessSlider = new UISlider;
-	if (!m_roughnessSlider->Initialize(m_D3D, -0.73f, -0.52f, 0.6f, 0.05f))
-		return false;
-
-	AddText(-0.94f, 0.625f, "Roughness:", 0.35f);
-
-	m_roughnessSlider->ChangeColor(226.0f/255.0f, 211.0f/255.0f, 90.0f/255.0f, 1.0f);
-	m_roughnessSlider->CreateTextArea(AddText(-0.79f, 0.625f, "0.00", 0.35f, TextEngine::Align::LEFT));
-	m_roughnessSlider->EventOnChangeValue = [=](float roughness) { m_pbrShader->SetRoughness(roughness); };
-	
-	//Metalness slider
-	m_metalnessSlider = new UISlider;
-	if (!m_metalnessSlider->Initialize(m_D3D, -0.73f, -0.52f, 0.45f, 0.05f))
-		return false;
-	
-	AddText(-0.94f, 0.475f, "Metalness:", 0.35f);
-
-	m_metalnessSlider->ChangeColor(226.0f / 255.0f, 211.0f / 255.0f, 90.0f / 255.0f, 1.0f);
-	m_metalnessSlider->CreateTextArea(AddText(-0.79f, 0.475f, "0.00", 0.35f, TextEngine::Align::LEFT));
-	m_metalnessSlider->EventOnChangeValue = [=](float metalness) { m_pbrShader->SetMetalness(metalness); };
-
-	//Texture preview - roughness
-	m_texturePreviewRoughness = new UITexturePreview;
-	m_texturePreviewRoughness->Initialize(m_D3D, -0.58f, 0.255f, 0.1f, m_pbrShader->m_roughnessTexture, m_pbrShader->m_roughnessTextureView);
-	AddText(-0.94f, 0.325f, "Roughness:", 0.35f);
-
-	//Texture preview - metalness
-	m_texturePreviewMetalness = new UITexturePreview;
-	m_texturePreviewMetalness->Initialize(m_D3D, -0.58f, 0.000f, 0.1f, m_pbrShader->m_metalnessTexture, m_pbrShader->m_metalnessTextureView);
-	AddText(-0.94f, 0.1f, "Metalness:", 0.35f);
-
-	//Texture preview - normal map
-	m_texturePreviewNormal = new UITexturePreview;
-	m_texturePreviewNormal->Initialize(m_D3D, -0.58f, -0.255f, 0.1f, m_pbrShader->m_normalTexture, m_pbrShader->m_normalTextureView);
-	AddText(-0.94f, -0.125f, "Normal:", 0.35f);
-
-	//Texture preview - albedo
-	m_texturePreviewAlbedo = new UITexturePreview;
-	m_texturePreviewAlbedo->Initialize(m_D3D, -0.58f, -0.510f, 0.1f, m_pbrShader->m_diffuseTexture, m_pbrShader->m_diffuseTextureView);
-	AddText(-0.94f, -0.350f, "Albedo:", 0.35f);
-*/
-	ID3D11Resource* tmp = nullptr;
-	for (int i = 0; i < MAX_TEXTURE_INPUT; i++)
 	{
-		m_emptyTexView[i] = nullptr;
-		UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, m_emptyTexView[i]);
+		ID3D11Resource* tmp{ nullptr };
+		for (auto& view : m_emptyTexView)
+			UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, view);
+		UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, m_emptyTexViewEditor);
 	}
-	UITexturePreview::LoadTexture(m_D3D->GetDevice(), EMPTY_TEX, tmp, m_emptyTexViewEditor);
-
 #pragma endregion
 
 	if (BLUR_BILINEAR)
 	{
 #pragma region Blur bilinear screenspace
-		float textureWidth = screenHeight;
-		float textureHeight = screenHeight;
 		//RENDER SCENE TO TEXTURE
-		if (!(m_renderTexture = new RenderTextureClass))
-			return false;
+		m_renderTexture = new RenderTextureClass;
 		if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
 			return false;
 
-		//m_renderTexture->LoadTexture(m_D3D->GetDevice(), L"seafloor.dds", m_renderTexture->GetShaderResource(), m_renderTexture->GetShaderResourceView());
-
-		if (!(m_renderTexturePreview = new UITexture))
-			return false;
+		m_renderTexturePreview = new UITexture;
 		if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
 			return false;
 
 		m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
 
 		//Texture downsampled
-		if (!(m_renderTextureDownsampled = new RenderTextureClass))
-			return false;
+		m_renderTextureDownsampled = new RenderTextureClass;
 		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
 			return false;
 
 		//Texture upscaled
-		if (!(m_renderTextureUpscaled = new RenderTextureClass))
-			return false;
+		m_renderTextureUpscaled = new RenderTextureClass;
 		if (!(m_renderTextureUpscaled->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
 			return false;
 
 		//Texture horizontal blur
-		if (!(m_renderTextureHorizontalBlur = new RenderTextureClass))
-			return false;
+		m_renderTextureHorizontalBlur = new RenderTextureClass;
 		if (!(m_renderTextureHorizontalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
 			return false;
 
 		//Texture vertical blur
-		if (!(m_renderTextureVerticalBlur = new RenderTextureClass))
-			return false;
+		m_renderTextureVerticalBlur = new RenderTextureClass;
 		if (!(m_renderTextureVerticalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
 			return false;
 #pragma endregion
 	}
-	if (!(m_renderTextureMainScene = new RenderTextureClass))
-		return false;
+	m_renderTextureMainScene = new RenderTextureClass;
 	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
 		return false;
 
-	if (!(m_shaderPreview = new RenderTextureClass))
-		return false;
+	m_shaderPreview = new RenderTextureClass;
 	if (!(m_shaderPreview->Initialize(m_D3D->GetDevice(), screenWidth * 0.25f, screenHeight * 0.25f)))
 		return false;
 
@@ -310,8 +159,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_shadowQuadModel = new ModelClass;
 	m_shadowQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f);
 	
-	ifstream skyboxFile;
-	skyboxFile.open("Skyboxes/cubemap.dds");
+	ifstream skyboxFile{ "Skyboxes/cubemap.dds" };
 	if (skyboxFile.fail())
 	{
 		system("texassemble cube -w 512 -h 512 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.bmp Skyboxes/negx.bmp Skyboxes/posy.bmp Skyboxes/negy.bmp Skyboxes/posz.bmp Skyboxes/negz.bmp");
@@ -325,8 +173,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		}
 	}
 	//LOAD SKYBOX
-	if (!(m_skyboxShader = new SkyboxShaderClass))
-		return false;
+	m_skyboxShader = new SkyboxShaderClass;
 	if (!m_skyboxShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"skybox.vs", L"skybox.ps", input))
 		return false;
 
@@ -334,46 +181,38 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
 	
 	//RENDER SCENE TO TEXTURE
-	if (!(m_renderTexture = new RenderTextureClass))
-		return false;
+	m_renderTexture = new RenderTextureClass;
 	if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE)))
 		return false;
 
-	if (!(m_renderTexturePreview = new UITexture))
-		return false;
+	m_renderTexturePreview = new UITexture;
 	if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
 		return false;
 
 	//Texture downsampled
-	if (!(m_skyboxDownsampled = new RenderTextureClass))
-		return false;
+	m_skyboxDownsampled = new RenderTextureClass;
 	if (!(m_skyboxDownsampled->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
-	if (!(m_convoluteShader = new SkyboxShaderClass))
-		return false;
+	m_convoluteShader = new SkyboxShaderClass;
 	if (!(m_convoluteShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"convolutionSkybox.vs", L"convolutionSkybox.ps", input)))
 		return false;
 
 	m_convoluteShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_convoluteShader->m_skyboxTexture, m_convoluteShader->m_skyboxTextureView);
 	m_convoluteShader->SetType(SkyboxShaderClass::SkyboxType::CONV_DIFFUSE);
 	m_convoluteShader->SetUpVector(XMFLOAT3{ 0, 1, 0 });
-	//DownsampleSkybox();
 	ConvoluteShader(m_convoluteShader->m_skyboxTextureView, m_skyboxDownsampled);
 	
 	//Calculate specular IBL environment prefiltered map
-	if (!(m_environmentTextureMap = new RenderTextureClass))
-		return false;
+	m_environmentTextureMap = new RenderTextureClass;
 	if (!(m_environmentTextureMap->Initialize(m_D3D->GetDevice(), ENVIRONMENT_SPECULAR_SIZE, ENVIRONMENT_SPECULAR_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
-	if (!(m_brdfLUT = new RenderTextureClass))
-		return false;
+	m_brdfLUT = new RenderTextureClass;
 	if (!(m_brdfLUT->Initialize(m_D3D->GetDevice(), 512, 512, RenderTextureClass::Scaling::NONE)))
 		return false;
 	
-	if (!(m_specularIBLShader = new SkyboxShaderClass))
-		return false;
+	m_specularIBLShader = new SkyboxShaderClass;
 	if (!(m_specularIBLShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"environmentPrefilteredMap.vs", L"environmentPrefilteredMap.ps", input)))
 		return false;
 
@@ -381,16 +220,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_specularIBLShader->SetType(SkyboxShaderClass::SkyboxType::ENVIRO);
 	m_specularIBLShader->SetUpVector(XMFLOAT3{ 0, 1, 0 });
 
-	if (!(m_brdfLutShader = new SkyboxShaderClass))
-		return false;
+	m_brdfLutShader = new SkyboxShaderClass;
 	if (!(m_brdfLutShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"SpecularLookupIBL.vs", L"SpecularLookupIBL.ps", input)))
 		return false;
 
-	//PrepareLutBrdf(m_brdfLUT);
 	PrepareEnvironmentPrefilteredMap(m_specularIBLShader->m_skyboxTextureView, m_environmentTextureMap);
 	CreateSingleEnvironmentMap();
 
 	//Skybox texture previews
+	//TODO Use contructors
 	m_skyboxPreviewLeft = new UITexture;
 	m_skyboxPreviewRight = new UITexture;
 	m_skyboxPreviewUp = new UITexture;
@@ -444,12 +282,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma endregion
 
 	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/conv_cubemap.dds"))
-	//if (!m_pbrShader->LoadIrradianceMap(m_environmentTextureMap->GetShaderResourceView()))
-	//if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_0.dds"))
 		return false;
-	//if (!m_pbrShader->LoadEnvironmentMap(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_0.dds"))
-	//if (!m_pbrShader->LoadEnvironmentMap(m_environmentTextureMap->GetShaderResourceView()))
-		//return false;
 	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_0.dds");
 	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_1.dds");
 	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_2.dds");
@@ -464,15 +297,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//Create textures that will hold buffers
 	m_positionBuffer = new RenderTextureClass;
 	m_positionBuffer->Initialize(m_D3D->GetDevice(), 1280, 720);
-	//m_positionBuffer->GetShaderResourceView() = nullptr;
 	
 	m_normalBuffer = new RenderTextureClass;
 	m_normalBuffer->Initialize(m_D3D->GetDevice(), 1280, 720);
-	//m_normalBuffer->GetShaderResourceView() = nullptr;
 
 	m_albedoBuffer = new RenderTextureClass;
 	m_albedoBuffer->Initialize(m_D3D->GetDevice(), 1280, 720);
-	//m_albedoBuffer->GetShaderResourceView() = nullptr;
 
 	//Create material shaders for buffers
 	m_GBufferShaderPosition = new GBufferShader;	
@@ -493,7 +323,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Create kernel for SSAO
-	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
+	std::uniform_real_distribution<float> randomFloats{ 0.0f, 1.0f };
 	std::default_random_engine generator;
 	XMFLOAT3 tmpSample;
 	std::array<XMFLOAT3, 64> ssaoKernel;
@@ -538,6 +368,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	for (int i = 0; i < 16; ++i)
 	{
 		ssaoNoise[i] = { randomFloats(generator), randomFloats(generator) };
+	}
+
+	int a[3];
+	for (int i = 0; i < 16; ++i)
+	{
+		a[0] = 1;
+		a[1] = 2;
+		a[2] = 3;
 	}
 
 	//Create SSAO noise texture
@@ -2451,7 +2289,6 @@ bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTex
 	}
 
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
 
 	XMFLOAT3 position = XMFLOAT3(0, 0, 0);
 	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
@@ -2512,8 +2349,6 @@ bool GraphicsClass::RenderDepthScene()
 {
 	XMMATRIX worldMatrix, lightViewMatrix, lightProjectionMatrix, translateMatrix;
 	XMMATRIX viewMatrix, projectionMatrix;
-	float posX, posY, posZ;
-	bool result;
 
 	//Set light position
 	m_directionalLight->SetLookAt(0, 0, 0);
@@ -2696,7 +2531,6 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 bool GraphicsClass::PrepareLutBrdf(RenderTextureClass * dstTex)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
 
 	dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), true);
 	dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
@@ -3399,7 +3233,6 @@ GraphicsClass::MouseRaycastResult GraphicsClass::RaycastToModel(ModelClass* cons
 	float pointX, pointY;
 	XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
 	XMVECTOR origin, rayOrigin, direction, rayDirection;
-	bool intersect, result;
 
 	pointX = x;
 	pointY = y;

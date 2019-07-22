@@ -1,12 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: graphicsclass.h
-////////////////////////////////////////////////////////////////////////////////
 #ifndef _GRAPHICSCLASS_H_
 #define _GRAPHICSCLASS_H_
 
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -72,9 +66,6 @@ static const char* CURRENT_GRAIN_TYPE = GrainTypeArray[0];
 
 constexpr float MODEL_DRAG_SPEED = 1.0f;
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: GraphicsClass
-////////////////////////////////////////////////////////////////////////////////
 class GraphicsClass
 {
 public:
@@ -393,10 +384,6 @@ private:
 	};
 
 public:
-	GraphicsClass();
-	GraphicsClass(const GraphicsClass&);
-	~GraphicsClass();
-
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
@@ -529,7 +516,7 @@ private:
 	UITexturePreview* m_texturePreviewMetalness;
 	UITexturePreview* m_texturePreviewNormal;
 	UITexturePreview* m_texturePreviewAlbedo;
-	ID3D11ShaderResourceView* m_emptyTexView[MAX_TEXTURE_INPUT];
+	std::array<ID3D11ShaderResourceView*, MAX_TEXTURE_INPUT> m_emptyTexView{ nullptr };
 	ID3D11ShaderResourceView* m_emptyTexViewEditor;
 
 	UIBackground* m_debugBackground;

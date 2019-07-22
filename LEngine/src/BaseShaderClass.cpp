@@ -32,7 +32,6 @@ bool BaseShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* v
 	ID3D10Blob* errorMessage{ nullptr };
 	ID3D10Blob* vertexShaderBuffer{ nullptr };
 	ID3D10Blob* pixelShaderBuffer{ nullptr };
-	D3D11_SAMPLER_DESC samplerDesc;
 
 	//Compile vertex shader
 	result = D3DCompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBuffer, &errorMessage);

@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+      <LINE>216</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>28020</DEFECTCODE>
+    <DESCRIPTION>The expression '0&lt;=_Param_(1)&amp;&amp;_Param_(1)&lt;=128-1' is not true at this call.</DESCRIPTION>
+    <FUNCTION>ShaderPBRGenerated::SetShaderParameters</FUNCTION>
+    <DECORATED>?SetShaderParameters@ShaderPBRGenerated@@MAE_NPAUID3D11DeviceContext@@AAUXMMATRIX@DirectX@@11@Z</DECORATED>
+    <FUNCLINE>131</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>133</LINE>
+        <COLUMN>100</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>136</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>138</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>146</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>147</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>148</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>150</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>151</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>152</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>156</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>157</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>160</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>163</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>164</LINE>
+        <COLUMN>33</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>46</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>176</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>177</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>178</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>181</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>182</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>185</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>186</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>187</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>188</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>189</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>191</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>192</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>195</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>196</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>199</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>200</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>201</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>202</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>203</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>205</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>206</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>210</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>211</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>212</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>62</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>215</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>216</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+      <LINE>216</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>28020</DEFECTCODE>
+    <DESCRIPTION>The expression '0&lt;=_Param_(2)&amp;&amp;_Param_(2)&lt;=128-_Param_(1)' is not true at this call.</DESCRIPTION>
+    <FUNCTION>ShaderPBRGenerated::SetShaderParameters</FUNCTION>
+    <DECORATED>?SetShaderParameters@ShaderPBRGenerated@@MAE_NPAUID3D11DeviceContext@@AAUXMMATRIX@DirectX@@11@Z</DECORATED>
+    <FUNCLINE>131</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>133</LINE>
+        <COLUMN>100</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>136</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>138</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>146</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>147</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>148</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>150</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>151</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>152</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>156</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>157</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>160</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>163</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>164</LINE>
+        <COLUMN>33</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>46</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>176</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>177</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>178</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>181</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>182</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>185</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>186</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>187</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>188</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>189</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>191</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>192</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>195</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>196</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>199</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>200</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>201</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>202</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>203</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>205</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>206</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>210</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>211</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>212</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>62</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>215</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>216</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT>
+</DEFECTS>

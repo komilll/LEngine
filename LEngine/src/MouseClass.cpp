@@ -101,17 +101,17 @@ void MouseClass::ProcessInput()
 	m_mouseY -= m_mouseState.lY;
 
 	// Ensure the mouse location doesn't exceed the screen width or height.
-	if (m_mouseX < -m_screenWidth) { m_mouseX = -m_screenWidth; }
-	if (m_mouseY < -m_screenHeight) { m_mouseY = -m_screenHeight; }
+	if (m_mouseX < -m_screenWidth) { m_mouseX = -static_cast<float>(m_screenWidth); }
+	if (m_mouseY < -m_screenHeight) { m_mouseY = -static_cast<float>(m_screenHeight); }
 
-	if (m_mouseX > m_screenWidth) { m_mouseX = m_screenWidth; }
-	if (m_mouseY > m_screenHeight) { m_mouseY = m_screenHeight; }	
+	if (m_mouseX > m_screenWidth) { m_mouseX = static_cast<float>(m_screenWidth); }
+	if (m_mouseY > m_screenHeight) { m_mouseY = static_cast<float>(m_screenHeight); }
 }
 
 void MouseClass::GetMouseLocation(int & mouseX, int & mouseY)
 {
-	mouseX = m_mouseX;
-	mouseY = m_mouseY;
+	mouseX = static_cast<float>(m_mouseX);
+	mouseY = static_cast<float>(m_mouseY);
 }
 
 void MouseClass::GetMouseLocationScreenSpace(float & mouseX, float & mouseY)
@@ -127,12 +127,12 @@ std::pair<float, float> MouseClass::GetMouseMovementFrame() const
 
 bool MouseClass::GetLMBPressed() const
 {
-	return m_mouseState.rgbButtons[0];
+	return m_mouseState.rgbButtons[0] == static_cast<BYTE>(1);
 }
 
 bool MouseClass::GetRMBPressed() const
 {
-	return m_mouseState.rgbButtons[1];
+	return m_mouseState.rgbButtons[1] == static_cast<BYTE>(1);
 }
 
 void MouseClass::SetRMBPressed(bool enable)
@@ -142,7 +142,7 @@ void MouseClass::SetRMBPressed(bool enable)
 
 bool MouseClass::GetMMBPressed() const
 {
-	return m_mouseState.rgbButtons[2];
+	return m_mouseState.rgbButtons[2] == static_cast<BYTE>(1);
 }
 
 void MouseClass::SetMMBPressed(bool enable)
@@ -223,7 +223,7 @@ bool MouseClass::SetCursorPosition(XMFLOAT2 screenPos, bool clamped)
 	point.x += static_cast<LONG>(screenPos.x * (GetD3D()->GetWindowSize().x * 0.5f));
 	point.y -= static_cast<LONG>(screenPos.y * (GetD3D()->GetWindowSize().y * 0.5f));
 
-	return SetCursorPos(point.x, point.y);
+	return SetCursorPos(point.x, point.y) == static_cast<BOOL>(1);
 }
 
 POINT MouseClass::CalculateMousePosition()

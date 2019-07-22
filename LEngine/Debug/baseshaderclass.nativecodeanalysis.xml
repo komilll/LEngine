@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>baseshaderclass.cpp</FILENAME>
+      <LINE>270</LINE>
+      <COLUMN>40</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>BaseShaderClass::LoadTexture</FUNCTION>
+    <DECORATED>?LoadTexture@BaseShaderClass@@SA_NPAUID3D11Device@@AAPAUID3D11Resource@@1AAPAUID3D11ShaderResourceView@@@Z</DECORATED>
+    <FUNCLINE>255</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>

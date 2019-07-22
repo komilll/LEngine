@@ -196,7 +196,7 @@ bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 
 		if (m_textEngine)
 		{
-			for (int i = 0; i < m_textPositionModifiers.size(); ++i)
+			for (unsigned int i = 0; i < m_textPositionModifiers.size(); ++i)
 			{
 				m_textEngine->GetData(i)->SetPosition((m_translationX + m_textPositionModifiers.at(i).first) * m_scale,
 					(m_translationY + m_textPositionModifiers.at(i).second) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);

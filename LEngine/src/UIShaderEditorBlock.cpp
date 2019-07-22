@@ -501,7 +501,7 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator) const
 		func = { (skipTabulator ? "" : "\t") + m_returnType + " " + m_variableName + " = " + m_functionName + "(" };
 		std::vector<std::string> args = {};
 
-		for (int i = 0; i < m_inputNodes.size(); ++i)
+		for (unsigned int i = 0; i < m_inputNodes.size(); ++i)
 		{
 			const auto& node = m_inputNodes.at(i);
 			if (node->m_connectedOutputNode != nullptr)
@@ -513,7 +513,7 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator) const
 				args.push_back(ReturnEmptyForGivenType(m_argumentTypes.at(i)));
 			}
 		}
-		for (int i = 0; i < args.size(); ++i)
+		for (unsigned int i = 0; i < args.size(); ++i)
 		{
 			func += args.at(i);
 			if (i < args.size() - 1)

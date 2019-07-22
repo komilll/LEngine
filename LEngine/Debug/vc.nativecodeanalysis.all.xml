@@ -1,0 +1,4640 @@
+﻿<?xml version="1.0" encoding="utf-8"?><DEFECTS><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>baseshaderclass.cpp</FILENAME>
+      <LINE>270</LINE>
+      <COLUMN>40</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>BaseShaderClass::LoadTexture</FUNCTION>
+    <DECORATED>?LoadTexture@BaseShaderClass@@SA_NPAUID3D11Device@@AAPAUID3D11Resource@@1AAPAUID3D11ShaderResourceView@@@Z</DECORATED>
+    <FUNCLINE>255</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>80</LINE>
+      <COLUMN>30</COLUMN>
+    </SFA>
+    <DEFECTCODE>6385</DEFECTCODE>
+    <DESCRIPTION>Reading invalid data from 'displayModeList':  the readable size is 'numModes*28' bytes, but '56' bytes may be read.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>57</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>63</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>64</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!displayModeList' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>70</LINE>
+        <COLUMN>8</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'displayModeList' is an Input to 'IDXGIOutput::GetDisplayModeList' (declared at c:\program files (x86)\windows kits\8.1\include\shared\dxgi.h:1427)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>71</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'i&lt;numModes')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>80</LINE>
+        <COLUMN>30</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>23</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'i' may equal 1</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>11</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&lt;numModes')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>80</LINE>
+        <COLUMN>30</COLUMN>
+        <KEYEVENT>
+          <ID>12</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>80</LINE>
+        <COLUMN>30</COLUMN>
+        <KEYEVENT>
+          <ID>13</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>Invalid read from 'displayModeList[1]', (readable range is 0 to 0)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>140</LINE>
+      <COLUMN>51</COLUMN>
+    </SFA>
+    <DEFECTCODE>6001</DEFECTCODE>
+    <DESCRIPTION>Using uninitialized memory 'denominator'.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'denominator' is not initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>57</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>63</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>64</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!displayModeList' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>70</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>71</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume 'i&lt;numModes' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>91</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>92</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>98</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>101</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>102</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'error!=0' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>108</LINE>
+        <COLUMN>1</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>109</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>112</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>113</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>116</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>117</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>120</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>121</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>124</LINE>
+        <COLUMN>4</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>127</LINE>
+        <COLUMN>30</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>130</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>131</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>134</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>11</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'm_vsync_enabled')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>139</LINE>
+        <COLUMN>52</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>51</COLUMN>
+        <KEYEVENT>
+          <ID>12</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'denominator' is used, but may not have been initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>139</LINE>
+      <COLUMN>52</COLUMN>
+    </SFA>
+    <DEFECTCODE>6001</DEFECTCODE>
+    <DESCRIPTION>Using uninitialized memory 'numerator'.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numerator' is not initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>57</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>63</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>64</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!displayModeList' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>70</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>71</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume 'i&lt;numModes' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>91</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>92</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>98</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>101</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>102</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'error!=0' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>108</LINE>
+        <COLUMN>1</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>109</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>112</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>113</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>116</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>117</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>120</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>121</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>124</LINE>
+        <COLUMN>4</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>127</LINE>
+        <COLUMN>30</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>130</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>131</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>134</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>11</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'm_vsync_enabled')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>139</LINE>
+        <COLUMN>52</COLUMN>
+        <KEYEVENT>
+          <ID>12</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numerator' is used, but may not have been initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>56</LINE>
+      <COLUMN>8</COLUMN>
+    </SFA>
+    <DEFECTCODE>6001</DEFECTCODE>
+    <DESCRIPTION>Using uninitialized memory 'numModes'.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numModes' is not initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'numModes' is an Input to 'IDXGIOutput::GetDisplayModeList' (declared at c:\program files (x86)\windows kits\8.1\include\shared\dxgi.h:1427)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numModes' is used, but may not have been initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>579</LINE>
+      <COLUMN>26</COLUMN>
+    </SFA>
+    <DEFECTCODE>6282</DEFECTCODE>
+    <DESCRIPTION>Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.</DESCRIPTION>
+    <FUNCTION>D3DClass::ChangeDepthStencilComparison</FUNCTION>
+    <DECORATED>?ChangeDepthStencilComparison@D3DClass@@QAEXW4D3D11_COMPARISON_FUNC@@@Z</DECORATED>
+    <FUNCLINE>573</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>1950</LINE>
+      <COLUMN>5</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'm_shaderEditorManager'. </DESCRIPTION>
+    <FUNCTION>GraphicsClass::RenderGUI</FUNCTION>
+    <DECORATED>?RenderGUI@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>1558</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1560</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1561</LINE>
+        <COLUMN>25</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1562</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1563</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1566</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1622</LINE>
+        <COLUMN>28</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'m_shaderEditorManager' may be NULL (Skip this branch)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1763</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1764</LINE>
+        <COLUMN>5</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'm_selectedModel' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1843</LINE>
+        <COLUMN>19</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1860</LINE>
+        <COLUMN>28</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1947</LINE>
+        <COLUMN>28</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>1950</LINE>
+        <COLUMN>5</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'m_shaderEditorManager' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2631</LINE>
+      <COLUMN>46</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::PrepareEnvironmentPrefilteredMap</FUNCTION>
+    <DECORATED>?PrepareEnvironmentPrefilteredMap@GraphicsClass@@AAE_NPAUID3D11ShaderResourceView@@PAVRenderTextureClass@@@Z</DECORATED>
+    <FUNCLINE>2568</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2632</LINE>
+      <COLUMN>6</COLUMN>
+    </SFA>
+    <DEFECTCODE>6215</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  a Boolean type to HRESULT.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::PrepareEnvironmentPrefilteredMap</FUNCTION>
+    <DECORATED>?PrepareEnvironmentPrefilteredMap@GraphicsClass@@AAE_NPAUID3D11ShaderResourceView@@PAVRenderTextureClass@@@Z</DECORATED>
+    <FUNCLINE>2568</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2635</LINE>
+      <COLUMN>53</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::PrepareEnvironmentPrefilteredMap</FUNCTION>
+    <DECORATED>?PrepareEnvironmentPrefilteredMap@GraphicsClass@@AAE_NPAUID3D11ShaderResourceView@@PAVRenderTextureClass@@@Z</DECORATED>
+    <FUNCLINE>2568</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2636</LINE>
+      <COLUMN>6</COLUMN>
+    </SFA>
+    <DEFECTCODE>6215</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  a Boolean type to HRESULT.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::PrepareEnvironmentPrefilteredMap</FUNCTION>
+    <DECORATED>?PrepareEnvironmentPrefilteredMap@GraphicsClass@@AAE_NPAUID3D11ShaderResourceView@@PAVRenderTextureClass@@@Z</DECORATED>
+    <FUNCLINE>2568</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2639</LINE>
+      <COLUMN>55</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::PrepareEnvironmentPrefilteredMap</FUNCTION>
+    <DECORATED>?PrepareEnvironmentPrefilteredMap@GraphicsClass@@AAE_NPAUID3D11ShaderResourceView@@PAVRenderTextureClass@@@Z</DECORATED>
+    <FUNCLINE>2568</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2640</LINE>
+      <COLUMN>6</COLUMN>
+    </SFA>
+    <DEFECTCODE>6215</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  a Boolean type to HRESULT.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::PrepareEnvironmentPrefilteredMap</FUNCTION>
+    <DECORATED>?PrepareEnvironmentPrefilteredMap@GraphicsClass@@AAE_NPAUID3D11ShaderResourceView@@PAVRenderTextureClass@@@Z</DECORATED>
+    <FUNCLINE>2568</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2770</LINE>
+      <COLUMN>45</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::CreateSingleEnvironmentMap</FUNCTION>
+    <DECORATED>?CreateSingleEnvironmentMap@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>2725</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2771</LINE>
+      <COLUMN>5</COLUMN>
+    </SFA>
+    <DEFECTCODE>6215</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  a Boolean type to HRESULT.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::CreateSingleEnvironmentMap</FUNCTION>
+    <DECORATED>?CreateSingleEnvironmentMap@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>2725</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2780</LINE>
+      <COLUMN>54</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::CreateSingleEnvironmentMap</FUNCTION>
+    <DECORATED>?CreateSingleEnvironmentMap@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>2725</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2781</LINE>
+      <COLUMN>5</COLUMN>
+    </SFA>
+    <DEFECTCODE>6215</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  a Boolean type to HRESULT.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::CreateSingleEnvironmentMap</FUNCTION>
+    <DECORATED>?CreateSingleEnvironmentMap@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>2725</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2810</LINE>
+      <COLUMN>54</COLUMN>
+    </SFA>
+    <DEFECTCODE>6214</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  HRESULT to a Boolean type.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::CreateSingleEnvironmentMap</FUNCTION>
+    <DECORATED>?CreateSingleEnvironmentMap@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>2725</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>2811</LINE>
+      <COLUMN>7</COLUMN>
+    </SFA>
+    <DEFECTCODE>6215</DEFECTCODE>
+    <DESCRIPTION>Cast between semantically different integer types:  a Boolean type to HRESULT.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::CreateSingleEnvironmentMap</FUNCTION>
+    <DECORATED>?CreateSingleEnvironmentMap@GraphicsClass@@AAE_NXZ</DECORATED>
+    <FUNCLINE>2725</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>graphicsclass.cpp</FILENAME>
+      <LINE>3244</LINE>
+      <COLUMN>1</COLUMN>
+    </SFA>
+    <DEFECTCODE>6246</DEFECTCODE>
+    <DESCRIPTION>Local declaration of 'model' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '3234' of 'c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\graphicsclass.cpp'.</DESCRIPTION>
+    <FUNCTION>GraphicsClass::TryPickObjects</FUNCTION>
+    <DECORATED>?TryPickObjects@GraphicsClass@@QAEXXZ</DECORATED>
+    <FUNCLINE>3223</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>graphicsclass.cpp</FILENAME>
+        <LINE>3234</LINE>
+        <COLUMN>39</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui.cpp</FILENAME>
+      <LINE>3915</LINE>
+      <COLUMN>145</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'window'. </DESCRIPTION>
+    <FUNCTION>ImGui::Render</FUNCTION>
+    <DECORATED>?Render@ImGui@@YAXXZ</DECORATED>
+    <FUNCLINE>3894</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3896</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3897</LINE>
+        <COLUMN>4</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3899</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3901</LINE>
+        <COLUMN>25</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3905</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3906</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3909</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3910</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3911</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3912</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3912</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3914</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3915</LINE>
+        <COLUMN>145</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3912</LINE>
+        <COLUMN>42</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3912</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3914</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3915</LINE>
+        <COLUMN>145</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'window' may be NULL (Skip this branch)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>3915</LINE>
+        <COLUMN>145</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'window' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui.cpp</FILENAME>
+      <LINE>4024</LINE>
+      <COLUMN>28</COLUMN>
+    </SFA>
+    <DEFECTCODE>28182</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer. 'window' contains the same NULL value as 'hovered_window' did. </DESCRIPTION>
+    <FUNCTION>FindHoveredWindow</FUNCTION>
+    <DECORATED>?FindHoveredWindow@@YAXXZ</DECORATED>
+    <FUNCLINE>4011</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4013</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4015</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4016</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4019</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4020</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4021</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4021</LINE>
+        <COLUMN>39</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4023</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4024</LINE>
+        <COLUMN>28</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4026</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4030</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4031</LINE>
+        <COLUMN>59</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4034</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4035</LINE>
+        <COLUMN>12</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4039</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4040</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4041</LINE>
+        <COLUMN>12</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4021</LINE>
+        <COLUMN>46</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4021</LINE>
+        <COLUMN>39</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4023</LINE>
+        <COLUMN>19</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'window' may be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4024</LINE>
+        <COLUMN>28</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>4024</LINE>
+        <COLUMN>28</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'window' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui.cpp</FILENAME>
+      <LINE>8187</LINE>
+      <COLUMN>18</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'window'. </DESCRIPTION>
+    <FUNCTION>ImGui::NavUpdateWindowingList</FUNCTION>
+    <DECORATED>?NavUpdateWindowingList@ImGui@@YAXXZ</DECORATED>
+    <FUNCLINE>8168</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8170</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8171</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume '!!((g.NavWindowingTarget!=0))')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8173</LINE>
+        <COLUMN>28</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8176</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8178</LINE>
+        <COLUMN>32</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8179</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8180</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8181</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8182</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8182</LINE>
+        <COLUMN>49</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'n&gt;=0')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8184</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8185</LINE>
+        <COLUMN>12</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'window' is an In/Out argument to 'ImGui::IsWindowNavFocusable' (declared at c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\imgui_internal.h:1386)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8185</LINE>
+        <COLUMN>12</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!IsWindowNavFocusable(window)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8187</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8188</LINE>
+        <COLUMN>18</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8190</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8182</LINE>
+        <COLUMN>56</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8182</LINE>
+        <COLUMN>49</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'n&gt;=0')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8184</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8185</LINE>
+        <COLUMN>12</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'window' is an In/Out argument to 'ImGui::IsWindowNavFocusable' (declared at c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\imgui_internal.h:1386)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8185</LINE>
+        <COLUMN>12</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!IsWindowNavFocusable(window)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui.cpp</FILENAME>
+        <LINE>8187</LINE>
+        <COLUMN>18</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'window' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_rectpack.h</FILENAME>
+      <LINE>499</LINE>
+      <COLUMN>6</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'cur-&gt;next'. </DESCRIPTION>
+    <FUNCTION>stbrp__skyline_pack_rectangle</FUNCTION>
+    <DECORATED>?stbrp__skyline_pack_rectangle@@YA?AUstbrp__findresult@@PAUstbrp_context@@HH@Z</DECORATED>
+    <FUNCLINE>444</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>447</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>454</LINE>
+        <COLUMN>65</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>460</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>461</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>462</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>464</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>470</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>471</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>473</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>474</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>475</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>482</LINE>
+        <COLUMN>20</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'cur-&gt;next' may be NULL (Skip this loop)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>491</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>493</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'cur-&gt;x&lt;res.x+width' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>497</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'cur-&gt;x&lt;context-&gt;width')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>499</LINE>
+        <COLUMN>6</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume '!!((cur-&gt;x&lt;cur-&gt;next-&gt;x))' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>499</LINE>
+        <COLUMN>6</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'cur-&gt;next' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_rectpack.h</FILENAME>
+      <LINE>498</LINE>
+      <COLUMN>17</COLUMN>
+    </SFA>
+    <DEFECTCODE>28182</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer. 'cur' contains the same NULL value as 'cur-&gt;next' did. See line 499 for an earlier location where this can occur</DESCRIPTION>
+    <FUNCTION>stbrp__skyline_pack_rectangle</FUNCTION>
+    <DECORATED>?stbrp__skyline_pack_rectangle@@YA?AUstbrp__findresult@@PAUstbrp_context@@HH@Z</DECORATED>
+    <FUNCLINE>444</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>447</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>448</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>454</LINE>
+        <COLUMN>65</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>460</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>461</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>462</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>464</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>470</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>471</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>473</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>474</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>475</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>482</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>491</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>493</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>497</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>499</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>500</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'cur' may be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'cur-&gt;x&lt;context-&gt;width')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_rectpack.h</FILENAME>
+        <LINE>498</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'cur' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_truetype.h</FILENAME>
+      <LINE>3906</LINE>
+      <COLUMN>15</COLUMN>
+    </SFA>
+    <DEFECTCODE>6385</DEFECTCODE>
+    <DESCRIPTION>Reading invalid data from 'buffer':  the readable size is '_Old_3`kernel_width' bytes, but '3' bytes may be read.</DESCRIPTION>
+    <FUNCTION>stbtt__h_prefilter</FUNCTION>
+    <DECORATED>?stbtt__h_prefilter@@YAXPAEHHHI@Z</DECORATED>
+    <FUNCLINE>3852</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3854</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'buffer' is a 8 byte array</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3855</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3856</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3857</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3858</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3858</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'j&lt;h')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3859</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3860</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3861</LINE>
+        <COLUMN>18</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3863</LINE>
+        <COLUMN>12</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3866</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Assume switch ( 'kernel_width' ) resolves to case 2: </MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3867</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3869</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3870</LINE>
+        <COLUMN>59</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3871</LINE>
+        <COLUMN>25</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3868</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'i&lt;w')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3905</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume '!!((pixels[i]==0))')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3906</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3907</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3904</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&lt;w')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3905</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume '!!((pixels[i]==0))')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3906</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>Invalid read from 'buffer[2]', (readable range is 0 to 1)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imstb_truetype.h</FILENAME>
+      <LINE>3968</LINE>
+      <COLUMN>15</COLUMN>
+    </SFA>
+    <DEFECTCODE>6385</DEFECTCODE>
+    <DESCRIPTION>Reading invalid data from 'buffer':  the readable size is '_Old_3`kernel_width' bytes, but '3' bytes may be read.</DESCRIPTION>
+    <FUNCTION>stbtt__v_prefilter</FUNCTION>
+    <DECORATED>?stbtt__v_prefilter@@YAXPAEHHHI@Z</DECORATED>
+    <FUNCLINE>3914</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3916</LINE>
+        <COLUMN>17</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'buffer' is a 8 byte array</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3917</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3918</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3919</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3920</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3920</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'j&lt;w')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3921</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3922</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3923</LINE>
+        <COLUMN>18</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'buffer' is an Output from 'memset' (declared at c:\program files (x86)\microsoft visual studio 14.0\vc\include\vcruntime_string.h:60)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3925</LINE>
+        <COLUMN>12</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3928</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Assume switch ( 'kernel_width' ) resolves to case 2: </MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3929</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3931</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3932</LINE>
+        <COLUMN>59</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3933</LINE>
+        <COLUMN>41</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3930</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3966</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'i&lt;h')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3967</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume '&lt;branch condition&gt;')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3968</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3969</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3966</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3966</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&lt;h')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3967</LINE>
+        <COLUMN>9</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume '&lt;branch condition&gt;')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imstb_truetype.h</FILENAME>
+        <LINE>3968</LINE>
+        <COLUMN>15</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>Invalid read from 'buffer[2]', (readable range is 0 to 1)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_draw.cpp</FILENAME>
+      <LINE>692</LINE>
+      <COLUMN>46</COLUMN>
+    </SFA>
+    <DEFECTCODE>6255</DEFECTCODE>
+    <DESCRIPTION>_alloca indicates failure by raising a stack overflow exception.  Consider using _malloca instead.</DESCRIPTION>
+    <FUNCTION>ImDrawList::AddPolyline</FUNCTION>
+    <DECORATED>?AddPolyline@ImDrawList@@QAEXPBUImVec2@@HI_NM@Z</DECORATED>
+    <FUNCLINE>669</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_draw.cpp</FILENAME>
+      <LINE>883</LINE>
+      <COLUMN>46</COLUMN>
+    </SFA>
+    <DEFECTCODE>6255</DEFECTCODE>
+    <DESCRIPTION>_alloca indicates failure by raising a stack overflow exception.  Consider using _malloca instead.</DESCRIPTION>
+    <FUNCTION>ImDrawList::AddConvexPolyFilled</FUNCTION>
+    <DECORATED>?AddConvexPolyFilled@ImDrawList@@QAEXPBUImVec2@@HI@Z</DECORATED>
+    <FUNCLINE>857</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_impl_win32.cpp</FILENAME>
+      <LINE>143</LINE>
+      <COLUMN>36</COLUMN>
+    </SFA>
+    <DEFECTCODE>6387</DEFECTCODE>
+    <DESCRIPTION>'g_hWnd' could be '0':  this does not adhere to the specification for the function 'IsChild'. </DESCRIPTION>
+    <FUNCTION>ImGui_ImplWin32_UpdateMousePos</FUNCTION>
+    <DECORATED>?ImGui_ImplWin32_UpdateMousePos@@YAXXZ</DECORATED>
+    <FUNCLINE>127</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>129</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>132</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'io.WantSetMousePos' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>141</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>27</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'active_window')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'g_hWnd' is an Input to 'IsChild' (declared at c:\program files (x86)\windows kits\8.1\include\um\winuser.h:4309)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'g_hWnd' should not be NULL, because this is not consistent with the SAL annotation on 'IsChild'</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_impl_win32.cpp</FILENAME>
+      <LINE>144</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>6387</DEFECTCODE>
+    <DESCRIPTION>'g_hWnd' could be '0':  this does not adhere to the specification for the function 'ScreenToClient'. See line 143 for an earlier location where this can occur</DESCRIPTION>
+    <FUNCTION>ImGui_ImplWin32_UpdateMousePos</FUNCTION>
+    <DECORATED>?ImGui_ImplWin32_UpdateMousePos@@YAXXZ</DECORATED>
+    <FUNCLINE>127</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>129</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>132</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'io.WantSetMousePos' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>141</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>27</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'active_window')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'g_hWnd' is an Input to 'IsChild' (declared at c:\program files (x86)\windows kits\8.1\include\um\winuser.h:4309)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume '&lt;branch condition&gt;')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'g_hWnd' is an Input to 'ScreenToClient' (declared at c:\program files (x86)\windows kits\8.1\include\um\winuser.h:8959)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'g_hWnd' should not be NULL, because this is not consistent with the SAL annotation on 'ScreenToClient'</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_widgets.cpp</FILENAME>
+      <LINE>1702</LINE>
+      <COLUMN>14</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'sscanf'.</DESCRIPTION>
+    <FUNCTION>DataTypeApplyOpFromText</FUNCTION>
+    <DECORATED>?DataTypeApplyOpFromText@@YA_NPBD0HPAX0@Z</DECORATED>
+    <FUNCLINE>1624</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_widgets.cpp</FILENAME>
+      <LINE>1708</LINE>
+      <COLUMN>14</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'sscanf'.</DESCRIPTION>
+    <FUNCTION>DataTypeApplyOpFromText</FUNCTION>
+    <DECORATED>?DataTypeApplyOpFromText@@YA_NPBD0HPAX0@Z</DECORATED>
+    <FUNCLINE>1624</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_widgets.cpp</FILENAME>
+      <LINE>4086</LINE>
+      <COLUMN>22</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'sscanf'.</DESCRIPTION>
+    <FUNCTION>ImGui::ColorEdit4</FUNCTION>
+    <DECORATED>?ColorEdit4@ImGui@@YA_NPBDQAMH@Z</DECORATED>
+    <FUNCLINE>3972</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_widgets.cpp</FILENAME>
+      <LINE>4088</LINE>
+      <COLUMN>22</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'sscanf'.</DESCRIPTION>
+    <FUNCTION>ImGui::ColorEdit4</FUNCTION>
+    <DECORATED>?ColorEdit4@ImGui@@YA_NPBDQAMH@Z</DECORATED>
+    <FUNCLINE>3972</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_widgets.cpp</FILENAME>
+      <LINE>5804</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'window'. See line 5780 for an earlier location where this can occur</DESCRIPTION>
+    <FUNCTION>ImGui::EndMenuBar</FUNCTION>
+    <DECORATED>?EndMenuBar@ImGui@@YAXXZ</DECORATED>
+    <FUNCLINE>5777</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5779</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5780</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5782</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5785</LINE>
+        <COLUMN>108</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5787</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5788</LINE>
+        <COLUMN>48</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5790</LINE>
+        <COLUMN>128</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'window' may be NULL (Skip this branch)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5804</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_widgets.cpp</FILENAME>
+        <LINE>5804</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'window' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>60</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::dump</FUNCTION>
+    <DECORATED>?dump@json11@@YAXNAAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>57</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>69</LINE>
+      <COLUMN>12</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::dump</FUNCTION>
+    <DECORATED>?dump@json11@@YAXHAAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>67</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>97</LINE>
+      <COLUMN>20</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::dump</FUNCTION>
+    <DECORATED>?dump@json11@@YAXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAV23@@Z</DECORATED>
+    <FUNCLINE>77</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>331</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::esc</FUNCTION>
+    <DECORATED>?esc@json11@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@D@Z</DECORATED>
+    <FUNCLINE>328</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>json11.cpp</FILENAME>
+      <LINE>333</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>6031</DEFECTCODE>
+    <DESCRIPTION>Return value ignored: 'snprintf'.</DESCRIPTION>
+    <FUNCTION>json11::esc</FUNCTION>
+    <DECORATED>?esc@json11@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@D@Z</DECORATED>
+    <FUNCLINE>328</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>main.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>18</COLUMN>
+    </SFA>
+    <DEFECTCODE>28251</DEFECTCODE>
+    <DESCRIPTION>Inconsistent annotation for 'WinMain': this instance has no annotations. See c:\program files (x86)\windows kits\8.1\include\um\winbase.h(905). </DESCRIPTION>
+    <FUNCTION>WinMain</FUNCTION>
+    <DECORATED>WinMain@16</DECORATED>
+    <FUNCLINE>7</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>modelclass.cpp</FILENAME>
+      <LINE>836</LINE>
+      <COLUMN>44</COLUMN>
+    </SFA>
+    <DEFECTCODE>6330</DEFECTCODE>
+    <DESCRIPTION>'char' passed as _Param_(1) when 'unsigned char' is required in call to 'isdigit'.</DESCRIPTION>
+    <FUNCTION>ModelClass::is_number::&lt;lambda_91781e30248ecabee818fcee37ea07fe&gt;::()</FUNCTION>
+    <DECORATED>??R&lt;lambda_91781e30248ecabee818fcee37ea07fe&gt;@@QBE_ND@Z</DECORATED>
+    <FUNCLINE>836</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shadereditormanager.cpp</FILENAME>
+      <LINE>1066</LINE>
+      <COLUMN>14</COLUMN>
+    </SFA>
+    <DEFECTCODE>6246</DEFECTCODE>
+    <DESCRIPTION>Local declaration of 'i' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '1035' of 'c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\shadereditormanager.cpp'.</DESCRIPTION>
+    <FUNCTION>ShaderEditorManager::LoadMaterial</FUNCTION>
+    <DECORATED>?LoadMaterial@ShaderEditorManager@@QAE_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>1011</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1035</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shadereditormanager.cpp</FILENAME>
+      <LINE>1074</LINE>
+      <COLUMN>14</COLUMN>
+    </SFA>
+    <DEFECTCODE>6246</DEFECTCODE>
+    <DESCRIPTION>Local declaration of 'i' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '1035' of 'c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\shadereditormanager.cpp'.</DESCRIPTION>
+    <FUNCTION>ShaderEditorManager::LoadMaterial</FUNCTION>
+    <DECORATED>?LoadMaterial@ShaderEditorManager@@QAE_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>1011</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1035</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shadereditormanager.cpp</FILENAME>
+      <LINE>1082</LINE>
+      <COLUMN>14</COLUMN>
+    </SFA>
+    <DEFECTCODE>6246</DEFECTCODE>
+    <DESCRIPTION>Local declaration of 'i' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '1035' of 'c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\shadereditormanager.cpp'.</DESCRIPTION>
+    <FUNCTION>ShaderEditorManager::LoadMaterial</FUNCTION>
+    <DECORATED>?LoadMaterial@ShaderEditorManager@@QAE_NV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z</DECORATED>
+    <FUNCLINE>1011</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1035</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shadereditormanager.cpp</FILENAME>
+      <LINE>1597</LINE>
+      <COLUMN>11</COLUMN>
+    </SFA>
+    <DEFECTCODE>6011</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer 'block'. </DESCRIPTION>
+    <FUNCTION>ShaderEditorManager::DeleteCurrentShaderBlock</FUNCTION>
+    <DECORATED>?DeleteCurrentShaderBlock@ShaderEditorManager@@QAEXXZ</DECORATED>
+    <FUNCLINE>1592</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1594</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1594</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1596</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1597</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1600</LINE>
+        <COLUMN>34</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1609</LINE>
+        <COLUMN>3</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1611</LINE>
+        <COLUMN>40</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1628</LINE>
+        <COLUMN>3</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1629</LINE>
+        <COLUMN>39</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1637</LINE>
+        <COLUMN>3</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1638</LINE>
+        <COLUMN>7</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'block' may be NULL (Skip this branch)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1594</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1594</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&gt;-1')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1596</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1597</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'block-&gt;m_focused')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shadereditormanager.cpp</FILENAME>
+        <LINE>1597</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'block' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shaderpbrclass.cpp</FILENAME>
+      <LINE>218</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>28020</DEFECTCODE>
+    <DESCRIPTION>The expression '0&lt;=_Param_(1)&amp;&amp;_Param_(1)&lt;=128-1' is not true at this call.</DESCRIPTION>
+    <FUNCTION>ShaderPBRClass::SetShaderParameters</FUNCTION>
+    <DECORATED>?SetShaderParameters@ShaderPBRClass@@MAE_NPAUID3D11DeviceContext@@AAUXMMATRIX@DirectX@@11@Z</DECORATED>
+    <FUNCLINE>129</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>131</LINE>
+        <COLUMN>100</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>134</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>135</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>136</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>141</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>145</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>146</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>148</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>149</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>150</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>154</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>155</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>158</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>159</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>159</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>162</LINE>
+        <COLUMN>33</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>159</LINE>
+        <COLUMN>46</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>159</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>174</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>175</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>176</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>179</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>180</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>183</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>184</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>185</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>186</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>187</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>189</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>190</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>193</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>194</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>197</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>198</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>199</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>200</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>201</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>203</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>204</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>208</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>209</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>210</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>211</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>212</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>215</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>216</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>215</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>216</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>215</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>216</LINE>
+        <COLUMN>62</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>217</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrclass.cpp</FILENAME>
+        <LINE>218</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+      <LINE>216</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>28020</DEFECTCODE>
+    <DESCRIPTION>The expression '0&lt;=_Param_(1)&amp;&amp;_Param_(1)&lt;=128-1' is not true at this call.</DESCRIPTION>
+    <FUNCTION>ShaderPBRGenerated::SetShaderParameters</FUNCTION>
+    <DECORATED>?SetShaderParameters@ShaderPBRGenerated@@MAE_NPAUID3D11DeviceContext@@AAUXMMATRIX@DirectX@@11@Z</DECORATED>
+    <FUNCLINE>131</FUNCLINE>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>133</LINE>
+        <COLUMN>100</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>136</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>138</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>146</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>147</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>148</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>150</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>151</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>152</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>156</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>157</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>160</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>163</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>164</LINE>
+        <COLUMN>33</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>46</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>161</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>176</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>177</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>178</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>181</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>182</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>185</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>186</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>187</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>188</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>189</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>191</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>192</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>195</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>196</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>199</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>200</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>201</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>202</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>203</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>205</LINE>
+        <COLUMN>21</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>206</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>210</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>211</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>212</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>213</LINE>
+        <COLUMN>45</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>214</LINE>
+        <COLUMN>62</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>215</LINE>
+        <COLUMN>44</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>shaderpbrgenerated.cpp</FILENAME>
+        <LINE>216</LINE>
+        <COLUMN>37</COLUMN>
+      </SFA>
+    </PATH>
+  </DEFECT></DEFECTS>

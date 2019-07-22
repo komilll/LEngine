@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_impl_win32.cpp</FILENAME>
+      <LINE>143</LINE>
+      <COLUMN>36</COLUMN>
+    </SFA>
+    <DEFECTCODE>6387</DEFECTCODE>
+    <DESCRIPTION>'g_hWnd' could be '0':  this does not adhere to the specification for the function 'IsChild'. </DESCRIPTION>
+    <FUNCTION>ImGui_ImplWin32_UpdateMousePos</FUNCTION>
+    <DECORATED>?ImGui_ImplWin32_UpdateMousePos@@YAXXZ</DECORATED>
+    <FUNCLINE>127</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>129</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>132</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'io.WantSetMousePos' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>141</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>27</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'active_window')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'g_hWnd' is an Input to 'IsChild' (declared at c:\program files (x86)\windows kits\8.1\include\um\winuser.h:4309)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'g_hWnd' should not be NULL, because this is not consistent with the SAL annotation on 'IsChild'</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+      <FILENAME>imgui_impl_win32.cpp</FILENAME>
+      <LINE>144</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>6387</DEFECTCODE>
+    <DESCRIPTION>'g_hWnd' could be '0':  this does not adhere to the specification for the function 'ScreenToClient'. See line 143 for an earlier location where this can occur</DESCRIPTION>
+    <FUNCTION>ImGui_ImplWin32_UpdateMousePos</FUNCTION>
+    <DECORATED>?ImGui_ImplWin32_UpdateMousePos@@YAXXZ</DECORATED>
+    <FUNCLINE>127</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>129</LINE>
+        <COLUMN>11</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>132</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'io.WantSetMousePos' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>141</LINE>
+        <COLUMN>10</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>13</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>142</LINE>
+        <COLUMN>27</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'active_window')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'g_hWnd' is an Input to 'IsChild' (declared at c:\program files (x86)\windows kits\8.1\include\um\winuser.h:4309)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>143</LINE>
+        <COLUMN>36</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume '&lt;branch condition&gt;')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'g_hWnd' is an Input to 'ScreenToClient' (declared at c:\program files (x86)\windows kits\8.1\include\um\winuser.h:8959)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\imgui\</FILEPATH>
+        <FILENAME>imgui_impl_win32.cpp</FILENAME>
+        <LINE>144</LINE>
+        <COLUMN>37</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'g_hWnd' should not be NULL, because this is not consistent with the SAL annotation on 'ScreenToClient'</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+</DEFECTS>

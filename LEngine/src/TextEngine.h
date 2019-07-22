@@ -40,7 +40,7 @@ public:
 		void SetText(std::string newString)
 		{
 			text = newString;
-			for (int i = 0; i < text.length(); i++)
+			for (unsigned int i = 0; i < text.length(); i++)
 			{
 				//TODO Test if that's correct - after if statement string would be invalided and prone to UB?
 				if (text[i] == '.')

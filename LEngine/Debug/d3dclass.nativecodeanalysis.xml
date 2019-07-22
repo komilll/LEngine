@@ -1,0 +1,1627 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>80</LINE>
+      <COLUMN>30</COLUMN>
+    </SFA>
+    <DEFECTCODE>6385</DEFECTCODE>
+    <DESCRIPTION>Reading invalid data from 'displayModeList':  the readable size is 'numModes*28' bytes, but '56' bytes may be read.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>4</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>57</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>63</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>64</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!displayModeList' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>70</LINE>
+        <COLUMN>8</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'displayModeList' is an Input to 'IDXGIOutput::GetDisplayModeList' (declared at c:\program files (x86)\windows kits\8.1\include\shared\dxgi.h:1427)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>71</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this loop, (assume 'i&lt;numModes')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>80</LINE>
+        <COLUMN>30</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>23</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'i' may equal 1</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>11</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Continue this loop, (assume 'i&lt;numModes')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>80</LINE>
+        <COLUMN>30</COLUMN>
+        <KEYEVENT>
+          <ID>12</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '&lt;branch condition&gt;' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>80</LINE>
+        <COLUMN>30</COLUMN>
+        <KEYEVENT>
+          <ID>13</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>Invalid read from 'displayModeList[1]', (readable range is 0 to 0)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>140</LINE>
+      <COLUMN>51</COLUMN>
+    </SFA>
+    <DEFECTCODE>6001</DEFECTCODE>
+    <DESCRIPTION>Using uninitialized memory 'denominator'.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'denominator' is not initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>57</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>63</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>64</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!displayModeList' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>70</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>71</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume 'i&lt;numModes' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>91</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>92</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>98</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>101</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>102</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'error!=0' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>108</LINE>
+        <COLUMN>1</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>109</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>112</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>113</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>116</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>117</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>120</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>121</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>124</LINE>
+        <COLUMN>4</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>127</LINE>
+        <COLUMN>30</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>130</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>131</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>134</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>11</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'm_vsync_enabled')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>139</LINE>
+        <COLUMN>52</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>140</LINE>
+        <COLUMN>51</COLUMN>
+        <KEYEVENT>
+          <ID>12</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'denominator' is used, but may not have been initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>139</LINE>
+      <COLUMN>52</COLUMN>
+    </SFA>
+    <DEFECTCODE>6001</DEFECTCODE>
+    <DESCRIPTION>Using uninitialized memory 'numerator'.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numerator' is not initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>57</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>63</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>64</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume '!displayModeList' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>70</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>71</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>7</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>6</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>78</LINE>
+        <COLUMN>11</COLUMN>
+        <KEYEVENT>
+          <ID>8</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this loop, (assume 'i&lt;numModes' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>91</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>92</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>9</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>98</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>101</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>102</LINE>
+        <COLUMN>10</COLUMN>
+        <KEYEVENT>
+          <ID>10</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'error!=0' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>108</LINE>
+        <COLUMN>1</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>109</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>112</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>113</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>116</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>117</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>120</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>121</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>124</LINE>
+        <COLUMN>4</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>127</LINE>
+        <COLUMN>30</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>130</LINE>
+        <COLUMN>35</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>131</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>134</LINE>
+        <COLUMN>36</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>137</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>11</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Enter this branch, (assume 'm_vsync_enabled')</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>139</LINE>
+        <COLUMN>52</COLUMN>
+        <KEYEVENT>
+          <ID>12</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numerator' is used, but may not have been initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>56</LINE>
+      <COLUMN>8</COLUMN>
+    </SFA>
+    <DEFECTCODE>6001</DEFECTCODE>
+    <DESCRIPTION>Using uninitialized memory 'numModes'.</DESCRIPTION>
+    <FUNCTION>D3DClass::Initialize</FUNCTION>
+    <DECORATED>?Initialize@D3DClass@@QAE_NHH_NPAUHWND__@@0MM@Z</DECORATED>
+    <FUNCLINE>3</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>5</LINE>
+        <COLUMN>9</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>6</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>7</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>8</LINE>
+        <COLUMN>14</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>14</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numModes' is not initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>24</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>27</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>38</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>51</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>11</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>5</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>14</LINE>
+        <COLUMN>19</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>16</LINE>
+        <COLUMN>22</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>26</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>31</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>19</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>20</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>21</LINE>
+        <COLUMN>23</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>22</LINE>
+        <COLUMN>18</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>23</LINE>
+        <COLUMN>16</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>7</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>24</LINE>
+        <COLUMN>20</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>26</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>27</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>29</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>32</LINE>
+        <COLUMN>17</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>35</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>36</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>42</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>43</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>3</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>49</LINE>
+        <COLUMN>8</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>50</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>4</ID>
+          <KIND>branch</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>Skip this branch, (assume 'FAILED(result)' is false)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+        <KEYEVENT>
+          <ID>5</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Full</IMPORTANCE>
+          <MESSAGE>'numModes' is an Input to 'IDXGIOutput::GetDisplayModeList' (declared at c:\program files (x86)\windows kits\8.1\include\shared\dxgi.h:1427)</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+        <FILENAME>d3dclass.cpp</FILENAME>
+        <LINE>56</LINE>
+        <COLUMN>8</COLUMN>
+        <KEYEVENT>
+          <ID>6</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'numModes' is used, but may not have been initialized</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\kamil\documents\visual studio 2015\projects\lengine\lengine\src\</FILEPATH>
+      <FILENAME>d3dclass.cpp</FILENAME>
+      <LINE>579</LINE>
+      <COLUMN>26</COLUMN>
+    </SFA>
+    <DEFECTCODE>6282</DEFECTCODE>
+    <DESCRIPTION>Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.</DESCRIPTION>
+    <FUNCTION>D3DClass::ChangeDepthStencilComparison</FUNCTION>
+    <DECORATED>?ChangeDepthStencilComparison@D3DClass@@QAEXW4D3D11_COMPARISON_FUNC@@@Z</DECORATED>
+    <FUNCLINE>573</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>

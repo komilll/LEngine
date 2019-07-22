@@ -99,6 +99,7 @@ bool UIBase::CreateBufferAdditionals(ID3D11Device *& device)
 		return false;
 
 	m_buffers = { m_appearanceBuffer };
+	return true;
 }
 
 bool UIBase::CreateSamplerState(ID3D11Device * device)

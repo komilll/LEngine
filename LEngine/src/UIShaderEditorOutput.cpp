@@ -8,13 +8,10 @@ UIShaderEditorOutput::UIShaderEditorOutput()
 
 bool UIShaderEditorOutput::MouseOnArea(MouseClass * mouse)
 {
-	bool result = false;
-	float mouseX{ 0 };
-	float mouseY{ 0 };
-	POINT p = mouse->CurrentMouseLocation();
+	const POINT p = mouse->CurrentMouseLocation();
 
 	//Calculate mouse X
-	mouseX = (float)p.x / (float)m_D3D->GetWindowSize().x;
+	float mouseX = static_cast<float>(p.x) / static_cast<float>(m_D3D->GetWindowSize().x);
 	mouseX = mouseX * 2.0f - 1.0f;
 	if (mouseX > 1.0f)
 		mouseX = 1.0f;
@@ -22,7 +19,7 @@ bool UIShaderEditorOutput::MouseOnArea(MouseClass * mouse)
 		mouseX = -1.0f;
 
 	//Calculate mouse Y
-	mouseY = (float)p.y / (float)m_D3D->GetWindowSize().y;
+	float mouseY = static_cast<float>(p.y) / static_cast<float>(m_D3D->GetWindowSize().y);
 	mouseY = mouseY * 2.0f - 1.0f;
 	if (mouseY > 1.0f)
 		mouseY = 1.0f;
@@ -34,12 +31,13 @@ bool UIShaderEditorOutput::MouseOnArea(MouseClass * mouse)
 	if (mouseX >(min_X + m_translationX) && mouseX < (max_X + m_translationX) &&
 		mouseY >(min_Y + m_translationY) && mouseY < (max_Y + m_translationY))
 	{
-		result = true;
+		return true;
 	}
 
-	return result;
+	return false;
 }
 
+//TODO Replace by constructor
 bool UIShaderEditorOutput::Initialize(D3DClass * d3d, ModelClass::ShapeSize shape, float left, float right, float top, float bottom)
 {
 	if (m_returnType == "float" || m_returnType == "")
@@ -96,7 +94,7 @@ void UIShaderEditorOutput::GetTranslation(float & x, float & y)
 	y = m_translationY;
 }
 
-void UIShaderEditorOutput::GetPosition(float & x, float & y)
+void UIShaderEditorOutput::GetPosition(float & x, float & y) const
 {
 	x = (max_X - min_X) * 0.5f + min_X + m_translationX;
 	y = (max_Y - min_Y) * 0.5f + min_Y + m_translationY;
@@ -104,10 +102,6 @@ void UIShaderEditorOutput::GetPosition(float & x, float & y)
 
 bool UIShaderEditorOutput::Render(ID3D11DeviceContext * deviceContext)
 {
-	//XMMATRIX tmpMatrix;
-	//tmpMatrix *= 0;
-	//tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
-
 	XMMATRIX worldMatrix = XMMatrixIdentity();
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
@@ -144,7 +138,7 @@ void UIShaderEditorOutput::StopDragging()
 		ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
-bool UIShaderEditorOutput::IsDragging()
+bool UIShaderEditorOutput::IsDragging() const
 {
 	return m_dragged;
 }
@@ -164,7 +158,7 @@ void UIShaderEditorOutput::SaveVisibleName()
 	}
 }
 
-std::string UIShaderEditorOutput::GetVisibleName()
+std::string UIShaderEditorOutput::GetVisibleName() const
 {
 	return m_savedVisibleName;
 }

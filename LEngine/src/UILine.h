@@ -10,8 +10,6 @@
 class UILine : public UIBase
 {
 public:
-	UILine();
-
 	///<summary> Initialize line</summary>
 	bool Initialize(D3DClass* d3d, UIShaderEditorOutput* startPin, UIShaderEditorInput* endPin, float scale = 1.0f);
 	
@@ -39,6 +37,6 @@ private:
 	float m_scale{ 1.0f };
 
 private:
-	const float lineThickness = 0.008f;
+	const float lineThickness{ 0.008f };
 };
 #endif // !_UIBASE_H_

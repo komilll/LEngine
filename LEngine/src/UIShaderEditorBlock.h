@@ -19,7 +19,7 @@
 class UIShaderEditorBlock : public UIBase
 {
 public:
-	enum EDragPinBehaviour
+	enum class EDragPinBehaviour
 	{
 		Dragging,
 		Start,
@@ -31,16 +31,16 @@ public:
 private:
 	struct Size
 	{
-		float x;
-		float y;
+		float x{ 0.0f };
+		float y{ 0.0f };
 
 		Size(float x, float y) : x(x), y(y) {}
 	};
 
 	struct Margin
 	{
-		float x;
-		float y;
+		float x{ 0.0f };
+		float y{ 0.0f };
 
 		Margin(float x, float y) : x(x), y(y) {}
 	};
@@ -57,36 +57,36 @@ public:
 	void Move(float x, float y);
 	void StartDragging();
 	void StopDragging();
-	bool IsDragging();
-	bool IsPinDragging();
+	bool IsDragging() const;
+	bool IsPinDragging() const;
 
 	UIShaderEditorBlock::EDragPinBehaviour DragPins(MouseClass* mouse, UIShaderEditorOutput*& out);
 
-	UIShaderEditorInput* CheckIfMouseOnInputPin(MouseClass* mouse);
+	UIShaderEditorInput* CheckIfMouseOnInputPin(MouseClass* mouse) const;
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 
-	std::string GenerateShaderCode(bool skipTabulator = false);
-	std::string ConvertType(std::string outName, std::string typeIn, std::string typeOut);
-	int GetInputCount();
+	std::string GenerateShaderCode(bool skipTabulator = false) const;
+	std::string ConvertType(std::string outName, std::string typeIn, std::string typeOut) const;
+	int GetInputCount() const;
 	void SetOutputPinName(std::string name);
 	UIShaderEditorOutput* GetFirstOutputNode();
-	std::string GetFunctionName();
-	std::string GetReturnType();
+	std::string GetFunctionName() const;
+	std::string GetReturnType() const;
 
 	void SetScale(float scale);
 	bool TryToMarkBlock(RectangleVertices markingBounds);
 	Size GetPosition() const;
 	void ChangeBlockName();
-	int GetBlockID();
+	int GetBlockID() const;
 	void UpdateVariable();
 
 private:
 	void CalculateBlockSize(int inCount, int outCount);
-	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize);
+	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize) const;
 	bool InitializeInputNodes(int inCount);
 	bool InitializeOutputNodes(int outCount);
-	std::string ReturnEmptyForGivenType(std::string type);
+	std::string ReturnEmptyForGivenType(std::string type) const;
 
 public:
 	std::string m_fileName{};

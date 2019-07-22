@@ -5,6 +5,7 @@
 #include "UIBase.h"
 #include "d3dclass.h"
 
+//TODO Replaced by ImGUI - Delete or add constructor otherwise
 ////////////////////////////////////////////
 // PROPABLY WILL BE REPLACE BY dxguid.lib //
 ////////////////////////////////////////////

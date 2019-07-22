@@ -1,10 +1,6 @@
 #include "UIBase.h"
 
-UIBase::UIBase()
-{
-	BaseShaderClass::BaseShaderClass();
-}
-
+//TODO Use contructors instead of initializing
 bool UIBase::InitializeModelGeneric(ID3D11Device * device, RectangleVertices rectangleVertices, bool withTex, bool isEmpty, float borderWidth)
 {
 	return InitializeModelGeneric(device, ModelClass::ShapeSize::RECTANGLE, rectangleVertices.minX, rectangleVertices.maxX, rectangleVertices.maxY, rectangleVertices.minY, withTex, isEmpty, borderWidth);
@@ -31,24 +27,14 @@ bool UIBase::InitializeSquare(ID3D11Device * device, float centerX, float center
 //Use standarized input data; Need to be changed and upgraded
 std::vector<LPCSTR> UIBase::GetInputNames()
 {
-	std::vector <LPCSTR> names;
-	names.push_back("position");
-	names.push_back("texcoord");
-	names.push_back("normal");
-	names.push_back("tangent");
-	names.push_back("binormal");
+	static const std::vector <LPCSTR> names{ "position", "texcoord", "normal", "tangent", "binormal" };
 	return names;
 }
 
 //Use standarized input formats; Need to be changed and upgraded
 std::vector<DXGI_FORMAT> UIBase::GetInputFormats()
 {
-	std::vector <DXGI_FORMAT> formats;
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
+	static const std::vector <DXGI_FORMAT> formats{ DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
 	return formats;
 }
 
@@ -59,7 +45,7 @@ void UIBase::GetColor(XMFLOAT4 & color)
 
 bool UIBase::Render(ID3D11DeviceContext * deviceContext, int indexCount, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	if (m_model == nullptr)
+	if (!m_model)
 		return false;
 	m_model->Render(deviceContext);
 
@@ -79,7 +65,7 @@ void UIBase::ChangeColor(XMFLOAT4 color)
 
 void UIBase::ChangeColor(float r, float g, float b, float a)
 {
-	m_uiColor = XMFLOAT4(r, g, b, a);
+	m_uiColor = XMFLOAT4{ r, g, b, a };
 }
 
 void UIBase::ChangeAlpha(float alpha)
@@ -89,7 +75,7 @@ void UIBase::ChangeAlpha(float alpha)
 
 bool UIBase::MouseOnArea(MouseClass* mouse)
 {
-	return false;
+	return false; //Overriden in child classes
 }
 
 ModelClass * UIBase::GetModel()
@@ -122,26 +108,21 @@ bool UIBase::CreateSamplerState(ID3D11Device * device)
 
 bool UIBase::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
-	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	AppearanceBuffer* dataPtr2;
-	unsigned int bufferNumber;
-
 	/////// PIXEL BUFFERS ///////
 	//Appearance buffer
-	result = deviceContext->Map(m_appearanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	const HRESULT result = deviceContext->Map(m_appearanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 		return false;
 
-	dataPtr2 = (AppearanceBuffer*)mappedResource.pData;
+	AppearanceBuffer* dataPtr2 = static_cast<AppearanceBuffer*>(mappedResource.pData);
 	dataPtr2->color = m_uiColor;
 
 	deviceContext->Unmap(m_appearanceBuffer, 0);
-	bufferNumber = 0;
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_appearanceBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &m_appearanceBuffer);
 
 	return true;
 }

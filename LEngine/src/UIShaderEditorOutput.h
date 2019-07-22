@@ -19,18 +19,18 @@ public:
 	
 	void Move(float x, float y);
 	void GetTranslation(float & x, float & y);
-	void GetPosition(float & x, float & y);
+	void GetPosition(float & x, float & y) const;
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 	virtual bool SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) override;
 
 	void StartDragging();
 	void StopDragging();
-	bool IsDragging();
+	bool IsDragging() const;
 
 	void SetScale(float scale);
 	void SaveVisibleName();
-	std::string GetVisibleName();
+	std::string GetVisibleName() const;
 	void PromoteToVariable();
 	void PromoteToVariable(std::string name);
 	void DemoteVariable();

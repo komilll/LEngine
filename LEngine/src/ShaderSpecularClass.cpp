@@ -26,13 +26,11 @@ bool ShaderSpecularClass::CreateBufferAdditionals(ID3D11Device * &device)
 
 bool ShaderSpecularClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	LightingBufferType* dataPtr2;
-	CameraBufferType* dataPtr3;
 	unsigned int bufferNumber;
 
 	/////// VERTEX BUFFERS ///////
@@ -41,13 +39,13 @@ bool ShaderSpecularClass::SetShaderParameters(ID3D11DeviceContext *deviceContext
 	if (FAILED(result))
 		return false;
 
-	dataPtr3 = (CameraBufferType*)mappedResource.pData;
+	CameraBufferType* dataPtr3 = static_cast<CameraBufferType*>(mappedResource.pData);
 	dataPtr3->cameraDirection = m_cameraPosition;
 	dataPtr3->padding = 0;
 
 	deviceContext->Unmap(m_cameraBuffer, 0);
 	bufferNumber = 1;
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_cameraBuffer);
+	deviceContext->VSSetConstantBuffers(bufferNumber++, 1, &m_cameraBuffer);
 
 	/////// PIXEL BUFFERS ///////
 	//Lighting buffer
@@ -55,17 +53,18 @@ bool ShaderSpecularClass::SetShaderParameters(ID3D11DeviceContext *deviceContext
 	if (FAILED(result))
 		return false;
 
-	dataPtr2 = (LightingBufferType*)mappedResource.pData;
+	LightingBufferType* dataPtr2 = static_cast<LightingBufferType*>(mappedResource.pData);
 	dataPtr2->direction = m_lightDirection;
 	dataPtr2->padding = 0;
 
 	deviceContext->Unmap(m_lightingBuffer, 0);
 	bufferNumber = 0;
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightingBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_lightingBuffer);
 
 	/////// RESOURCES ///////
 	//Pixel shader resources
-	deviceContext->PSSetShaderResources(0, 1, &m_diffuseTextureView);
-	deviceContext->PSSetShaderResources(1, 1, &m_normalTextureView);
+	bufferNumber = 0;
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_diffuseTextureView);
+	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_normalTextureView);
 	return true;
 }

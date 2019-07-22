@@ -2,12 +2,8 @@
 
 bool VignetteShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
-
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	unsigned int bufferNumber;
 
 	/////// VERTEX BUFFERS ///////
 
@@ -16,7 +12,6 @@ bool VignetteShader::SetShaderParameters(ID3D11DeviceContext * deviceContext, XM
 
 	/////// RESOURCES ///////
 	//Pixel shader resources
-	bufferNumber = 0;
-	deviceContext->PSSetShaderResources(bufferNumber++, 1, &m_vignetteResourceView);
+	deviceContext->PSSetShaderResources(0, 1, &m_vignetteResourceView);
 	return true;
 }

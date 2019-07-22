@@ -4,14 +4,13 @@
 
 #include "UIBase.h"
 
+//TODO Replaced by ImGui
 ////////////////////////////////////////////
 // PROPABLY WILL BE REPLACE BY dxguid.lib //
 ////////////////////////////////////////////
 class UITick : public UIBase
 {
 public:
-	UITick();
-
 	///<summary> Create tick field (Square) with size and position </summary>
 	bool Initialize(D3DClass *d3d, float positionX, float positionY, float size);
 	///<summary> Tick or untick window </summary>

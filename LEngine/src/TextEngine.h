@@ -9,10 +9,10 @@
 #include <vector>
 #include "d3dclass.h"
 
-///////////////////////////////////////////////////////////////////
-// PROPABLY WILL BE REPLACED BY dxguid.lib (or slightly modified) //
-///////////////////////////////////////////////////////////////////
-
+//TODO Replaced by ImGUI
+////////////////////////////////////////////
+// PROPABLY WILL BE REPLACE BY dxguid.lib //
+////////////////////////////////////////////
 ///<summary>Collects all text data and render it once at the end of frame</summary>
 class TextEngine
 {
@@ -26,6 +26,7 @@ public:
 	private:
 		float screenPosX = 0;
 		float screenPosY = 0;
+		int index = 0;
 
 	public:
 		float posX = 0;
@@ -41,11 +42,14 @@ public:
 			text = newString;
 			for (int i = 0; i < text.length(); i++)
 			{
+				//TODO Test if that's correct - after if statement string would be invalided and prone to UB?
 				if (text[i] == '.')
 					text = text.substr(0, i + 1 + 2);
 			}
 		}
+		//TODO Add constructor
 
+		//TODO Getter/Setter doesn't provide any additional value
 		int GetIndex()
 		{
 			return index;
@@ -61,13 +65,9 @@ public:
 			posX = screenWidth * (0.5f + posX_ * 0.5f);
 			posY = screenHeight * (0.5f - posY_ * 0.5f);
 		}
-
-	private: int index = 0;
 	};
 
 public:
-	TextEngine();
-
 	void Initialize(ID3D11Device* d3d, wchar_t const* fontPath);
 	FontData* WriteText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight, float posX, float posY, std::string text, float scale = 1.0f, 
 		Align align = Align::LEFT, XMVECTOR color = DirectX::Colors::White);

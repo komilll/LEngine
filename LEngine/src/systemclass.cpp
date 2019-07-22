@@ -1,58 +1,19 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: systemclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "systemclass.h"
-
-
-SystemClass::SystemClass()
-{
-	m_Input = 0;
-	m_Graphics = 0;
-}
-
-
-SystemClass::SystemClass(const SystemClass& other)
-{
-}
-
-
-SystemClass::~SystemClass()
-{
-}
-
 
 bool SystemClass::Initialize()
 {
-	int screenWidth, screenHeight;
-	bool result;
-
-	// Initialize the width and height of the screen to zero before sending the variables into the function.
-	screenWidth = 0;
-	screenHeight = 0;
+	//TODO Change to constructor
+	int screenWidth{ 0 };
+	int screenHeight{ 0 };
 
 	// Initialize the windows api.
 	InitializeWindows(screenWidth, screenHeight);
 
-	// Create the input object.  This object will be used to handle reading the keyboard input from the user.
 	m_Input = new InputClass;
-	if(!m_Input)
-	{
-		return false;
-	}
-
-	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = new GraphicsClass;
-	if(!m_Graphics)
-	{
-		return false;
-	}
 
-	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
-	if(!result)
-	{
+	if (!m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd))
 		return false;
-	}
 
 	m_Mouse = new MouseClass;
 	if (!m_Mouse)
@@ -69,6 +30,8 @@ bool SystemClass::Initialize()
 
 void SystemClass::Shutdown()
 {
+	//TODO Upgrade or remove completely
+
 	// Release the graphics object.
 	if(m_Graphics)
 	{
@@ -94,15 +57,12 @@ void SystemClass::Shutdown()
 void SystemClass::Run()
 {
 	MSG msg;
-	bool done, result;
-
 
 	// Initialize the message structure.
 	ZeroMemory(&msg, sizeof(MSG));
 	
 	// Loop until there is a quit message from the window or the user.
-	done = false;
-	while(!done)
+	while(true)
 	{
 		// Handle the windows messages.
 		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -114,21 +74,14 @@ void SystemClass::Run()
 		// If windows signals to end the application then exit out.
 		if(msg.message == WM_QUIT)
 		{
-			done = true;
+			break;
 		}
-		else
+		else if (!Frame())
 		{
-			// Otherwise do the frame processing.
-			result = Frame();
-			if(!result)
-			{
-				done = true;
-			}
+			break;
 		}
 
 	}
-
-	return;
 }
 
 
@@ -144,6 +97,7 @@ bool SystemClass::Frame()
 
 	if (m_Input->IsKeyDown(VK_ESCAPE))
 	{
+		//TODO Save current scene
 		if (m_Graphics)
 			m_Graphics->SaveScene("test.txt");
 		return false;
@@ -221,11 +175,6 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 
 void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 {
-	WNDCLASSEX wc;
-	DEVMODE dmScreenSettings;
-	int posX, posY;
-
-
 	// Get an external pointer to this object.	
 	ApplicationHandle = this;
 
@@ -233,8 +182,9 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	m_hinstance = GetModuleHandle(NULL);
 
 	// Give the application a name.
-	m_applicationName = "Engine";
+	m_applicationName = "LEngine";
 
+	WNDCLASSEX wc;
 	// Setup the windows class with default settings.
 	wc.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc   = WndProc;
@@ -256,9 +206,12 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	screenWidth  = GetSystemMetrics(SM_CXSCREEN);
 	screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
+	int posX{ 0 };
+	int posY{ 0 };
 	// Setup the screen settings depending on whether it is running in full screen or in windowed mode.
 	if(FULL_SCREEN)
 	{
+		DEVMODE dmScreenSettings;
 		// If full screen set the screen to maximum size of the users desktop and 32bit.
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
 		dmScreenSettings.dmSize       = sizeof(dmScreenSettings);
@@ -296,8 +249,6 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 
 	// Hide the mouse cursor.
 	ShowCursor(true);
-
-	return;
 }
 
 
@@ -322,8 +273,6 @@ void SystemClass::ShutdownWindows()
 
 	// Release the pointer to this class.
 	ApplicationHandle = NULL;
-
-	return;
 }
 
 void SystemClass::HandleInput()
@@ -393,8 +342,8 @@ void SystemClass::HandleInput()
 			}
 			else
 			{
-				float xDiff = m_Graphics->GetCurrentMousePosition().first - pos.first;
-				float yDiff = m_Graphics->GetCurrentMousePosition().second - pos.second;
+				const float xDiff = m_Graphics->GetCurrentMousePosition().first - pos.first;
+				const float yDiff = m_Graphics->GetCurrentMousePosition().second - pos.second;
 
 				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -xDiff * rotatePerTick * previewRotateScale, 0 });
 				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ yDiff * rotatePerTick * previewRotateScale, 0, 0 });
@@ -409,9 +358,11 @@ void SystemClass::HandleInput()
 			lmbPressed = false;
 		}
 
-		if ((float)m_Mouse->GetMouseScroll() > 0.0f)
+		if (m_Mouse->GetMouseScroll() == 0.0f)
+		{ /* Empty - most predictable branch */ }
+		else if (m_Mouse->GetMouseScroll() > 0.0f)
 			m_Graphics->MoveCameraForward(movementPerTick);
-		else if ((float)m_Mouse->GetMouseScroll() < 0.0f)
+		else if (m_Mouse->GetMouseScroll() < 0.0f)
 			m_Graphics->MoveCameraBackward(movementPerTick);
 	}
 

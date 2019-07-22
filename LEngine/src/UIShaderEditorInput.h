@@ -9,8 +9,6 @@
 class UIShaderEditorInput : public UIBase
 {
 public:
-	UIShaderEditorInput();
-
 	bool MouseOnArea(MouseClass* mouse) override;
 
 	///<summary> Initialize shape: Rectangle/Triangle </summary>
@@ -19,16 +17,16 @@ public:
 	bool Initialize(D3DClass* d3d, float centerX, float centerY, float size);
 	
 	void Move(float x, float y);
-	void GetTranslation(float& x, float& y);
+	void GetTranslation(float& x, float& y) const;
 
-	void GetPosition(float & x, float & y);
+	void GetPosition(float & x, float & y) const;
 
 	virtual bool Render(ID3D11DeviceContext *deviceContext) final;
 	virtual bool SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix) override;
 
 	void StartDragging();
 	void StopDragging();
-	bool IsDragging();
+	bool IsDragging() const;
 
 	void SetScale(float scale);
 

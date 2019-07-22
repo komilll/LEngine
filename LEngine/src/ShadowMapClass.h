@@ -4,6 +4,7 @@
 
 #include "BaseShaderClass.h"
 
+//TODO Seem to be unused - investigate
 class ShadowMapClass : public BaseShaderClass
 {
 private:

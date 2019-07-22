@@ -150,7 +150,7 @@ void MouseClass::SetMMBPressed(bool enable)
 	m_mouseState.rgbButtons[2] = enable;
 }
 
-int MouseClass::GetMouseScroll() const
+float MouseClass::GetMouseScroll() const
 {
 	return (m_mouseState.lZ / 120.0f);
 }

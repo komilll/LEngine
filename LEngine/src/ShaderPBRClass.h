@@ -4,6 +4,7 @@
 
 #include "BaseShaderClass.h"
 
+///<summary> Basically unused due to usage of GeneratedPBRClass; Delete in future </summary>
 class ShaderPBRClass : public BaseShaderClass
 {
 private:

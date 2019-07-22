@@ -4,7 +4,7 @@
 
 #include "UIBase.h"
 
-
+//TODO Unused?
 ///<summary>Class used to preview Color/Texture in Material Editor</summary>
 class UIColorBlockPreview : public UIBase
 {

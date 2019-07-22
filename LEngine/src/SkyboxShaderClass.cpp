@@ -52,21 +52,20 @@ bool SkyboxShaderClass::CreateSamplerState(ID3D11Device * device)
 
 bool SkyboxShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	if (!BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 
 	/////// ADDITIONAL BUFFERS ///////
 	if (m_skyboxType == SkyboxType::CONV_DIFFUSE)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		UpVectorBuffer* dataPtr;
 		unsigned int bufferNumber;
 
 		HRESULT result = deviceContext->Map(m_upVectorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		if (FAILED(result))
 			return false;
 
-		dataPtr = (UpVectorBuffer*)mappedResource.pData;
+		UpVectorBuffer* dataPtr = static_cast<UpVectorBuffer*>(mappedResource.pData);
 		dataPtr->upVector = m_upVector;
 		dataPtr->rightVectorDirection = m_rightVectorDirection;
 
@@ -77,14 +76,13 @@ bool SkyboxShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	else if (m_skyboxType == SkyboxType::ENVIRO)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		UpVectorBuffer* dataPtr;
 		unsigned int bufferNumber;
 
 		HRESULT result = deviceContext->Map(m_upVectorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		if (FAILED(result))
 			return false;
 
-		dataPtr = (UpVectorBuffer*)mappedResource.pData;
+		UpVectorBuffer* dataPtr = static_cast<UpVectorBuffer*>(mappedResource.pData);
 		dataPtr->upVector = m_upVector;
 		dataPtr->rightVectorDirection = m_roughness;
 

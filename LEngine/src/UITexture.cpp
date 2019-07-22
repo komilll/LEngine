@@ -1,5 +1,6 @@
 #include "UITexture.h"
 
+//TODO Replace by constructor
 bool UITexture::Initialize(D3DClass * d3d, float centerX, float centerY, float size, wchar_t * textureFilename)
 {
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"textureShader.vs", L"textureShader.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))

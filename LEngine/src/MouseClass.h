@@ -33,7 +33,7 @@ public:
 	bool GetLMBPressed() const;
 	bool GetRMBPressed() const;
 	bool GetMMBPressed() const;
-	int GetMouseScroll() const;
+	float GetMouseScroll() const;
 
 	POINT CurrentMouseLocation() const;
 	std::pair<float, float> MouseFrameMovement();

@@ -16,13 +16,10 @@ UIShaderPBRBlock::UIShaderPBRBlock(XMFLOAT2 startPosition)
 
 bool UIShaderPBRBlock::MouseOnArea(MouseClass * mouse)
 {
-	bool result = false;
-	float mouseX{ 0 };
-	float mouseY{ 0 };
-	POINT p = mouse->CurrentMouseLocation();
+	const POINT p = mouse->CurrentMouseLocation();
 
 	//Calculate mouse X
-	mouseX = (float)p.x / (float)m_D3D->GetWindowSize().x;
+	float mouseX = static_cast<float>(p.x) / static_cast<float>(m_D3D->GetWindowSize().x);
 	mouseX = mouseX * 2.0f - 1.0f;
 	if (mouseX > 1.0f)
 		mouseX = 1.0f;
@@ -30,7 +27,7 @@ bool UIShaderPBRBlock::MouseOnArea(MouseClass * mouse)
 		mouseX = -1.0f;
 
 	//Calculate mouse Y
-	mouseY = (float)p.y / (float)m_D3D->GetWindowSize().y;
+	float mouseY = static_cast<float>(p.y) / static_cast<float>(m_D3D->GetWindowSize().y);
 	mouseY = mouseY * 2.0f - 1.0f;
 	if (mouseY > 1.0f)
 		mouseY = 1.0f;
@@ -42,12 +39,13 @@ bool UIShaderPBRBlock::MouseOnArea(MouseClass * mouse)
 	if (mouseX >(m_blockVertices.minX + m_translationX) * m_scale && mouseX < (m_blockVertices.maxX + m_translationX) * m_scale &&
 		mouseY >(m_blockVertices.minY + m_translationY) * m_scale && mouseY < (m_blockVertices.maxY + m_translationY) * m_scale)
 	{
-		result = true;
+		return true;
 	}
 
-	return result;
+	return false;
 }
 
+//TODO Replace by constructor
 bool UIShaderPBRBlock::Initialize(D3DClass * d3d)
 {
 	m_D3D = d3d;
@@ -102,7 +100,7 @@ void UIShaderPBRBlock::StopDragging()
 	m_dragged = false;
 }
 
-bool UIShaderPBRBlock::IsDragging()
+bool UIShaderPBRBlock::IsDragging() const
 {
 	return m_dragged;
 }
@@ -115,10 +113,10 @@ void UIShaderPBRBlock::SetScale(float scale)
 bool UIShaderPBRBlock::TryToMarkBlock(RectangleVertices markingBounds)
 {
 	int correctPos = 0; //Need to get 2 points
-	float minX = m_blockVertices.minX + m_translationX;
-	float maxX = m_blockVertices.maxX + m_translationX;
-	float minY = m_blockVertices.minY + m_translationY;
-	float maxY = m_blockVertices.maxY + m_translationY;
+	const float minX = m_blockVertices.minX + m_translationX;
+	const float maxX = m_blockVertices.maxX + m_translationX;
+	const float minY = m_blockVertices.minY + m_translationY;
+	const float maxY = m_blockVertices.maxY + m_translationY;
 
 	//TEST X POSITION
 	//Block in middle X
@@ -173,10 +171,6 @@ UIShaderPBRBlock::Size UIShaderPBRBlock::GetPosition()
 
 bool UIShaderPBRBlock::Render(ID3D11DeviceContext * deviceContext)
 {
-	//XMMATRIX tmpMatrix;
-	//tmpMatrix *= 0;
-	//tmpMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
-
 	XMMATRIX worldMatrix = XMMatrixIdentity();
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
@@ -235,7 +229,7 @@ bool UIShaderPBRBlock::InitializeInputNodes()
 			return false;
 		}
 		inputNode->ChangeColor(1.0f, 1.0f, 1.0f, 1.0f);
-		inputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);
+		inputNode->Move(0.0f, -static_cast<float>(i) * paddingBetweenBlocks);
 
 		m_inputNodes.push_back(inputNode);
 	}

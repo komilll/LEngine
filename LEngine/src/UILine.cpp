@@ -1,10 +1,6 @@
 #include "UILine.h"
 
-UILine::UILine()
-{
-	UIBase::UIBase();
-}
-
+//TODO Use constructor
 bool UILine::Initialize(D3DClass * d3d, UIShaderEditorOutput * startPin, UIShaderEditorInput * endPin, float scale)
 {
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
@@ -56,10 +52,9 @@ bool UILine::CalculateLine()
 
 	m_xDiff = (endPinX - startPinX);
 	m_yDiff = (endPinY - startPinY);
-	float lineLength = std::sqrt(m_xDiff * m_xDiff + m_yDiff * m_yDiff);
+	const float lineLength = std::sqrt(m_xDiff * m_xDiff + m_yDiff * m_yDiff);
 
 	m_startPin->GetPosition(m_translationX, m_translationY);
-
 	m_vertices = RectangleVertices{ 0.0f, lineLength, 0.0f, lineThickness };
 
 	return InitializeModelGeneric(m_D3D->GetDevice(), m_vertices);

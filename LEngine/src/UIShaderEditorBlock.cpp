@@ -29,12 +29,10 @@ UIShaderEditorBlock::UIShaderEditorBlock(XMFLOAT2 startPosition, std::string fun
 
 bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 {
-	float mouseX{ 0 };
-	float mouseY{ 0 };
-	POINT p = mouse->CurrentMouseLocation();
-
+	const POINT p = mouse->CurrentMouseLocation();
+	
 	//Calculate mouse X
-	mouseX = (float)p.x / (float)m_D3D->GetWindowSize().x;
+	float mouseX = static_cast<float>(p.x) / static_cast<float>(m_D3D->GetWindowSize().x);
 	mouseX = mouseX * 2.0f - 1.0f;
 	if (mouseX > 1.0f)
 		mouseX = 1.0f;
@@ -42,7 +40,7 @@ bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 		mouseX = -1.0f;
 
 	//Calculate mouse Y
-	mouseY = (float)p.y / (float)m_D3D->GetWindowSize().y;
+	float mouseY = static_cast<float>(p.y) / static_cast<float>(m_D3D->GetWindowSize().y);
 	mouseY = mouseY * 2.0f - 1.0f;
 	if (mouseY > 1.0f)
 		mouseY = 1.0f;
@@ -62,6 +60,7 @@ bool UIShaderEditorBlock::MouseOnArea(MouseClass * mouse)
 
 bool UIShaderEditorBlock::Initialize(D3DClass * d3d, int inCount, int outCount)
 {
+	//TODO Why late initialization? Cannot be done in constructor?
 	m_D3D = d3d;
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))
 		return false;
@@ -139,12 +138,12 @@ void UIShaderEditorBlock::StopDragging()
 	m_dragged = false;
 }
 
-bool UIShaderEditorBlock::IsDragging()
+bool UIShaderEditorBlock::IsDragging() const
 {
 	return m_dragged;
 }
 
-bool UIShaderEditorBlock::IsPinDragging()
+bool UIShaderEditorBlock::IsPinDragging() const
 {
 	return m_pinDragged;
 }
@@ -221,16 +220,12 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
 
-	//worldMatrix *= 0;
-	//worldMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
-
 	if (m_focused && m_outlineObject)
 	{
 		//Render outline
 		if (m_outlineObject && !m_outlineObject->Render(deviceContext, 0, worldMatrix, worldMatrix * 0, worldMatrix * 0))
 			return false;
 	}
-	//worldMatrix.r[0] = XMVECTOR{ m_translationX, m_translationY, 0, 0 };
 	worldMatrix = XMMatrixIdentity();
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_translationX, m_translationY, 0.0f));
 	worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(m_scale, m_scale, m_scale));
@@ -251,6 +246,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 
 		if (m_textEngine)
 		{
+			//TODO Too many code repetition - create function
 			if (m_functionName == "float")
 			{
 				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale, 
@@ -409,9 +405,9 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 		return false;
 }
 
-std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
+std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator) const
 {	
-	std::string func{};
+	std::string func;
 	if (GetInputCount() == 0) //Variable
 	{
 		func = { (skipTabulator ? "" : "\t") };
@@ -531,7 +527,7 @@ std::string UIShaderEditorBlock::GenerateShaderCode(bool skipTabulator)
 	return func;
 }
 
-std::string UIShaderEditorBlock::ConvertType(std::string outName, std::string typeIn, std::string typeOut)
+std::string UIShaderEditorBlock::ConvertType(std::string outName, std::string typeIn, std::string typeOut) const
 {
 	if (typeIn == typeOut)
 	{
@@ -561,7 +557,7 @@ std::string UIShaderEditorBlock::ConvertType(std::string outName, std::string ty
 	return "ERROR";
 }
 
-int UIShaderEditorBlock::GetInputCount()
+int UIShaderEditorBlock::GetInputCount() const
 {
 	return m_inputNodes.size();
 }
@@ -582,12 +578,12 @@ UIShaderEditorOutput * UIShaderEditorBlock::GetFirstOutputNode()
 		return nullptr;
 }
 
-std::string UIShaderEditorBlock::GetFunctionName()
+std::string UIShaderEditorBlock::GetFunctionName() const
 {
 	return m_functionName;
 }
 
-std::string UIShaderEditorBlock::GetReturnType()
+std::string UIShaderEditorBlock::GetReturnType() const
 {
 	return m_returnType;
 }
@@ -599,11 +595,11 @@ void UIShaderEditorBlock::SetScale(float scale)
 
 bool UIShaderEditorBlock::TryToMarkBlock(RectangleVertices markingBounds)
 {
-	int correctPos = 0; //Need to get 2 points
-	float minX = m_blockVertices.minX + m_translationX;
-	float maxX = m_blockVertices.maxX + m_translationX;
-	float minY = m_blockVertices.minY + m_translationY;
-	float maxY = m_blockVertices.maxY + m_translationY;
+	int correctPos = 0; //Need to get 2 points - correct X axis and correct Y axis
+	const float minX = m_blockVertices.minX + m_translationX;
+	const float maxX = m_blockVertices.maxX + m_translationX;
+	const float minY = m_blockVertices.minY + m_translationY;
+	const float maxY = m_blockVertices.maxY + m_translationY;
 
 //TEST X POSITION
 	//Block in middle X
@@ -658,10 +654,11 @@ UIShaderEditorBlock::Size UIShaderEditorBlock::GetPosition() const
 
 void UIShaderEditorBlock::ChangeBlockName()
 {
+	//TODO ChangeBlockName - unused?
 	//m_textEngine->GetData(0)->text = GetFirstOutputNode()->GetVisibleName();
 }
 
-int UIShaderEditorBlock::GetBlockID()
+int UIShaderEditorBlock::GetBlockID() const
 {
 	return m_blockID;
 }
@@ -675,6 +672,7 @@ void UIShaderEditorBlock::UpdateVariable()
 
 void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 {
+	//TODO Create function
 	int inOutCount = inCount > outCount ? inCount : outCount;
 	Size blockSize = blockSizeVector[inOutCount - 1];
 	blockSize.x = 0.1f;
@@ -735,7 +733,7 @@ void UIShaderEditorBlock::CalculateBlockSize(int inCount, int outCount)
 	m_blockVertices.maxY = blockSize.y * 0.5f;
 }
 
-UIBase::RectangleVertices UIShaderEditorBlock::CalculateOutlineSize(UIBase::RectangleVertices blockSize)
+UIBase::RectangleVertices UIShaderEditorBlock::CalculateOutlineSize(UIBase::RectangleVertices blockSize) const
 {
 	return RectangleVertices{ blockSize.minX - outlineMargin, blockSize.maxX + outlineMargin, blockSize.minY - outlineMargin, blockSize.maxY + outlineMargin };
 }
@@ -752,9 +750,9 @@ bool UIShaderEditorBlock::InitializeInputNodes(int count)
 		{
 			return false;
 		}
-		inputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);		
+		inputNode->Move(0.0f, -static_cast<float>(i) * paddingBetweenBlocks);		
 
-		m_inputNodes.push_back(inputNode);
+		m_inputNodes.push_back(std::move(inputNode));
 	}
 
 	return true;
@@ -774,7 +772,7 @@ bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 		}
 		outputNode->Move(0.0f, -(float)i * paddingBetweenBlocks);				
 
-		m_outputNodes.push_back(outputNode);
+		m_outputNodes.push_back(std::move(outputNode));
 	}
 	if (m_outputNodes.size() == 1 && m_inputNodes.size() == 0)
 	{
@@ -784,7 +782,7 @@ bool UIShaderEditorBlock::InitializeOutputNodes(int count)
 	return true;
 }
 
-std::string UIShaderEditorBlock::ReturnEmptyForGivenType(std::string type)
+std::string UIShaderEditorBlock::ReturnEmptyForGivenType(std::string type) const
 {
 	if (type == "float")
 		return "0.0f";
@@ -798,7 +796,7 @@ std::string UIShaderEditorBlock::ReturnEmptyForGivenType(std::string type)
 	return "";
 }
 
-UIShaderEditorInput* UIShaderEditorBlock::CheckIfMouseOnInputPin(MouseClass* mouse)
+UIShaderEditorInput* UIShaderEditorBlock::CheckIfMouseOnInputPin(MouseClass* mouse) const
 {
 	for (const auto& pin : m_inputNodes)
 	{

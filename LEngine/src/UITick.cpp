@@ -1,10 +1,5 @@
 #include "UITick.h"
 
-UITick::UITick()
-{
-	UIBase::UIBase();
-}
-
 bool UITick::Initialize(D3DClass * d3d, float positionX, float positionY, float size)
 {
 	if (!BaseShaderClass::Initialize(d3d->GetDevice(), *d3d->GetHWND(), UI_SHADER_VS, UI_SHADER_PS, BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))

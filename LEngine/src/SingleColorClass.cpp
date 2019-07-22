@@ -38,7 +38,6 @@ bool SingleColorClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, X
 
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	LightBuffer* dataPtr2;
 	unsigned int bufferNmber;
 
 	/////// VERTEX BUFFERS ///////
@@ -47,7 +46,7 @@ bool SingleColorClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, X
 	if (FAILED(result))
 		return false;
 
-	dataPtr2 = (LightBuffer*)mappedResource.pData;
+	LightBuffer* dataPtr2 = static_cast<LightBuffer*>(mappedResource.pData);
 	dataPtr2->lightPosition = m_lightPosition;
 	dataPtr2->lightViewMatrix = m_lightViewMatrix;
 	dataPtr2->lightProjectionMatrix = m_lightProjectionMatrix;
@@ -55,7 +54,7 @@ bool SingleColorClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, X
 
 	deviceContext->Unmap(m_lightBuffer, 0);
 	int bufferNumber = 1;
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	deviceContext->VSSetConstantBuffers(bufferNumber++, 1, &m_lightBuffer);
 
 	/////// PIXEL BUFFERS ///////
 	/////// --- EMPTY --- ///////

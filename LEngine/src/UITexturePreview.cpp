@@ -1,5 +1,6 @@
 #include "UITexturePreview.h"
 
+//TODO Replace by constructor
 bool UITexturePreview::Initialize(D3DClass * d3d, float centerX, float centerY, float size, wchar_t* textureFilename)
 {
 	m_D3D = d3d;
@@ -97,8 +98,6 @@ std::string UITexturePreview::TextureChooseWindow(D3DClass* d3d, ID3D11Resource 
 							}
 						}
 					}
-					//if (onlyPreview == false)
-					//	BaseShaderClass::LoadTexture(d3d->GetDevice(), wFilePath, *m_externalTexture, *m_externalTextureView);
 
 					CoTaskMemFree(pszFilePath);
 				}

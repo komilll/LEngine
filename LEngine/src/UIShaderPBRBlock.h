@@ -9,6 +9,7 @@
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderPBRBlock : public UIBase
 {
+	//TODO Should be sibling of UIShaderEditorBlock
 private:
 	struct Size
 	{
@@ -38,7 +39,7 @@ public:
 	void Move(float x, float y);
 	void StartDragging();
 	void StopDragging();
-	bool IsDragging();
+	bool IsDragging() const;
 	void SetScale(float scale);
 	bool TryToMarkBlock(RectangleVertices markingBounds);
 	UIShaderPBRBlock::Size GetPosition();

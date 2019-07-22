@@ -19,18 +19,14 @@ class UIBase : public BaseShaderClass
 public:
 	struct RectangleVertices
 	{
-		float minX;
-		float maxX;
-		float minY;
-		float maxY;
+		float minX{ 0.0f };
+		float maxX{ 0.0f };
+		float minY{ 0.0f };
+		float maxY{ 0.0f };
 
-		RectangleVertices()
-		{
-			RectangleVertices(0, 0, 0, 0);
-		}
+		RectangleVertices() = default;
 		RectangleVertices(float minX, float maxX, float minY, float maxY) :
-			minX(minX), maxX(maxX), minY(minY), maxY(maxY)
-		{}
+			minX(minX), maxX(maxX), minY(minY), maxY(maxY) {}
 	};
 
 private:
@@ -40,8 +36,6 @@ private:
 	};
 
 public:
-	UIBase();
-
 	virtual bool Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix);
 	virtual bool MouseOnArea(MouseClass* mouse);
 	
@@ -67,7 +61,7 @@ protected:
 
 protected:
 	ModelClass* m_model;
-	XMFLOAT4 m_uiColor = XMFLOAT4(1.0, 1.0, 1.0, 1.0);
+	XMFLOAT4 m_uiColor{ 1.0, 1.0, 1.0, 1.0 };
 
 	ID3D11Buffer* m_appearanceBuffer;
 	ID3D11Buffer* m_positionBuffer;

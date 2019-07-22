@@ -1,11 +1,9 @@
 #include "TextEngine.h"
 
-TextEngine::TextEngine()
-{
-}
-
 void TextEngine::Initialize(ID3D11Device* device, wchar_t const* fontPath)
 {
+	//TODO Do in constructor
+	//TODO Should it be unique pointer?
 	m_font = std::make_unique<DirectX::SpriteFont>(device, fontPath);
 }
 
@@ -13,8 +11,9 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 {
 	FontData data;
 
+	//TODO Why unique ptr?
 	m_spriteBatch = std::make_unique<SpriteBatch>(deviceContext);
-	std::wstring wstr = std::wstring(text_.begin(), text_.end());
+	const std::wstring wstr = std::wstring(text_.begin(), text_.end());
 
 	//Measure new text length and change position based on aligments
 	data.posX = screenWidth * (0.5f + posX * 0.5f);
@@ -37,20 +36,20 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 
 void TextEngine::RenderText(ID3D11DeviceContext * deviceContext, float screenWidth, float screenHeight)
 {
-	DirectX::XMVECTOR fontPos;
+	DirectX::XMVECTOR fontPos{ 0.0f, 0.0f };
 
 	if (m_spriteBatch)
 	{
 		m_spriteBatch->Begin();
 		//Fetch data from list and render each text
-		for (int i = 0; i < m_data.size(); i++)
+		for (const auto& data : m_data)
 		{
-			fontPos.m128_f32[0] = m_data.at(i).posX;
-			fontPos.m128_f32[1] = m_data.at(i).posY;
+			fontPos.m128_f32[0] = data.posX;
+			fontPos.m128_f32[1] = data.posY;
 
-			std::wstring wstr = std::wstring(m_data.at(i).text.begin(), m_data.at(i).text.end());
+			std::wstring wstr = std::wstring(data.text.begin(), data.text.end());
 
-			m_font->DrawString(m_spriteBatch.get(), wstr.c_str(), fontPos, m_data.at(i).color, 0.0f, m_data.at(i).origin, m_data.at(i).scale);
+			m_font->DrawString(m_spriteBatch.get(), wstr.c_str(), fontPos, data.color, 0.0f, data.origin, data.scale);
 		}
 		m_spriteBatch->End();
 	}

@@ -416,8 +416,8 @@ public:
 	void CopyBlocks();
 	void PasteBlocks();
 
-	bool MouseAboveEditorPreview();
-	std::pair<float, float> GetCurrentMousePosition();
+	bool MouseAboveEditorPreview() const;
+	std::pair<float, float> GetCurrentMousePosition() const;
 
 	void SaveScene(const std::string name);
 	bool ImGuiHovered() const { return m_shaderEditorManager->IsMouseHoveredOnImGui(); };
@@ -443,7 +443,6 @@ private:
 	void ReinitializeMainModel();
 	void RefreshModelTick();
 
-	bool RenderDebugSettings();
 	bool RenderSkybox();
 	//BILINEAR SCREEN BLUR
 	bool RenderSceneToTexture();

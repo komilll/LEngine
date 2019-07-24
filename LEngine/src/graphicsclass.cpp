@@ -159,17 +159,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_shadowQuadModel = new ModelClass;
 	m_shadowQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f);
 	
-	ifstream skyboxFile{ "Skyboxes/cubemap.dds" };
-	if (skyboxFile.fail())
+	if (std::ifstream skyboxFile{ "Skyboxes/cubemap.dds" })
+	{ }
+	else
 	{
 		system("texassemble cube -w 512 -h 512 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.bmp Skyboxes/negx.bmp Skyboxes/posy.bmp Skyboxes/negy.bmp Skyboxes/posz.bmp Skyboxes/negz.bmp");
-		skyboxFile.open("Skyboxes/cubemap.dds");
-		if (skyboxFile.fail())
+		if (std::ifstream skyboxFile{ "Skyboxes/cubemap.dds" })
+		{ }
+		else
 		{
 			system("texassemble cube -w 512 -h 512 -f R8G8B8A8_UNORM -o Skyboxes/cubemap.dds Skyboxes/posx.jpg Skyboxes/negx.jpg Skyboxes/posy.jpg Skyboxes/negy.jpg Skyboxes/posz.jpg Skyboxes/negz.jpg");
-			skyboxFile.open("Skyboxes/cubemap.dds");
-			if (skyboxFile.fail())
+			if (std::ifstream skyboxFile{ "Skyboxes/cubemap.dds" })
+			{ }
+			else
+			{
 				return false;
+			}
 		}
 	}
 	//LOAD SKYBOX
@@ -177,7 +182,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_skyboxShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"skybox.vs", L"skybox.ps", input))
 		return false;
 
-	skyboxFile.close();
 	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
 	
 	//RENDER SCENE TO TEXTURE
@@ -323,7 +327,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Create kernel for SSAO
-	std::uniform_real_distribution<float> randomFloats{ 0.0f, 1.0f };
+	const std::uniform_real_distribution<float> randomFloats{ 0.0f, 1.0f };
 	std::default_random_engine generator;
 	XMFLOAT3 tmpSample;
 	std::array<XMFLOAT3, 64> ssaoKernel;
@@ -332,50 +336,24 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	for (int i = 0; i < SSAO_KERNEL_SIZE; i++)
 	{
 		//Generate random vector3 ([-1, 1], [-1, 1], [0, 1])
-		tmpSample.x = randomFloats(generator) * 2.0f - 1.0f;
-		tmpSample.y = randomFloats(generator) * 2.0f - 1.0f;
-		tmpSample.z = randomFloats(generator);
-
+		XMVECTOR tmpVector = { randomFloats(generator) * 2.0f - 1.0f, randomFloats(generator) * 2.0f - 1.0f, randomFloats(generator) };
 		//Normalize vector3
-		XMVECTOR tmpVector;
-		tmpVector.m128_f32[0] = tmpSample.x;
-		tmpVector.m128_f32[1] = tmpSample.y;
-		tmpVector.m128_f32[2] = tmpSample.z;
-
 		tmpVector = XMVector3Normalize(tmpVector);
-		
-		tmpSample.x = tmpVector.m128_f32[0];
-		tmpSample.y = tmpVector.m128_f32[1];
-		tmpSample.z = tmpVector.m128_f32[2];
-
-		//Multiply by random value all coordinates of vector3
-		//float randomMultiply = randomFloats(generator);
-		//tmpSample.x *= randomMultiply;
-		//tmpSample.y *= randomMultiply;
-		//tmpSample.z *= randomMultiply;
 
 		//Scale samples so they are more aligned to middle of hemisphere
 		float scale = float(i) / 64.0f;
 		scale = lerp(0.1f, 1.0f, scale * scale);
-		tmpSample.x *= scale;
-		tmpSample.y *= scale;
-		tmpSample.z *= scale;
+		tmpVector.m128_f32[0] *= scale;
+		tmpVector.m128_f32[1] *= scale;
+		tmpVector.m128_f32[2] *= scale;
 
 		//Pass value to array
-		ssaoKernel[i] = tmpSample;
+		ssaoKernel[i] = { tmpVector.m128_f32[0], tmpVector.m128_f32[1], tmpVector.m128_f32[2] };
 	}
 
 	for (int i = 0; i < 16; ++i)
 	{
 		ssaoNoise[i] = { randomFloats(generator), randomFloats(generator) };
-	}
-
-	int a[3];
-	for (int i = 0; i < 16; ++i)
-	{
-		a[0] = 1;
-		a[1] = 2;
-		a[2] = 3;
 	}
 
 	//Create SSAO noise texture
@@ -391,7 +369,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_ssaoTexture = new RenderTextureClass;
 	if (!m_ssaoTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight))
 		return false;
-	//m_ssaoTexture->GetShaderResourceView() = nullptr;
 
 	m_postSSAOTexture = new RenderTextureClass;
 	if (!m_postSSAOTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight))
@@ -454,29 +431,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
 
-	//constexpr int rowCount = 10;
+	//TODO Replace by empty or load last scene
 	LoadScene("test.txt");
-	//for (int i = 0; i < rowCount; ++i)
-	//{
-	//	for (int j = 0; j < rowCount; ++j)
-	//	{
-	//		ModelClass* model = new ModelClass;
-	//		//model->Initialize(m_D3D, "bunny.obj", false);
-	//		//model->SetPosition(0.25f * i, 0.25f * j, 10.0f);
-	//		m_sceneModels.push_back(std::move(model));
-	//	}
-	//}
-
-	//auto start = GetTimeMillis();
-	//for (const auto& model : m_sceneModels)
-	//{ 
-	//	model->Initialize(m_D3D, "bunny.obj", false);
-	//}
-	//auto end = GetTimeMillis();
-	//if (ofstream out{ "measure.txt" })
-	//{
-	//	out << (end - start);
-	//}
 
 	m_modelPicker = new ModelPicker(m_D3D);
 
@@ -489,7 +445,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-
+	//TODO Upgrade or remove completely
 	// Release the model object.
 	if(m_Model)
 	{
@@ -518,31 +474,14 @@ void GraphicsClass::Shutdown()
 
 bool GraphicsClass::Frame()
 {
-	bool result;
 	static int timer = 0;
-	timer++;
-	if (timer % 300 == 0)
+	if (timer++ % 300 == 0)
 	{
 		timer = 0;
 		SaveScene("test.txt");
 	}
 
-	// Render the graphics scene.
-	//m_rotationY += 0.01f;
-	if (m_rotationY >= 360.0f)
-		m_rotationY = 0.0f;
-
-	//if (m_directionalLight->GetPosition().x > 5.0f)
-	//	m_directionalLight->SetPosition(0.0f, m_directionalLight->GetPosition().y, m_directionalLight->GetPosition().z);
-	//m_directionalLight->SetPosition(m_directionalLight->GetPosition().x + 0.01f, m_directionalLight->GetPosition().y , m_directionalLight->GetPosition().z);
-
-	result = Render();
-	if(!result)
-	{
-		return false;
-	}
-
-	return true;
+	return Render();
 }
 
 void GraphicsClass::MoveCameraForward(float val)
@@ -598,93 +537,6 @@ void GraphicsClass::UpdateUI()
 		m_shaderEditorManager->UpdateBlocks();
 	}
 	m_D3D->DisableAlphaBlending();
-
-	return;
-
-	if (m_mouse == nullptr)
-		return;
-
-	if (m_mouse->GetMouse()->GetLMBPressed())
-	{
-		if (m_roughnessSlider->IsChanging())
-		{
-			m_roughnessSlider->ChangeSliderValue(m_mouse->GetMouse());
-		}
-		else if (m_metalnessSlider->IsChanging())
-		{
-			m_metalnessSlider->ChangeSliderValue(m_mouse->GetMouse());
-		}
-
-		if (m_mouse->GetMouse()->isInputConsumed == true)
-			return;
-
-		if (m_roughnessSlider->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_roughnessSlider->StartUsing();
-			m_roughnessSlider->ChangeSliderValue(m_mouse->GetMouse());
-		}
-		else if (m_metalnessSlider->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_metalnessSlider->StartUsing();
-			m_metalnessSlider->ChangeSliderValue(m_mouse->GetMouse());
-		}
-		else if (m_texturePreviewRoughness->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewRoughness->TextureChooseWindow(*m_D3D->GetHWND());
-		}
-		else if (m_texturePreviewMetalness->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewMetalness->TextureChooseWindow(*m_D3D->GetHWND());
-		}
-		else if (m_texturePreviewNormal->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewNormal->TextureChooseWindow(*m_D3D->GetHWND());
-		}
-		else if (m_texturePreviewAlbedo->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewAlbedo->TextureChooseWindow(*m_D3D->GetHWND());
-		}
-	}
-	else if (m_mouse->GetMouse()->GetRMBPressed())
-	{
-		if (m_mouse->GetMouse()->isInputConsumed == true)
-			return;
-
-		if (m_texturePreviewRoughness->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewRoughness->DeleteTexture();
-		}
-		else if (m_texturePreviewMetalness->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewMetalness->DeleteTexture();
-		}
-		else if (m_texturePreviewNormal->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewNormal->DeleteTexture();
-		}
-		else if (m_texturePreviewAlbedo->MouseOnArea(m_mouse->GetMouse()))
-		{
-			m_mouse->GetMouse()->isInputConsumed = true;
-			m_texturePreviewAlbedo->DeleteTexture();
-		}
-	}
-	else
-	{
-		m_mouse->GetMouse()->isInputConsumed = false;
-		if (m_roughnessSlider->IsChanging())
-			m_roughnessSlider->EndUsing();
-		if (m_metalnessSlider->IsChanging())
-			m_metalnessSlider->EndUsing();
-	}
 }
 
 void GraphicsClass::UpdateShaderEditorMouseOnly()
@@ -699,7 +551,7 @@ void GraphicsClass::SetMouseRef(MouseClass * mouse)
 {
 	ShowCursor(true);
 	m_mouse->SetMouse(mouse);
-	if (m_mouse->GetModel() == nullptr)
+	if (!m_mouse->GetModel())
 		m_mouse->InitializeMouse();
 
 	if (!CreateShaderEditor())
@@ -708,7 +560,7 @@ void GraphicsClass::SetMouseRef(MouseClass * mouse)
 
 MouseClass* GraphicsClass::GetMouse()
 {
-	if (m_mouse == nullptr)
+	if (!m_mouse)
 		return nullptr;
 
 	return m_mouse->GetMouse();
@@ -727,10 +579,6 @@ TextEngine::FontData * GraphicsClass::AddText(float && posX, float && posY, std:
 void GraphicsClass::ChangeRenderWindow()
 {
 	RENDER_MATERIAL_EDITOR = !RENDER_MATERIAL_EDITOR;
-	//if (m_spherePreviewModel)
-	//{
-	//	m_spherePreviewModel->SetPosition(0.0f, 0.0f, 2.0f);
-	//}
 	if (!RENDER_MATERIAL_EDITOR)
 	{
 		ReinitializeMainModel();
@@ -795,12 +643,12 @@ void GraphicsClass::PasteBlocks()
 	m_shaderEditorManager->PasteBlocks();
 }
 
-bool GraphicsClass::MouseAboveEditorPreview()
+bool GraphicsClass::MouseAboveEditorPreview() const
 {
 	return m_shaderEditorManager->MouseAbovePreview();
 }
 
-std::pair<float, float> GraphicsClass::GetCurrentMousePosition()
+std::pair<float, float> GraphicsClass::GetCurrentMousePosition() const
 {
 	return m_shaderEditorManager->GetCurrentMousePosition();
 }
@@ -808,7 +656,6 @@ std::pair<float, float> GraphicsClass::GetCurrentMousePosition()
 bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -821,6 +668,7 @@ bool GraphicsClass::Render()
 
 	if (BLUR_BILINEAR)
 	{
+		//TODO Test if blur is working
 		if (!RenderSceneToTexture())
 			return false;
 
@@ -829,8 +677,7 @@ bool GraphicsClass::Render()
 		BlurFilterScreenSpace(true);
 		UpscaleTexture();
 
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 	}
 	else
@@ -857,22 +704,18 @@ bool GraphicsClass::Render()
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 			//STANDARD SCENE RENDERING		
-			result = RenderScene();
-			if (!result)
+			if (!RenderScene())
 				return false;
 		}
 		else
 		{
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-			//result = RenderScene();
-			result = RenderMaterialPreview();
-			if (!result)
+			if (!RenderMaterialPreview())
 				return false;
 			
 			m_renderTexturePreview->BindTexture(m_shaderPreview->GetShaderResourceView());
-			result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-			if (!result)
+			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 				return false;
 
 			m_D3D->ResetViewport();
@@ -888,11 +731,6 @@ bool GraphicsClass::Render()
 		//m_skyboxPreviewDown->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		//m_skyboxPreviewForward->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		//m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	}
-
-	if (ENABLE_DEBUG)
-	{
-		RenderDebugSettings();
 	}
 
 	if (ENABLE_GUI)
@@ -912,7 +750,7 @@ bool GraphicsClass::RenderSceneToTexture()
 
 	m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
 
-	if (RenderScene() == false)
+	if (!RenderScene())
 		return false;
 
 	m_D3D->SetBackBufferRenderTarget();
@@ -923,7 +761,6 @@ bool GraphicsClass::RenderSceneToTexture()
 bool GraphicsClass::RenderScene()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix;
-	bool result;
 
 	m_Camera->Render();
 
@@ -946,13 +783,12 @@ bool GraphicsClass::RenderScene()
 		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	//m_D3D->TurnZBufferOff();
 	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
-
 	for (ModelClass* const& model : m_sceneModels)
 	{
 		if (!model->GetMaterial())
 		{
+			//TODO Create function - repeated in code many times
 			if (m_materialList.find("pbr") == m_materialList.end())
 			{
 				m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
@@ -960,9 +796,6 @@ bool GraphicsClass::RenderScene()
 			model->SetMaterial(m_materialList.at("pbr"));
 			continue;
 		}
-		//model->Render(m_D3D->GetDeviceContext());
-		////XMVECTOR light_ = XMVector3Rotate(XMVECTOR{ -1.0f, 0.0, -1.0f, 0.0f }, XMVECTOR{ m_Camera->GetRotation().x / 3.14f, m_Camera->GetRotation().y / 3.14f, m_Camera->GetRotation().z / 3.14f, 0.0f });
-		//m_pbrShader->m_lightDirection = XMFLOAT4(light_.m128_f32[0], 0.0, light_.m128_f32[2], 1.2f);
 
 		m_Camera->GetViewMatrix(viewMatrix);
 		m_D3D->GetWorldMatrix(worldMatrix);
@@ -974,14 +807,12 @@ bool GraphicsClass::RenderScene()
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
-		//m_pbrShader->m_cameraPosition = m_Camera->GetPosition();
 		model->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
 		model->Render(m_D3D->GetDeviceContext());
-		//result = m_pbrShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		result = model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 
+		//TODO Add flag for rendering wireframe
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
 		for (const auto& wireframe : model->GetWireframeList())
 		{
@@ -996,13 +827,11 @@ bool GraphicsClass::RenderScene()
 			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
 			wireframe->Render(m_D3D->GetDeviceContext());
-			result = m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-			if (!result)
+			if(!m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 				return false;
 		}
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
-	//m_D3D->TurnZBufferOn();
 
 	if (DRAW_SKYBOX)
 	{
@@ -1011,24 +840,7 @@ bool GraphicsClass::RenderScene()
 	}
 	m_D3D->SetBackBufferRenderTarget();
 
-	//METALNESS / ROUGHNESS presentation
-	//result = m_colorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//if (!result)
-	//	return false;
-	//for (float x = 0; x < 6; x++)
-	//{
-	//	for (float y = 0; y < 6; y++)
-	//	{
-	//		worldMatrix = XMMatrixIdentity();
-	//		worldMatrix = XMMatrixTranslation(x * 1.25f, y * 1.25f, 0.0f);
-	//		m_pbrShader->SetRoughness(x / 6.0f);
-	//		m_pbrShader->SetMetalness(y / 6.0f);
-	//		result = m_pbrShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//		if (!result)
-	//			return false;
-	//	}
-	//}
-
+	//TODO Test post-process stack
 	if (!m_postprocessSSAO)
 		m_postProcessShader->ResetSSAO();
 	if (!m_postprocessBloom)
@@ -1055,6 +867,7 @@ bool GraphicsClass::RenderScene()
 
 	if (m_postprocessBloom)
 	{
+		//TODO Every frame initialization?
 		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
@@ -1083,7 +896,8 @@ bool GraphicsClass::RenderScene()
 
 		BlurFilterScreenSpace(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
 		BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-		for (int i = 0; i < 10; i++)
+		constexpr int numberOfBlurRepeats{ 10 };
+		for (int i = 0; i < numberOfBlurRepeats; i++)
 		{
 			BlurFilterScreenSpace(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
 			BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
@@ -1103,8 +917,7 @@ bool GraphicsClass::RenderScene()
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
 		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 	}
 	
@@ -1143,8 +956,7 @@ bool GraphicsClass::RenderScene()
 		m_D3D->EnableAlphaBlending();
 
 		m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 
 		m_D3D->DisableAlphaBlending();
@@ -1155,7 +967,7 @@ bool GraphicsClass::RenderScene()
 	//m_cubeModel->Render(m_D3D->GetDeviceContext());
 	//m_colorShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
-	//SHADOWMAPPING presentation
+	//TODO SHADOWMAPPING presentation
 	//for (int i = 0; i < 5; i++)
 	//{
 	//	m_Camera->GetViewMatrix(viewMatrix);
@@ -1179,7 +991,6 @@ bool GraphicsClass::RenderScene()
 
 	//Draw model picker
 	m_D3D->TurnZBufferOff();
-	//for (ModelClass* const& model : m_sceneModels)
 	if (m_selectedModel)
 	{
 		m_Camera->GetViewMatrix(viewMatrix);
@@ -1208,7 +1019,6 @@ bool GraphicsClass::RenderMaterialPreview()
 	MaterialPrefab* const material = m_materialList.at(materialName);
 
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
 
 	//RENDER MAIN SCENE MODEL
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
@@ -1236,8 +1046,7 @@ bool GraphicsClass::RenderMaterialPreview()
 
 		material->GetShader()->m_cameraPosition = m_Camera->GetPosition();
 		model->Render(m_D3D->GetDeviceContext());
-		result = material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 	}
 	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
@@ -1248,6 +1057,8 @@ bool GraphicsClass::RenderMaterialPreview()
 			return false;
 	}
 	m_D3D->SetBackBufferRenderTarget();
+
+	//TODO Post-process stack duplicated from RenderScene()
 
 	if (!m_postprocessSSAO)
 		m_postProcessShader->ResetSSAO();
@@ -1323,8 +1134,7 @@ bool GraphicsClass::RenderMaterialPreview()
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
 		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 	}
 
@@ -1363,8 +1173,7 @@ bool GraphicsClass::RenderMaterialPreview()
 		m_D3D->EnableAlphaBlending();
 
 		m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 
 		m_D3D->DisableAlphaBlending();
@@ -1379,7 +1188,6 @@ bool GraphicsClass::RenderMaterialPreview()
 
 	//Draw model picker
 	m_D3D->TurnZBufferOff();
-	//for (ModelClass* const& model : m_sceneModels)
 	if (m_selectedModel)
 	{
 		m_Camera->GetViewMatrix(viewMatrix);
@@ -1395,6 +1203,7 @@ bool GraphicsClass::RenderMaterialPreview()
 
 bool GraphicsClass::RenderGUI()
 {
+	//Load ImGUI methods
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -1420,7 +1229,7 @@ bool GraphicsClass::RenderGUI()
 
 		if (ImGui::CollapsingHeader("Materials explorer"))
 		{
-			float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+			const float windowLineWidth = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 			{
 				int materialIndex = 0;
 				for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
@@ -1442,9 +1251,8 @@ bool GraphicsClass::RenderGUI()
 						m_shaderEditorManager->LoadMaterial(materialIndex);
 						m_shaderEditorManager->m_refreshModel = true;
 					}
-					//if (ImGui::ImageButton(m_emptyTexViewEditor, ImVec2{ 64, 64 }))
-					float lastButtonPos = ImGui::GetItemRectMax().x;
-					float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
+					const float lastButtonPos = ImGui::GetItemRectMax().x;
+					const float nextButtonPos = lastButtonPos + ImGui::GetStyle().ItemSpacing.x + 64;
 					if (nextButtonPos < windowLineWidth)
 					{
 						ImGui::SameLine();
@@ -1462,7 +1270,6 @@ bool GraphicsClass::RenderGUI()
 		m_shaderEditorManager->ResetMouseHoveredOnImGui();
 		//Base window of editor - flow control/variables
 		{
-			//////////////////
 			ImGui::SetNextWindowPos({ 2, 180 });
 			ImGui::SetNextWindowSize({ 318, 541 });
 			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor", (bool*)0, 
@@ -1514,10 +1321,6 @@ bool GraphicsClass::RenderGUI()
 			ImGui::Spacing();
 			ImGui::Spacing();
 
-			//if (ImGui::Button("Load material"))
-			//{
-			//	m_shaderEditorManager->LoadMaterial(m_shaderEditorManager->m_materialToSaveName);
-			//}
 			//Show scalar options
 			if (m_shaderEditorManager->m_focusedBlock && m_shaderEditorManager->m_focusedBlock->GetInputCount() == 0
 				&& m_shaderEditorManager->m_focusedBlock->GetFirstOutputNode())
@@ -1537,7 +1340,7 @@ bool GraphicsClass::RenderGUI()
 						continue;
 					}
 
-					EMaterialInputResult result = RenderInputForMaterial(in, false, m_shaderEditorManager->GetPickingColorElement() == in->GetFirstOutputNode());
+					const EMaterialInputResult result = RenderInputForMaterial(in, false, m_shaderEditorManager->GetPickingColorElement() == in->GetFirstOutputNode());
 					if (result == EMaterialInputResult::StopOthers)
 					{
 						m_shaderEditorManager->SetPickingColorElement(in->GetFirstOutputNode());
@@ -1621,27 +1424,6 @@ bool GraphicsClass::RenderGUI()
 				m_selectedModel = nullptr;
 			}
 		}
-
-
-		//if (ImGui::BeginCombo("Type Grain", CURRENT_GRAIN_TYPE))
-		//{
-		//	const int count = (int)GrainType::Count;
-		//	for (int i = 0; i < count; ++i)
-		//	{
-		//		bool isSelected = (i == (int)m_grainSettings.type);
-		//		if (ImGui::Selectable(GrainTypeArray[i], isSelected))
-		//		{
-		//			CURRENT_GRAIN_TYPE = GrainTypeArray[i];
-		//			m_grainSettings.type = (GrainType)i;
-		//		}
-		//		if (isSelected)
-		//		{
-		//			ImGui::SetItemDefaultFocus();
-		//		}
-		//	}
-
-		//	ImGui::EndCombo();
-		//}
 
 		if (m_selectedModel && m_selectedModel->GetMaterial())
 		{
@@ -1778,7 +1560,7 @@ bool GraphicsClass::RenderGUI()
 		}
 	}
 
-	//SSAO radius/bias slider
+	//SSAO radius/bias slider - DO NOT DELETE
 		//ImGui::SliderFloat("SSAO Radius", &m_GBufferShaderSSAO->m_radiusSize, 0.0f, 5.0f, "%.2f");
 		//ImGui::SliderFloat("SSAO Bias", &m_GBufferShaderSSAO->m_bias, 0.0f, 0.1f, "%.3f");
 
@@ -1801,23 +1583,12 @@ Finished_drawing:
 
 void GraphicsClass::ReinitializeMainModel()
 {
-	std::vector <LPCSTR> names;
-	names.push_back("position");
-	names.push_back("texcoord");
-	names.push_back("normal");
-	names.push_back("tangent");
-	names.push_back("binormal");
-	std::vector <DXGI_FORMAT> formats;
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	formats.push_back(DXGI_FORMAT_R32G32B32_FLOAT);
-	BaseShaderClass::vertexInputType input(names, formats);
+	static std::vector <LPCSTR> names{ "position", "texcoord", "normal", "tangent", "binormal" };
+	static std::vector <DXGI_FORMAT> formats{ DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
+	static const BaseShaderClass::vertexInputType input{ names, formats };
 
 	m_pbrShader->m_materialNames = m_shaderEditorManager->GetUsedTextures();
 	m_pbrShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"pbr_used.vs", L"pbr_used.ps", input);
-	//m_pbrShader->LoadGeneratedTextures(m_D3D->GetDevice());
 }
 
 void GraphicsClass::RefreshModelTick()
@@ -1839,53 +1610,6 @@ void GraphicsClass::RefreshModelTick()
 	}
 }
 
-bool GraphicsClass::RenderDebugSettings()
-{
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	m_D3D->TurnZBufferOff();
-
-	//Get the world, view, and projection matrices from the camera and d3d objects.
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	m_D3D->GetWorldMatrix(worldMatrix);
-	//DRAW UI TRANSLUCENT OPTIONS
-	m_D3D->EnableAlphaBlending();
-
-	bool result = m_debugBackground->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-	m_D3D->DisableAlphaBlending();
-
-	//DRAW UI OPAQUE OPTIONS
-	result = m_roughnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-
-	result = m_metalnessSlider->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-	
-	//DRAW UI INPUT
-	m_texturePreviewRoughness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	m_texturePreviewMetalness->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	m_texturePreviewNormal->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-	m_texturePreviewAlbedo->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-
-	m_textEngine->RenderText(m_D3D->GetDeviceContext(), m_screenWidth, m_screenHeight);
-
-	////ALWAYS RENDER MOUSE AT THE VERY END
-	m_D3D->TurnZBufferOff();
-
-	result = m_mouse->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
-		return false;
-	m_D3D->TurnZBufferOn();
-
-	return true;
-}
-
 bool GraphicsClass::RenderSkybox()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -1893,10 +1617,11 @@ bool GraphicsClass::RenderSkybox()
 	XMFLOAT3 tmp = m_Camera->GetPosition();
 	m_Camera->SetPosition(0.0f, 0.0f, 0.01f);
 	m_Camera->Render();
-	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
+	m_Camera->SetPosition(tmp);
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//DO NOT DELETE - Skybox rotation
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
@@ -1915,7 +1640,6 @@ bool GraphicsClass::RenderSkybox()
 bool GraphicsClass::DownsampleTexture()
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-	bool result;
 
 	m_renderTextureDownsampled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 	m_renderTextureDownsampled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
@@ -1927,14 +1651,11 @@ bool GraphicsClass::DownsampleTexture()
 	m_renderTextureDownsampled->GetOrthoMatrix(orthoMatrix);
 
 	m_D3D->TurnZBufferOff();
-
 	for (ModelClass* const& model : m_sceneModels)
 	{
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 			return false;
 	}
-
 	m_D3D->TurnZBufferOn();
 
 	m_D3D->SetBackBufferRenderTarget();
@@ -1947,7 +1668,6 @@ bool GraphicsClass::DownsampleTexture()
 bool GraphicsClass::UpscaleTexture()
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-	bool result;
 
 	m_renderTextureUpscaled->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 	m_renderTextureUpscaled->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -1959,14 +1679,11 @@ bool GraphicsClass::UpscaleTexture()
 	m_renderTextureUpscaled->GetOrthoMatrix(orthoMatrix);
 
 	m_D3D->TurnZBufferOff();
-
 	for (ModelClass* const& model : m_sceneModels)
 	{
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 			return false;
 	}
-
 	m_D3D->TurnZBufferOn();
 
 	m_D3D->SetBackBufferRenderTarget();
@@ -1985,7 +1702,6 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical, const RenderTextureClas
 bool GraphicsClass::BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResourceView * textureToBlur, RenderTextureClass * textureToReturn, int screenWidth)
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-	bool result;
 
 	if (vertical == false) //HORIZONTAL - 1st
 	{
@@ -2005,8 +1721,7 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResou
 		//m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
 		for (ModelClass* const& model : m_sceneModels)
 		{
-			result = m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-			if (!result)
+			if (!m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 				return false;
 		}
 
@@ -2035,8 +1750,7 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResou
 		//m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
 		for (ModelClass* const& model : m_sceneModels)
 		{
-			result = m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-			if (!result)
+			if (!m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 				return false;
 		}
 
@@ -2054,7 +1768,6 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResou
 bool GraphicsClass::BlurFilterScreenSpace(bool vertical)
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-	bool result;
 
 	if (vertical == false) //HORIZONTAL - 1st
 	{
@@ -2074,8 +1787,7 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical)
 		m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
 		for (ModelClass* const& model : m_sceneModels)
 		{
-			result = m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-			if (!result)
+			if (!m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 				return false;
 		}
 
@@ -2104,8 +1816,7 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical)
 		m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
 		for (ModelClass* const& model : m_sceneModels)
 		{
-			result = m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-			if (!result)
+			if (!m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 				return false;
 		}
 
@@ -2123,14 +1834,12 @@ bool GraphicsClass::BlurFilterScreenSpace(bool vertical)
 bool GraphicsClass::DownsampleSkybox()
 {
 	//Texture horizontal blur
-	if (!(m_skyboxBlurHorizontal = new RenderTextureClass))
-		return false;
+	m_skyboxBlurHorizontal = new RenderTextureClass;
 	if (!(m_skyboxBlurHorizontal->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	//Texture vertical blur
-	if (!(m_skyboxBlurVertical = new RenderTextureClass))
-		return false;
+	m_skyboxBlurVertical = new RenderTextureClass;
 	if (!(m_skyboxBlurVertical->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
 		return false;
 
@@ -2141,16 +1850,17 @@ bool GraphicsClass::DownsampleSkybox()
 	//DownsampleSkyboxFace(L"Skyboxes/negy.jpg", L"Skyboxes/conv_negy.dds", false);
 	//DownsampleSkyboxFace(L"Skyboxes/negz.jpg", L"Skyboxes/conv_negz.dds", false);
 
-	ifstream skyboxFile;
-	skyboxFile.open("Skyboxes/conv_cubemap.dds");
-	if (skyboxFile.fail())
-	{
+	if (std::ifstream skyboxFile{ "Skyboxes/conv_cubemap.dds" })
+	{}
+	else
+	{	//Couldn't open file - create
 		system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/conv_cubemap.dds Skyboxes/conv_posx.dds Skyboxes/conv_negx.dds Skyboxes/conv_posy.dds Skyboxes/conv_negy.dds Skyboxes/conv_posz.dds Skyboxes/conv_negz.dds");
-		skyboxFile.open("Skyboxes/conv_cubemap.dds");
-		if (skyboxFile.fail())
-			return false;
+		if (std::ifstream skyboxFile{ "Skyboxes/conv_cubemap.dds" }) {}
+		else
+		{
+			return false; //File wasn't created - error!
+		}
 	}
-	skyboxFile.close();
 
 	return true;
 }
@@ -2158,7 +1868,6 @@ bool GraphicsClass::DownsampleSkybox()
 bool GraphicsClass::DownsampleSkyboxFace(const wchar_t * inputFilename, const wchar_t * outputFilename, bool isDDS)
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-	bool result;
 
 	m_renderTexture->LoadTexture(m_D3D->GetDevice(), inputFilename, m_renderTexture->GetShaderResource(), m_renderTexture->GetShaderResourceView(), isDDS);
 	m_renderTexturePreview->BindTexture(m_renderTexture->GetShaderResourceView());
@@ -2173,14 +1882,11 @@ bool GraphicsClass::DownsampleSkyboxFace(const wchar_t * inputFilename, const wc
 	m_skyboxDownsampled->GetOrthoMatrix(orthoMatrix);
 
 	m_D3D->TurnZBufferOff();
-
 	for (ModelClass* const& model : m_sceneModels)
 	{
-		result = m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-		if (!result)
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 			return false;
 	}
-
 	m_D3D->TurnZBufferOn();
 
 	m_D3D->SetBackBufferRenderTarget();
@@ -2209,10 +1915,10 @@ bool GraphicsClass::BlurFilter(bool vertical, RenderTextureClass * srcTex, Rende
 	return BlurFilter(vertical, srcTex->GetShaderResourceView(), dstTex, width);
 }
 
+//TODO Blur horizontal/vertical/blurfilter repeats themselves - investigave
 bool GraphicsClass::BlurFilter(bool vertical, ID3D11ShaderResourceView * srcTex, RenderTextureClass * dstTex, int width)
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
-	bool result;
 
 	if (vertical == false) //HORIZONTAL - 1st
 	{
@@ -2232,8 +1938,7 @@ bool GraphicsClass::BlurFilter(bool vertical, ID3D11ShaderResourceView * srcTex,
 		m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
 		for (ModelClass* const& model : m_sceneModels)
 		{
-			result = m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-			if (!result)
+			if (!m_blurShaderHorizontal->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 				return false;
 		}
 
@@ -2262,8 +1967,7 @@ bool GraphicsClass::BlurFilter(bool vertical, ID3D11ShaderResourceView * srcTex,
 		m_renderTexturePreview->GetModel()->Render(m_D3D->GetDeviceContext());
 		for (ModelClass* const& model : m_sceneModels)
 		{
-			result = m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix);
-			if (!result)
+			if (!m_blurShaderVertical->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix))
 				return false;
 		}
 
@@ -2280,52 +1984,51 @@ bool GraphicsClass::BlurFilter(bool vertical, ID3D11ShaderResourceView * srcTex,
 
 bool GraphicsClass::ConvoluteShader(ID3D11ShaderResourceView * srcTex, RenderTextureClass * dstTex)
 {
-	ifstream skyboxFile;
-	skyboxFile.open("Skyboxes/conv_cubemap.dds");
-	if (skyboxFile.fail() == false)
+	if (std::ifstream skyboxFile{ "Skyboxes/conv_cubemap.dds" })
 	{
-		skyboxFile.close();
 		return true;
 	}
-
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-
-	XMFLOAT3 position = XMFLOAT3(0, 0, 0);
-	XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
-	XMFLOAT3 up[] = { XMFLOAT3{0, 1, 0}, XMFLOAT3{0, 0, 1}, XMFLOAT3{1, 0, 0}, XMFLOAT3{0, -1, 0}, XMFLOAT3{0, 0, -1}, XMFLOAT3{-1, 0, 0} };
-	wchar_t* filenames[] = { L"Skyboxes/conv_negy.dds", L"Skyboxes/conv_negz.dds" , L"Skyboxes/conv_negx.dds", L"Skyboxes/conv_posy.dds", L"Skyboxes/conv_posz.dds", L"Skyboxes/conv_posx.dds" };
-	for (int i = 0; i < 6; i++)
+	else
 	{
-		dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
+		XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+		//XMFLOAT3 position = XMFLOAT3(0, 0, 0);
+		//XMVECTOR tar[] = { XMVectorSet(1, 0, 0, 0), XMVectorSet(-1, 0, 0, 0), XMVectorSet(0, 1, 0, 0), XMVectorSet(0, -1, 0, 0), XMVectorSet(0, 0, 1, 0), XMVectorSet(0, 0, -1, 0) };
+		XMFLOAT3 up[] = { XMFLOAT3{0, 1, 0}, XMFLOAT3{0, 0, 1}, XMFLOAT3{1, 0, 0}, XMFLOAT3{0, -1, 0}, XMFLOAT3{0, 0, -1}, XMFLOAT3{-1, 0, 0} };
+		wchar_t* filenames[] = { L"Skyboxes/conv_negy.dds", L"Skyboxes/conv_negz.dds" , L"Skyboxes/conv_negx.dds", L"Skyboxes/conv_posy.dds", L"Skyboxes/conv_posz.dds", L"Skyboxes/conv_posx.dds" };
+		for (int i = 0; i < 6; i++)
+		{
+			dstTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+			dstTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 0.0f, 0.0f, 1.0f);
 
-		m_convoluteShader->SetUpVector(up[i]);
+			m_Camera->Render();
+			m_Camera->GetViewMatrix(viewMatrix);
+			m_D3D->GetWorldMatrix(worldMatrix);
+			m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+			m_convoluteShader->SetUpVector(up[i]);
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-		m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+			m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
-		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-		m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
+			m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+			m_convoluteShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
-		m_D3D->SetBackBufferRenderTarget();
-		m_D3D->ResetViewport();
+			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+			m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
 
-		//m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
+			m_D3D->SetBackBufferRenderTarget();
+			m_D3D->ResetViewport();
 
-		SaveDDSTextureToFile(m_D3D->GetDeviceContext(), dstTex->GetShaderResource(), filenames[i]);
+			//m_renderTexturePreview->BindTexture(dstTex->GetShaderResourceView());
+
+			SaveDDSTextureToFile(m_D3D->GetDeviceContext(), dstTex->GetShaderResource(), filenames[i]);
+		}
+
+		system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/conv_cubemap.dds Skyboxes/conv_posx.dds Skyboxes/conv_negx.dds Skyboxes/conv_posy.dds Skyboxes/conv_negy.dds Skyboxes/conv_posz.dds Skyboxes/conv_negz.dds");
+
+		return true;
 	}
-
-	system("texassemble cube -w 256 -h 256 -f R8G8B8A8_UNORM -o Skyboxes/conv_cubemap.dds Skyboxes/conv_posx.dds Skyboxes/conv_negx.dds Skyboxes/conv_posy.dds Skyboxes/conv_negy.dds Skyboxes/conv_posz.dds Skyboxes/conv_negz.dds");
-
-	return true;
 }
 
 bool GraphicsClass::CreateShadowMap(RenderTextureClass*& targetTex)
@@ -2333,7 +2036,7 @@ bool GraphicsClass::CreateShadowMap(RenderTextureClass*& targetTex)
 	targetTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 	targetTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 1.0f, 1.0f, 1.0f, 1.0f);
 
-	if (RenderDepthScene() == false)
+	if (!RenderDepthScene())
 		return false;
 
 	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
@@ -2352,8 +2055,6 @@ bool GraphicsClass::RenderDepthScene()
 
 	//Set light position
 	m_directionalLight->SetLookAt(0, 0, 0);
-	//m_directionalLight->SetPosition(-20, 15, -5);
-	//m_directionalLight->SetPosition(5, 10, -5);
 	m_shadowMapShader->SetLightPosition(m_directionalLight->GetPosition());
 	for (ModelClass* const& model : m_sceneModels)
 	{
@@ -2556,6 +2257,7 @@ bool GraphicsClass::PrepareLutBrdf(RenderTextureClass * dstTex)
 	return true;
 }
 
+//TODO Reduntant? "PrepareEnvironmentPrefilteredMap"
 bool GraphicsClass::CreateSingleEnvironmentMap()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -2742,7 +2444,6 @@ bool GraphicsClass::RenderSSAONoiseTexture(RenderTextureClass * targetTex, GBuff
 
 	/////// RENDER SCENE TO BUFFER ///////
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
 
 	//Create matrices based on light position
 	m_Camera->Render();
@@ -2753,8 +2454,7 @@ bool GraphicsClass::RenderSSAONoiseTexture(RenderTextureClass * targetTex, GBuff
 	//Render test buddha
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
-	result = shaderToExecute->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
+	if(!shaderToExecute->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 	////////////////////////////////////
 	m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
@@ -2772,7 +2472,6 @@ bool GraphicsClass::RenderSSAOTexture(RenderTextureClass * targetTex, GBufferSha
 
 	/////// RENDER SCENE TO BUFFER ///////
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
 
 	//Create matrices based on light position
 	m_Camera->Render();
@@ -2783,8 +2482,7 @@ bool GraphicsClass::RenderSSAOTexture(RenderTextureClass * targetTex, GBufferSha
 	//Render test buddha
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
-	result = shaderToExecute->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if (!result)
+	if (!shaderToExecute->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 		return false;
 	////////////////////////////////////
 	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
@@ -2797,6 +2495,7 @@ bool GraphicsClass::RenderSSAOTexture(RenderTextureClass * targetTex, GBufferSha
 
 void GraphicsClass::RenderTextureViewImGui(ID3D11Resource *& resource, ID3D11ShaderResourceView *& resourceView, const char* label)
 {
+	//Propably unused but DO NOT DELETE
 	ImGui::Text(label);
 	if (ImGui::ImageButton(resourceView == nullptr ? m_emptyTexView[m_internalTextureViewIndex] : resourceView, ImVec2{ 64, 64 }))
 	{
@@ -3020,11 +2719,6 @@ bool GraphicsClass::CreateShaderEditor()
 {
 	m_shaderEditorManager = new ShaderEditorManager(m_D3D, m_mouse->GetMouse());
 	m_shaderEditorManager->SetRefToClickedOutside(&m_focusOnChoosingWindowsShader);
-
-	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, 0.2f }), 0, 1);
-	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ -0.2f, -0.2f }), 0, 1);
-	//m_shaderEditorManager->AddShaderBlock(new UIShaderEditorBlock({ 0.2f, 0.0f }), 2, 1);
-
 	return true;
 }
 
@@ -3395,9 +3089,9 @@ bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker
 {
 	XMMATRIX wMatrix;
 	m_D3D->GetWorldMatrix(wMatrix);
-	XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, axis);
+	const XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, axis);
 	m_D3D->GetWorldMatrix(wMatrix);
-	XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, axis);
+	const XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, axis);
 
 	return TestAABBIntersection(lb, rt, origin, dirfrac);
 }

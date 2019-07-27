@@ -431,6 +431,16 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_lutShader->SetLUT(m_D3D->GetDevice(), L"lut_sepia.png", false);
 #pragma endregion
 
+#pragma region FXAA
+	m_fxaaShader = new FXAAShader;
+	if (!m_fxaaShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"fxaa.vs", L"fxaa.ps", input))
+		return false;
+
+	m_antialiasedTexture = new RenderTextureClass;
+	if (!m_antialiasedTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
+		return false;
+#pragma endregion
+
 	//TODO Replace by empty or load last scene
 	LoadScene("test.txt");
 
@@ -701,10 +711,21 @@ bool GraphicsClass::Render()
 				if (!RenderSSAOTexture(m_ssaoTexture, m_GBufferShaderSSAO))
 					return false;
 			}
+			if (m_postprocessFXAA) //TODO Currently working on previous frame
+			{
+				m_fxaaShader->SetScreenBuffer(m_renderTextureMainScene->GetShaderResourceView());
+				if (!RenderFXAATexture(m_antialiasedTexture))
+					return false;
+			}
+
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 			//STANDARD SCENE RENDERING		
 			if (!RenderScene())
+				return false;
+
+			m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
+			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 				return false;
 		}
 		else
@@ -851,6 +872,35 @@ bool GraphicsClass::RenderScene()
 		m_postProcessShader->UseChromaticAberration(false);
 	if (!m_postprocessGrain)
 		m_postProcessShader->UseGrain(false);
+
+	if (m_postprocessFXAA)
+	{
+		//m_antialiasedTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		//m_antialiasedTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		//ApplyFXAA(m_renderTextureMainScene->GetShaderResourceView());
+
+		//m_D3D->SetBackBufferRenderTarget();
+
+		//m_antialiasedTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		//m_antialiasedTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+		//m_Camera->Render();
+		//m_D3D->GetWorldMatrix(worldMatrix);
+		//m_Camera->GetViewMatrix(viewMatrix);
+		//m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+		//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+
+		//if (!m_fxaaShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+		//	return false;
+
+		//m_D3D->SetBackBufferRenderTarget();
+		//m_D3D->ResetViewport();
+		//m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
+	}
 
 	if (m_postprocessSSAO)
 	{
@@ -2712,6 +2762,34 @@ bool GraphicsClass::ApplyChromaticAberration(ID3D11ShaderResourceView * chromati
 bool GraphicsClass::ApplyGrain(ID3D11ShaderResourceView * grainTexture, ID3D11ShaderResourceView * mainFrameBuffer)
 {
 	m_postProcessShader->UseGrain(true);
+	return true;
+}
+
+bool GraphicsClass::RenderFXAATexture(RenderTextureClass * targetTex)
+{
+	targetTex->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	targetTex->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	/////// RENDER SCENE TO BUFFER ///////
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+
+	//Create matrices based on light position
+	m_Camera->Render();
+	m_D3D->GetWorldMatrix(worldMatrix);
+	m_Camera->GetViewMatrix(viewMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//Render test buddha
+	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+
+	if (!m_fxaaShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+		return false;
+	////////////////////////////////////
+	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
+
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
+
 	return true;
 }
 

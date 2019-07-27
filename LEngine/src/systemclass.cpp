@@ -16,8 +16,6 @@ bool SystemClass::Initialize()
 		return false;
 
 	m_Mouse = new MouseClass;
-	if (!m_Mouse)
-		return false;
 	if (!m_Mouse->Initialize(m_Graphics->GetD3D(), m_hinstance, m_hwnd, screenWidth, screenHeight))
 		return false;
 

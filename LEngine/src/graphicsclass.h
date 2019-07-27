@@ -41,6 +41,7 @@
 #include "ShaderEditorManager.h"
 #include "json11.hpp"
 #include "ModelPickerShader.h"
+#include "FXAAShader.h"
 
 /////////////
 // GLOBALS //
@@ -483,6 +484,9 @@ private:
 	bool ApplyChromaticAberration(ID3D11ShaderResourceView* chromaticAberrationTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyGrain(ID3D11ShaderResourceView* grainTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 
+	//FXAA
+	bool RenderFXAATexture(RenderTextureClass * targetTex);
+
 	//Fill shader editor manager with data
 	bool CreateShaderEditor();
 
@@ -611,6 +615,10 @@ private:
 	//GRAIN
 	GrainSettings m_grainSettings;
 
+	//ANTI-ALIASING
+	FXAAShader* m_fxaaShader;
+	RenderTextureClass* m_antialiasedTexture;
+
 	//ImGUI
 	int m_internalTextureViewIndex = -1;
 	bool m_focusOnChoosingWindowsShader{ false };
@@ -635,6 +643,8 @@ private:
 	bool m_postprocessLUT = false;
 	bool m_postprocessChromaticAberration = false;
 	bool m_postprocessGrain = false;
+//Anti-aliasing postprocess
+	bool m_postprocessFXAA = true;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

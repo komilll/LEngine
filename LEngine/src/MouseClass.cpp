@@ -127,12 +127,12 @@ std::pair<float, float> MouseClass::GetMouseMovementFrame() const
 
 bool MouseClass::GetLMBPressed() const
 {
-	return m_mouseState.rgbButtons[0] == static_cast<BYTE>(1);
+	return m_mouseState.rgbButtons[0];// == static_cast<BYTE>(1);
 }
 
 bool MouseClass::GetRMBPressed() const
 {
-	return m_mouseState.rgbButtons[1] == static_cast<BYTE>(1);
+	return m_mouseState.rgbButtons[1];// == static_cast<BYTE>(1);
 }
 
 void MouseClass::SetRMBPressed(bool enable)
@@ -142,7 +142,7 @@ void MouseClass::SetRMBPressed(bool enable)
 
 bool MouseClass::GetMMBPressed() const
 {
-	return m_mouseState.rgbButtons[2] == static_cast<BYTE>(1);
+	return m_mouseState.rgbButtons[2];// == static_cast<BYTE>(1);
 }
 
 void MouseClass::SetMMBPressed(bool enable)

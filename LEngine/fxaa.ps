@@ -1,0 +1,234 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: fxaa.ps
+////////////////////////////////////////////////////////////////////////////////
+
+//Based on http://blog.simonrodriguez.fr/articles/30-07-2016_implementing_fxaa.html
+
+Texture2D screenTexture : register(t0);
+SamplerState SampleType : register(s0); 
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+	float4 position : SV_POSITION;
+	float2 tex: TEXCOORD0;
+};
+
+float rgb2luma(float3 rgb);
+
+static const float EDGE_THRESHOLD_MIN = 0.0312f;
+static const float EDGE_THRESHOLD_MAX = 0.125f;
+static const float SUBPIXEL_QUALITY = 0.75f;
+static const int ITERATIONS = 12;
+static const float QUALITY[ITERATIONS] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 4.0f, 8.0f};
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+//TODO - Pass as parameter
+	float2 inverseScreenSize = float2(1.0f / 1280.0f, 1.0f / 720.0f);
+	
+	float3 colorCenter = screenTexture.Sample(SampleType, input.tex).rgb;	
+
+//DETECT EDGES	
+	//Center luma
+	float lumaCenter = rgb2luma(colorCenter);
+	
+	//Direct neighbour luma
+	float lumaDown = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(0, -1)).rgb);
+	float lumaUp = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(0, 1)).rgb);
+	float lumaLeft = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(-1, 0)).rgb);
+	float lumaRight = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(1, 0)).rgb);
+	
+	//Find max, min luma
+	float lumaMin = min(lumaCenter, min(min(lumaDown, lumaUp), min(lumaLeft, lumaRight)));
+	float lumaMax = max(lumaCenter, max(max(lumaDown, lumaUp), max(lumaLeft, lumaRight)));
+	
+	//Delta (max-min)
+	float lumaRange = lumaMax - lumaMin;
+		
+	[branch] if (lumaRange < max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD_MAX))
+	{
+		//Difference between lumas too small - there is no edge (or pixel is in very dark area)
+		return float4(colorCenter, 1.0f);
+	}
+//CHOOSE EDGE DIRECTION
+	//Find corners lumas
+	float lumaDownLeft = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(-1, -1)).rgb);
+	float lumaUpRight = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(1, 1)).rgb);
+	float lumaUpLeft = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(-1, 1)).rgb);
+	float lumaDownRight = rgb2luma(screenTexture.Sample(SampleType, input.tex, float2(1, -1)).rgb);
+	
+	//Combine lumas for future computation
+	float lumaDownUp = lumaDown + lumaUp;
+	float lumaLeftRight = lumaLeft + lumaRight;
+	float lumaLeftCorners = lumaDownLeft + lumaUpLeft;
+	float lumaDownCorners = lumaDownLeft + lumaDownRight;
+	float lumaRightCorners = lumaDownRight + lumaUpRight;
+	float lumaUpCorners = lumaUpRight + lumaUpLeft;
+
+	//Calculate horiozntal/vertical edges
+	float edgeHorizontal =  abs(-2.0 * lumaLeft + lumaLeftCorners)  + abs(-2.0 * lumaCenter + lumaDownUp ) * 2.0    + abs(-2.0 * lumaRight + lumaRightCorners);
+	float edgeVertical =    abs(-2.0 * lumaUp + lumaUpCorners)      + abs(-2.0 * lumaCenter + lumaLeftRight) * 2.0  + abs(-2.0 * lumaDown + lumaDownCorners);
+	
+	//Check local edge direction
+	bool isHorizontal = (edgeHorizontal >= edgeVertical);
+	
+	//Get lumas of pixels of opposite directions
+	float luma1 = isHorizontal ? lumaDown : lumaLeft;
+	float luma2 = isHorizontal ? lumaUp : lumaRight;
+	
+	//Calculate gradients for both
+	float gradient1 = luma1 - lumaCenter;
+	float gradient2 = luma2 - lumaCenter;
+	
+	//Check which direction is steepest
+	bool is1Steepest = abs(gradient1) >= abs(gradient2);
+	
+	//Get strongest gradient and normalize it
+	float gradientScaled = 0.25f * max(abs(gradient1), abs(gradient2));
+	
+//CALCULATE NEW UV
+	//Calculate step length based on screen size
+	float stepLength = isHorizontal ? inverseScreenSize.y : inverseScreenSize.x;
+	
+	//Average luma in correct direction
+	float lumaLocalAverage = 0.0f;
+	
+	[branch] if (is1Steepest)
+	{
+		//Switch direction, because is1Steepest indicates DOWN or LEFT
+		stepLength *= -1.0f;
+		lumaLocalAverage = 0.5f * (luma1 + lumaCenter);
+	}
+	else
+	{
+		lumaLocalAverage = 0.5f * (luma2 + lumaCenter);
+	}
+	
+	//Move UV by half a pixel to correct direction
+	float2 currentUV = input.tex;
+	[branch] if (isHorizontal)
+	{
+		currentUV.y += stepLength * 0.5f;
+	}
+	else
+	{
+		currentUV.x += stepLength * 0.5f;
+	}
+	
+//FIRST ITERATION
+	float2 offset = isHorizontal ? float2(inverseScreenSize.x, 0.0f) : float2(0.0f, inverseScreenSize.y);
+	
+	//Explore both sides
+	float2 uv1 = currentUV - offset;
+	float2 uv2 = currentUV + offset;
+	
+	//Read lumas from both extremes - find delta
+	float lumaEnd1 = rgb2luma(screenTexture.Sample(SampleType, uv1).rgb);
+	float lumaEnd2 = rgb2luma(screenTexture.Sample(SampleType, uv2).rgb);
+	lumaEnd1 -= lumaLocalAverage;
+	lumaEnd2 -= lumaLocalAverage;
+	
+	//If luma deltas is larger than local gradient - reached edge
+	bool reached1 = abs(lumaEnd1) >= gradientScaled;
+	bool reached2 = abs(lumaEnd2) >= gradientScaled;
+	bool reachedBoth = reached1 && reached2;
+	
+	//If the side is not reached - continue exploration in given direction
+	[branch] if (!reached1)
+	{
+		uv1 -= offset;
+	}
+	[branch] if (!reached2)
+	{
+		uv2 += offset;
+	}
+	
+//CONTINUE ITERATION
+	[branch] if (!reachedBoth)
+	{
+		for (int i = 2; i < ITERATIONS; ++i)
+		{
+			[branch] if (!reached1)
+			{
+				lumaEnd1 = rgb2luma(screenTexture.Sample(SampleType, uv1).rgb);				
+				lumaEnd1 -= lumaLocalAverage;
+			}			
+			[branch] if (!reached2)
+			{
+				lumaEnd2 = rgb2luma(screenTexture.Sample(SampleType, uv2).rgb);
+				lumaEnd2 -= lumaLocalAverage;
+			}
+			reached1 = abs(lumaEnd1) >= gradientScaled;
+			reached2 = abs(lumaEnd2) >= gradientScaled;
+			reachedBoth = reached1 && reached2;
+			
+			[branch] if(!reached1)
+				uv1 -= offset * QUALITY[i];
+		
+			[branch] if(!reached2)
+				uv2 += offset * QUALITY[i];
+				
+			[branch] if(reachedBoth)
+				break;
+		}
+	}
+	
+//ESTIMATE OFFSET
+	float distance1 = isHorizontal ? (input.tex.x - uv1.x) : (input.tex.y - uv1.y);
+	float distance2 = isHorizontal ? (uv2.x - input.tex.x) : (uv2.y - input.tex.y);
+	
+	//Get dinal distance with direction
+	bool isDirection1 = distance1 < distance2;
+	float distanceFinal = min(distance1, distance2);
+	
+	//Length of edge
+	float edgeThickness = (distance1 + distance2);
+	
+	//UV offset
+	float pixelOffset = -distanceFinal/edgeThickness + 0.5f;
+	
+//CHECK LUMA
+	bool isLumaCenterSmaller = lumaCenter < lumaLocalAverage;
+	
+	// If the luma at center is smaller than at its neighbour, the delta luma at each end should be positive (same variation).
+	// (in the direction of the closer side of the edge.)
+	bool correctVariation = ((isDirection1 ? lumaEnd1 : lumaEnd2) < 0.0f) != isLumaCenterSmaller;
+	
+	//If the luma variation is incorrect, do not offset
+	float finalOffset = correctVariation ? pixelOffset : 0.0f;
+	
+//SUBPIXEL ANTIALIASING
+	//Weighted average
+	float lumaAverage = (1.0f / 12.0f) * (2.0f * (lumaDownUp + lumaLeftRight)) + lumaLeftCorners + lumaRightCorners;
+	//Radio of the delta between global average and the center luma
+	float subPixelOffset1 = clamp(abs(lumaAverage - lumaCenter) / lumaRange, 0.0f, 1.0f);
+	float subPixelOffset2 = (-2.0f * subPixelOffset1 + 3.0f) * subPixelOffset1 * subPixelOffset1;
+	
+	float subPixelOffsetFinal = subPixelOffset2 * subPixelOffset2 * SUBPIXEL_QUALITY;
+	// Pick the biggest of the two offsets.
+	finalOffset = max(finalOffset, subPixelOffsetFinal);
+
+//FINAL READ	
+	float2 finalUV = input.tex;
+	[branch] if(isHorizontal)
+	{
+		finalUV.y += finalOffset * stepLength;
+	}
+	else 
+	{
+		finalUV.x += finalOffset * stepLength;
+	}	
+	float4 finalColor = float4(screenTexture.Sample(SampleType, finalUV).rgb, 1.0f);
+	
+	return finalColor;
+}
+
+float rgb2luma(float3 rgb)
+{
+	return sqrt(dot(rgb, float3(0.299f, 0.587f, 0.114f)));
+}

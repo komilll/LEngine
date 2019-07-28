@@ -262,7 +262,7 @@ bool BaseShaderClass::LoadTexture(ID3D11Device* device, ID3D11Resource *& inText
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 	shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
 	shaderResourceViewDesc.TextureCube.MipLevels = 1;
 

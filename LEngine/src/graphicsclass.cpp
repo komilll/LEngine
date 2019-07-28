@@ -724,9 +724,12 @@ bool GraphicsClass::Render()
 			if (!RenderScene())
 				return false;
 
-			m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
-			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-				return false;
+			if (m_postprocessFXAA)
+			{
+				m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
+				if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+					return false;
+			}
 		}
 		else
 		{
@@ -872,35 +875,6 @@ bool GraphicsClass::RenderScene()
 		m_postProcessShader->UseChromaticAberration(false);
 	if (!m_postprocessGrain)
 		m_postProcessShader->UseGrain(false);
-
-	if (m_postprocessFXAA)
-	{
-		//m_antialiasedTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		//m_antialiasedTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		//ApplyFXAA(m_renderTextureMainScene->GetShaderResourceView());
-
-		//m_D3D->SetBackBufferRenderTarget();
-
-		//m_antialiasedTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		//m_antialiasedTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-		//m_Camera->Render();
-		//m_D3D->GetWorldMatrix(worldMatrix);
-		//m_Camera->GetViewMatrix(viewMatrix);
-		//m_D3D->GetProjectionMatrix(projectionMatrix);
-
-		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-		//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-		//if (!m_fxaaShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-		//	return false;
-
-		//m_D3D->SetBackBufferRenderTarget();
-		//m_D3D->ResetViewport();
-		//m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
-	}
 
 	if (m_postprocessSSAO)
 	{
@@ -2173,12 +2147,12 @@ bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * 
 
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 
 	ifstream skyboxFile;
@@ -2373,7 +2347,7 @@ bool GraphicsClass::CreateSingleEnvironmentMap()
 	{
 		ZeroMemory(&textureDesc, sizeof(textureDesc));
 		renderTargetViewDesc.Format = textureDesc.Format;
-		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
 		renderTargetViewDesc.Texture2DArray.ArraySize = 1;
 		renderTargetViewDesc.Texture2DArray.MipSlice = mip;
 

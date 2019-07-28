@@ -217,11 +217,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float2 finalUV = input.tex;
 	[branch] if(isHorizontal)
 	{
-		finalUV.y += finalOffset * stepLength;
+		finalUV.y += /*finalOffset **/ stepLength;
 	}
 	else 
 	{
-		finalUV.x += finalOffset * stepLength;
+		finalUV.x += /*finalOffset **/ stepLength;
 	}	
 	float4 finalColor = float4(screenTexture.Sample(SampleType, finalUV).rgb, 1.0f);
 	

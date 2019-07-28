@@ -644,7 +644,7 @@ private:
 	bool m_postprocessChromaticAberration = false;
 	bool m_postprocessGrain = false;
 //Anti-aliasing postprocess
-	bool m_postprocessFXAA = true;
+	bool m_postprocessFXAA = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

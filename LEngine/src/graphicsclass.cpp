@@ -1560,7 +1560,7 @@ bool GraphicsClass::RenderGUI()
 			ImGui::SliderFloat("Intensity Grain", &m_grainSettings.intensity, 0.0f, 1.0f, "%.2f");
 			ImGui::SliderFloat("Size Grain", &m_grainSettings.size, 0.01f, 10.0f, "%.2f");
 
-			if (ImGui::BeginCombo("Type Grain", CURRENT_GRAIN_TYPE))
+			if (ImGui::BeginCombo("Type Grain", CurrentGrainType))
 			{
 				constexpr int count = (int)GrainType::Count;
 				for (int i = 0; i < count; ++i)
@@ -1568,7 +1568,7 @@ bool GraphicsClass::RenderGUI()
 					bool isSelected = (i == (int)m_grainSettings.type);
 					if (ImGui::Selectable(GrainTypeArray[i], isSelected))
 					{
-						CURRENT_GRAIN_TYPE = GrainTypeArray[i];
+						CurrentGrainType = GrainTypeArray[i];
 						m_grainSettings.type = (GrainType)i;
 					}
 					if (isSelected)
@@ -1581,6 +1581,49 @@ bool GraphicsClass::RenderGUI()
 			}
 			ImGui::Checkbox("Has color", &m_grainSettings.hasColor);
 			ImGui::TreePop();
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Anti-aliasing"))
+	{
+		if (ImGui::BeginCombo("Anti-aliasing type", CurrentAntialiasingType))
+		{
+			constexpr int count = AntialiasingTypeArray.size();
+			for (int i = 0; i < count; ++i)
+			{
+				const bool isSelected = (i == (int)m_antialiasingSettings.type);
+				if (ImGui::Selectable(AntialiasingTypeArray[i], isSelected))
+				{
+					CurrentAntialiasingType = AntialiasingTypeArray[i];
+					m_antialiasingSettings.type = (AntialiasingType)i;
+				}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		if (ImGui::BeginCombo("Anti-aliasing quality", CurrentAntialiasingCount))
+		{
+			constexpr int count = AntialiasingCountArray.size();
+			for (int i = 0; i < count; ++i)
+			{
+				const bool isSelected = (std::pow(i, 2) == (int)m_antialiasingSettings.sampleCount);
+				if (ImGui::Selectable(AntialiasingCountArray[i], isSelected))
+				{
+					CurrentAntialiasingCount = AntialiasingCountArray[i];
+					istringstream iss{ CurrentAntialiasingCount };
+					iss >> m_antialiasingSettings.sampleCount;
+					MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
+					m_D3D->Initialize(m_screenWidth, m_screenHeight, true, *m_D3D->GetHWND(), false, SCREEN_DEPTH, SCREEN_NEAR);
+				}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
 		}
 	}
 

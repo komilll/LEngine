@@ -42,6 +42,7 @@
 #include "json11.hpp"
 #include "ModelPickerShader.h"
 #include "FXAAShader.h"
+#include <array>
 
 /////////////
 // GLOBALS //
@@ -62,8 +63,14 @@ const int SSAO_NOISE_SIZE = 16;
 
 const int MAX_TEXTURE_INPUT = 4;
 
-static const char* GrainTypeArray[] = { "Small", "Unregular", "Unregular white" };
-static const char* CURRENT_GRAIN_TYPE = GrainTypeArray[0];
+static const std::array<const char*, 3> GrainTypeArray { "Small", "Unregular", "Unregular white" };
+static const char* CurrentGrainType = GrainTypeArray[0];
+
+static const std::array<const char*, 4> AntialiasingTypeArray = { "OFF", "MSAA", "FXAA", "SSAA" };
+static const char* CurrentAntialiasingType = AntialiasingTypeArray[0];
+
+static const std::array<const char*, 3> AntialiasingCountArray = { "x2", "x4", "x8" };
+static const char* CurrentAntialiasingCount = AntialiasingCountArray[0];
 
 constexpr float MODEL_DRAG_SPEED = 1.0f;
 
@@ -137,6 +144,13 @@ private:
 		Break
 	};
 
+	enum class AntialiasingType : int
+	{
+		MSAA = 0,
+		FXAA = 1,
+		SSAA = 2
+	};
+
 	struct BloomSettings
 	{
 		//float weights[5] = { 0.481f, 0.417f, 0.272f, 0.08f, 0.0f };
@@ -158,6 +172,12 @@ private:
 		float size{ 6.83f };
 		bool hasColor{ false };
 		GrainType type{ GrainType::Small };
+	};
+
+	struct AntialiasingSettings
+	{
+		int sampleCount{ 1 };
+		AntialiasingType type{ AntialiasingType::MSAA };
 	};
 
 	class ModelPicker
@@ -618,6 +638,7 @@ private:
 	//ANTI-ALIASING
 	FXAAShader* m_fxaaShader;
 	RenderTextureClass* m_antialiasedTexture;
+	AntialiasingSettings m_antialiasingSettings;
 
 	//ImGUI
 	int m_internalTextureViewIndex = -1;

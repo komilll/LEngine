@@ -13,6 +13,8 @@
 #include <array>
 using namespace DirectX;
 
+static int MSAA_NUMBER_OF_SAMPLES = 1; //[1/2/4/8] on GTX750Ti StormX Dual
+
 class D3DClass
 {
 private:

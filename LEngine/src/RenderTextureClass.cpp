@@ -1,4 +1,5 @@
 #include "RenderTextureClass.h"
+#include "d3dclass.h"
 
 bool RenderTextureClass::InitializeShadowMap(ID3D11Device * device, int textureWidth, int textureHeight)
 {
@@ -206,7 +207,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Count = MSAA_NUMBER_OF_SAMPLES;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;

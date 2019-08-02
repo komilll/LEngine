@@ -150,8 +150,8 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	// Set the handle for the window to render to.
     swapChainDesc.OutputWindow = hwnd;
 
-	// Turn multisampling off.
-	swapChainDesc.SampleDesc.Count = MSAA_NUMBER_OF_SAMPLES;
+	// Turn multisampling on.
+	swapChainDesc.SampleDesc.Count = 1;
     swapChainDesc.SampleDesc.Quality = 0;
 
 	// Set to full screen or windowed mode.
@@ -187,7 +187,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 	// Get the pointer to the back buffer.
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
-	if(FAILED(result))
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -212,7 +212,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthBufferDesc.SampleDesc.Count = MSAA_NUMBER_OF_SAMPLES;
+	depthBufferDesc.SampleDesc.Count = 1;
 	depthBufferDesc.SampleDesc.Quality = 0;
 	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -411,6 +411,11 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
     return true;
+}
+
+void D3DClass::ReinitializeForMSAA()
+{
+
 }
 
 
@@ -649,4 +654,9 @@ BaseShaderClass::vertexInputType D3DClass::GetBaseInputType() const
 D3DClass::WindowSize D3DClass::GetWindowSize() const
 {
 	return D3DClass::WindowSize(m_windowSizeX, m_windowSizeY);
+}
+
+IDXGISwapChain * D3DClass::GetSwapChain()
+{
+	return m_swapChain;
 }

@@ -21,8 +21,8 @@ public:
 public:
 	//TODO Add constructor
 	bool InitializeShadowMap(ID3D11Device* device, int textureWidth, int textureHeight);
-	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling = RenderTextureClass::Scaling::NONE, bool skybox = false);
-	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight, int mipLevels);
+	bool Initialize(ID3D11Device* device, int textureWidth, int textureHeight, int msaaCount, RenderTextureClass::Scaling scaling = RenderTextureClass::Scaling::NONE, bool skybox = false);
+	bool InitializeWithMip(ID3D11Device* device, int textureWidth, int textureHeight, int mipLevels);
 
 	///<summary>Choose target to pass render info</summary>
 	void SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, bool withViewport = true);
@@ -38,7 +38,7 @@ public:
 	void GetOrthoMatrix(XMMATRIX &orthoMatrix) const;
 
 private:
-	bool Initialize2DTexture(ID3D11Device*& device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling);
+	bool Initialize2DTexture(ID3D11Device*& device, int textureWidth, int textureHeight, int msaaCount, RenderTextureClass::Scaling scaling);
 	bool InitializeSkybox(ID3D11Device*& device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling);
 
 private:

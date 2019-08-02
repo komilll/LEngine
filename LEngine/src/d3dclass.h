@@ -13,8 +13,6 @@
 #include <array>
 using namespace DirectX;
 
-static int MSAA_NUMBER_OF_SAMPLES = 1; //[1/2/4/8] on GTX750Ti StormX Dual
-
 class D3DClass
 {
 private:
@@ -28,6 +26,7 @@ private:
 
 public:
 	bool Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear);
+	void ReinitializeForMSAA();
 	void Shutdown();
 	
 	void BeginScene(float red, float green, float blue, float alpha);
@@ -64,6 +63,10 @@ public:
 	BaseShaderClass::vertexInputType GetBaseInputType() const;
 
 	WindowSize GetWindowSize() const;
+	IDXGISwapChain* GetSwapChain();
+
+public:
+	int MSAA_NUMBER_OF_SAMPLES{ 1 }; //[1/2/4/8] on GTX750Ti StormX Dual
 
 private:
 	bool m_vsync_enabled;

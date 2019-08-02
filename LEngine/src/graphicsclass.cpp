@@ -9,6 +9,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
 
+	if (std::ifstream in{ "msaa_settings.txt" })
+	{
+		in >> m_D3D->MSAA_NUMBER_OF_SAMPLES;
+	}
+
 	// Initialize the Direct3D object.
 	if(!m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR))
 		return false;
@@ -103,7 +108,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma region Blur bilinear screenspace
 		//RENDER SCENE TO TEXTURE
 		m_renderTexture = new RenderTextureClass;
-		if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
+		if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 			return false;
 
 		m_renderTexturePreview = new UITexture;
@@ -114,31 +119,31 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 		//Texture downsampled
 		m_renderTextureDownsampled = new RenderTextureClass;
-		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
+		if (!(m_renderTextureDownsampled->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 			return false;
 
 		//Texture upscaled
 		m_renderTextureUpscaled = new RenderTextureClass;
-		if (!(m_renderTextureUpscaled->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
+		if (!(m_renderTextureUpscaled->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 			return false;
 
 		//Texture horizontal blur
 		m_renderTextureHorizontalBlur = new RenderTextureClass;
-		if (!(m_renderTextureHorizontalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
+		if (!(m_renderTextureHorizontalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 			return false;
 
 		//Texture vertical blur
 		m_renderTextureVerticalBlur = new RenderTextureClass;
-		if (!(m_renderTextureVerticalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2)))
+		if (!(m_renderTextureVerticalBlur->Initialize(m_D3D->GetDevice(), screenWidth / 2, screenHeight / 2, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 			return false;
 #pragma endregion
 	}
 	m_renderTextureMainScene = new RenderTextureClass;
-	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight)))
+	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 		return false;
 
 	m_shaderPreview = new RenderTextureClass;
-	if (!(m_shaderPreview->Initialize(m_D3D->GetDevice(), screenWidth * 0.25f, screenHeight * 0.25f)))
+	if (!(m_shaderPreview->Initialize(m_D3D->GetDevice(), screenWidth * 0.25f, screenHeight * 0.25f, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 		return false;
 
 	//Blur shader - vertical and horizontal
@@ -186,7 +191,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	
 	//RENDER SCENE TO TEXTURE
 	m_renderTexture = new RenderTextureClass;
-	if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE)))
+	if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 		return false;
 
 	m_renderTexturePreview = new UITexture;
@@ -195,7 +200,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	//Texture downsampled
 	m_skyboxDownsampled = new RenderTextureClass;
-	if (!(m_skyboxDownsampled->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
+	if (!(m_skyboxDownsampled->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, m_D3D->MSAA_NUMBER_OF_SAMPLES, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	m_convoluteShader = new SkyboxShaderClass;
@@ -209,11 +214,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	
 	//Calculate specular IBL environment prefiltered map
 	m_environmentTextureMap = new RenderTextureClass;
-	if (!(m_environmentTextureMap->Initialize(m_D3D->GetDevice(), ENVIRONMENT_SPECULAR_SIZE, ENVIRONMENT_SPECULAR_SIZE, RenderTextureClass::Scaling::NONE)))
+	if (!(m_environmentTextureMap->Initialize(m_D3D->GetDevice(), ENVIRONMENT_SPECULAR_SIZE, ENVIRONMENT_SPECULAR_SIZE, m_D3D->MSAA_NUMBER_OF_SAMPLES, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	m_brdfLUT = new RenderTextureClass;
-	if (!(m_brdfLUT->Initialize(m_D3D->GetDevice(), 512, 512, RenderTextureClass::Scaling::NONE)))
+	if (!(m_brdfLUT->Initialize(m_D3D->GetDevice(), 512, 512, m_D3D->MSAA_NUMBER_OF_SAMPLES, RenderTextureClass::Scaling::NONE)))
 		return false;
 	
 	m_specularIBLShader = new SkyboxShaderClass;
@@ -300,13 +305,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma region SSAO
 	//Create textures that will hold buffers
 	m_positionBuffer = new RenderTextureClass;
-	m_positionBuffer->Initialize(m_D3D->GetDevice(), 1280, 720);
+	m_positionBuffer->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 	
 	m_normalBuffer = new RenderTextureClass;
-	m_normalBuffer->Initialize(m_D3D->GetDevice(), 1280, 720);
+	m_normalBuffer->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 
 	m_albedoBuffer = new RenderTextureClass;
-	m_albedoBuffer->Initialize(m_D3D->GetDevice(), 1280, 720);
+	m_albedoBuffer->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 
 	//Create material shaders for buffers
 	m_GBufferShaderPosition = new GBufferShader;	
@@ -367,15 +372,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	//Create SSAO texture
 	m_ssaoTexture = new RenderTextureClass;
-	if (!m_ssaoTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight))
+	if (!m_ssaoTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
 
 	m_postSSAOTexture = new RenderTextureClass;
-	if (!m_postSSAOTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight))
+	if (!m_postSSAOTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
 
 	m_ssaoNoiseTexture = new RenderTextureClass;
-	m_ssaoNoiseTexture->Initialize(m_D3D->GetDevice(), SSAO_NOISE_SIZE, SSAO_NOISE_SIZE);
+	m_ssaoNoiseTexture->Initialize(m_D3D->GetDevice(), SSAO_NOISE_SIZE, SSAO_NOISE_SIZE, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 	if (!m_ssaoNoiseTexture->LoadTexture(m_D3D->GetDevice(), L"ssaoNoise.dds", m_ssaoNoiseTexture->GetShaderResource(), m_ssaoNoiseTexture->GetShaderResourceView()))
 		return false;
 	m_GBufferShaderSSAO->SetKernelValues(ssaoKernel);
@@ -403,15 +408,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	m_bloomHelperTexture = new RenderTextureClass;
-	if (!m_bloomHelperTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
+	if (!m_bloomHelperTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
 
 	m_bloomHorizontalBlur = new RenderTextureClass;
-	if (!m_bloomHorizontalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
+	if (!m_bloomHorizontalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
 
 	m_bloomVerticalBlur = new RenderTextureClass;
-	if (!m_bloomVerticalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
+	if (!m_bloomVerticalBlur->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
 #pragma endregion
 
@@ -437,7 +442,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	m_antialiasedTexture = new RenderTextureClass;
-	if (!m_antialiasedTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight))
+	if (!m_antialiasedTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
 #pragma endregion
 
@@ -761,6 +766,13 @@ bool GraphicsClass::Render()
 	{
 		RenderGUI();
 	}
+
+	ID3D11Texture2D* backBuffer;
+	m_D3D->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
+	m_D3D->GetDeviceContext()->ResolveSubresource(backBuffer, 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	//backBuffer->Release();
+	//m_renderTextureMainScene->GetShaderResource()->Release();
+
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 
@@ -1615,8 +1627,9 @@ bool GraphicsClass::RenderGUI()
 					CurrentAntialiasingCount = AntialiasingCountArray[i];
 					istringstream iss{ CurrentAntialiasingCount };
 					iss >> m_antialiasingSettings.sampleCount;
-					MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
-					m_D3D->Initialize(m_screenWidth, m_screenHeight, true, *m_D3D->GetHWND(), false, SCREEN_DEPTH, SCREEN_NEAR);
+					m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
+					if (std::ofstream out{ "msaa_settings.txt" })
+						out << m_D3D->MSAA_NUMBER_OF_SAMPLES;
 				}
 				if (isSelected)
 				{
@@ -1902,12 +1915,12 @@ bool GraphicsClass::DownsampleSkybox()
 {
 	//Texture horizontal blur
 	m_skyboxBlurHorizontal = new RenderTextureClass;
-	if (!(m_skyboxBlurHorizontal->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
+	if (!(m_skyboxBlurHorizontal->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, m_D3D->MSAA_NUMBER_OF_SAMPLES, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	//Texture vertical blur
 	m_skyboxBlurVertical = new RenderTextureClass;
-	if (!(m_skyboxBlurVertical->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, RenderTextureClass::Scaling::NONE)))
+	if (!(m_skyboxBlurVertical->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, m_D3D->MSAA_NUMBER_OF_SAMPLES, RenderTextureClass::Scaling::NONE)))
 		return false;
 
 	DownsampleSkyboxFace(L"Skyboxes/posx.jpg", L"Skyboxes/conv_posx.dds", false);

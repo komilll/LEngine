@@ -20,7 +20,7 @@ float rgb2luma(float3 rgb);
 
 static const float EDGE_THRESHOLD_MIN = 0.0312f;
 static const float EDGE_THRESHOLD_MAX = 0.125f;
-static const float SUBPIXEL_QUALITY = 0.75f;
+static const float SUBPIXEL_QUALITY = 0.08f;
 static const int ITERATIONS = 12;
 static const float QUALITY[ITERATIONS] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 4.0f, 8.0f};
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//Delta (max-min)
 	float lumaRange = lumaMax - lumaMin;
 		
-	[branch] if (lumaRange < max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD_MAX))
+	if (lumaRange < max(EDGE_THRESHOLD_MIN, lumaMax * EDGE_THRESHOLD_MAX))
 	{
 		//Difference between lumas too small - there is no edge (or pixel is in very dark area)
 		return float4(colorCenter, 1.0f);
@@ -98,10 +98,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	//Average luma in correct direction
 	float lumaLocalAverage = 0.0f;
 	
-	[branch] if (is1Steepest)
+	if (is1Steepest)
 	{
 		//Switch direction, because is1Steepest indicates DOWN or LEFT
-		stepLength *= -1.0f;
+		stepLength = -stepLength;
 		lumaLocalAverage = 0.5f * (luma1 + lumaCenter);
 	}
 	else
@@ -111,7 +111,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	
 	//Move UV by half a pixel to correct direction
 	float2 currentUV = input.tex;
-	[branch] if (isHorizontal)
+	if (isHorizontal)
 	{
 		currentUV.y += stepLength * 0.5f;
 	}
@@ -139,41 +139,41 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	bool reachedBoth = reached1 && reached2;
 	
 	//If the side is not reached - continue exploration in given direction
-	[branch] if (!reached1)
+	if (!reached1)
 	{
 		uv1 -= offset;
 	}
-	[branch] if (!reached2)
+	if (!reached2)
 	{
 		uv2 += offset;
 	}
 	
 //CONTINUE ITERATION
-	[branch] if (!reachedBoth)
+	if (!reachedBoth)
 	{
 		for (int i = 2; i < ITERATIONS; ++i)
 		{
-			[branch] if (!reached1)
+			if (!reached1)
 			{
 				lumaEnd1 = rgb2luma(screenTexture.Sample(SampleType, uv1).rgb);				
-				lumaEnd1 -= lumaLocalAverage;
+				lumaEnd1 = lumaEnd1 - lumaLocalAverage;
 			}			
-			[branch] if (!reached2)
+			if (!reached2)
 			{
 				lumaEnd2 = rgb2luma(screenTexture.Sample(SampleType, uv2).rgb);
-				lumaEnd2 -= lumaLocalAverage;
+				lumaEnd2 = lumaEnd2 - lumaLocalAverage;
 			}
 			reached1 = abs(lumaEnd1) >= gradientScaled;
 			reached2 = abs(lumaEnd2) >= gradientScaled;
 			reachedBoth = reached1 && reached2;
 			
-			[branch] if(!reached1)
+			if(!reached1)
 				uv1 -= offset * QUALITY[i];
 		
-			[branch] if(!reached2)
+			if(!reached2)
 				uv2 += offset * QUALITY[i];
 				
-			[branch] if(reachedBoth)
+			if(reachedBoth)
 				break;
 		}
 	}
@@ -214,15 +214,16 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	finalOffset = max(finalOffset, subPixelOffsetFinal);
 
 //FINAL READ	
-	float2 finalUV = input.tex;
-	[branch] if(isHorizontal)
+	float2 finalUV = input.tex;	
+
+	if(isHorizontal)
 	{
-		finalUV.y += /*finalOffset **/ stepLength;
+		finalUV.y += finalOffset * stepLength;
 	}
 	else 
 	{
-		finalUV.x += /*finalOffset **/ stepLength;
-	}	
+		finalUV.x += finalOffset * stepLength;
+	}		
 	float4 finalColor = float4(screenTexture.Sample(SampleType, finalUV).rgb, 1.0f);
 	
 	return finalColor;

@@ -638,6 +638,7 @@ private:
 	//ANTI-ALIASING
 	FXAAShader* m_fxaaShader;
 	RenderTextureClass* m_antialiasedTexture;
+	RenderTextureClass* m_ssaaTexture;
 	AntialiasingSettings m_antialiasingSettings;
 
 	//ImGUI
@@ -666,6 +667,7 @@ private:
 	bool m_postprocessGrain = false;
 //Anti-aliasing postprocess
 	bool m_postprocessFXAA = false;
+	bool m_postprocessSSAA = true;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

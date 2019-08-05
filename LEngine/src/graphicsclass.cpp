@@ -444,6 +444,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_antialiasedTexture = new RenderTextureClass;
 	if (!m_antialiasedTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
 		return false;
+
+	m_ssaaTexture = new RenderTextureClass;
+	if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES))
+		return false;
 #pragma endregion
 
 	//TODO Replace by empty or load last scene
@@ -762,16 +766,26 @@ bool GraphicsClass::Render()
 		//m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	}
 
+	//static RenderTextureClass *renderTexture;
+	//if (renderTexture == nullptr)
+	//{
+	//	renderTexture = new RenderTextureClass;
+	//	renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
+	//}
+
+	//for (int i = 0; i < m_D3D->MSAA_NUMBER_OF_SAMPLES; ++i)
+	//{
+	//	m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	//}
+
+	//m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
+	//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+	//	return false;
+
 	if (ENABLE_GUI)
 	{
 		RenderGUI();
 	}
-
-	ID3D11Texture2D* backBuffer;
-	m_D3D->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
-	m_D3D->GetDeviceContext()->ResolveSubresource(backBuffer, 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
-	//backBuffer->Release();
-	//m_renderTextureMainScene->GetShaderResource()->Release();
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
@@ -812,6 +826,11 @@ bool GraphicsClass::RenderScene()
 	{
 		m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 		m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (m_postprocessSSAA)
+	{
+		m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else
 	{
@@ -875,6 +894,30 @@ bool GraphicsClass::RenderScene()
 			return false;
 	}
 	m_D3D->SetBackBufferRenderTarget();
+
+	m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	for (ModelClass* const& model : m_sceneModels)
+	{
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+		model->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
+		model->Render(m_D3D->GetDeviceContext());
+		if (!model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+
+	}
+	m_D3D->SetBackBufferRenderTarget();
+	m_D3D->ResetViewport();
 
 	//TODO Test post-process stack
 	if (!m_postprocessSSAO)

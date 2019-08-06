@@ -68,7 +68,7 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 
 	BlurWeightsBuffer* dataPtr3 = static_cast<BlurWeightsBuffer*>(mappedResource.pData);
 	dataPtr3->weights = XMFLOAT4{ m_weights[0], m_weights[1], m_weights[2], m_weights[3] };
-	dataPtr3->lastWeightAndpadding = XMFLOAT4{ m_weights[5], -1, -1, -1 };
+	dataPtr3->lastWeightAndpadding = XMFLOAT4{ m_weights[4], -1, -1, -1 };
 
 	deviceContext->Unmap(m_weightsBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &m_weightsBuffer);

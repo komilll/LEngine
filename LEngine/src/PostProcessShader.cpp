@@ -143,13 +143,14 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	dataPtr2->hasSSAO = m_ssaoBufferView != nullptr;
 	dataPtr2->hasBloom = m_bloomBufferView != nullptr;
 	dataPtr2->hasLUT = m_lutBufferView != nullptr;
-	dataPtr2->hasChromaticAberration = (float)m_chromaticAberration;
-	dataPtr2->hasGrain = (float)m_useGrain;
+	dataPtr2->hasChromaticAberration = m_chromaticAberration ? 1.0f : 0.0f;
+	dataPtr2->hasGrain = m_useGrain ? 1.0f : 0.0f;
 	dataPtr2->padding = XMFLOAT3{ 0,0,0 };
 
 	deviceContext->Unmap(m_textureBuffer, 0);
 	unsigned int bufferNumber{ 0 };
-	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_textureBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_textureBuffer);
+	bufferNumber++;
 
 	//Chromatic aberration buffer
 	result = deviceContext->Map(m_chromaticBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -163,7 +164,8 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	dataPtr3->intensity = m_chromaticAberrationIntensity;
 
 	deviceContext->Unmap(m_chromaticBuffer, 0);
-	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_chromaticBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_chromaticBuffer);
+	bufferNumber++;
 
 	//Grain buffer
 	result = deviceContext->Map(m_grainBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -177,7 +179,8 @@ bool PostProcessShader::SetShaderParameters(ID3D11DeviceContext *deviceContext, 
 	dataPtr4->type = m_type;
 
 	deviceContext->Unmap(m_grainBuffer, 0);
-	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_grainBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_grainBuffer);
+	bufferNumber++;
 	/////// RESOURCES ///////
 	//Pixel shader resources
 	bufferNumber = 0;

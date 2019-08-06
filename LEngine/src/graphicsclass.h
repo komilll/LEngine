@@ -503,6 +503,7 @@ private:
 	bool ApplyLUT(ID3D11ShaderResourceView* lutTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyChromaticAberration(ID3D11ShaderResourceView* chromaticAberrationTexture, ID3D11ShaderResourceView* mainFrameBuffer);
 	bool ApplyGrain(ID3D11ShaderResourceView* grainTexture, ID3D11ShaderResourceView* mainFrameBuffer);
+	bool RenderPostprocess(ID3D11ShaderResourceView* mainFrameBuffer);
 
 	//FXAA
 	bool RenderFXAATexture(RenderTextureClass * targetTex);
@@ -667,7 +668,8 @@ private:
 	bool m_postprocessGrain = false;
 //Anti-aliasing postprocess
 	bool m_postprocessFXAA = false;
-	bool m_postprocessSSAA = true;
+	bool m_postprocessSSAA = false;
+	bool m_postprocessMSAA = false;
 
 	float m_rotationY = 0.0f;
 	int m_screenWidth = 0;

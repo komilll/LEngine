@@ -469,6 +469,8 @@ private:
 	bool RenderSceneToTexture();
 	bool DownsampleTexture();
 	bool UpscaleTexture();
+	bool BlurFilterScreenSpaceTexture(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
+	bool BlurFilterScreenSpaceTexture(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpace(bool vertical); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpace(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
@@ -640,6 +642,8 @@ private:
 	FXAAShader* m_fxaaShader;
 	RenderTextureClass* m_antialiasedTexture;
 	RenderTextureClass* m_ssaaTexture;
+	RenderTextureClass* m_ssaaTextureBlurredHor;
+	RenderTextureClass* m_ssaaTextureBlurredVer;
 	AntialiasingSettings m_antialiasingSettings;
 
 	//ImGUI
@@ -668,7 +672,7 @@ private:
 	bool m_postprocessGrain = false;
 //Anti-aliasing postprocess
 	bool m_postprocessFXAA = false;
-	bool m_postprocessSSAA = false;
+	bool m_postprocessSSAA = true;
 	bool m_postprocessMSAA = false;
 
 	float m_rotationY = 0.0f;

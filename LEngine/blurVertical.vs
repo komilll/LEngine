@@ -57,7 +57,7 @@ PixelInputType ColorVertexShader(VertexInputType input)
     output.tex = input.tex;
     
 	// Determine the floating point size of a texel for a screen with this specific height.
-    texelSize = 1.0f / 360.0f;
+    texelSize = 1.0f / screenSize;
 
     // Create UV coordinates for the pixel and its four vertical neighbors on either side.
     output.texCoord1 = input.tex + float2(0.0f, texelSize * -4.0f);

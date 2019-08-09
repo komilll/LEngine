@@ -784,38 +784,52 @@ bool GraphicsClass::Render()
 			renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
 		}
 
-		//for (int i = 0; i < m_D3D->MSAA_NUMBER_OF_SAMPLES; ++i)
-		//{
-			//m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
-		//}
+		m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		//m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
+		m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+
+		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
 		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 		//	return false;
 	}
 	else if (m_postprocessSSAA)
 	{
+		//m_Camera->Render();
+		//m_Camera->GetViewMatrix(viewMatrix);
+		//m_D3D->GetWorldMatrix(worldMatrix);
+		//m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		//if (m_antialiasingSettings.sampleCount != 4)
+		//{
+		//	m_antialiasingSettings.sampleCount = 4;
+		//	m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount);
+
+		//	if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * m_antialiasingSettings.sampleCount, m_screenHeight * m_antialiasingSettings.sampleCount, 1))
+		//		return false;
+		//}
 		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f / m_antialiasingSettings.sampleCount, 1.0f / m_antialiasingSettings.sampleCount, 
+		//	1.0f / m_antialiasingSettings.sampleCount, -1.0f / m_antialiasingSettings.sampleCount, true);
+		//if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f / m_antialiasingSettings.sampleCount, 1.0f / m_antialiasingSettings.sampleCount, 
+		//	1.0f / m_antialiasingSettings.sampleCount, -1.0f / m_antialiasingSettings.sampleCount)))
+		//	return false;
+
 		BlurFilterScreenSpaceTexture(false, m_ssaaTexture, m_ssaaTextureBlurredHor, m_screenWidth); //Blur horizontal
 		BlurFilterScreenSpaceTexture(true, m_ssaaTextureBlurredHor, m_ssaaTextureBlurredVer, m_screenHeight); //Blur vertical
 
-		//m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		//m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -2.0f, 2.0f, 2.0f, -2.0f, true);
-		//if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -2.0f, 2.0f, 2.0f, -2.0f)))
-		//{
-		//	return false;
-		//}
-		m_renderTexturePreview->BindTexture(m_ssaaTexture->GetShaderResourceView());
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+		m_renderTexturePreview->BindTexture(m_ssaaTextureBlurredVer->GetShaderResourceView());
 		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 			return false;
+	}
+	else
+	{
+		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+			return false;
 
-		//m_renderTexturePreview->BindTexture(m_ssaaTexture->GetShaderResourceView());
-		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-		//	return false;
-
-		//m_D3D->SetBackBufferRenderTarget();
 	}
 
 	if (ENABLE_GUI)
@@ -881,11 +895,11 @@ bool GraphicsClass::RenderScene()
 		if (!model->GetMaterial())
 		{
 			//TODO Create function - repeated in code many times
-			if (m_materialList.find("pbr") == m_materialList.end())
+			if (m_materialList.find("gold") == m_materialList.end())
 			{
-				m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+				m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
 			}
-			model->SetMaterial(m_materialList.at("pbr"));
+			model->SetMaterial(m_materialList.at("gold"));
 			continue;
 		}
 
@@ -1378,11 +1392,11 @@ bool GraphicsClass::RenderGUI()
 				ModelClass* model = new ModelClass;
 				if (model->Initialize(m_D3D, model->LoadModelCalculatePath().c_str()))
 				{
-					if (m_materialList.find("pbr") == m_materialList.end())
+					if (m_materialList.find("gold") == m_materialList.end())
 					{
-						m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+						m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
 					}
-					model->SetMaterial(m_materialList.at("pbr"));
+					model->SetMaterial(m_materialList.at("gold"));
 
 					CreateAABB(model);
 					if (m_previewData.model)
@@ -1550,11 +1564,11 @@ bool GraphicsClass::RenderGUI()
 		}
 		else if (m_selectedModel)
 		{
-			if (m_materialList.find("pbr") == m_materialList.end())
+			if (m_materialList.find("gold") == m_materialList.end())
 			{
-				m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+				m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
 			}
-			m_selectedModel->SetMaterial(m_materialList.at("pbr"));
+			m_selectedModel->SetMaterial(m_materialList.at("gold"));
 		}
 	}
 	else
@@ -1564,11 +1578,11 @@ bool GraphicsClass::RenderGUI()
 			ModelClass* model = new ModelClass;
 			if (model->Initialize(m_D3D, model->LoadModelCalculatePath().c_str()))
 			{
-				if (m_materialList.find("pbr") == m_materialList.end())
+				if (m_materialList.find("gold") == m_materialList.end())
 				{
-					m_materialList.insert({ "pbr", new MaterialPrefab{ "pbr", m_D3D } });
+					m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
 				}
-				model->SetMaterial(m_materialList.at("pbr"));
+				model->SetMaterial(m_materialList.at("gold"));
 
 				m_sceneModels.push_back(std::move(model));
 				CreateAABB(model);
@@ -1684,15 +1698,27 @@ bool GraphicsClass::RenderGUI()
 			constexpr int count = AntialiasingCountArray.size();
 			for (int i = 0; i < count; ++i)
 			{
-				const bool isSelected = (std::pow(i, 2) == (int)m_antialiasingSettings.sampleCount);
-				if (ImGui::Selectable(AntialiasingCountArray[i], isSelected))
+				const bool isSelected = (std::pow(2, i + 1) == (int)m_antialiasingSettings.sampleCount);
+				if (ImGui::Selectable(AntialiasingCountArray[i]))
 				{
 					CurrentAntialiasingCount = AntialiasingCountArray[i];
-					istringstream iss{ CurrentAntialiasingCount };
-					iss >> m_antialiasingSettings.sampleCount;
-					m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
-					if (std::ofstream out{ "msaa_settings.txt" })
-						out << m_D3D->MSAA_NUMBER_OF_SAMPLES;
+					m_antialiasingSettings.sampleCount = std::pow(2, i + 1);
+					//m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
+					//if (std::ofstream out{ "msaa_settings.txt" })
+					//	out << m_D3D->MSAA_NUMBER_OF_SAMPLES;
+
+					m_postprocessFXAA = false;
+					m_postprocessSSAA = false;
+					m_postprocessMSAA = false;
+
+					if (m_antialiasingSettings.type == AntialiasingType::SSAA)
+					{
+						m_postprocessSSAA = true;
+						m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount);
+
+						if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * m_antialiasingSettings.sampleCount, m_screenHeight * m_antialiasingSettings.sampleCount, 1))
+							return false;
+					}
 				}
 				if (isSelected)
 				{

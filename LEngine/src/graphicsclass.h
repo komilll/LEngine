@@ -146,9 +146,10 @@ private:
 
 	enum class AntialiasingType : int
 	{
-		MSAA = 0,
-		FXAA = 1,
-		SSAA = 2
+		None = 0,
+		MSAA = 1,
+		FXAA = 2,
+		SSAA = 3
 	};
 
 	struct BloomSettings
@@ -176,7 +177,7 @@ private:
 
 	struct AntialiasingSettings
 	{
-		int sampleCount{ 1 };
+		int sampleCount{ 2 };
 		AntialiasingType type{ AntialiasingType::MSAA };
 	};
 
@@ -672,7 +673,7 @@ private:
 	bool m_postprocessGrain = false;
 //Anti-aliasing postprocess
 	bool m_postprocessFXAA = false;
-	bool m_postprocessSSAA = true;
+	bool m_postprocessSSAA = false;
 	bool m_postprocessMSAA = false;
 
 	float m_rotationY = 0.0f;

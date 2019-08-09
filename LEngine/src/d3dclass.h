@@ -65,6 +65,8 @@ public:
 	WindowSize GetWindowSize() const;
 	IDXGISwapChain* GetSwapChain();
 
+	bool CreateDepthBuffer(int sizeMultiplier = 1);
+
 public:
 	int MSAA_NUMBER_OF_SAMPLES{ 1 }; //[1/2/4/8] on GTX750Ti StormX Dual
 

@@ -328,6 +328,28 @@ void SystemClass::HandleInput()
 		{
 			m_Graphics->TryPickObjects();
 		}
+
+		if (m_Input->IsKeyDown(VK_F1))
+		{
+			m_Graphics->SetCameraRotation({ 0.0f, 0.0f, 0.0f });
+			m_Graphics->SetCameraPosition({ 0.0f, 0.1f, -0.25f });
+		}
+		else if (m_Input->IsKeyDown(VK_F2))
+		{
+			m_Graphics->SetCameraRotation({ 0.0f, 0.0f, 0.0f });
+			m_Graphics->SetCameraPosition({ 0.0f, 0.0f, -1.0f });
+		}
+		else if (m_Input->IsKeyDown(VK_F3))
+		{
+			m_Graphics->SetCameraRotation({ 0.0f, 42.75f, 0.0f });
+			m_Graphics->SetCameraPosition({ -0.496388048f, 0.0f, -0.442110479f });
+		}
+
+		if (m_Input->IsKeyDown(VK_G))
+		{
+			m_Input->KeyUp(VK_G);
+			m_Graphics->ToggleGUI();
+		}
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())
 	{

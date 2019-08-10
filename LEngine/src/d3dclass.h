@@ -35,7 +35,7 @@ public:
 	ID3D11Device* GetDevice() const;
 	ID3D11DeviceContext* GetDeviceContext() const;
 	HWND* GetHWND() const;
-	ID3D11DepthStencilView* GetDepthStencilView() const;
+	ID3D11DepthStencilView* GetDepthStencilView(int count = -1) const;
 
 	//Get MVP matrices
 	void GetProjectionMatrix(XMMATRIX&) const;
@@ -65,7 +65,8 @@ public:
 	WindowSize GetWindowSize() const;
 	IDXGISwapChain* GetSwapChain();
 
-	bool CreateDepthBuffer(int sizeMultiplier = 1);
+	bool CreateDepthBuffer(int sizeMultiplier = 1, int count = 1);
+	ID3D11DepthStencilView* CreateDepthBufferReturn(int sizeMultiplier = 1);
 
 public:
 	int MSAA_NUMBER_OF_SAMPLES{ 1 }; //[1/2/4/8] on GTX750Ti StormX Dual
@@ -80,6 +81,10 @@ private:
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11Texture2D* m_depthStencilBuffer;
 	ID3D11DepthStencilView* m_depthStencilView;
+	ID3D11DepthStencilView* m_depthStencilView_1;
+	ID3D11DepthStencilView* m_depthStencilView_2;
+	ID3D11DepthStencilView* m_depthStencilView_4;
+	ID3D11DepthStencilView* m_depthStencilView_8;
 	ID3D11BlendState* m_enableAlphaBlending;
 	ID3D11BlendState* m_disableAlphaBlending;
 

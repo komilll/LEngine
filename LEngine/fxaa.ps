@@ -21,8 +21,8 @@ float rgb2luma(float3 rgb);
 static const float EDGE_THRESHOLD_MIN = 0.0312f;
 static const float EDGE_THRESHOLD_MAX = 0.125f;
 static const float SUBPIXEL_QUALITY = 0.08f;
-static const int ITERATIONS = 12;
-static const float QUALITY[ITERATIONS] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 4.0f, 8.0f};
+static const int ITERATIONS = 50;
+// static const float QUALITY[ITERATIONS] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 1.5f, 2.0f, 2.0f, 2.0f, 2.0f, 4.0f, 8.0f};
 ////////////////////////////////////////////////////////////////////////////////
 // Pixel Shader
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,10 +168,10 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 			reachedBoth = reached1 && reached2;
 			
 			if(!reached1)
-				uv1 -= offset * QUALITY[i];
+				uv1 -= offset * 0.1f;//* QUALITY[i];
 		
 			if(!reached2)
-				uv2 += offset * QUALITY[i];
+				uv2 += offset * 0.1f;//* QUALITY[i];
 				
 			if(reachedBoth)
 				break;

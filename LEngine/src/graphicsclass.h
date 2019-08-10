@@ -54,7 +54,6 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
-const bool ENABLE_GUI = true;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -69,14 +68,18 @@ static const char* CurrentGrainType = GrainTypeArray[0];
 static const std::array<const char*, 4> AntialiasingTypeArray = { "OFF", "MSAA", "FXAA", "SSAA" };
 static const char* CurrentAntialiasingType = AntialiasingTypeArray[0];
 
-static const std::array<const char*, 3> AntialiasingCountArray = { "x2", "x4", "x8" };
-static const char* CurrentAntialiasingCount = AntialiasingCountArray[0];
+static const std::array<const char*, 3> AntialiasingCountArrayMSAA = { "x2", "x4", "x8" };
+static const char* CurrentAntialiasingCountMSAA = AntialiasingCountArrayMSAA[0];
+
+static const std::array<const char*, 3> AntialiasingCountArraySSAA = { "x2", "x4", "x8 - NOT RECOMMENDED" };
+static const char* CurrentAntialiasingCountSSAA = AntialiasingCountArraySSAA[0];
 
 constexpr float MODEL_DRAG_SPEED = 1.0f;
 
 class GraphicsClass
 {
 public:
+	bool ENABLE_GUI = true;
 	bool RENDER_MATERIAL_EDITOR = true;
 
 	struct PreviewModelData
@@ -178,7 +181,7 @@ private:
 	struct AntialiasingSettings
 	{
 		int sampleCount{ 2 };
-		AntialiasingType type{ AntialiasingType::MSAA };
+		AntialiasingType type{ AntialiasingType::None };
 	};
 
 	class ModelPicker
@@ -409,6 +412,8 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
+	void SetCameraPosition(XMFLOAT3 position);
+	void SetCameraRotation(XMFLOAT3 rotation);
 	void MoveCameraForward(float val);
 	void MoveCameraBackward(float val);
 	void MoveCameraLeft(float val);
@@ -444,6 +449,8 @@ public:
 	void SaveScene(const std::string name);
 	bool ImGuiHovered() const { return m_shaderEditorManager->IsMouseHoveredOnImGui(); };
 
+	void ToggleGUI();
+
 #pragma region Model picker
 public:
 	void TryPickObjects();
@@ -469,6 +476,7 @@ private:
 	//BILINEAR SCREEN BLUR
 	bool RenderSceneToTexture();
 	bool DownsampleTexture();
+	bool DownsampleTexture(RenderTextureClass* dst, RenderTextureClass* const src, const float size = 1.0f, const int depthStencilViewSize = 1);
 	bool UpscaleTexture();
 	bool BlurFilterScreenSpaceTexture(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpaceTexture(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
@@ -643,6 +651,7 @@ private:
 	FXAAShader* m_fxaaShader;
 	RenderTextureClass* m_antialiasedTexture;
 	RenderTextureClass* m_ssaaTexture;
+	RenderTextureClass* m_ssaaTextureBlurred_2;
 	RenderTextureClass* m_ssaaTextureBlurredHor;
 	RenderTextureClass* m_ssaaTextureBlurredVer;
 	AntialiasingSettings m_antialiasingSettings;

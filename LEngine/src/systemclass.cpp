@@ -350,6 +350,11 @@ void SystemClass::HandleInput()
 			m_Input->KeyUp(VK_G);
 			m_Graphics->ToggleGUI();
 		}
+		else if (m_Input->IsKeyDown(VK_M))
+		{
+			m_Input->KeyUp(VK_M);
+			m_Graphics->ToggleMSAA();
+		}
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())
 	{

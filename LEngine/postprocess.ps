@@ -77,7 +77,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	//BLOOM
 	float4 bloom = bloomTexture.Sample(SampleType, input.tex);
-	finalColor += (bloom * g_hasBloom);
+	finalColor += (bloom * g_hasBloom);	
 	//finalColor.xyz = pow(finalColor.xyz, float3(1.0f / 2.2f)); //gamma correction
 
 	//CHROMATIC ABERRATION

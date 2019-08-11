@@ -66,7 +66,7 @@ public:
 	IDXGISwapChain* GetSwapChain();
 
 	bool CreateDepthBuffer(int sizeMultiplier = 1, int count = 1);
-	ID3D11DepthStencilView* CreateDepthBufferReturn(int sizeMultiplier = 1);
+	ID3D11DepthStencilView* CreateDepthBufferReturn(int sizeMultiplier = 1, int count = 1);
 
 public:
 	int MSAA_NUMBER_OF_SAMPLES{ 1 }; //[1/2/4/8] on GTX750Ti StormX Dual
@@ -81,6 +81,7 @@ private:
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11Texture2D* m_depthStencilBuffer;
 	ID3D11DepthStencilView* m_depthStencilView;
+	ID3D11DepthStencilView* m_depthStencilViewBackBuffer;
 	ID3D11DepthStencilView* m_depthStencilView_1;
 	ID3D11DepthStencilView* m_depthStencilView_2;
 	ID3D11DepthStencilView* m_depthStencilView_4;

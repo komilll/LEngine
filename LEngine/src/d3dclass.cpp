@@ -192,6 +192,15 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
+	//ID3D11InfoQueue* infoQueue{ nullptr };
+	//m_device->QueryInterface(IID_PPV_ARGS(&infoQueue));
+	//if (infoQueue)
+	//{
+	//	infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+	//	infoQueue->Release();
+	//	infoQueue = nullptr;
+	//}
+
 	// Create the render target view with the back buffer pointer.
 	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
 	if(FAILED(result))
@@ -204,6 +213,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	backBufferPtr = 0;
 
 	CreateDepthBuffer();
+	m_depthStencilViewBackBuffer = CreateDepthBufferReturn(1, 1);
 	m_depthStencilView_1 = CreateDepthBufferReturn(1);
 	m_depthStencilView_2 = CreateDepthBufferReturn(2);
 	m_depthStencilView_4 = CreateDepthBufferReturn(4);
@@ -521,7 +531,7 @@ ID3D11DepthStencilView * D3DClass::GetDepthStencilView(int count) const
 
 void D3DClass::SetBackBufferRenderTarget() const
 {
-	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView());
+	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilViewBackBuffer);
 }
 
 void D3DClass::TurnZBufferOn() const
@@ -690,7 +700,7 @@ bool D3DClass::CreateDepthBuffer(int sizeMultiplier, int count)
 	return true;
 }
 
-ID3D11DepthStencilView * D3DClass::CreateDepthBufferReturn(int sizeMultiplier)
+ID3D11DepthStencilView * D3DClass::CreateDepthBufferReturn(int sizeMultiplier, int count)
 {
 	HRESULT result;
 	DXGI_ADAPTER_DESC adapterDesc;
@@ -710,7 +720,7 @@ ID3D11DepthStencilView * D3DClass::CreateDepthBufferReturn(int sizeMultiplier)
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthBufferDesc.SampleDesc.Count = 1;
+	depthBufferDesc.SampleDesc.Count = count;
 	depthBufferDesc.SampleDesc.Quality = 0;
 	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;

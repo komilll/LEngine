@@ -41,9 +41,8 @@ bool BlurShaderClass::CreateBufferAdditionals(ID3D11Device *& device)
 
 bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix, XMMATRIX &projectionMatrix)
 {
-	if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
-		return false;
-
+	//if (BaseShaderClass::SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix) == false)
+	//	return false;
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;	
 
@@ -55,11 +54,12 @@ bool BlurShaderClass::SetShaderParameters(ID3D11DeviceContext *deviceContext, XM
 
 	ScreenSizeBuffer* dataPtr2 = static_cast<ScreenSizeBuffer*>(mappedResource.pData);
 	dataPtr2->size = m_size;
-	dataPtr2->padding = XMFLOAT3{ 0,0,0 };
+	dataPtr2->padding_1 = 0.0f;
+	dataPtr2->padding_2 = 0.0f;
+	dataPtr2->padding_3 = 0.0f;
 
 	deviceContext->Unmap(m_screenSizeBuffer, 0);
-	unsigned int bufferNumber{ 1 };
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_screenSizeBuffer);
+	deviceContext->VSSetConstantBuffers(0, 1, &m_screenSizeBuffer);
 
 	/////// PIXEL BUFFERS ///////
 	result = deviceContext->Map(m_weightsBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -84,9 +84,9 @@ bool BlurShaderClass::CreateSamplerState(ID3D11Device * device)
 	D3D11_SAMPLER_DESC samplerDesc;
 
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;

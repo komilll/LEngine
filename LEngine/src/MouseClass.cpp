@@ -110,8 +110,8 @@ void MouseClass::ProcessInput()
 
 void MouseClass::GetMouseLocation(int & mouseX, int & mouseY)
 {
-	mouseX = static_cast<float>(m_mouseX);
-	mouseY = static_cast<float>(m_mouseY);
+	mouseX = static_cast<int>(m_mouseX);
+	mouseY = static_cast<int>(m_mouseY);
 }
 
 void MouseClass::GetMouseLocationScreenSpace(float & mouseX, float & mouseY)

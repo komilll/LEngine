@@ -79,7 +79,7 @@ constexpr float MODEL_DRAG_SPEED = 1.0f;
 class GraphicsClass
 {
 public:
-	bool ENABLE_GUI = true;
+	bool ENABLE_GUI = false;
 	bool RENDER_MATERIAL_EDITOR = true;
 
 	struct PreviewModelData
@@ -450,6 +450,7 @@ public:
 	bool ImGuiHovered() const { return m_shaderEditorManager->IsMouseHoveredOnImGui(); };
 
 	void ToggleGUI();
+	void ToggleMSAA();
 
 #pragma region Model picker
 public:

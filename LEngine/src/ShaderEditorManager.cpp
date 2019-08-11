@@ -1026,7 +1026,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 		int numOfElements;
 
 		getline(input, line);
-		numOfElements = ::atof(line.c_str());
+		numOfElements = ::atoi(line.c_str());
 
 		float x;
 		float y;
@@ -1039,10 +1039,10 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 				getline(input, line);
 			}
 			getline(input, line);
-			x = ::atof(line.c_str());
+			x = static_cast<float>(::atof(line.c_str()));
 
 			getline(input, line);
-			y = ::atof(line.c_str());
+			y = static_cast<float>(::atof(line.c_str()));
 
 			getline(input, line);
 			name = line;
@@ -1059,14 +1059,14 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 				if (block->m_fileName == "float1")
 				{
 					getline(input, line);
-					block->GetFirstOutputNode()->m_value = ::atof(line.c_str());
+					block->GetFirstOutputNode()->m_value = static_cast<float>(::atof(line.c_str()));
 				}
 				else if (block->m_fileName == "float2")
 				{
 					for (unsigned int i = 0; i < 2; ++i)
 					{
 						getline(input, line);
-						block->GetFirstOutputNode()->m_valueTwo[i] = ::atof(line.c_str());
+						block->GetFirstOutputNode()->m_valueTwo[i] = static_cast<float>(::atof(line.c_str()));
 					}
 				}
 				else if (block->m_fileName == "float3")
@@ -1074,7 +1074,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 					for (unsigned int i = 0; i < 3; ++i)
 					{
 						getline(input, line);
-						block->GetFirstOutputNode()->m_valueThree[i] = ::atof(line.c_str());
+						block->GetFirstOutputNode()->m_valueThree[i] = static_cast<float>(::atof(line.c_str()));
 					}
 				}
 				else if (block->m_fileName == "float4")
@@ -1082,7 +1082,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 					for (unsigned int i = 0; i < 4; ++i)
 					{
 						getline(input, line);
-						block->GetFirstOutputNode()->m_valueFour[i] = ::atof(line.c_str());
+						block->GetFirstOutputNode()->m_valueFour[i] = static_cast<float>(::atof(line.c_str()));
 					}
 				}
 				else if (block->m_fileName == "texture")
@@ -1110,10 +1110,10 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 		}
 
 		getline(input, line);
-		x = ::atof(line.c_str());
+		x = static_cast<float>(::atof(line.c_str()));
 
 		getline(input, line);
-		y = ::atof(line.c_str());
+		y = static_cast<float>(::atof(line.c_str()));
 
 		m_pbrBlock->ResetPosition();
 		m_pbrBlock->Move(x, y);

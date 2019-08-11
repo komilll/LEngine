@@ -59,7 +59,7 @@ bool RenderTextureClass::InitializeShadowMap(ID3D11Device * device, int textureW
 bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int textureHeight, int msaaCount, RenderTextureClass::Scaling scaling, bool skybox)
 {
 	if (skybox)
-		return InitializeSkybox(device, textureWidth, textureHeight, scaling);
+		return InitializeSkybox(device, textureWidth, textureHeight, msaaCount, scaling);
 	else
 		return Initialize2DTexture(device, textureWidth, textureHeight, msaaCount, scaling);
 }
@@ -222,7 +222,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+	renderTargetViewDesc.ViewDimension = msaaCount > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 	result = device->CreateRenderTargetView(m_texture2D, &renderTargetViewDesc, &m_renderTargetView);
@@ -232,7 +232,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+	shaderResourceViewDesc.ViewDimension = msaaCount > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
@@ -270,7 +270,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	return true;
 }
 
-bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling)
+bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWidth, int textureHeight, int msaaCount, RenderTextureClass::Scaling scaling)
 {
 	HRESULT result;
 
@@ -281,12 +281,12 @@ bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWid
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 6;
 	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Count = msaaCount;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | D3D11_RESOURCE_MISC_GENERATE_MIPS;;
+	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 	result = device->CreateTexture2D(&textureDesc, NULL, &m_texture2D);
 	if (FAILED(result))
@@ -295,7 +295,7 @@ bool RenderTextureClass::InitializeSkybox(ID3D11Device *& device, int textureWid
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+	renderTargetViewDesc.ViewDimension = msaaCount > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY : D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 	renderTargetViewDesc.Texture2DArray.MipSlice = 0;
 	renderTargetViewDesc.Texture2DArray.ArraySize = 1;
 

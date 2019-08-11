@@ -39,7 +39,7 @@ public:
 
 private:
 	bool Initialize2DTexture(ID3D11Device*& device, int textureWidth, int textureHeight, int msaaCount, RenderTextureClass::Scaling scaling);
-	bool InitializeSkybox(ID3D11Device*& device, int textureWidth, int textureHeight, RenderTextureClass::Scaling scaling);
+	bool InitializeSkybox(ID3D11Device*& device, int textureWidth, int textureHeight, int msaaCount, RenderTextureClass::Scaling scaling);
 
 private:
 	XMMATRIX m_orthoMatrix;

@@ -768,7 +768,7 @@ bool GraphicsClass::Render()
 
 			if (!RenderMaterialPreview())
 				return false;
-			
+
 			m_renderTexturePreview->BindTexture(m_shaderPreview->GetShaderResourceView());
 			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 				return false;
@@ -788,24 +788,23 @@ bool GraphicsClass::Render()
 		//m_skyboxPreviewBack->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	}
 
-
 	if (m_postprocessMSAA)
 	{
-		//static RenderTextureClass *renderTexture;
-		//if (renderTexture == nullptr)
-		//{
-		//	renderTexture = new RenderTextureClass;
-		//	renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
-		//}
-		//m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		static RenderTextureClass *renderTexture;
+		if (renderTexture == nullptr)
+		{
+			renderTexture = new RenderTextureClass;
+			renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
+		}
+		m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		//m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
-		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-		//	return false;
-
-		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
 		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
+
+		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+		//	return false;
 	}
 	else if (m_postprocessSSAA)
 	{
@@ -952,14 +951,14 @@ bool GraphicsClass::RenderScene()
 		}
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
-
+	m_D3D->SetBackBufferRenderTarget();
 	if (DRAW_SKYBOX)
 	{
 		if (RenderSkybox() == false)
 			return false;
-	}
+	}	
 	m_D3D->SetBackBufferRenderTarget();
-
+	
 	//TODO Test post-process stack
 	if (!m_postprocessSSAO)
 		m_postProcessShader->ResetSSAO();
@@ -1014,33 +1013,21 @@ bool GraphicsClass::RenderScene()
 		m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
 		m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
 
-		BlurFilterScreenSpace(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-		BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-		constexpr int numberOfBlurRepeats{ 10 };
-		for (int i = 0; i < numberOfBlurRepeats; i++)
+		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		BlurFilterScreenSpaceTexture(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
+		BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+		constexpr int numberOfBlurRepeats{ 5 };
+		for (int i = 2; i < numberOfBlurRepeats; i++)
 		{
-			BlurFilterScreenSpace(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-			BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+			BlurFilterScreenSpaceTexture(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / std::pow(i, 2)); //Blur horizontal
+			BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / std::pow(i, 2)); //Blur vertical
 		}
 
 		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
 	}
 
-	//if (!m_postprocessSSAO && !m_postprocessBloom && !m_postprocessLUT)
-	//{
-	//	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-	//	m_Camera->Render();
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	//	m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-	//	if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-	//		return false;
-	//}
-	
 	if (m_postprocessLUT)
 	{
 		ApplyLUT(m_lutShader->GetLUT(), m_renderTextureMainScene->GetShaderResourceView());
@@ -1059,46 +1046,29 @@ bool GraphicsClass::RenderScene()
 		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
 	}
 
-	if (m_postprocessBloom)
+	//Always render to create one buffer to present
+	if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
 	{
-		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		return false;
 	}
 
 	if (m_postprocessVignette)
 	{
-		//m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
+		m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
 		m_Camera->Render();
 		m_Camera->GetViewMatrix(viewMatrix);
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
 		m_D3D->EnableAlphaBlending();
-
-		m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
-		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-			return false;
-
-		m_D3D->DisableAlphaBlending();
-		m_D3D->SetBackBufferRenderTarget();
-	}
-
-	if (m_postprocessSSAO || m_postprocessBloom || m_postprocessLUT || m_postprocessChromaticAberration || m_postprocessGrain)
-	{
-		if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
 		{
-			return false;
+			m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
+			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+				return false; 
 		}
+		m_D3D->DisableAlphaBlending();
 	}
-
-	//worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
-	//m_cubeModel->Render(m_D3D->GetDeviceContext());
-	//m_colorShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 	//TODO SHADOWMAPPING presentation
 	//for (int i = 0; i < 5; i++)
@@ -1115,18 +1085,15 @@ bool GraphicsClass::RenderScene()
 	//		return false;
 	//}
 
-	if (m_postprocessBloom)
-	{
-		//Clear to make sure there is no pointer to local variable which outlives scope
-		m_bloomShader->m_bloomTexture = nullptr;
-		m_bloomShader->m_bloomTextureView = nullptr;
-	}
+	//TODO Shouldn't be deleted?
+	//Clear to make sure there is no pointer to local variable which outlives scope
+	m_bloomShader->m_bloomTexture = nullptr;
+	m_bloomShader->m_bloomTextureView = nullptr;
 
 	//Draw model picker
 	m_D3D->TurnZBufferOff();
 	if (m_selectedModel)
 	{
-		m_D3D->SetBackBufferRenderTarget();
 		m_Camera->GetViewMatrix(viewMatrix);
 		m_D3D->GetWorldMatrix(worldMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
@@ -1725,10 +1692,10 @@ bool GraphicsClass::RenderGUI()
 					else if (m_antialiasingSettings.type == AntialiasingType::MSAA)
 					{
 						m_postprocessMSAA = true;
-						//m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
-						//if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
-						//	return false;
-						//m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+						m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
+						if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+							return false;
+						m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 					}
 					else if (m_antialiasingSettings.type == AntialiasingType::FXAA)
 					{
@@ -1787,10 +1754,10 @@ bool GraphicsClass::RenderGUI()
 						m_postprocessFXAA = false;
 						m_postprocessSSAA = false;
 						m_postprocessMSAA = true;
-						//m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
-						//if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
-						//	return false;
-						//m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+						m_D3D->MSAA_NUMBER_OF_SAMPLES = m_antialiasingSettings.sampleCount;
+						if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+							return false;
+						m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 					}
 					if (isSelected)
 					{
@@ -3127,6 +3094,23 @@ void GraphicsClass::SaveScene(const std::string name)
 void GraphicsClass::ToggleGUI()
 {
 	ENABLE_GUI = !ENABLE_GUI;
+}
+
+void GraphicsClass::ToggleMSAA()
+{
+	if (!m_postprocessMSAA)
+	{
+		m_postprocessMSAA = true;
+		m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
+	}
+	else
+	{
+		m_postprocessMSAA = false;
+		m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
+	}
+	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+		return;
+	m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
 }
 
 static std::pair<float, float> savedMousePos{};

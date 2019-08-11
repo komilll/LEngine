@@ -10,10 +10,13 @@ class BlurShaderClass : public BaseShaderClass
 public:
 	static const int k_numberOfWeights{ 5 };
 
+	__declspec(align(16))
 	struct ScreenSizeBuffer
 	{
-		float size{ 0.0f };
-		XMFLOAT3 padding{ 0.0f, 0.0f, 0.0f };
+		float size;
+		float padding_1;
+		float padding_2;
+		float padding_3;
 	};
 
 	struct BlurWeightsBuffer

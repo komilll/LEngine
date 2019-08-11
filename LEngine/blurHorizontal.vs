@@ -1,18 +1,14 @@
 /////////////
 // GLOBALS //
 /////////////
-cbuffer MatrixBuffer
-{
-	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
-};
-
-cbuffer ScreenSizeBuffer
+cbuffer ScreenSizeBuffer : register(cb0)
 {
     float screenSize;
-    float3 paddingSizeBuffer;
+	float g_padding1;
+	float g_padding2;
+	float g_padding3;
 };
+
 
 //////////////
 // TYPEDEFS //

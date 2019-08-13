@@ -122,7 +122,7 @@ bool BaseShaderClass::CreateBuffers(ID3D11Device * device)
 	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 192;
+	matrixBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	const HRESULT result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);

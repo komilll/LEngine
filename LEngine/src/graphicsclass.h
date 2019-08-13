@@ -510,11 +510,11 @@ private:
 	inline void RenderTextureViewImGuiEditor(ID3D11Resource*& resource, ID3D11ShaderResourceView*& resourceView, const char* label, std::string& path, bool skipLabel = false);
 	EMaterialInputResult RenderInputForMaterial(UIShaderEditorBlock* block, bool changeName = false, bool isActive = false);
 	//Applying post-processes
-	bool ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer);
-	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture, ID3D11ShaderResourceView* mainFrameBuffer);
-	bool ApplyLUT(ID3D11ShaderResourceView* lutTexture, ID3D11ShaderResourceView* mainFrameBuffer);
-	bool ApplyChromaticAberration(ID3D11ShaderResourceView* chromaticAberrationTexture, ID3D11ShaderResourceView* mainFrameBuffer);
-	bool ApplyGrain(ID3D11ShaderResourceView* grainTexture, ID3D11ShaderResourceView* mainFrameBuffer);
+	bool ApplySSAO(ID3D11ShaderResourceView* ssaoMap);
+	bool ApplyBloom(ID3D11ShaderResourceView* bloomTexture);
+	bool ApplyLUT(ID3D11ShaderResourceView* lutTexture);
+	bool ApplyChromaticAberration();
+	bool ApplyGrain();
 	bool RenderPostprocess(ID3D11ShaderResourceView* mainFrameBuffer);
 
 	//FXAA
@@ -562,6 +562,8 @@ private:
 
 	LightClass* m_directionalLight;
 	RenderTextureClass* m_shaderPreview;
+	RenderTextureClass* m_msaaSkybox;
+	RenderTextureClass* m_msaaResolveTexture;
 
 	ModelPicker* m_modelPicker;
 

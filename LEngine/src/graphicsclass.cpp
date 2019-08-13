@@ -188,7 +188,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	m_skyboxShader->LoadTexture(m_D3D->GetDevice(), L"Skyboxes/cubemap.dds", m_skyboxShader->m_skyboxTexture, m_skyboxShader->m_skyboxTextureView);
-	
+
+	m_msaaSkybox = new RenderTextureClass();
+	if (!(m_msaaSkybox->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1)))
+		return false;
+
+	m_msaaResolveTexture = new RenderTextureClass();
+	if (!m_msaaResolveTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1))
+		return false;
+
 	//RENDER SCENE TO TEXTURE
 	m_renderTexture = new RenderTextureClass;
 	if (!(m_renderTexture->Initialize(m_D3D->GetDevice(), CONVOLUTION_DIFFUSE_SIZE, CONVOLUTION_DIFFUSE_SIZE, 1)))
@@ -755,6 +763,12 @@ bool GraphicsClass::Render()
 			if (!RenderScene())
 				return false;
 
+			//m_msaaSkybox->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+			//m_msaaSkybox->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+			//m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+			//m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
 			if (m_postprocessFXAA)
 			{
 				m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
@@ -789,18 +803,18 @@ bool GraphicsClass::Render()
 	}
 
 	if (m_postprocessMSAA)
-	{
-		static RenderTextureClass *renderTexture;
-		if (renderTexture == nullptr)
-		{
-			renderTexture = new RenderTextureClass;
-			renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
-		}
-		m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	{		
+		//static RenderTextureClass *renderTexture;
+		//if (renderTexture == nullptr)
+		//{
+		//	renderTexture = new RenderTextureClass;
+		//	renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
+		//}
+		//m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
-		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-			return false;
+		//m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
+		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+		//	return false;
 
 		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
 		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
@@ -951,7 +965,7 @@ bool GraphicsClass::RenderScene()
 		}
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
-	m_D3D->SetBackBufferRenderTarget();
+	
 	if (DRAW_SKYBOX)
 	{
 		if (RenderSkybox() == false)
@@ -979,7 +993,7 @@ bool GraphicsClass::RenderScene()
 			m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
-		ApplySSAO(m_ssaoTexture->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
+		ApplySSAO(m_ssaoTexture->GetShaderResourceView());
 		
 		m_D3D->SetBackBufferRenderTarget();
 	}
@@ -1025,31 +1039,42 @@ bool GraphicsClass::RenderScene()
 			BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / std::pow(i, 2)); //Blur vertical
 		}
 
-		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
+		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
 	}
 
 	if (m_postprocessLUT)
 	{
-		ApplyLUT(m_lutShader->GetLUT(), m_renderTextureMainScene->GetShaderResourceView());
+		ApplyLUT(m_lutShader->GetLUT());
 	}
 
 	if (m_postprocessChromaticAberration)
 	{		
-		ApplyChromaticAberration(nullptr, m_renderTextureMainScene->GetShaderResourceView());
+		ApplyChromaticAberration();
 		m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
 		m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
 	}
 	
 	if (m_postprocessGrain)
 	{
-		ApplyGrain(nullptr, m_renderTextureMainScene->GetShaderResourceView());
+		ApplyGrain();
 		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
 	}
 
 	//Always render to create one buffer to present
-	if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
+	if (m_D3D->MSAA_NUMBER_OF_SAMPLES > 1)
 	{
-		return false;
+		m_D3D->GetDeviceContext()->ResolveSubresource(m_msaaResolveTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		if (!RenderPostprocess(m_msaaResolveTexture->GetShaderResourceView()))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
+		{
+			return false;
+		}
 	}
 
 	if (m_postprocessVignette)
@@ -1180,7 +1205,7 @@ bool GraphicsClass::RenderMaterialPreview()
 			m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		}
 
-		ApplySSAO(m_ssaoTexture->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
+		ApplySSAO(m_ssaoTexture->GetShaderResourceView());
 
 		m_D3D->SetBackBufferRenderTarget();
 	}
@@ -1221,7 +1246,7 @@ bool GraphicsClass::RenderMaterialPreview()
 			BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
 		}
 
-		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView(), m_renderTextureMainScene->GetShaderResourceView());
+		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
 	}
 
 	if (!m_postprocessSSAO && !m_postprocessBloom && !m_postprocessLUT)
@@ -1241,19 +1266,19 @@ bool GraphicsClass::RenderMaterialPreview()
 
 	if (m_postprocessLUT)
 	{
-		ApplyLUT(m_lutShader->GetLUT(), m_renderTextureMainScene->GetShaderResourceView());
+		ApplyLUT(m_lutShader->GetLUT());
 	}
 
 	if (m_postprocessChromaticAberration)
 	{
-		ApplyChromaticAberration(nullptr, m_renderTextureMainScene->GetShaderResourceView());
+		ApplyChromaticAberration();
 		m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
 		m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
 	}
 
 	if (m_postprocessGrain)
 	{
-		ApplyGrain(nullptr, m_renderTextureMainScene->GetShaderResourceView());
+		ApplyGrain();
 		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
 	}
 
@@ -2945,7 +2970,7 @@ GraphicsClass::EMaterialInputResult GraphicsClass::RenderInputForMaterial(UIShad
 	return EMaterialInputResult::Continue;
 }
 
-bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderResourceView*& mainFrameBuffer)
+bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView* ssaoMap)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	m_Camera->Render();
@@ -2953,18 +2978,17 @@ bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView*& ssaoMap, ID3D11ShaderRe
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	if (mainFrameBuffer != nullptr)
-		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
 	if (ssaoMap != nullptr)
 		m_postProcessShader->SetSSAOBuffer(ssaoMap);
 
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	worldMatrix = worldMatrix * 0;
-	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	return true;
 }
 
-bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	m_Camera->Render();
@@ -2972,8 +2996,6 @@ bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture, ID3D11Sh
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	if (mainFrameBuffer != nullptr)
-		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
 	if (bloomTexture != nullptr)
 		m_postProcessShader->SetBloomBuffer(bloomTexture);
 
@@ -2983,7 +3005,7 @@ bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture, ID3D11Sh
 	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 }
 
-bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	m_Camera->Render();
@@ -2991,8 +3013,6 @@ bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture, ID3D11Shader
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	if (mainFrameBuffer != nullptr)
-		m_postProcessShader->SetScreenBuffer(mainFrameBuffer);
 	if (lutTexture != nullptr)
 		m_postProcessShader->SetLUTBuffer(lutTexture);
 
@@ -3002,13 +3022,13 @@ bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture, ID3D11Shader
 	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 }
 
-bool GraphicsClass::ApplyChromaticAberration(ID3D11ShaderResourceView * chromaticAberrationTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+bool GraphicsClass::ApplyChromaticAberration()
 {
 	m_postProcessShader->UseChromaticAberration(true);
 	return true;
 }
 
-bool GraphicsClass::ApplyGrain(ID3D11ShaderResourceView * grainTexture, ID3D11ShaderResourceView * mainFrameBuffer)
+bool GraphicsClass::ApplyGrain()
 {
 	m_postProcessShader->UseGrain(true);
 	return true;

@@ -100,7 +100,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	{
 		finalColor = CalculateGrain(finalColor, input.tex);
 	}
-	return finalColor;
+	return finalColor;	
 }
 
 float luma(float3 color)

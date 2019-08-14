@@ -43,6 +43,7 @@
 #include "ModelPickerShader.h"
 #include "FXAAShader.h"
 #include <array>
+#include "PointLight.h"
 
 /////////////
 // GLOBALS //
@@ -468,12 +469,15 @@ private:
 private:
 	bool Render();
 	bool RenderScene();
+	bool RenderLightModels();
 	bool RenderMaterialPreview();
 	bool RenderGUI();
 	void ReinitializeMainModel();
 	void RefreshModelTick();
 
 	bool RenderSkybox();
+	//LIGHTING
+	std::vector<PointLight*> m_pointLights;
 	//BILINEAR SCREEN BLUR
 	bool RenderSceneToTexture();
 	bool DownsampleTexture();

@@ -8,18 +8,18 @@ class ShaderPBRGenerated : public BaseShaderClass
 {
 private:
 	static const int NUM_LIGHTS_DIRECTIONAL = 1;
-	static const int NUM_LIGHTS_POINT = 0;
-	//#define USE_POINT_LIGHTS
+	static const int NUM_LIGHTS_POINT = 1;
 
 	struct LightingBufferType
 	{
 		XMFLOAT4 directional_directionStregth[NUM_LIGHTS_DIRECTIONAL];
 		XMFLOAT4 directional_color[NUM_LIGHTS_DIRECTIONAL];
-#ifdef USE_POINT_LIGHTS
+	};
+
+	struct PointLightBuffer
+	{
 		XMFLOAT4 point_positionWithRadius[NUM_LIGHTS_POINT];
 		XMFLOAT4 point_colorWithStrength[NUM_LIGHTS_POINT];
-#endif
-		//float strength[NUM_LIGHTS];
 	};
 
 	struct CameraBufferType
@@ -55,11 +55,8 @@ private:
 
 	struct PointLight
 	{
-		XMFLOAT4 positionWithRadius;
-		XMFLOAT4 colorWithStrength;
-
-		PointLight() = default;
-		PointLight(XMFLOAT4 positionWithRadius_, XMFLOAT4 colorWithStrength_) : positionWithRadius(positionWithRadius_), colorWithStrength(colorWithStrength_) {}
+		XMFLOAT4 m_positionWithRadius;
+		XMFLOAT4 m_colorWithStrength;
 	};
 
 public:
@@ -79,10 +76,11 @@ public:
 	void AddDirectionalLight(XMFLOAT3 direction, float strength, float red, float green, float blue);
 
 	void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength);
-	void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength);
-	void AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength);
-	void AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength);
-	void AddPointLight(XMFLOAT3 position, float radius, XMFLOAT3 color, float colorStrength);
+	//void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength);
+	//void AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength);
+	//void AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength);
+	//void AddPointLight(XMFLOAT3 position, float radius, XMFLOAT3 color, float colorStrength);
+	//void AddPointLight(PointLight* light);
 
 	void SetRoughness(float roughness);
 	void SetMetalness(float metalness);
@@ -120,6 +118,7 @@ private:
 	std::vector<PointLight> m_pointLight;
 
 	ID3D11Buffer* m_lightingBuffer;
+	ID3D11Buffer* m_pointLightBuffer;
 	ID3D11Buffer* m_cameraBuffer;
 	ID3D11Buffer* m_PBRBuffer;
 	ID3D11Buffer* m_ShaderTextureBuffer;

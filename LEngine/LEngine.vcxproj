@@ -199,6 +199,7 @@
     <ClInclude Include="src\ModelPickerShader.h" />
     <ClInclude Include="src\MouseClass.h" />
     <ClInclude Include="src\MouseClassContainer.h" />
+    <ClInclude Include="src\PointLight.h" />
     <ClInclude Include="src\PostProcessShader.h" />
     <ClInclude Include="src\RenderTextureClass.h" />
     <ClInclude Include="src\ShaderEditorManager.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="src\ModelPickerShader.cpp" />
     <ClCompile Include="src\MouseClass.cpp" />
     <ClCompile Include="src\MouseClassContainer.cpp" />
+    <ClCompile Include="src\PointLight.cpp" />
     <ClCompile Include="src\PostProcessShader.cpp" />
     <ClCompile Include="src\RenderTextureClass.cpp" />
     <ClCompile Include="src\ShaderEditorManager.cpp" />

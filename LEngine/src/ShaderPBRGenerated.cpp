@@ -11,6 +11,11 @@ bool ShaderPBRGenerated::LoadIrradianceMap(ID3D11ShaderResourceView *& shaderRes
 	return true;
 }
 
+//void ShaderPBRGenerated::AddPointLight(PointLight* light)
+//{
+//	m_pointLight.push_back(light);
+//}
+
 void ShaderPBRGenerated::SetRoughness(float roughness)
 {
 	m_roughness = roughness;
@@ -74,25 +79,25 @@ void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 col
 	m_pointLight.push_back(PointLight{ positionWithRadius, colorWithStrength });
 }
 
-void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength)
-{
-	m_pointLight.push_back(PointLight{ positionWithRadius,{ color.x, color.y, color.z, colorStrength } });
-}
-
-void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength)
-{
-	m_pointLight.push_back(PointLight{ positionWithRadius,{ red, green, blue, colorStrength } });
-}
-
-void ShaderPBRGenerated::AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength)
-{
-	m_pointLight.push_back(PointLight{ { position.x, position.y, position.z, radius },{ red, green, blue, colorStrength } });
-}
-
-void ShaderPBRGenerated::AddPointLight(XMFLOAT3 position, float radius, XMFLOAT3 color, float colorStrength)
-{
-	m_pointLight.push_back(PointLight{ { position.x, position.y, position.z, radius },{ color.x, color.y, color.z, colorStrength } });
-}
+//void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength)
+//{
+//	//m_pointLight.push_back(PointLight{ positionWithRadius,{ color.x, color.y, color.z, colorStrength } });
+//}
+//
+//void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength)
+//{
+//	//m_pointLight.push_back(PointLight{ positionWithRadius,{ red, green, blue, colorStrength } });
+//}
+//
+//void ShaderPBRGenerated::AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength)
+//{
+//	//m_pointLight.push_back(PointLight{ { position.x, position.y, position.z, radius },{ red, green, blue, colorStrength } });
+//}
+//
+//void ShaderPBRGenerated::AddPointLight(XMFLOAT3 position, float radius, XMFLOAT3 color, float colorStrength)
+//{
+//	//m_pointLight.push_back(PointLight{ { position.x, position.y, position.z, radius },{ color.x, color.y, color.z, colorStrength } });
+//}
 
 bool ShaderPBRGenerated::CreateBufferAdditionals(ID3D11Device * &device)
 {
@@ -117,11 +122,15 @@ bool ShaderPBRGenerated::CreateBufferAdditionals(ID3D11Device * &device)
 	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_PBRBuffer)))
 		return false;
 
-	tempBufferDesc.ByteWidth = sizeof(PBRBufferType);
+	tempBufferDesc.ByteWidth = sizeof(ShaderTextureBufferType);
 	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_ShaderTextureBuffer)))
 		return false;
 
-	m_buffers = { m_lightingBuffer, m_cameraBuffer, m_PBRBuffer, m_ShaderTextureBuffer };
+	tempBufferDesc.ByteWidth = sizeof(PointLightBuffer);
+	if (FAILED(device->CreateBuffer(&tempBufferDesc, NULL, &m_pointLightBuffer)))
+		return false;
+
+	m_buffers = { m_lightingBuffer, m_cameraBuffer, m_PBRBuffer, m_ShaderTextureBuffer, m_pointLightBuffer };
 
 	LoadGeneratedTextures(device);
 
@@ -148,9 +157,7 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	dataPtr3->padding = 0;
 
 	deviceContext->Unmap(m_cameraBuffer, 0);
-	bufferNumber = 1;
-	deviceContext->VSSetConstantBuffers(bufferNumber++, 1, &m_cameraBuffer);
-
+	deviceContext->VSSetConstantBuffers(1, 1, &m_cameraBuffer);
 	/////// PIXEL BUFFERS ///////
 	//Lighting buffer
 	result = deviceContext->Map(m_lightingBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -162,20 +169,30 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	{
 		dataPtr2->directional_directionStregth[i] = m_directionalLight.at(i).direction;
 		dataPtr2->directional_color[i] = m_directionalLight.at(i).color;
-		//dataPtr2->strength[i] = m_lightDirection.at(i).w;
 	}
-#ifdef USE_POINT_LIGHTS
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
-	{
-		dataPtr2->point_positionWithRadius[i] = m_pointLight.at(i).positionWithRadius;
-		//dataPtr2->point_colorWithStrength[i] = XMFLOAT4{ 1, 0, 0, 2 };
-		dataPtr2->point_colorWithStrength[i] = m_pointLight.at(i).colorWithStrength;
-	}
-#endif
 
 	deviceContext->Unmap(m_lightingBuffer, 0);
 	bufferNumber = 0;
-	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_lightingBuffer);
+	deviceContext->PSSetConstantBuffers(0, 1, &m_lightingBuffer);
+
+	//Point light buffer
+	result = deviceContext->Map(m_pointLightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	PointLightBuffer* pointBuffer{ static_cast<PointLightBuffer*>(mappedResource.pData) };
+
+	//const int pointLightSize = min(m_pointLight.size(), NUM_LIGHTS_POINT);
+	//for (int i = 0; i < pointLightSize; i++)
+	//{
+	//	pointBuffer->point_positionWithRadius[i] = m_pointLight.at(i).m_positionWithRadius;
+	//	pointBuffer->point_colorWithStrength[i] = m_pointLight.at(i).m_colorWithStrength;
+	//}
+	pointBuffer->point_positionWithRadius[0] = { 1.5f, 0.75f, 0.0f, 15.0f };
+	pointBuffer->point_colorWithStrength[0] = { 1.0f, 0.0f, 0.0f, 5.0f };
+
+	deviceContext->Unmap(m_pointLightBuffer, 0);
+	deviceContext->PSSetConstantBuffers(1, 1, &m_pointLightBuffer);
 
 	//PBR Buffer
 	result = deviceContext->Map(m_PBRBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -189,7 +206,7 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	dataPtr4->padding = XMFLOAT2{ 0,0 };
 
 	deviceContext->Unmap(m_PBRBuffer, 0);
-	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_PBRBuffer);
+	deviceContext->PSSetConstantBuffers(2, 1, &m_PBRBuffer);
 
 	//Shader Texture Buffer
 	result = deviceContext->Map(m_ShaderTextureBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -197,13 +214,13 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 		return false;
 
 	ShaderTextureBufferType* dataPtr5{ static_cast<ShaderTextureBufferType*>(mappedResource.pData) };
-	dataPtr5->hasNormalMap = m_normalTextureView != nullptr;
-	dataPtr5->hasRoughnessMap = m_roughnessTextureView != nullptr;
-	dataPtr5->hasMetalnessMap = m_metalnessTextureView != nullptr;
-	dataPtr5->hasAlbedoMap = m_diffuseTextureView != nullptr;
+	dataPtr5->hasNormalMap = static_cast<int>(m_normalTextureView != nullptr);
+	dataPtr5->hasRoughnessMap = static_cast<int>(m_roughnessTextureView != nullptr);
+	dataPtr5->hasMetalnessMap = static_cast<int>(m_metalnessTextureView != nullptr);
+	dataPtr5->hasAlbedoMap = static_cast<int>(m_diffuseTextureView != nullptr);
 
 	deviceContext->Unmap(m_ShaderTextureBuffer, 0);
-	deviceContext->PSSetConstantBuffers(bufferNumber++, 1, &m_ShaderTextureBuffer);
+	deviceContext->PSSetConstantBuffers(3, 1, &m_ShaderTextureBuffer);
 
 	/////// RESOURCES ///////
 	//Pixel shader resources

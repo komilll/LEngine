@@ -479,6 +479,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_singleColorShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"modelpicker.vs", L"modelpicker.ps", m_D3D->GetBaseInputType()))
 		return false;
 
+	//Point lights
+	PointLight* pointLight = new PointLight;
+	if (!pointLight->Initialize(m_D3D, "sphere.obj", true))
+		return false;
+	pointLight->SetScale(0.1f, 0.1f, 0.1f);
+	pointLight->SetParams({ 1.5f, 0.75f, 0.0f }, 15.0f, {1.0f, 0.0f, 0.0f}, 25.0f);
+	m_pbrShader->AddPointLight(pointLight->GetPositionWithRadius(), pointLight->GetColorWithStrength());
+	m_pointLights.push_back(std::move(pointLight));
+
 	return true;
 }
 
@@ -965,7 +974,10 @@ bool GraphicsClass::RenderScene()
 		}
 		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
-	
+
+	if (!RenderLightModels())
+		return false;
+
 	if (DRAW_SKYBOX)
 	{
 		if (RenderSkybox() == false)
@@ -1126,6 +1138,28 @@ bool GraphicsClass::RenderScene()
 			return false;
 	}
 	m_D3D->TurnZBufferOn();
+
+	return true;
+}
+
+bool GraphicsClass::RenderLightModels()
+{
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	for (const auto& light : m_pointLights)
+	{
+		m_Camera->Render();
+
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(light->GetPosition().x, light->GetPosition().y, light->GetPosition().z));
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(light->GetScale().x, light->GetScale().y, light->GetScale().z));
+		
+		light->Render(m_D3D->GetDeviceContext());
+		if (!m_singleColorShader->Render(m_D3D->GetDeviceContext(), light->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+	}
 
 	return true;
 }

@@ -40,6 +40,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
 	float3 diffuseLookUp : TEXCOORD2;
+	float3 worldPosition : TEXCOORD3;
 };
 
 
@@ -69,6 +70,7 @@ PixelInputType ColorVertexShader(VertexInputType input)
 
 	//Calculate view direction for pixels
 	worldPosition = mul(input.position, worldMatrix);
+	output.worldPosition = worldPosition;
 
 	output.viewDirection = cameraPosition.xyz - worldPosition.xyz;
 	output.viewDirection = normalize(output.viewDirection);

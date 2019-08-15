@@ -135,7 +135,8 @@ void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext * deviceContext, 
 	const std::array<float, 4> color{ red, green, blue, alpha };
 
 	deviceContext->ClearRenderTargetView(m_renderTargetView, &color[0]);
-	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	if (depthStencilView)
+		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
 void RenderTextureClass::SetViewport(ID3D11DeviceContext * deviceContext)

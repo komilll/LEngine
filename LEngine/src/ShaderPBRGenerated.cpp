@@ -165,7 +165,7 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 		return false;
 
 	LightingBufferType* dataPtr2{ static_cast<LightingBufferType*>(mappedResource.pData) };
-	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++)
+	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; ++i)
 	{
 		dataPtr2->directional_directionStregth[i] = m_directionalLight.at(i).direction;
 		dataPtr2->directional_color[i] = m_directionalLight.at(i).color;
@@ -188,8 +188,8 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	//	pointBuffer->point_positionWithRadius[i] = m_pointLight.at(i).m_positionWithRadius;
 	//	pointBuffer->point_colorWithStrength[i] = m_pointLight.at(i).m_colorWithStrength;
 	//}
-	pointBuffer->point_positionWithRadius[0] = { 1.5f, 0.75f, 0.0f, 15.0f };
-	pointBuffer->point_colorWithStrength[0] = { 1.0f, 0.0f, 0.0f, 5.0f };
+	pointBuffer->point_positionWithRadius[0] = { 1.5f, 0.75f, 0.0f, 5.0f };
+	pointBuffer->point_colorWithStrength[0] = { 1.0f, 0.0f, 0.0f, 0.5f };
 
 	deviceContext->Unmap(m_pointLightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(1, 1, &m_pointLightBuffer);

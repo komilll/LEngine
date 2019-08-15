@@ -42,7 +42,7 @@ static float4 tex_14;
 Texture2D additionalTexture_5 : register(t12);
 static float4 tex_22;
 
-#define NUM_LIGHTS_DIRECTIONAL 1
+#define NUM_LIGHTS_DIRECTIONAL 2
 #define NUM_LIGHTS_POINT 1
 cbuffer LightingBuffer : register(b0)
 {
@@ -88,6 +88,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
 	float3 diffuseLookUp : TEXCOORD2;
+	float3 worldPosition : TEXCOORD3;
 };
 
 //////////////
@@ -101,7 +102,7 @@ float4 GetBaseColor();
 
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
-float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
+float NormalDistributionFunction(float roughness, float NdotH);
 float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
 float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness);
 
@@ -194,7 +195,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float3 Normal = input.normal * GetNormal();
 
 	float3 N = normalize(Normal);
-    float3 V = input.viewDirection;
+    float3 V = normalize(input.viewDirection);
 	float3 R = reflect(-input.viewDirection, input.normal);
 
 	float NdotV = max(dot(N, V), 0.0);
@@ -220,13 +221,35 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 //MULTIPLE DIRECTIONAL LIGHT PASS
 	float4 finalColor = float4(ambient, 1.0f); //Base of output color is ambient lighting
-
+	//float4 finalColor = 0;
+	float4 directionalLight = 0;
 #if NUM_LIGHTS_DIRECTIONAL > 0
 	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++)
 		accumulatedLightStrength += g_directionalLightDirectionStrength[i].w;
 
 	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++) //Iterate over number of directional lights
 	{
+		float3 L = normalize(g_directionalLightDirectionStrength[i].xyz);
+		float3 H = normalize(V + L);
+		//float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		//float attenuation = 1.0f / (distance * distance);
+		float3 radiance = g_directionalLightColor[i].xyz * g_directionalLightDirectionStrength[i].w;
+		
+		// //Cook-torrance brdf
+		float NdotH = max(dot(N, H), 0.0f);
+		float NdotV = max(dot(N, V), 0.0f);
+		float NdotL = max(dot(N, L), 0.0f);
+		
+		float NDF = NormalDistributionFunction(roughness, NdotH);
+		float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+		
+		float3 numerator = NDF * G * F;
+		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+		specular = numerator / max(denominator, 0.001);
+
+		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		
+	/*
 		lightDir = normalize(g_directionalLightDirectionStrength[i].xyz);
 		lightIntensity = saturate(dot(Normal, lightDir));	
 
@@ -254,7 +277,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 		//return float4(Lo, 1.0f);
 		finalColor += float4(Lo, 1.0f);
+		directionalLight = float4(Lo, 1.0f);
+		
+		//finalColor = float4(specular, 1.0f);
 		//finalColor += float4(ambient + Lo, 1.0f);
+	*/
 	}
 	//finalColor = saturate(finalColor);
 #endif
@@ -268,29 +295,83 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 
 	for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
 	{
-		float distance = length(input.position.z - g_pointLightPositionWithRadius[i].z);
-		//distance = 1.0f;
-		lightDir = normalize(input.position.z - g_pointLightPositionWithRadius[i].z);
-		lightIntensity = 1.0f / (POINT_LIGHT_CONSTANT + POINT_LIGHT_LINEAR * distance + POINT_LIGHT_QUADRATIC * distance * distance);
-
-	//Calculate multiple dot products
-		float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
-		float NdotH = max(dot(normal, halfV), 0.0);
-		float NdotL = max(dot(normal, lightDir), 0.0);
-
-	//NORMAL DISTRUBUTION FUNCTION
-		float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
-	//GEOMETRY FUNCTION
-		float G = GeometrySmithGGX(roughness, NdotV, NdotL);
-
-	//FINAL CALCULATIONS
-		float3 numerator = D * G * F;
+		float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		float3 H = normalize(V - L);
+		float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		float attenuation = 1.0f / (distance * distance);
+		float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation;
+		
+		// //Cook-torrance brdf
+		float NdotH = max(dot(N, H), 0.0f);
+		float NdotV = max(dot(N, V), 0.0f);
+		float NdotL = max(dot(N, -L), 0.0f);
+		
+		float NDF = NormalDistributionFunction(roughness, NdotH);
+		float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+		
+		float3 numerator = NDF * G * F;
 		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 		specular = numerator / max(denominator, 0.001);
 
-		float3 Lo = NdotL * lightIntensity * g_pointLightColorWithStrength[i].w * g_pointLightColorWithStrength[i].xyz;
-		finalColor = float4(Lo, 1.0f);
-		finalColor = g_pointLightColorWithStrength[i].w;
+		//finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		
+	/*
+		float3 pointDir = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		float dist = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);		
+		float4 ambientColor = 0;
+		if (dist < g_pointLightPositionWithRadius[i].w * g_pointLightPositionWithRadius[i].w)
+		{
+			ambientColor = float4(g_pointLightColorWithStrength[i].xyz, 1.0f) * 0.1f;
+		}		
+		float diffuseFactor = max(dot(normal, -pointDir), 0);
+
+		float4 diffuseColor = float4(0, 0, 0, 0);
+		float4 specularColor = float4(0, 0, 0, 0);		
+		if (diffuseFactor > 0) {			
+			diffuseColor = float4(g_pointLightColorWithStrength[i].xyz * g_pointLightColorWithStrength[i].w * diffuseFactor, 1.0f);
+			float3 vertexToEye = normalize(input.viewDirection);
+			float3 lightReflect = normalize(reflect(-pointDir, normal));
+			float specularFactor = dot(vertexToEye, lightReflect);
+			if (specularFactor > 0) {
+				float specularPower = 2.0f;
+				float specularMultiplier = 0.5f;
+				specularFactor = pow(specularFactor, specularPower);
+				specularColor = float4(g_pointLightColorWithStrength[i].xyz * specularMultiplier * specularFactor, 1.0f);
+			}
+		}
+		
+		float4 tmpColor = ambientColor + diffuseColor + specularColor;				
+		tmpColor = saturate(tmpColor);		
+		float attenuation = (POINT_LIGHT_CONSTANT + POINT_LIGHT_LINEAR * dist + POINT_LIGHT_QUADRATIC * dist * dist);
+	*/
+		
+		
+		
+		//finalColor = tmpColor * directionalLight / attenuation;	
+	
+		// float distance = length(input.position.z - g_pointLightPositionWithRadius[i].z);
+		// //distance = 1.0f;
+		// lightDir = normalize(input.position.z - g_pointLightPositionWithRadius[i].z);
+		// lightIntensity = 1.0f / (POINT_LIGHT_CONSTANT + POINT_LIGHT_LINEAR * distance + POINT_LIGHT_QUADRATIC * distance * distance);
+
+	// //Calculate multiple dot products
+		// float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
+		// float NdotH = max(dot(normal, halfV), 0.0);
+		// float NdotL = max(dot(normal, lightDir), 0.0);
+
+	// //NORMAL DISTRUBUTION FUNCTION
+		// float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
+	// //GEOMETRY FUNCTION
+		// float G = GeometrySmithGGX(roughness, NdotV, NdotL);
+
+	// //FINAL CALCULATIONS
+		// float3 numerator = D * G * F;
+		// float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+		// specular = numerator / max(denominator, 0.001);
+
+		// float3 Lo = NdotL * lightIntensity * g_pointLightColorWithStrength[i].w * g_pointLightColorWithStrength[i].xyz;
+		// finalColor += float4(Lo, 1.0f);
+		//finalColor = g_pointLightColorWithStrength[i].w;
 	}
 	//finalColor += normalize(pointLight);
 #endif
@@ -312,7 +393,7 @@ float GeometrySchlickGGX(float NdotV, float k)
     return nom / denom;
 }
 
-float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH)
+float NormalDistributionFunction(float roughness, float NdotH)
 {
 	float a2 = max(roughness * roughness, 0.001);
 	float denom = 1.0 + NdotH * NdotH * (a2 - 1.0);
@@ -372,6 +453,28 @@ float3 GetPrefilteredColor(float roughness, float3 R)
 
 	return lerp(colors[index], colors[clamp(index + 1, 0, 4)], lerpVal);
 }
+
+// float4 CalcLightInternal(float3 lightColor, float lightStrength, float3 lightDirection, float3 normal)
+// {
+    // float4 ambientColor = float4(lightColor, 1.0f) * lightStrength;
+    // float diffuseFactor = dot(normal, -lightDirection);
+
+    // float4 diffuseColor = float4(0, 0, 0, 0);
+    // float4 specularColor = float4(0, 0, 0, 0);
+
+    // if (diffuseFactor > 0) {
+        // diffuseColor = float4(lightColor * lightStrength * diffuseFactor, 1.0f);
+        // float3 vertexToEye = normalize(gEyeWorldPos - WorldPos0);
+        // float3 lightReflect = normalize(reflect(lightDirection, normal));
+        // float specularFactor = dot(vertexToEye, LightReflect);
+        // if (specularFactor > 0) {
+            // specularFactor = pow(specularFactor, gSpecularPower);
+            // specularColor = vec4(Light.Color * gMatSpecularIntensity * specularFactor, 1.0f);
+        // }
+    // }
+
+    // return (AmbientColor + DiffuseColor + SpecularColor);
+// } 
 
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS

@@ -531,10 +531,10 @@ ID3D11DepthStencilView * D3DClass::GetDepthStencilView(int count) const
 
 void D3DClass::SetBackBufferRenderTarget() const
 {	
-	if (MSAA_NUMBER_OF_SAMPLES == 1)
+	//if (MSAA_NUMBER_OF_SAMPLES == 1)
 		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView());
-	else
-		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilViewBackBuffer);
+	//else
+		//m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilViewBackBuffer);
 }
 
 void D3DClass::TurnZBufferOn() const

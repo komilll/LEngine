@@ -75,7 +75,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_used.vs", L"pbr_used.ps", input))
 		return false;
 
-	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 10.0f, -5.0f }, 15.0f, 1.0f, 1.0f, 1.0f);
+	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 5.0f, -5.0f }, 5.0f, 1.0f, 1.0f, 1.0f);
 	
 	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 0.0f, -1.0f }, 0.4f, 1.0f, 0.0f, 0.0f);
 	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 2.0f, 6.0f }, 0.7f, 0.0f, 1.0f, 0.0f);
@@ -484,7 +484,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!pointLight->Initialize(m_D3D, "sphere.obj", true))
 		return false;
 	pointLight->SetScale(0.1f, 0.1f, 0.1f);
-	pointLight->SetParams({ 1.5f, 0.75f, 0.0f }, 15.0f, {1.0f, 0.0f, 0.0f}, 25.0f);
+	pointLight->SetPosition({ 1.5f, 0.75f, 0.0f });
+	pointLight->SetParams({ 1.5f, 0.75f, 0.0f }, 5.0f, {1.0f, 0.0f, 0.0f}, 0.01f);
 	m_pbrShader->AddPointLight(pointLight->GetPositionWithRadius(), pointLight->GetColorWithStrength());
 	m_pointLights.push_back(std::move(pointLight));
 
@@ -741,6 +742,7 @@ bool GraphicsClass::Render()
 	else
 	{
 		RefreshModelTick();
+		m_D3D->SetBackBufferRenderTarget();
 
 		//CreateShadowMap(m_shadowMapTexture);
 		if (RENDER_MATERIAL_EDITOR == false)
@@ -759,12 +761,12 @@ bool GraphicsClass::Render()
 				if (!RenderSSAOTexture(m_ssaoTexture, m_GBufferShaderSSAO))
 					return false;
 			}
-			if (m_postprocessFXAA) //TODO Currently working on previous frame
-			{
-				m_fxaaShader->SetScreenBuffer(m_renderTextureMainScene->GetShaderResourceView());
-				if (!RenderFXAATexture(m_antialiasedTexture))
-					return false;
-			}
+			//if (m_postprocessFXAA) //TODO Currently working on previous frame
+			//{
+			//	m_fxaaShader->SetScreenBuffer(m_renderTextureMainScene->GetShaderResourceView());
+			//	if (!RenderFXAATexture(m_antialiasedTexture))
+			//		return false;
+			//}
 
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -777,13 +779,6 @@ bool GraphicsClass::Render()
 
 			//m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 			//m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-			if (m_postprocessFXAA)
-			{
-				m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
-				if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-					return false;
-			}
 		}
 		else
 		{
@@ -863,6 +858,18 @@ bool GraphicsClass::Render()
 		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 	}
+	else if (m_postprocessFXAA)
+	{
+		m_fxaaShader->SetScreenBuffer(m_renderTextureMainScene->GetShaderResourceView());
+		if (!RenderFXAATexture(m_antialiasedTexture))
+			return false;		
+
+		m_D3D->SetBackBufferRenderTarget();
+
+		m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+	}
 	else
 	{
 		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
@@ -874,7 +881,6 @@ bool GraphicsClass::Render()
 	{
 		RenderGUI();
 	}
-
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 	return true;
@@ -1153,8 +1159,8 @@ bool GraphicsClass::RenderLightModels()
 		m_Camera->GetViewMatrix(viewMatrix);
 		m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(light->GetPosition().x, light->GetPosition().y, light->GetPosition().z));
 		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(light->GetScale().x, light->GetScale().y, light->GetScale().z));
+		worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(light->GetPosition().x, light->GetPosition().y, light->GetPosition().z));
 		
 		light->Render(m_D3D->GetDeviceContext());
 		if (!m_singleColorShader->Render(m_D3D->GetDeviceContext(), light->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
@@ -1759,6 +1765,11 @@ bool GraphicsClass::RenderGUI()
 					else if (m_antialiasingSettings.type == AntialiasingType::FXAA)
 					{
 						m_postprocessFXAA = true;
+						m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
+						m_antialiasingSettings.sampleCount = 1;
+						if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+							return false;
+						m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount);
 					}
 				}
 				if (isSelected)
@@ -1825,10 +1836,6 @@ bool GraphicsClass::RenderGUI()
 				}
 				ImGui::EndCombo();
 			}
-		}
-		else if (m_antialiasingSettings.type == AntialiasingType::FXAA)
-		{
-			m_postprocessFXAA = true;
 		}
 	}
 
@@ -3101,14 +3108,8 @@ bool GraphicsClass::RenderFXAATexture(RenderTextureClass * targetTex)
 
 	//Render test buddha
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
 	if (!m_fxaaShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 		return false;
-	////////////////////////////////////
-	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
-
-	m_D3D->SetBackBufferRenderTarget();
-	m_D3D->ResetViewport();
 
 	return true;
 }

@@ -123,8 +123,8 @@ bool RenderTextureClass::InitializeWithMip(ID3D11Device * device, int textureWid
 void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext * deviceContext, ID3D11DepthStencilView * depthStencilView, bool withViewport)
 {
 	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, depthStencilView);
-	if (depthStencilView)
-		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	//if (depthStencilView)
+	//	deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	if (withViewport)
 		deviceContext->RSSetViewports(1, &m_viewport);

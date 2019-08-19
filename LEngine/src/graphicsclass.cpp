@@ -743,6 +743,7 @@ bool GraphicsClass::Render()
 	{
 		RefreshModelTick();
 		m_D3D->SetBackBufferRenderTarget();
+		return true;
 
 		//CreateShadowMap(m_shadowMapTexture);
 		if (RENDER_MATERIAL_EDITOR == false)
@@ -771,8 +772,8 @@ bool GraphicsClass::Render()
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 			//STANDARD SCENE RENDERING		
-			if (!RenderScene())
-				return false;
+			//if (!RenderScene())
+			//	return false;
 
 			//m_msaaSkybox->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 			//m_msaaSkybox->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -826,37 +827,34 @@ bool GraphicsClass::Render()
 	}
 	else if (m_postprocessSSAA)
 	{
-		if (m_antialiasingSettings.sampleCount == 2)
-		{
-			constexpr float size = 1.0f;
-			constexpr int depthStencilViewSize = 1;
-			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, depthStencilViewSize))
-				return false;
-		}
-		else if (m_antialiasingSettings.sampleCount == 4)
-		{
-			constexpr float size = 1.0f;
-			constexpr int depthStencilViewSize = 1;
-			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, depthStencilViewSize))
-				return false;
-		}
-		else if (m_antialiasingSettings.sampleCount == 8)
-		{
-			constexpr float size = 1.0f;
-			constexpr int depthStencilViewSize = 1;
-			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, depthStencilViewSize))
-				return false;
-		}
+		//if (m_antialiasingSettings.sampleCount == 2)
+		//{
+		//	constexpr float size = 1.0f;
+		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, 2))
+		//		return false;
+		//}
+		//else if (m_antialiasingSettings.sampleCount == 4)
+		//{
+		//	constexpr float size = 1.0f;
+		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size))
+		//		return false;
+		//}
+		//else if (m_antialiasingSettings.sampleCount == 8)
+		//{
+		//	constexpr float size = 1.0f;
+		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size))
+		//		return false;
+		//}
 
 		//Back to normal render targets
-		m_D3D->SetBackBufferRenderTarget();
-		if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
-			return false;
+		//m_D3D->SetBackBufferRenderTarget();
+		//if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
+		//	return false;
 
-		//Render antialiased buffer
-		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-			return false;
+		////Render antialiased buffer
+		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+		//	return false;
 	}
 	else if (m_postprocessFXAA)
 	{
@@ -922,11 +920,13 @@ bool GraphicsClass::RenderScene()
 	}
 	else if (m_postprocessSSAA)
 	{
+		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
 		m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else
 	{
+		m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
 		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
@@ -1089,9 +1089,19 @@ bool GraphicsClass::RenderScene()
 	}
 	else
 	{
-		if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
+		if (m_postprocessSSAA)
 		{
-			return false;
+			if (!RenderPostprocess(m_ssaaTexture->GetShaderResourceView()))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
+			{
+				return false;
+			}
 		}
 	}
 
@@ -1956,8 +1966,8 @@ bool GraphicsClass::DownsampleTexture(RenderTextureClass * dst, RenderTextureCla
 	if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, size, 1.0f, -size)))
 		return false;
 
-	dst->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(1));
-	dst->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(1), 0.0f, 0.0f, 0.0f, 1.0f);
+	dst->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthStencilViewSize));
+	dst->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
 
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	m_renderTexturePreview->BindTexture(src->GetShaderResourceView());
@@ -3043,7 +3053,8 @@ bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture)
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	worldMatrix = worldMatrix * 0;
-	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	return true;
 }
 
 bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture)
@@ -3060,7 +3071,8 @@ bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture)
 	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	worldMatrix = worldMatrix * 0;
-	return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	return true;
 }
 
 bool GraphicsClass::ApplyChromaticAberration()
@@ -3153,19 +3165,33 @@ void GraphicsClass::ToggleGUI()
 
 void GraphicsClass::ToggleMSAA()
 {
-	if (!m_postprocessMSAA)
+	//if (!m_postprocessMSAA)
+	//{
+	//	m_postprocessMSAA = true;
+	//	m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
+	//}
+	//else
+	//{
+	//	m_postprocessMSAA = false;
+	//	m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
+	//}
+	//if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+	//	return;
+	//m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+
+	if (!m_postprocessSSAA)
 	{
-		m_postprocessMSAA = true;
-		m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
+		m_antialiasingSettings.sampleCount = 2;
+		m_postprocessSSAA = true;
 	}
 	else
 	{
-		m_postprocessMSAA = false;
-		m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
+		m_antialiasingSettings.sampleCount = 2;
+		m_postprocessSSAA = false;
 	}
-	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+	if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * m_antialiasingSettings.sampleCount, m_screenHeight * m_antialiasingSettings.sampleCount, 1))
 		return;
-	m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+	m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount, 1);
 }
 
 static std::pair<float, float> savedMousePos{};

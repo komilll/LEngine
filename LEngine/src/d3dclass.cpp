@@ -191,7 +191,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	{
 		return false;
 	}
-
+//~~~~DEBUG INFO~~~~
 	ID3D11InfoQueue* infoQueue{ nullptr };
 	m_device->QueryInterface(IID_PPV_ARGS(&infoQueue));
 	if (infoQueue)
@@ -200,7 +200,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		infoQueue->Release();
 		infoQueue = nullptr;
 	}
-
+//~~~~~~~~~~~~~~~~~~~~
 	// Create the render target view with the back buffer pointer.
 	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
 	if(FAILED(result))
@@ -529,12 +529,19 @@ ID3D11DepthStencilView * D3DClass::GetDepthStencilView(int count) const
 		return m_depthStencilView_8;
 }
 
-void D3DClass::SetBackBufferRenderTarget() const
+void D3DClass::SetBackBufferRenderTarget(int size) const
 {	
-	if (MSAA_NUMBER_OF_SAMPLES == 1)
-		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView());
+	if (size == -1)
+	{
+		if (MSAA_NUMBER_OF_SAMPLES == 1)
+			m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView());
+		else
+			m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilViewBackBuffer);
+	}
 	else
-		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilViewBackBuffer);
+	{
+		m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, GetDepthStencilView(size));
+	}
 }
 
 void D3DClass::TurnZBufferOn() const

@@ -51,7 +51,7 @@ public:
 	void ChangeRasterizerCulling(D3D11_CULL_MODE cullMode);
 	void ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFunc);
 
-	void SetBackBufferRenderTarget() const;
+	void SetBackBufferRenderTarget(int size = -1) const;
 
 	void TurnZBufferOn() const;
 	void TurnZBufferOff() const;

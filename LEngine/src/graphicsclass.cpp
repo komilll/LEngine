@@ -742,7 +742,7 @@ bool GraphicsClass::Render()
 	else
 	{
 		RefreshModelTick();
-		m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
+		//m_D3D->SetBackBufferRenderTarget();
 		
 		//CreateShadowMap(m_shadowMapTexture);
 		if (RENDER_MATERIAL_EDITOR == false)
@@ -807,54 +807,52 @@ bool GraphicsClass::Render()
 	}
 
 	if (m_postprocessMSAA)
-	{		
-		//static RenderTextureClass *renderTexture;
-		//if (renderTexture == nullptr)
-		//{
-		//	renderTexture = new RenderTextureClass;
-		//	renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
-		//}
-		//m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+	{	
+		m_D3D->SetBackBufferRenderTarget();
+
+		static RenderTextureClass *renderTexture;
+		if (renderTexture == nullptr)
+		{
+			renderTexture = new RenderTextureClass;
+			renderTexture->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, 1);
+		}
+		m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		//m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
 		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 		//	return false;
 
-		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-		//	return false;
+		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+			return false;
 	}
 	else if (m_postprocessSSAA)
 	{
 		if (m_antialiasingSettings.sampleCount == 2)
 		{
 			constexpr float size = 1.0f;
+			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, 1))
+				return false;
+		}
+		else if (m_antialiasingSettings.sampleCount == 4)
+		{
+			constexpr float size = 1.0f;
+			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, 1))
+				return false;
+		}
+		else if (m_antialiasingSettings.sampleCount == 8)
+		{
+			constexpr float size = 1.0f;
 			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size))
 				return false;
 		}
-		//else if (m_antialiasingSettings.sampleCount == 4)
-		//{
-		//	constexpr float size = 1.0f;
-		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size))
-		//		return false;
-		//}
-		//else if (m_antialiasingSettings.sampleCount == 8)
-		//{
-		//	constexpr float size = 1.0f;
-		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size))
-		//		return false;
-		//}
-
-		//Back to normal render targets
-		if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f)))
-			return false;
 
 		//Render antialiased buffer
+		m_D3D->SetBackBufferRenderTarget();
+
 		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
 		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
-
-		m_D3D->SetBackBufferRenderTarget(1);
 	}
 	else if (m_postprocessFXAA)
 	{
@@ -920,13 +918,11 @@ bool GraphicsClass::RenderScene()
 	}
 	else if (m_postprocessSSAA)
 	{
-		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
 		m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else
 	{
-		m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
 		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
@@ -988,8 +984,9 @@ bool GraphicsClass::RenderScene()
 	{
 		if (RenderSkybox() == false)
 			return false;
-	}	
+	}
 	m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
+	return true;
 	
 	//TODO Test post-process stack
 	if (!m_postprocessSSAO)
@@ -1965,9 +1962,12 @@ bool GraphicsClass::DownsampleTexture(RenderTextureClass * dst, RenderTextureCla
 
 	if (!(m_renderTexturePreview->Initialize(m_D3D, ModelClass::ShapeSize::RECTANGLE, -1.0f, size, 1.0f, -size)))
 		return false;
+	
+	dst->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(1));
+	dst->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(1), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	dst->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthStencilViewSize));
-	dst->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
+	//BlurFilterScreenSpaceTexture(false, src, m_bloomHorizontalBlur, m_screenWidth, depthStencilViewSize); //Blur horizontal
+	//BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, dst, m_screenHeight, depthStencilViewSize); //Blur vertical
 
 	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 	m_renderTexturePreview->BindTexture(src->GetShaderResourceView());
@@ -2005,20 +2005,20 @@ bool GraphicsClass::UpscaleTexture()
 	return true;
 }
 
-bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const RenderTextureClass * textureToBlur, RenderTextureClass * textureToReturn, int screenWidth)
+bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const RenderTextureClass * textureToBlur, RenderTextureClass * textureToReturn, int screenWidth, int depthBufferSize)
 {
 	ID3D11ShaderResourceView* resourceView = textureToBlur->GetShaderResourceViewCopy();
-	return BlurFilterScreenSpaceTexture(vertical, resourceView, textureToReturn, screenWidth);
+	return BlurFilterScreenSpaceTexture(vertical, resourceView, textureToReturn, screenWidth, depthBufferSize);
 }
 
-bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const ID3D11ShaderResourceView * textureToBlur, RenderTextureClass * textureToReturn, int screenWidth)
+bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const ID3D11ShaderResourceView * textureToBlur, RenderTextureClass * textureToReturn, int screenWidth, int depthBufferSize)
 {
 	XMMATRIX worldMatrix, viewMatrix, orthoMatrix;
 
 	if (vertical == false) //HORIZONTAL - 1st
 	{
-		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize));
+		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize), 0.0f, 0.0f, 0.0f, 1.0f);
 
 		m_Camera->Render();
 
@@ -2038,12 +2038,12 @@ bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const ID3D11Shad
 
 		m_D3D->TurnZBufferOn();
 
-		m_D3D->SetBackBufferRenderTarget();
+		//m_D3D->SetBackBufferRenderTarget();
 	}
 	else //VERTICAL - 2nd
 	{
-		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize));
+		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize), 0.0f, 0.0f, 0.0f, 1.0f);
 
 		m_Camera->Render();
 
@@ -2061,7 +2061,7 @@ bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const ID3D11Shad
 				return false;
 		}
 		m_D3D->TurnZBufferOn();
-		m_D3D->SetBackBufferRenderTarget();
+		//m_D3D->SetBackBufferRenderTarget();
 	}
 
 	return true;
@@ -3165,33 +3165,35 @@ void GraphicsClass::ToggleGUI()
 
 void GraphicsClass::ToggleMSAA()
 {
-	//if (!m_postprocessMSAA)
-	//{
-	//	m_postprocessMSAA = true;
-	//	m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
-	//}
-	//else
-	//{
-	//	m_postprocessMSAA = false;
-	//	m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
-	//}
-	//if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
-	//	return;
-	//m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
-
-	if (!m_postprocessSSAA)
+	if (!m_postprocessMSAA)
 	{
-		m_antialiasingSettings.sampleCount = 2;
-		m_postprocessSSAA = true;
+		m_postprocessMSAA = true;
+		m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
 	}
 	else
 	{
-		m_antialiasingSettings.sampleCount = 2;
-		m_postprocessSSAA = false;
+		m_postprocessMSAA = false;
+		m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
 	}
-	if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * m_antialiasingSettings.sampleCount, m_screenHeight * m_antialiasingSettings.sampleCount, 1))
+	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
 		return;
-	m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount, 1);
+	m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+
+
+
+	//if (!m_postprocessSSAA)
+	//{
+	//	m_antialiasingSettings.sampleCount = 2;
+	//	m_postprocessSSAA = true;
+	//}
+	//else
+	//{
+	//	m_antialiasingSettings.sampleCount = 1;
+	//	m_postprocessSSAA = false;
+	//}
+	//if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * m_antialiasingSettings.sampleCount, m_screenHeight * m_antialiasingSettings.sampleCount, 1))
+	//	return;
+	//m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount, 1);
 }
 
 static std::pair<float, float> savedMousePos{};

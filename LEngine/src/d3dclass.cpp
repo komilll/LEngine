@@ -192,15 +192,15 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 //~~~~DEBUG INFO~~~~
-	ID3D11InfoQueue* infoQueue{ nullptr };
-	m_device->QueryInterface(IID_PPV_ARGS(&infoQueue));
-	if (infoQueue)
-	{
-		infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
-		infoQueue->Release();
-		infoQueue = nullptr;
-	}
-//~~~~~~~~~~~~~~~~~~~~
+//	ID3D11InfoQueue* infoQueue{ nullptr };
+//	m_device->QueryInterface(IID_PPV_ARGS(&infoQueue));
+//	if (infoQueue)
+//	{
+//		infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+//		infoQueue->Release();
+//		infoQueue = nullptr;
+//	}
+////~~~~~~~~~~~~~~~~~~~~
 	// Create the render target view with the back buffer pointer.
 	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
 	if(FAILED(result))
@@ -790,4 +790,58 @@ ID3D11DepthStencilView * D3DClass::CreateDepthBufferReturn(int sizeMultiplier, i
 	}
 
 	return depthStencilView;
+}
+
+void D3DClass::CreateRenderTarget(int sizeMultiplier)
+{
+	//D3D11_TEXTURE2D_DESC textureDesc;
+	//ZeroMemory(&textureDesc, sizeof(textureDesc));
+	//textureDesc.Width = textureWidth;
+	//textureDesc.Height = textureHeight;
+	//textureDesc.MipLevels = 1;
+	//textureDesc.ArraySize = 1;
+	//textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	//textureDesc.SampleDesc.Count = 1;
+	//textureDesc.SampleDesc.Quality = 0;
+	//textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	//textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	//textureDesc.CPUAccessFlags = 0;
+	//textureDesc.MiscFlags = 0;
+
+	//result = device->CreateTexture2D(&textureDesc, NULL, &m_texture2D);
+	//if (FAILED(result))
+	//	return false;
+
+	//D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	//ZeroMemory(&textureDesc, sizeof(textureDesc));
+	//renderTargetViewDesc.Format = textureDesc.Format;
+	//renderTargetViewDesc.ViewDimension = msaaCount > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
+	//renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	//result = device->CreateRenderTargetView(m_texture2D, &renderTargetViewDesc, &m_renderTargetView);
+	//if (FAILED(result))
+	//	return false;
+
+	//D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	//ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+	//shaderResourceViewDesc.Format = textureDesc.Format;
+	//shaderResourceViewDesc.ViewDimension = msaaCount > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
+	//shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	//shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	//result = device->CreateShaderResourceView(m_texture2D, &shaderResourceViewDesc, &m_shaderResourceView);
+	//if (FAILED(result))
+	//	return false;
+
+
+	//ID3D11Texture2D* backBufferPtr;
+	//HRESULT result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
+	//if (FAILED(result))
+	//{
+	//	return;
+	//}
+
+	//// Release pointer to the back buffer as we no longer need it.
+	//backBufferPtr->Release();
+	//backBufferPtr = 0;
 }

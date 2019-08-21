@@ -483,8 +483,8 @@ private:
 	bool DownsampleTexture();
 	bool DownsampleTexture(RenderTextureClass* dst, RenderTextureClass* const src, const float size = 1.0f, const int depthStencilViewSize = -1);
 	bool UpscaleTexture();
-	bool BlurFilterScreenSpaceTexture(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
-	bool BlurFilterScreenSpaceTexture(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
+	bool BlurFilterScreenSpaceTexture(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth, int depthBufferSize = -1); //Vertical = true; Horizontal = false
+	bool BlurFilterScreenSpaceTexture(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth, int depthBufferSize = -1); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpace(bool vertical); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpace(bool vertical, const RenderTextureClass* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false
 	bool BlurFilterScreenSpace(bool vertical, const ID3D11ShaderResourceView* textureToBlur, RenderTextureClass* textureToReturn, int screenWidth); //Vertical = true; Horizontal = false

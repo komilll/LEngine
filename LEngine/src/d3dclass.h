@@ -67,6 +67,7 @@ public:
 
 	bool CreateDepthBuffer(int sizeMultiplier = 1, int count = 1);
 	ID3D11DepthStencilView* CreateDepthBufferReturn(int sizeMultiplier = 1, int count = 1);
+	void CreateRenderTarget(int sizeMultiplier = 1);
 
 public:
 	int MSAA_NUMBER_OF_SAMPLES{ 1 }; //[1/2/4/8] on GTX750Ti StormX Dual

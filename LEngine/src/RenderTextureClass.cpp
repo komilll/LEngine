@@ -209,7 +209,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	textureDesc.SampleDesc.Count = msaaCount;
+	textureDesc.SampleDesc.Count = msaaCount == -1 ? 1 : msaaCount;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -223,7 +223,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = msaaCount > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.ViewDimension = (msaaCount > 1 || msaaCount == -1) ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 	result = device->CreateRenderTargetView(m_texture2D, &renderTargetViewDesc, &m_renderTargetView);
@@ -233,7 +233,7 @@ bool RenderTextureClass::Initialize2DTexture(ID3D11Device *& device, int texture
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 	shaderResourceViewDesc.Format = textureDesc.Format;
-	shaderResourceViewDesc.ViewDimension = msaaCount > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.ViewDimension = (msaaCount > 1 || msaaCount == -1) ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 

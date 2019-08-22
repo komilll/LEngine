@@ -1,7 +1,7 @@
 
-#define NUM_LIGHTS_DIRECTIONAL 1
-#define NUM_LIGHTS_POINT 8
-cbuffer LightingBuffer
+#define NUM_LIGHTS_DIRECTIONAL 2
+#define NUM_LIGHTS_POINT 1
+cbuffer LightingBuffer : register(b0)
 {
 #if NUM_LIGHTS_DIRECTIONAL > 0
 	float4 g_directionalLightDirectionStrength[NUM_LIGHTS_DIRECTIONAL];
@@ -9,7 +9,7 @@ cbuffer LightingBuffer
 #endif
 };
 
-cbuffer PointLightBuffer
+cbuffer PointLightBuffer : register(b1)
 {
 #if NUM_LIGHTS_POINT > 0
 	float4 g_pointLightPositionWithRadius[NUM_LIGHTS_POINT];
@@ -17,16 +17,15 @@ cbuffer PointLightBuffer
 #endif
 };
 
-cbuffer PBRBuffer
+cbuffer PBRBuffer : register(b2)
 {
 	float g_roughness;
 	float g_metalness;
-	float g_roughnessLOD;
-	float g_paddingPBR;
+	float2 g_paddingPBR;
 	float4 g_albedoTint;
 };
 
-cbuffer ShaderTextureBuffer
+cbuffer ShaderTextureBuffer : register(b3)
 {
 	int g_hasNormalMap;
 	int g_hasRoughnessMap;
@@ -46,6 +45,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
     float3 binormal : BINORMAL;
 	float3 diffuseLookUp : TEXCOORD2;
+	float3 worldPosition : TEXCOORD3;
 };
 
 //////////////
@@ -59,7 +59,7 @@ float4 GetBaseColor();
 
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
-float NormalDistributionFunction(float3 halfV, float roughness, float PI, float NdotH);
+float NormalDistributionFunction(float roughness, float NdotH);
 float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
 float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness);
 

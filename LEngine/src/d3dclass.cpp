@@ -192,14 +192,14 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 //~~~~DEBUG INFO~~~~
-//	ID3D11InfoQueue* infoQueue{ nullptr };
-//	m_device->QueryInterface(IID_PPV_ARGS(&infoQueue));
-//	if (infoQueue)
-//	{
-//		infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
-//		infoQueue->Release();
-//		infoQueue = nullptr;
-//	}
+	//ID3D11InfoQueue* infoQueue{ nullptr };
+	//m_device->QueryInterface(IID_PPV_ARGS(&infoQueue));
+	//if (infoQueue)
+	//{
+	//	infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+	//	infoQueue->Release();
+	//	infoQueue = nullptr;
+	//}
 ////~~~~~~~~~~~~~~~~~~~~
 	// Create the render target view with the back buffer pointer.
 	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);

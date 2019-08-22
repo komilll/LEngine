@@ -742,7 +742,6 @@ bool GraphicsClass::Render()
 	else
 	{
 		RefreshModelTick();
-		//m_D3D->SetBackBufferRenderTarget();
 		
 		//CreateShadowMap(m_shadowMapTexture);
 		if (RENDER_MATERIAL_EDITOR == false)
@@ -761,31 +760,19 @@ bool GraphicsClass::Render()
 				if (!RenderSSAOTexture(m_ssaoTexture, m_GBufferShaderSSAO))
 					return false;
 			}
-			//if (m_postprocessFXAA) //TODO Currently working on previous frame
-			//{
-			//	m_fxaaShader->SetScreenBuffer(m_renderTextureMainScene->GetShaderResourceView());
-			//	if (!RenderFXAATexture(m_antialiasedTexture))
-			//		return false;
-			//}
-
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 			//STANDARD SCENE RENDERING		
 			if (!RenderScene())
 				return false;
-
-			//m_msaaSkybox->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			//m_msaaSkybox->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-			//m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			//m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 		}
 		else
 		{
+			m_D3D->SetBackBufferRenderTarget();
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-			if (!RenderMaterialPreview())
-				return false;
+			//if (!RenderMaterialPreview())
+			//	return false;
 
 			m_renderTexturePreview->BindTexture(m_shaderPreview->GetShaderResourceView());
 			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
@@ -808,8 +795,6 @@ bool GraphicsClass::Render()
 
 	if (m_postprocessMSAA)
 	{	
-		m_D3D->SetBackBufferRenderTarget();
-
 		static RenderTextureClass *renderTexture;
 		if (renderTexture == nullptr)
 		{
@@ -818,13 +803,13 @@ bool GraphicsClass::Render()
 		}
 		m_D3D->GetDeviceContext()->ResolveSubresource(renderTexture->GetShaderResource(), 0, m_renderTextureMainScene->GetShaderResource(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		//m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
-		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-		//	return false;
-
-		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		m_renderTexturePreview->BindTexture(renderTexture->GetShaderResourceView());
 		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
+
+		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+		//	return false;
 	}
 	else if (m_postprocessSSAA)
 	{
@@ -860,6 +845,7 @@ bool GraphicsClass::Render()
 		if (!RenderFXAATexture(m_antialiasedTexture))
 			return false;		
 
+		m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 		m_D3D->SetBackBufferRenderTarget();
 
 		m_renderTexturePreview->BindTexture(m_antialiasedTexture->GetShaderResourceView());
@@ -956,25 +942,27 @@ bool GraphicsClass::RenderScene()
 		if (!model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 			return false;
 
-		//TODO Add flag for rendering wireframe
-		m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
-		for (const auto& wireframe : model->GetWireframeList())
+		if (DRAW_AABB)
 		{
-			m_Camera->GetViewMatrix(viewMatrix);
-			m_D3D->GetWorldMatrix(worldMatrix);
-			m_D3D->GetProjectionMatrix(projectionMatrix);
+			m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
+			for (const auto& wireframe : model->GetWireframeList())
+			{
+				m_Camera->GetViewMatrix(viewMatrix);
+				m_D3D->GetWorldMatrix(worldMatrix);
+				m_D3D->GetProjectionMatrix(projectionMatrix);
 
-			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
-			wireframe->Render(m_D3D->GetDeviceContext());
-			if(!m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-				return false;
+				wireframe->Render(m_D3D->GetDeviceContext());
+				if (!m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+					return false;
+			}
+			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 		}
-		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
 
 	if (!RenderLightModels())
@@ -986,7 +974,6 @@ bool GraphicsClass::RenderScene()
 			return false;
 	}
 	m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
-	return true;
 	
 	//TODO Test post-process stack
 	if (!m_postprocessSSAO)
@@ -1755,6 +1742,8 @@ bool GraphicsClass::RenderGUI()
 
 					if (m_antialiasingSettings.type == AntialiasingType::SSAA)
 					{
+						if (m_antialiasingSettings.sampleCount == 1)
+							m_antialiasingSettings.sampleCount = 2;
 						m_D3D->CreateDepthBuffer(m_antialiasingSettings.sampleCount);
 						if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * m_antialiasingSettings.sampleCount, m_screenHeight * m_antialiasingSettings.sampleCount, 1))
 							return false;
@@ -1911,13 +1900,11 @@ bool GraphicsClass::RenderSkybox()
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
 	m_skyboxModel->Render(m_D3D->GetDeviceContext());
 	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_skyboxModel->GetIndexCount(), worldMatrix, /*viewMatrix*/ XMMatrixIdentity(), projectionMatrix);
 
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
 
 	return true;
@@ -3165,20 +3152,20 @@ void GraphicsClass::ToggleGUI()
 
 void GraphicsClass::ToggleMSAA()
 {
-	if (!m_postprocessMSAA)
-	{
-		m_postprocessMSAA = true;
-		m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
-	}
-	else
-	{
-		m_postprocessMSAA = false;
-		m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
-	}
-	if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
-		return;
-	m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+	m_postprocessFXAA = !m_postprocessFXAA;
 
+	//if (!m_postprocessMSAA)
+	//{
+	//	m_D3D->MSAA_NUMBER_OF_SAMPLES = 2;
+	//}
+	//else
+	//{
+	//	m_D3D->MSAA_NUMBER_OF_SAMPLES = 1;
+	//}
+	//if (!(m_renderTextureMainScene->Initialize(m_D3D->GetDevice(), m_screenWidth, m_screenHeight, m_D3D->MSAA_NUMBER_OF_SAMPLES)))
+	//	return;
+	//m_D3D->CreateDepthBuffer(1, m_D3D->MSAA_NUMBER_OF_SAMPLES);
+	//m_postprocessMSAA = !m_postprocessMSAA;
 
 
 	//if (!m_postprocessSSAA)

@@ -480,14 +480,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
 	//Point lights
-	PointLight* pointLight = new PointLight;
-	if (!pointLight->Initialize(m_D3D, "sphere.obj", true))
-		return false;
-	pointLight->SetScale(0.1f, 0.1f, 0.1f);
-	pointLight->SetPosition({ 1.5f, 0.75f, 0.0f });
-	pointLight->SetParams({ 1.5f, 0.75f, 0.0f }, 5.0f, {1.0f, 0.0f, 0.0f}, 0.01f);
-	m_pbrShader->AddPointLight(pointLight->GetPositionWithRadius(), pointLight->GetColorWithStrength());
-	m_pointLights.push_back(std::move(pointLight));
+	//PointLight* pointLight = new PointLight();
+	//if (!pointLight->Initialize(m_D3D, "sphere.obj", true))
+	//	return false;
+	//pointLight->SetScale(0.1f, 0.1f, 0.1f);
+	//pointLight->SetPosition({ 1.5f, 0.75f, 0.0f });
+	//pointLight->SetParams({ 1.5f, 0.75f, 0.0f }, 5.0f, {1.0f, 0.0f, 0.0f}, 0.01f);
+	//m_pointLights.push_back(std::move(pointLight));
 
 	return true;
 }
@@ -1388,6 +1387,14 @@ bool GraphicsClass::RenderGUI()
 					break;
 				}
 			}
+			for (PointLight* const& model : m_pointLights)
+			{
+				if (ImGui::Selectable(model->m_name.c_str(), model->m_selected))
+				{
+					m_selectedModel = model;
+					break;
+				}
+			}
 		}
 
 		if (ImGui::CollapsingHeader("Materials explorer"))
@@ -1567,6 +1574,18 @@ bool GraphicsClass::RenderGUI()
 	ImGui::Begin("BaseWindow", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 	if (m_selectedModel)
 	{
+		//Point light options
+		if (PointLight* light = dynamic_cast<PointLight*>(m_selectedModel))
+		{
+			if (ImGui::ColorPicker3("Point light: color", light->GetColorRef()))
+				light->UpdateShader();
+			if (ImGui::SliderFloat("Point light: strength", light->GetStrengthRef(), 0.0f, 5.0f, "%.2f"))
+				light->UpdateShader();
+			//if (ImGui::SliderFloat("Point light: radius", light->GetRadiusRef(), 0.0, 50.0f, "%.2f"))
+			//	light->UpdateShader();
+		}
+
+		//Standard model options
 		ImGui::InputFloat3("Position", m_selectedModel->GetPositionRef(), "%.2f");
 		ImGui::SliderFloat3("Scale", m_selectedModel->GetScaleRef(), 0.0f, 5.0f, "%.2f");
 		ImGui::SliderFloat3("Rotation", m_selectedModel->GetRotationRef(), 0.0f, 180.0f, "%.1f");
@@ -1578,9 +1597,13 @@ bool GraphicsClass::RenderGUI()
 		{
 			m_selectedModel->LoadModel();
 		}
-		if (ImGui::Button("Delete model"))
+		if (ImGui::Button("Delete object"))
 		{
-			m_sceneModels.erase(std::find(m_sceneModels.begin(), m_sceneModels.end(), m_selectedModel));
+			if (const auto light = dynamic_cast<PointLight*>(m_selectedModel))
+				m_pointLights.erase(std::find(m_pointLights.begin(), m_pointLights.end(), light));
+			else
+				m_sceneModels.erase(std::find(m_sceneModels.begin(), m_sceneModels.end(), m_selectedModel));
+
 			if (m_selectedModel)
 			{
 				delete m_selectedModel;
@@ -1637,6 +1660,23 @@ bool GraphicsClass::RenderGUI()
 				m_sceneModels.push_back(std::move(model));
 				CreateAABB(model);
 			}
+		}
+		if (ImGui::Button("Add point light"))
+		{
+			PointLight* light = new PointLight;
+			if (!light->Initialize(m_D3D, "sphere.obj", true))
+				return false;
+
+			light->SetScale(0.1f, 0.1f, 0.1f);
+			XMFLOAT3 lightPos = m_Camera->GetPosition(); 
+			constexpr float spawnDistance = 0.5f;
+			lightPos.x += m_Camera->GetForwardVector().x * spawnDistance;
+			lightPos.y += m_Camera->GetForwardVector().y * spawnDistance;
+			lightPos.z += m_Camera->GetForwardVector().z * spawnDistance;
+			light->SetPosition(lightPos);
+
+			light->SetParams(light->GetPositionXYZ(), 5.0f, {1.0f, 1.0f, 1.0f}, 0.5f);
+			m_pointLights.push_back(std::move(light));
 		}
 	}
 
@@ -3142,6 +3182,10 @@ void GraphicsClass::SaveScene(const std::string name)
 		{
 			output << model->GetSaveData() << "\n";
 		}
+		for (PointLight* const& model : m_pointLights)
+		{
+			output << model->GetSaveData() << "\n";
+		}
 	}
 }
 
@@ -3195,7 +3239,19 @@ void GraphicsClass::TryPickObjects()
 		return;
 	}
 
-	for (const auto& model : m_sceneModels)
+	if (TryPickObjectsIterate(m_sceneModels))
+		return;
+
+	if (TryPickObjectsIterate(m_pointLights))
+		return;
+
+	m_selectedModel = nullptr;
+}
+
+template<class T>
+bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models)
+{
+	for (const auto& model : models)
 	{
 		const auto result = RaycastToModel(model);
 		const XMFLOAT3 lb = model->GetBounds().GetMinBounds(model);
@@ -3210,12 +3266,12 @@ void GraphicsClass::TryPickObjects()
 			}
 			m_selectedModel = model;
 			model->m_selected = true;
-			return;
+			return true;
 		}
 	}
-
-	m_selectedModel = nullptr;
+	return false;
 }
+
 void GraphicsClass::TryRayPick()
 {
 	//for (const auto& model : m_sceneModels)
@@ -3287,19 +3343,19 @@ void GraphicsClass::UpdateRayPick()
 		if (m_modelPickerBools.xAxis)
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::X, mouseNormalized);
-			const float sizeX = model->GetBounds().GetSizeX() * (mouseLength * 0.5f / boundsScreenSize.x);
+			const float sizeX = model->GetBounds().GetSizeX() * model->GetScale().x * (mouseLength * 0.5f / boundsScreenSize.x);
 			model->SetPosition(model->GetPosition().x + std::abs(sizeX * dot) * (mouse.x > 0.0f ? 1.0f : -1.0f), model->GetPosition().y, model->GetPosition().z);
 		}
 		else if (m_modelPickerBools.yAxis)
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::Y, mouseNormalized);
-			const float sizeY = model->GetBounds().GetSizeY() * (mouseLength * 0.5f / boundsScreenSize.y);
+			const float sizeY = model->GetBounds().GetSizeY() * model->GetScale().y * (mouseLength * 0.5f / boundsScreenSize.y);
 			model->SetPosition(model->GetPosition().x, model->GetPosition().y + std::abs(sizeY * dot) * (mouse.y > 0.0f ? 1.0f : -1.0f), model->GetPosition().z);
 		}
 		else if (m_modelPickerBools.zAxis)
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::Z, mouseNormalized);
-			const float sizeZ = model->GetBounds().GetSizeZ() * (mouseLength * 0.1f / boundsScreenSize.z);
+			const float sizeZ = model->GetBounds().GetSizeZ() * model->GetScale().z * (mouseLength * 0.1f / boundsScreenSize.z);
 			model->SetPosition(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z + sizeZ * dot);
 		}
 	}
@@ -3398,6 +3454,67 @@ GraphicsClass::MouseRaycastResult GraphicsClass::RaycastToModel(ModelClass* cons
 	return MouseRaycastResult{ {origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac };
 }
 
+void GraphicsClass::LoadPointLightSave(PointLight * model, json11::Json json)
+{
+	if (json["radius"].is_null())
+		return;
+
+	const auto radius = json["radius"].number_value();
+	const json11::Json::array color = json["color"].array_items();
+	const auto strenght = json["strength"].number_value();
+	
+	model->SetParams(model->GetPositionXYZ(), radius, { static_cast<float>(color.at(0).number_value()),static_cast<float>(color.at(1).number_value()), static_cast<float>(color.at(2).number_value()) }, strenght);
+	model->UpdateShader();
+}
+
+void GraphicsClass::LoadModelSave(ModelClass * model, json11::Json json)
+{
+	if (!model)
+		return;
+
+	const std::string sceneName = json["sceneName"].string_value();
+	const json11::Json::array position = json["position"].array_items();
+	const json11::Json::array scale = json["scale"].array_items();
+	const json11::Json::array rotation = json["rotation"].array_items();
+	const std::string materialName = json["material"].string_value();
+	model->m_name = sceneName;
+	model->SaveVisibleName();
+	if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
+	{
+		model->SetPosition(position.at(0).number_value(), position.at(1).number_value(), position.at(2).number_value());
+		model->SetScale(scale.at(0).number_value(), scale.at(1).number_value(), scale.at(2).number_value());
+		model->SetRotation(rotation.at(0).number_value(), rotation.at(1).number_value(), rotation.at(2).number_value());
+	}
+	CreateAABB(model);
+}
+
+void GraphicsClass::CreateModelSave(std::string modelName, json11::Json json)
+{
+	ModelClass* model = new ModelClass;
+	if (model->Initialize(m_D3D, (modelName + ".obj").c_str()))
+	{
+		const std::string sceneName = json["sceneName"].string_value();
+		const json11::Json::array position = json["position"].array_items();
+		const json11::Json::array scale = json["scale"].array_items();
+		const json11::Json::array rotation = json["rotation"].array_items();
+		const std::string materialName = json["material"].string_value();
+		model->m_name = sceneName;
+		model->SaveVisibleName();
+		if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
+		{
+			model->SetPosition(position.at(0).number_value(), position.at(1).number_value(), position.at(2).number_value());
+			model->SetScale(scale.at(0).number_value(), scale.at(1).number_value(), scale.at(2).number_value());
+			model->SetRotation(rotation.at(0).number_value(), rotation.at(1).number_value(), rotation.at(2).number_value());
+		}
+		CreateAABB(model);
+		m_sceneModels.push_back(std::move(model));
+	}
+	else
+	{
+		delete model;
+	}
+}
+
 void GraphicsClass::LoadScene(const std::string name)
 {
 	std::string line;
@@ -3410,29 +3527,20 @@ void GraphicsClass::LoadScene(const std::string name)
 			const std::string modelName = json["modelName"].string_value();
 			if (modelName != "")
 			{
-				ModelClass* model = new ModelClass;
-				if (model->Initialize(m_D3D, (modelName + ".obj").c_str()))
+				if (!json["radius"].is_null())
 				{
-					const std::string sceneName = json["sceneName"].string_value();
-					const json11::Json::array position = json["position"].array_items();
-					const json11::Json::array scale = json["scale"].array_items();
-					const json11::Json::array rotation = json["rotation"].array_items();
-					const std::string materialName = json["material"].string_value();
-					model->m_name = sceneName;
-					model->SaveVisibleName();
-					if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
-					{
-						model->SetPosition(position.at(0).number_value(), position.at(1).number_value(), position.at(2).number_value());
-						model->SetScale(scale.at(0).number_value(), scale.at(1).number_value(), scale.at(2).number_value());
-						model->SetRotation(rotation.at(0).number_value(), rotation.at(1).number_value(), rotation.at(2).number_value());
-					}
-					m_sceneModels.push_back(std::move(model));
-					CreateAABB(model);
-					continue;
+					PointLight* model = new PointLight;
+					if (!model->Initialize(m_D3D, "sphere.obj", true))
+						return;
+					LoadModelSave(model, json);
+					LoadPointLightSave(model, json);
+					m_pointLights.push_back(std::move(model));
+					//Moved after this point
 				}
-				else
+				else 
 				{
-					delete model;
+					CreateModelSave(modelName, json);
+					//Moved after this point
 				}
 			}
 		}

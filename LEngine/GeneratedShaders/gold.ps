@@ -299,7 +299,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float3 H = normalize(V - L);
 		float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
 		float attenuation = 1.0f / (distance * distance);
-		float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
+		float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * g_pointLightColorWithStrength[i].w;// * (distance / g_pointLightPositionWithRadius[i].w);
 		
 		// //Cook-torrance brdf
 		float NdotH = max(dot(N, H), 0.0f);

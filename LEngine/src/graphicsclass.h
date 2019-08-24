@@ -457,6 +457,7 @@ public:
 #pragma region Model picker
 public:
 	void TryPickObjects();
+	template<class T> bool TryPickObjectsIterate(std::vector<T*>& models);
 	void TryRayPick();
 	void UpdateRayPick();
 	void ResetRayPick();
@@ -534,6 +535,9 @@ private:
 	inline static __int64 GetTimeMillis();
 
 	//Saving/Loading scene
+	void LoadPointLightSave(PointLight* model, json11::Json json);
+	void LoadModelSave(ModelClass* model, json11::Json json);
+	void CreateModelSave(std::string modelName, json11::Json json);
 	void LoadScene(const std::string name);
 	void CreateAABB(ModelClass* baseModel);
 	void CreateAABBBox(const Bounds bounds);

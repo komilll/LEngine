@@ -1,5 +1,7 @@
 #include "ShaderPBRGenerated.h"
 
+std::vector<ShaderPBRGenerated::PointLight> ShaderPBRGenerated::k_pointLight;
+
 bool ShaderPBRGenerated::LoadIrradianceMap(ID3D11Device *device, const wchar_t * filename)
 {
 	return LoadTexture(device, filename, m_irradianceMap, m_irradianceMapView);
@@ -74,9 +76,19 @@ void ShaderPBRGenerated::AddDirectionalLight(XMFLOAT3 direction, float strength,
 	m_directionalLight.push_back(DirectionalLight{ { direction.x, direction.y, direction.z, strength },{ red, green, blue, 0.0f } });
 }
 
-void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength)
+int ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength)
 {
-	m_pointLight.push_back(PointLight{ positionWithRadius, colorWithStrength });
+	k_pointLight.push_back(PointLight{ positionWithRadius, colorWithStrength });
+	return k_pointLight.size() - 1;
+}
+
+void ShaderPBRGenerated::UpdatePointLight(int index, XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength)
+{
+	if (index >= 0 && index < k_pointLight.size())
+	{
+		k_pointLight.at(index).m_colorWithStrength = colorWithStrength;
+		k_pointLight.at(index).m_positionWithRadius = positionWithRadius;
+	}
 }
 
 //void ShaderPBRGenerated::AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength)
@@ -183,13 +195,13 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	PointLightBuffer* pointBuffer{ static_cast<PointLightBuffer*>(mappedResource.pData) };
 
 	//const int pointLightSize = min(m_pointLight.size(), NUM_LIGHTS_POINT);
-	//for (int i = 0; i < pointLightSize; i++)
-	//{
-	//	pointBuffer->point_positionWithRadius[i] = m_pointLight.at(i).m_positionWithRadius;
-	//	pointBuffer->point_colorWithStrength[i] = m_pointLight.at(i).m_colorWithStrength;
-	//}
-	pointBuffer->point_positionWithRadius[0] = { 1.5f, 0.75f, 0.0f, 5.0f };
-	pointBuffer->point_colorWithStrength[0] = { 1.0f, 0.0f, 0.0f, 0.5f };
+	for (int i = 0; i < 1; i++)
+	{
+		pointBuffer->point_positionWithRadius[i] = k_pointLight.at(i).m_positionWithRadius;
+		pointBuffer->point_colorWithStrength[i] = k_pointLight.at(i).m_colorWithStrength;
+	}
+	//pointBuffer->point_positionWithRadius[0] = { 1.5f, 0.75f, 0.0f, 5.0f };
+	//pointBuffer->point_colorWithStrength[0] = { 1.0f, 0.0f, 0.0f, 0.5f };
 
 	deviceContext->Unmap(m_pointLightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(1, 1, &m_pointLightBuffer);

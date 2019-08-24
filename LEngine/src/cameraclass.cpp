@@ -90,3 +90,11 @@ void CameraClass::GetViewPreviewMatrix(XMMATRIX & viewPreviewMatrix)
 {
 	viewPreviewMatrix = m_viewPreviewMatrix;
 }
+
+XMFLOAT3 CameraClass::GetForwardVector() const
+{
+	constexpr float conv{ 0.0174532925f };
+	const XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(m_rotationX * conv, m_rotationY * conv, m_rotationZ * conv);
+	const XMVECTOR toReturn = XMVector3Normalize(XMVector3TransformCoord(Camera::forward, rotationMatrix));
+	return{ toReturn.m128_f32[0], toReturn.m128_f32[1], toReturn.m128_f32[2] };
+}

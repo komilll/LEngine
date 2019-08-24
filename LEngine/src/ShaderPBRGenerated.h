@@ -53,6 +53,7 @@ private:
 		DirectionalLight(XMFLOAT4 direction_, XMFLOAT4 color_) : direction(direction_), color(color_) {}
 	};
 
+public:
 	struct PointLight
 	{
 		XMFLOAT4 m_positionWithRadius;
@@ -75,7 +76,8 @@ public:
 	void AddDirectionalLight(XMFLOAT4 directionStrength, float red, float green, float blue);
 	void AddDirectionalLight(XMFLOAT3 direction, float strength, float red, float green, float blue);
 
-	void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength);
+	static int AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength);
+	static void UpdatePointLight(int index, XMFLOAT4 positionWithRadius, XMFLOAT4 colorWithStrength);
 	//void AddPointLight(XMFLOAT4 positionWithRadius, XMFLOAT3 color, float colorStrength);
 	//void AddPointLight(XMFLOAT4 positionWithRadius, float red, float green, float blue, float colorStrength);
 	//void AddPointLight(XMFLOAT3 position, float radius, float red, float green, float blue, float colorStrength);
@@ -115,7 +117,7 @@ protected:
 
 private:
 	std::vector<DirectionalLight> m_directionalLight;
-	std::vector<PointLight> m_pointLight;
+	static std::vector<ShaderPBRGenerated::PointLight> k_pointLight;
 
 	ID3D11Buffer* m_lightingBuffer;
 	ID3D11Buffer* m_pointLightBuffer;

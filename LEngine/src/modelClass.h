@@ -101,8 +101,8 @@ public:
 
 	int GetIndexCount() const;
 
-	void SetPosition(float x, float y, float z);
-	void SetPosition(XMFLOAT3 position);
+	virtual void SetPosition(float x, float y, float z);
+	virtual void SetPosition(XMFLOAT3 position);
 	void SetScale(float x, float y, float z);
 	void SetScale(XMFLOAT3 scale);
 	void SetRotation(float x, float y, float z);
@@ -119,7 +119,7 @@ public:
 
 	std::string GetName() const;
 	std::string GetModelFilename() const;
-	std::string GetSaveData() const;
+	virtual std::string GetSaveData() const;
 	static ModelClass* LoadModel(D3DClass * d3d);
 	void LoadModel();
 	std::string LoadModelCalculatePath();
@@ -150,16 +150,18 @@ public:
 	std::string m_name;
 	bool m_selected;
 
-private:
+protected:
+	XMFLOAT4 m_position{ 0.0f, 0.0f, 0.0f, 0.0f };
+	XMFLOAT3 m_scale{ 1.0f, 1.0f, 1.0f };
+	XMFLOAT3 m_rotation{ 0.0f, 0.0f, 0.0f };
 	std::string m_savedName;
 	std::string m_modelFilename;
 	std::string m_materialName;
+
+private:
 	ID3D11Device* m_device;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
-	XMFLOAT4 m_position { 0.0f, 0.0f, 0.0f, 0.0f};
-	XMFLOAT3 m_scale { 1.0f, 1.0f, 1.0f };
-	XMFLOAT3 m_rotation { 0.0f, 0.0f, 0.0f };
 	D3DClass* m_D3D;
 
 	MaterialPrefab* m_material;

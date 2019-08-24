@@ -28,6 +28,7 @@ public:
 	void GetViewMatrix(XMMATRIX& viewMatrix);
 	void GetViewPreviewMatrix(XMMATRIX& viewPreviewMatrix);
 
+	XMFLOAT3 GetForwardVector() const;
 private:
 	float m_positionX{ 0.0f };
 	float m_positionY{ 0.0f };

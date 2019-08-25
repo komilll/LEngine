@@ -89,6 +89,7 @@ public:
 
 	//TODO Use constructors instead of "Initialize" methods
 	bool Initialize(D3DClass * d3d, const char* modelFilename, bool pickable = true);
+	bool InitializeFBX(D3DClass * d3d, const char* modelFilename, bool pickable = true);
 	bool Initialize(D3DClass* d3d, XMFLOAT3 origin, XMFLOAT3 destination);
 	bool Initialize(ID3D11Device* device, ShapeSize shape, float left, float right, float top, float bottom, bool withTex = true, bool isEmpty = false, float borderWidth = 0.007f);
 	bool Initialize(ID3D11Device* device, XMFLOAT3 leftMin, XMFLOAT3 leftMax, XMFLOAT3 rightMin, XMFLOAT3 rightMax);	
@@ -122,7 +123,8 @@ public:
 	virtual std::string GetSaveData() const;
 	static ModelClass* LoadModel(D3DClass * d3d);
 	void LoadModel();
-	std::string LoadModelCalculatePath();
+	HRESULT LoadModelFBX(const char* modelFilename);
+	std::string LoadModelCalculatePath(bool fbx = false);
 	void SaveVisibleName();
 
 	MaterialPrefab* const GetMaterial() const { return m_material; };

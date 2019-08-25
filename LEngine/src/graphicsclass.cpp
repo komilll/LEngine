@@ -1661,6 +1661,21 @@ bool GraphicsClass::RenderGUI()
 				CreateAABB(model);
 			}
 		}
+		if (ImGui::Button("Add model FBX"))
+		{
+			ModelClass* model = new ModelClass;
+			if (model->InitializeFBX(m_D3D, model->LoadModelCalculatePath(true).c_str()))
+			{
+				if (m_materialList.find("gold") == m_materialList.end())
+				{
+					m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
+				}
+				model->SetMaterial(m_materialList.at("gold"));
+
+				m_sceneModels.push_back(std::move(model));
+				CreateAABB(model);
+			}
+		}
 		if (ImGui::Button("Add point light"))
 		{
 			PointLight* light = new PointLight;

@@ -2,6 +2,7 @@
 // Filename: modelclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "modelclass.h"
+#include <fbxsdk.h>
 
 ModelClass::ModelClass(D3DClass * d3d, const char * modelFilename, XMFLOAT3 position, bool pickable)
 {
@@ -17,6 +18,17 @@ bool ModelClass::Initialize(D3DClass* d3d, const char * modelFilename, bool pick
 	m_device = d3d->GetDevice();
 	m_modelFilename = modelFilename;
 	if (!InitializeBuffers(m_device, modelFilename))
+		return false;
+
+	return true;
+}
+
+bool ModelClass::InitializeFBX(D3DClass * d3d, const char * modelFilename, bool pickable)
+{
+	m_D3D = d3d;
+	m_device = d3d->GetDevice();
+	m_modelFilename = modelFilename;
+	if (LoadModelFBX(modelFilename) == E_FAIL)
 		return false;
 
 	return true;
@@ -292,6 +304,114 @@ void ModelClass::LoadModel()
 {
 	assert(m_D3D);
 	Initialize(m_D3D, LoadModelCalculatePath().c_str());
+}
+
+HRESULT ModelClass::LoadModelFBX(const char* modelFilename)
+{
+	//std::unique_ptr<FbxManager> fbxManager = make_unique<FbxManager>(FbxManager::Create());
+	static FbxManager* fbxManager;
+	if (!fbxManager)
+	{
+		fbxManager = FbxManager::Create();
+		static FbxIOSettings* ioSettings = FbxIOSettings::Create(fbxManager, IOSROOT);
+		fbxManager->SetIOSettings(ioSettings);
+	}
+
+	FbxImporter* importer = FbxImporter::Create(fbxManager, "");
+	FbxScene* fbxScene = FbxScene::Create(fbxManager, "");
+
+	if (!importer->Initialize(modelFilename, -1, fbxManager->GetIOSettings()))
+		return E_FAIL;
+
+	if (!importer->Import(fbxScene))
+		return E_FAIL;
+
+	importer->Destroy();
+
+	FbxNode* fbxRootNode = fbxScene->GetRootNode();
+	if (fbxRootNode)
+	{
+		for (int i = 0; i < fbxRootNode->GetChildCount(); ++i) 
+		{
+			FbxNode* fbxChildNode = fbxRootNode->GetChild(i);
+
+			if (fbxChildNode->GetNodeAttribute() == NULL)
+				continue;
+
+			FbxNodeAttribute::EType attributeType = fbxChildNode->GetNodeAttribute()->GetAttributeType();
+
+			if (attributeType != FbxNodeAttribute::eMesh)
+				continue;
+
+			FbxGeometryConverter converter(fbxChildNode->GetFbxManager());
+			converter.Triangulate(fbxScene, true);
+
+			FbxMesh* mesh = static_cast<FbxMesh*>(fbxChildNode->GetNodeAttribute());
+			FbxVector4* fbxVertices = mesh->GetControlPoints();
+
+			std::vector<VertexType> verticesVector(0);
+
+			std::vector<DirectX::XMFLOAT3> vertexPosition;
+
+			std::vector<float> positionAxis_X;
+			std::vector<float> positionAxis_Y;
+			std::vector<float> positionAxis_Z;
+
+			for (int j = 0; j < mesh->GetPolygonCount(); ++j)
+			{
+				int numVertices = mesh->GetPolygonSize(j);
+				//assert(numVertices == 3);
+
+				for (int k = 0; k < numVertices; ++k)
+				{
+					const int controlPointIndex = mesh->GetPolygonVertex(j, k);
+
+					const float xPos = static_cast<float>(fbxVertices[controlPointIndex].mData[0]);
+					const float yPos = static_cast<float>(fbxVertices[controlPointIndex].mData[1]);
+					const float zPos = static_cast<float>(fbxVertices[controlPointIndex].mData[2]);
+
+					vertexPosition.push_back(DirectX::XMFLOAT3(xPos, yPos, zPos));
+					positionAxis_X.emplace_back(xPos);
+					positionAxis_Y.emplace_back(yPos);
+					positionAxis_Z.emplace_back(zPos);
+				}
+			}
+
+			VertexType* vertices{ nullptr };
+			unsigned long* indices;
+			int m_vertexCount = 0;
+
+			vertices = new VertexType[m_vertexCount = vertexPosition.size()];
+			for (int i = 0; i < m_vertexCount; i++)
+			{
+				vertices[i].position = vertexPosition.at(i);
+			}
+
+			auto m_indicesCount = m_vertexCount;
+			if (m_indicesCount == 0)
+				m_indicesCount = verticesVector.size();
+
+			m_indexCount = m_indicesCount;
+			indices = new unsigned long[m_indexCount];
+			for (int i = 0; i < m_indexCount; i++)
+			{
+				indices[i] = i;
+			}
+
+			if (CreateBuffers(m_D3D->GetDevice(), vertices, indices, m_vertexCount, m_indexCount) == false)
+				return false;
+
+			//Release unused data
+			delete[] vertices;
+			vertices = 0;
+
+			delete[] indices;
+			indices = 0;
+		}
+	}
+	fbxRootNode->Destroy();
+
+	return S_OK;
 }
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilename)
@@ -844,13 +964,15 @@ void ModelClass::CalculateAxisBound(float & min, float & max, std::vector<float>
 	}
 }
 
-std::string ModelClass::LoadModelCalculatePath()
+std::string ModelClass::LoadModelCalculatePath(bool fbx)
 {
 	PWSTR pszFilePath;
 	wchar_t* wFilePath = 0;
 	std::wstringstream ss;
 	IFileOpenDialog *pFileOpen;
-	const COMDLG_FILTERSPEC objSpec = { L"OBJ (Wavefront .obj)", L"*.obj" };
+	COMDLG_FILTERSPEC objSpec = { L"OBJ (Wavefront .obj)", L"*.obj" };
+	if (fbx)
+		objSpec = { L"FBX (.fbx)", L"*.fbx" };
 	const COMDLG_FILTERSPEC rgSpec[] = { objSpec };
 
 	// Create the FileOpenDialog object.

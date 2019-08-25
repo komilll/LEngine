@@ -368,15 +368,24 @@ void ShaderEditorManager::CreateChoosingWindowItemsArray()
 {
 	for (const auto& file : GetFilenamesInDirectory("ShaderFunctions", false))
 	{
-		std::string tmp;
+		std::string tmp = "";
+		std::size_t size = 0;
 		for (const auto& c : file)
 		{
 			if (c == '.')
 				break;
 			tmp += ::toupper(c);
+			size++;
 		}
-		ChoosingWindowItems.push_back(tmp.c_str());
+		char* tmpChar = new char[sizeof(tmp.c_str()) / sizeof(tmp.c_str()[0])];/* = new char[size];*/
+		//for (auto i = 0; i < size; ++i)
+		//	tmpChar[i] = tmp.c_str()[i];
+		strcpy(tmpChar, tmp.c_str());
+		ChoosingWindowItems.push_back(tmpChar);
+		
+		//ChoosingWindowItems.push_back(tmp.c_str());
 		//strcpy(const_cast<char*>(ChoosingWindowItems.at(ChoosingWindowItems.size() - 1)), tmp.c_str());
+
 	}
 	ChoosingWindowItemsOriginal._Construct(ChoosingWindowItems.begin(), ChoosingWindowItems.end());
 
@@ -1569,19 +1578,23 @@ void ShaderEditorManager::PressedOutsideOfChoosingWindow()
 void ShaderEditorManager::SearchThroughChoosingWindow()
 {
 	ChoosingWindowItems._Construct(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
+	std::string input = m_choosingWindowSearch.data();
 
-	for (int i = ChoosingWindowItems.size() - 1; i >= 0; --i)
+	if (!input.empty())
 	{
-		std::string mainStr;
-		for (const auto& c : m_choosingWindowSearch)
-			mainStr += ::toupper(c);
-
-		const std::string str{ ChoosingWindowItems.at(i) };
-		const std::size_t found = str.find(mainStr);
-
-		if (found == std::string::npos)
+		for (int i = ChoosingWindowItems.size() - 1; i >= 0; --i)
 		{
-			ChoosingWindowItems.erase(ChoosingWindowItems.begin() + i);
+			std::string mainStr;
+			for (const auto& c : input)
+				mainStr += ::toupper(c);
+
+			const std::string str{ ChoosingWindowItems.at(i) };
+			const std::size_t found = str.find(mainStr);
+
+			if (found == std::string::npos)
+			{
+				ChoosingWindowItems.erase(ChoosingWindowItems.begin() + i);
+			}
 		}
 	}
 

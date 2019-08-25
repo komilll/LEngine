@@ -55,7 +55,7 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
-const bool DRAW_AABB = false;
+const bool DRAW_AABB = true;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -81,7 +81,7 @@ constexpr float MODEL_DRAG_SPEED = 1.0f;
 class GraphicsClass
 {
 public:
-	bool ENABLE_GUI = false;
+	bool ENABLE_GUI = true;
 	bool RENDER_MATERIAL_EDITOR = true;
 
 	struct PreviewModelData

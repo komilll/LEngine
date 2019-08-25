@@ -1486,7 +1486,7 @@ bool GraphicsClass::RenderGUI()
 			}
 			if (ImGui::Button("Save material"))
 			{
-				m_shaderEditorManager->SaveMaterial(m_shaderEditorManager->m_materialToSaveName);
+				m_shaderEditorManager->SaveMaterial(m_shaderEditorManager->m_materialToSaveName.data());
 			}
 			ImGui::Spacing();
 			ImGui::Spacing();
@@ -1549,7 +1549,7 @@ bool GraphicsClass::RenderGUI()
 			}
 			m_shaderEditorManager->SearchThroughChoosingWindow();
 
-			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), m_shaderEditorManager->ChoosingWindowItems.data(), m_shaderEditorManager->ChoosingWindowItems.size()))
+			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), &m_shaderEditorManager->ChoosingWindowItems[0], m_shaderEditorManager->ChoosingWindowItems.size()))
 			{
 				m_hideShaderWindowOnNextTry = false;
 				m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);

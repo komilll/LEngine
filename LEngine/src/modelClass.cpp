@@ -328,88 +328,236 @@ HRESULT ModelClass::LoadModelFBX(const char* modelFilename)
 
 	importer->Destroy();
 
-	FbxNode* fbxRootNode = fbxScene->GetRootNode();
-	if (fbxRootNode)
+	VertexType* vertices{ nullptr };
+	unsigned long* indices;
+	std::vector<VertexType> verticesVector(0);
+	std::vector<unsigned long> indicesVec;
+	int m_vertexCount = 0;
+
+	if (!ReadBinary(modelFilename, verticesVector, indicesVec))
 	{
-		for (int i = 0; i < fbxRootNode->GetChildCount(); ++i) 
+		FbxNode* fbxRootNode = fbxScene->GetRootNode();
+		if (fbxRootNode)
 		{
-			FbxNode* fbxChildNode = fbxRootNode->GetChild(i);
-
-			if (fbxChildNode->GetNodeAttribute() == NULL)
-				continue;
-
-			FbxNodeAttribute::EType attributeType = fbxChildNode->GetNodeAttribute()->GetAttributeType();
-
-			if (attributeType != FbxNodeAttribute::eMesh)
-				continue;
-
-			FbxGeometryConverter converter(fbxChildNode->GetFbxManager());
-			converter.Triangulate(fbxScene, true);
-
-			FbxMesh* mesh = static_cast<FbxMesh*>(fbxChildNode->GetNodeAttribute());
-			FbxVector4* fbxVertices = mesh->GetControlPoints();
-
-			std::vector<VertexType> verticesVector(0);
-
-			std::vector<DirectX::XMFLOAT3> vertexPosition;
-
-			std::vector<float> positionAxis_X;
-			std::vector<float> positionAxis_Y;
-			std::vector<float> positionAxis_Z;
-
-			for (int j = 0; j < mesh->GetPolygonCount(); ++j)
+			for (int i = 0; i < fbxRootNode->GetChildCount(); ++i)
 			{
-				int numVertices = mesh->GetPolygonSize(j);
-				//assert(numVertices == 3);
+				FbxNode* fbxChildNode = fbxRootNode->GetChild(i);
 
-				for (int k = 0; k < numVertices; ++k)
+				if (fbxChildNode->GetNodeAttribute() == NULL)
+					continue;
+
+				FbxNodeAttribute::EType attributeType = fbxChildNode->GetNodeAttribute()->GetAttributeType();
+
+				if (attributeType != FbxNodeAttribute::eMesh)
+					continue;
+
+				FbxGeometryConverter converter(fbxChildNode->GetFbxManager());
+				converter.Triangulate(fbxScene, true);
+
+				FbxMesh* mesh = static_cast<FbxMesh*>(fbxChildNode->GetNodeAttribute());
+				FbxVector4* fbxVertices = mesh->GetControlPoints();
+
+
+				std::vector<DirectX::XMFLOAT3> vertexPosition;
+				std::vector<DirectX::XMFLOAT3> normalPosition;
+				std::vector<DirectX::XMFLOAT2> texPosition;
+
+				std::vector<float> positionAxis_X;
+				std::vector<float> positionAxis_Y;
+				std::vector<float> positionAxis_Z;
+
+				for (int j = 0; j < mesh->GetPolygonCount(); ++j)
 				{
-					const int controlPointIndex = mesh->GetPolygonVertex(j, k);
+					int numVertices = mesh->GetPolygonSize(j);
+					//assert(numVertices == 3);
 
-					const float xPos = static_cast<float>(fbxVertices[controlPointIndex].mData[0]);
-					const float yPos = static_cast<float>(fbxVertices[controlPointIndex].mData[1]);
-					const float zPos = static_cast<float>(fbxVertices[controlPointIndex].mData[2]);
+					for (int k = 0; k < numVertices; ++k)
+					{
+						const int controlPointIndex = mesh->GetPolygonVertex(j, k);
 
-					vertexPosition.push_back(DirectX::XMFLOAT3(xPos, yPos, zPos));
-					positionAxis_X.emplace_back(xPos);
-					positionAxis_Y.emplace_back(yPos);
-					positionAxis_Z.emplace_back(zPos);
+						const float xPos = static_cast<float>(fbxVertices[controlPointIndex].mData[0]);
+						const float yPos = static_cast<float>(fbxVertices[controlPointIndex].mData[1]);
+						const float zPos = static_cast<float>(fbxVertices[controlPointIndex].mData[2]);
+
+						vertexPosition.push_back(DirectX::XMFLOAT3(xPos, yPos, zPos));
+						positionAxis_X.emplace_back(xPos);
+						positionAxis_Y.emplace_back(yPos);
+						positionAxis_Z.emplace_back(zPos);
+					}
+				}
+
+				const auto normal = mesh->GetElementNormal();
+				if (normal)
+				{
+					if (normal->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+					{
+						//Let's get normals of each vertex, since the mapping mode of normal element is by control point
+						for (int lVertexIndex = 0; lVertexIndex < mesh->GetControlPointsCount(); lVertexIndex++)
+						{
+							int lNormalIndex = 0;
+							if (normal->GetReferenceMode() == FbxGeometryElement::eDirect)
+								lNormalIndex = lVertexIndex;
+
+							//reference mode is index-to-direct, get normals by the index-to-direct
+							if (normal->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+								lNormalIndex = normal->GetIndexArray().GetAt(lVertexIndex);
+
+							//Got normals of each vertex.
+							FbxVector4 lNormal = normal->GetDirectArray().GetAt(lNormalIndex);
+							normalPosition.push_back({ static_cast<float>(lNormal.mData[0]), static_cast<float>(lNormal.mData[1]), static_cast<float>(lNormal.mData[2]) });
+						}
+					}
+					else if (normal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+					{
+						int lIndexByPolygonVertex = 0;
+						//Let's get normals of each polygon, since the mapping mode of normal element is by polygon-vertex.
+						for (int lPolygonIndex = 0; lPolygonIndex < mesh->GetPolygonCount(); lPolygonIndex++)
+						{
+							//get polygon size, you know how many vertices in current polygon.
+							int lPolygonSize = mesh->GetPolygonSize(lPolygonIndex);
+							//retrieve each vertex of current polygon.
+							for (int i = 0; i < lPolygonSize; i++)
+							{
+								int lNormalIndex = 0;
+								//reference mode is direct, the normal index is same as lIndexByPolygonVertex.
+								if (normal->GetReferenceMode() == FbxGeometryElement::eDirect)
+									lNormalIndex = lIndexByPolygonVertex;
+
+								//reference mode is index-to-direct, get normals by the index-to-direct
+								if (normal->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+									lNormalIndex = normal->GetIndexArray().GetAt(lIndexByPolygonVertex);
+
+								//Got normals of each polygon-vertex.
+								FbxVector4 lNormal = normal->GetDirectArray().GetAt(lNormalIndex);
+								normalPosition.push_back({ static_cast<float>(lNormal.mData[0]), static_cast<float>(lNormal.mData[1]), static_cast<float>(lNormal.mData[2]) });
+
+								lIndexByPolygonVertex++;
+							}
+						}
+					}
+				}
+
+				//get all UV set names
+				FbxStringList lUVSetNameList;
+				mesh->GetUVSetNames(lUVSetNameList);
+
+				//iterating over all uv sets
+				for (int lUVSetIndex = 0; lUVSetIndex < lUVSetNameList.GetCount(); lUVSetIndex++)
+				{
+					//get lUVSetIndex-th uv set
+					const char* lUVSetName = lUVSetNameList.GetStringAt(lUVSetIndex);
+					const FbxGeometryElementUV* lUVElement = mesh->GetElementUV(lUVSetName);
+
+					if (!lUVElement)
+						continue;
+
+					// only support mapping mode eByPolygonVertex and eByControlPoint
+					if (lUVElement->GetMappingMode() != FbxGeometryElement::eByPolygonVertex &&
+						lUVElement->GetMappingMode() != FbxGeometryElement::eByControlPoint)
+						return false;
+
+					//index array, where holds the index referenced to the uv data
+					const bool lUseIndex = lUVElement->GetReferenceMode() != FbxGeometryElement::eDirect;
+					const int lIndexCount = (lUseIndex) ? lUVElement->GetIndexArray().GetCount() : 0;
+
+					//iterating through the data by polygon
+					const int lPolyCount = mesh->GetPolygonCount();
+
+					if (lUVElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+					{
+						for (int lPolyIndex = 0; lPolyIndex < lPolyCount; ++lPolyIndex)
+						{
+							// build the max index array that we need to pass into MakePoly
+							const int lPolySize = mesh->GetPolygonSize(lPolyIndex);
+							for (int lVertIndex = 0; lVertIndex < lPolySize; ++lVertIndex)
+							{
+								FbxVector2 lUVValue;
+
+								//get the index of the current vertex in control points array
+								int lPolyVertIndex = mesh->GetPolygonVertex(lPolyIndex, lVertIndex);
+
+								//the UV index depends on the reference mode
+								int lUVIndex = lUseIndex ? lUVElement->GetIndexArray().GetAt(lPolyVertIndex) : lPolyVertIndex;
+
+								lUVValue = lUVElement->GetDirectArray().GetAt(lUVIndex);
+
+								texPosition.push_back({ static_cast<float>(lUVValue.mData[0]), static_cast<float>(lUVValue.mData[1]) });
+							}
+						}
+					}
+					else if (lUVElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+					{
+						int lPolyIndexCounter = 0;
+						for (int lPolyIndex = 0; lPolyIndex < lPolyCount; ++lPolyIndex)
+						{
+							// build the max index array that we need to pass into MakePoly
+							const int lPolySize = mesh->GetPolygonSize(lPolyIndex);
+							for (int lVertIndex = 0; lVertIndex < lPolySize; ++lVertIndex)
+							{
+								if (lPolyIndexCounter < lIndexCount)
+								{
+									FbxVector2 lUVValue;
+
+									//the UV index depends on the reference mode
+									int lUVIndex = lUseIndex ? lUVElement->GetIndexArray().GetAt(lPolyIndexCounter) : lPolyIndexCounter;
+
+									lUVValue = lUVElement->GetDirectArray().GetAt(lUVIndex);
+
+									texPosition.push_back({ static_cast<float>(lUVValue.mData[0]), static_cast<float>(lUVValue.mData[1]) });
+
+									lPolyIndexCounter++;
+								}
+							}
+						}
+					}
+				}
+
+				CalculateAxisBound(bounds.minX, bounds.maxX, positionAxis_X);
+				CalculateAxisBound(bounds.minY, bounds.maxY, positionAxis_Y);
+				CalculateAxisBound(bounds.minZ, bounds.maxZ, positionAxis_Z);
+
+				vertices = new VertexType[m_vertexCount = vertexPosition.size()];
+				for (int i = 0; i < m_vertexCount; i++)
+				{
+					vertices[i].position = vertexPosition.at(i);
+					vertices[i].normal = normalPosition.at(i);
+					vertices[i].tex = texPosition.at(i);
 				}
 			}
-
-			VertexType* vertices{ nullptr };
-			unsigned long* indices;
-			int m_vertexCount = 0;
-
-			vertices = new VertexType[m_vertexCount = vertexPosition.size()];
-			for (int i = 0; i < m_vertexCount; i++)
-			{
-				vertices[i].position = vertexPosition.at(i);
-			}
-
-			auto m_indicesCount = m_vertexCount;
-			if (m_indicesCount == 0)
-				m_indicesCount = verticesVector.size();
-
-			m_indexCount = m_indicesCount;
-			indices = new unsigned long[m_indexCount];
-			for (int i = 0; i < m_indexCount; i++)
-			{
-				indices[i] = i;
-			}
-
-			if (CreateBuffers(m_D3D->GetDevice(), vertices, indices, m_vertexCount, m_indexCount) == false)
-				return false;
-
-			//Release unused data
-			delete[] vertices;
-			vertices = 0;
-
-			delete[] indices;
-			indices = 0;
 		}
+		fbxRootNode->Destroy();
 	}
-	fbxRootNode->Destroy();
+	else
+	{
+		m_vertexCount = verticesVector.size();
+	}
+
+	auto m_indicesCount = m_vertexCount;
+	m_indexCount = m_indicesCount;
+	indices = new unsigned long[m_indexCount];
+	for (int i = 0; i < m_indexCount; i++)
+	{
+		indices[i] = i;
+		indicesVec.push_back(i);
+	}
+
+	if (CreateBuffers(m_D3D->GetDevice(), vertices, indices, m_vertexCount, m_indexCount) == false)
+		return false;
+
+	if (verticesVector.size() == 0)
+	{
+		for (int i = 0; i < m_vertexCount; i++)
+			verticesVector.push_back(vertices[i]);
+
+		SaveBinary(modelFilename, verticesVector, indicesVec);
+	}
+
+	//Release unused data
+	delete[] vertices;
+	vertices = 0;
+
+	delete[] indices;
+	indices = 0;
 
 	return S_OK;
 }
@@ -545,9 +693,15 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, const char* modelFilena
 
 	m_indexCount = m_indicesCount;
 	indices = new unsigned long[m_indexCount];
-	for (int i = 0; i < m_indexCount; i++)
+	if (indicesVec.size() > 0)
 	{
-		indices[i] = indicesVec.at(i);
+		for (int i = 0; i < m_indexCount; i++)
+			indices[i] = indicesVec.at(i);
+	}
+	else
+	{
+		for (int i = 0; i < m_indexCount; i++)
+			indices[i] = i;
 	}
 
 	//CalculateDataForNormalMapping(vertices);

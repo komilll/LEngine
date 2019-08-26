@@ -1,3 +1,3 @@
-{"material": "", "modelName": "bunny.obj", "position": [1.6133871078491211, 0.59250736236572266, -0.22439779341220856], "rotation": [0, 0, 0], "scale": [0.97000002861022949, 0.97000002861022949, 0.97000002861022949], "sceneName": "Bunny"}
-{"material": "", "modelName": "LP_B-Rocks_00.fbx", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}
+{"material": "", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}
+{"material": "", "modelName": "LP_S-Rock_01.fbx.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}
 {"color": [0.097014904022216797, 0.47867113351821899, 1], "material": "", "modelName": "sphere.obj", "position": [1.5787869691848755, 0.75846582651138306, -0.3449782133102417], "radius": 0.34999999403953552, "rotation": [0, 0, 0], "scale": [0.10000000149011612, 0.10000000149011612, 0.10000000149011612], "sceneName": "Blue light", "strength": 0.029999999329447746}

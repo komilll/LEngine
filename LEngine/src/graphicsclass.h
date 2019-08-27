@@ -454,6 +454,11 @@ public:
 	void ToggleGUI();
 	void ToggleMSAA();
 
+	///// HELPER FUNCTIONS /////
+	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
+	static float lerp(float a, float b, float val);
+	inline static __int64 GetTimeMillis();
+
 #pragma region Model picker
 public:
 	void TryPickObjects();
@@ -528,11 +533,6 @@ private:
 
 	//Fill shader editor manager with data
 	bool CreateShaderEditor();
-
-	///// HELPER FUNCTIONS /////
-	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
-	static float lerp(float a, float b, float val);
-	inline static __int64 GetTimeMillis();
 
 	//Saving/Loading scene
 	void LoadPointLightSave(PointLight* model, json11::Json json);

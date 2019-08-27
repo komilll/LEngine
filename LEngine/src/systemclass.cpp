@@ -277,9 +277,12 @@ void SystemClass::HandleInput()
 {
 	XMVECTOR cameraMovement{ 0, 0, 0 };
 	XMVECTOR cameraRotation{ 0, 0, 0 };
-	constexpr float movementPerTick = 0.1f;
+	static float movementPerTick = 0.1f;
 	constexpr float rotatePerTick = 0.75f;
 	constexpr float previewRotateScale = 50.0f;
+	constexpr float speedUpCameraMovementPerScroll = 0.1f;
+	constexpr float speedLimitMax = 4.0f;
+	constexpr float speedLimitMin = 0.02f;
 
 	static bool lmbPressed = false;
 	static std::pair<float, float> pos;
@@ -355,6 +358,19 @@ void SystemClass::HandleInput()
 			m_Input->KeyUp(VK_M);
 			m_Graphics->ToggleMSAA();
 		}
+
+		if (m_Mouse->GetMouseScroll() == 0.0f)
+		{ /* Empty - most predictable branch */
+		}
+		else if (m_Mouse->GetMouseScroll() > 0.0f)
+			movementPerTick += speedUpCameraMovementPerScroll;
+		else if (m_Mouse->GetMouseScroll() < 0.0f)
+			movementPerTick -= speedUpCameraMovementPerScroll;
+
+		if (movementPerTick > speedLimitMax)
+			movementPerTick = speedLimitMax;
+		else if (movementPerTick < speedLimitMin)
+			movementPerTick = speedLimitMin;
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())
 	{

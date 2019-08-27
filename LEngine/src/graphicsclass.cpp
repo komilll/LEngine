@@ -470,9 +470,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 #pragma endregion
 
-	//TODO Replace by empty or load last scene
-	LoadScene("test.txt");
-
 	m_modelPicker = new ModelPicker(m_D3D);
 
 	m_singleColorShader = new ModelPickerShader;
@@ -988,11 +985,11 @@ bool GraphicsClass::RenderScene()
 
 	if (m_postprocessSSAO)
 	{
-		if (m_postprocessBloom)
-		{
-			m_postSSAOTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		}
+		//if (m_postprocessBloom)
+		//{
+		//	m_postSSAOTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		//	m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		//}
 
 		ApplySSAO(m_ssaoTexture->GetShaderResourceView());
 		
@@ -1081,6 +1078,7 @@ bool GraphicsClass::RenderScene()
 		}
 		else
 		{
+			m_D3D->SetBackBufferRenderTarget();
 			if (!RenderPostprocess(m_renderTextureMainScene->GetShaderResourceView()))
 			{
 				return false;
@@ -3172,6 +3170,15 @@ bool GraphicsClass::CreateShaderEditor()
 {
 	m_shaderEditorManager = new ShaderEditorManager(m_D3D, m_mouse->GetMouse());
 	m_shaderEditorManager->SetRefToClickedOutside(&m_focusOnChoosingWindowsShader);
+
+	for (const auto& name : m_shaderEditorManager->GetAllMaterialNames())
+	{
+		m_materialList.insert({ name, new MaterialPrefab{ name, m_D3D } });
+	}
+
+	//TODO Replace by empty or load last scene
+	LoadScene("test.txt");
+
 	return true;
 }
 
@@ -3492,6 +3499,11 @@ void GraphicsClass::LoadModelSave(ModelClass * model, json11::Json json)
 	const json11::Json::array scale = json["scale"].array_items();
 	const json11::Json::array rotation = json["rotation"].array_items();
 	const std::string materialName = json["material"].string_value();
+	if (materialName != "" && m_materialList.find(materialName) != m_materialList.end())
+	{
+		model->SetMaterial(m_materialList.at(materialName));
+	}
+
 	model->m_name = sceneName;
 	model->SaveVisibleName();
 	if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
@@ -3508,20 +3520,7 @@ void GraphicsClass::CreateModelSave(std::string modelName, json11::Json json)
 	ModelClass* model = new ModelClass;
 	if (model->Initialize(m_D3D, (modelName + ".obj").c_str()))
 	{
-		const std::string sceneName = json["sceneName"].string_value();
-		const json11::Json::array position = json["position"].array_items();
-		const json11::Json::array scale = json["scale"].array_items();
-		const json11::Json::array rotation = json["rotation"].array_items();
-		const std::string materialName = json["material"].string_value();
-		model->m_name = sceneName;
-		model->SaveVisibleName();
-		if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)
-		{
-			model->SetPosition(position.at(0).number_value(), position.at(1).number_value(), position.at(2).number_value());
-			model->SetScale(scale.at(0).number_value(), scale.at(1).number_value(), scale.at(2).number_value());
-			model->SetRotation(rotation.at(0).number_value(), rotation.at(1).number_value(), rotation.at(2).number_value());
-		}
-		CreateAABB(model);
+		LoadModelSave(model, json);
 		m_sceneModels.push_back(std::move(model));
 	}
 	else
@@ -3542,6 +3541,7 @@ void GraphicsClass::LoadScene(const std::string name)
 			const std::string modelName = json["modelName"].string_value();
 			if (modelName != "")
 			{
+				//Point light
 				if (!json["radius"].is_null())
 				{
 					PointLight* model = new PointLight;
@@ -3552,6 +3552,7 @@ void GraphicsClass::LoadScene(const std::string name)
 					m_pointLights.push_back(std::move(model));
 					//Moved after this point
 				}
+				//Standard model
 				else 
 				{
 					CreateModelSave(modelName, json);

@@ -1426,15 +1426,22 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 			func += funcName;
 			func += "\n{\n";
 
-			std::string type = m_pbrBlock->m_inputTypes.at(i);
-			if (type == "float")
-				func += "\treturn 0.0f;";
-			else if (type == "float2")
-				func += "\treturn float2(0.0f, 0.0f);";
-			else if (type == "float3")
-				func += "\treturn float3(0.0f, 0.0f, 0.0f);";
-			else if (type == "float4")
-				func += "\treturn float4(0.0f, 0.0f, 0.0f, 0.0f);";
+			if (m_pbrBlock->m_inputNames.at(i) == "Normal")
+			{
+				func += "\treturn float3(1.0f, 1.0f, 1.0f);";
+			}
+			else
+			{
+				std::string type = m_pbrBlock->m_inputTypes.at(i);
+				if (type == "float")
+					func += "\treturn 0.0f;";
+				else if (type == "float2")
+					func += "\treturn float2(0.0f, 0.0f);";
+				else if (type == "float3")
+					func += "\treturn float3(0.0f, 0.0f, 0.0f);";
+				else if (type == "float4")
+					func += "\treturn float4(0.0f, 0.0f, 0.0f, 0.0f);";
+			}
 
 			func += "\n}";
 			func += "\n"; //New line and empty line

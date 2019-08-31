@@ -41,6 +41,16 @@ MaterialPrefab::MaterialPrefab(const std::string name, D3DClass* d3d)
 		if (!m_shader->LoadBrdfLut(m_D3D->GetDevice(), L"Skyboxes/LutBRDF.dds"))
 			return;
 	}
+
+	//Load additional settings
+	if (std::ifstream input{ "Materials/" + name + ".settings" })
+	{
+		std::string line;
+
+		getline(input, line);
+		m_isEmissive = (line == "1");
+	}
+	m_shader->m_isEmissive = m_isEmissive;
 }
 
 std::vector<std::string> MaterialPrefab::GetTextureNames(const std::string materialFilename) const

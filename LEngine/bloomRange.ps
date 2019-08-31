@@ -25,10 +25,18 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	float4 finalColor = textureBloom.Sample(SampleType, input.tex);
 
 	//float3(0.2126, 0.7152, 0.0722)
-	float brightness = dot(finalColor.rgb, g_bloomIntensity);
+	//return sqrt(dot(rgb, float3(0.299f, 0.587f, 0.114f)));
+	//float brightness = dot(finalColor.rgb, g_bloomIntensity);
+	float brightness = sqrt(dot(finalColor.rgb, float3(0.299f, 0.587f, 0.114f)));
 
-	[branch] if(brightness > 1.0f)
+	if (brightness > g_bloomIntensity.r)
 		return finalColor;
 	else
 		return float4(0.0f, 0.0f, 0.0f, 1.0f);
+	// [branch] if(brightness > g_bloomIntensity.r)
+		// return finalColor;
+	// else
+		// return float4(0.0f, 0.0f, 0.0f, 1.0f);
+		
+	// return finalColor;
 }

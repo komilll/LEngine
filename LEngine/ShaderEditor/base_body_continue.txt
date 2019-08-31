@@ -164,6 +164,11 @@
 	
 	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
 	//return saturate(finalColor);// * lightIntensity;
+	if (g_isEmissive)
+	{
+		float luma = sqrt(dot(finalColor.rgb, float3(0.299f, 0.587f, 0.114f)));
+		finalColor = float4(float3(GetEmissiveColor() * luma), 1.0f);
+	}
 	return finalColor * g_albedoTint;// * lightIntensity;
 
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;

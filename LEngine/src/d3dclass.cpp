@@ -506,7 +506,7 @@ void D3DClass::ChangeDepthStencilComparison(D3D11_COMPARISON_FUNC comparisionFun
 	{
 		m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 	}
-	else if (comparisionFunc = D3D11_COMPARISON_LESS_EQUAL)
+	else if (comparisionFunc = D3D11_COMPARISON_EQUAL)
 	{
 		m_deviceContext->OMSetDepthStencilState(m_depthStencilStateSkybox, 1);
 	}
@@ -671,7 +671,7 @@ bool D3DClass::CreateDepthBuffer(int sizeMultiplier, int count)
 		return false;
 	}
 
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_EQUAL;
 	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilStateSkybox);
 	if (FAILED(result))
 	{

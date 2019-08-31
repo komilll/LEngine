@@ -61,10 +61,12 @@ bool UIShaderPBRBlock::Initialize(D3DClass * d3d)
 
 	m_textEngine = new TextEngine;
 	m_textEngine->Initialize(m_D3D->GetDevice(), L"Fonts/Calibri_12.spritefont");
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Color");
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Metalness");
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Roughness");
-	m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_translationX, m_translationY, "Normal");
+	assert(m_textPositionModifiers.size() == m_inputNodesCount, "UIShaderPBRBlock.cpp - size of vectors are different");
+
+	for (int i = 0; i < m_inputNames.size(); ++i)
+	{
+		m_textEngine->WriteText(d3d->GetDeviceContext(), d3d->GetWindowSize().x, d3d->GetWindowSize().y, m_textPositionModifiers.at(i).first, m_textPositionModifiers.at(i).second, m_inputNames.at(i));
+	}
 
 	m_outlineObject = new UIBase;
 	if (!m_outlineObject->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"uiline.vs", L"uiline.ps", BaseShaderClass::vertexInputType(GetInputNames(), GetInputFormats())))

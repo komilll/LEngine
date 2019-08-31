@@ -10,12 +10,21 @@
 class MaterialPrefab
 {
 public:
+	enum class MaterialType {
+		Unlit, Lit
+	};
+
+public:
 	MaterialPrefab(const std::string name, D3DClass* d3d);
 	ShaderPBRGenerated* const GetShader() const { return m_shader; };
 	std::string GetName() const { return m_name; };
 
 private:
 	std::vector<std::string> GetTextureNames(const std::string materialFilename) const;
+
+public:
+	MaterialType m_materialType{ MaterialType::Lit };
+	bool m_isEmissive{ false };
 
 private:
 	std::string m_name;

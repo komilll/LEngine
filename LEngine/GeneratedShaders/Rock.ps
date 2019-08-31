@@ -58,7 +58,8 @@ cbuffer PBRBuffer : register(b2)
 {
 	float g_roughness;
 	float g_metalness;
-	float2 g_paddingPBR;
+	int g_isEmissive;
+	float g_paddingPBR;
 	float4 g_albedoTint;
 };
 
@@ -93,6 +94,7 @@ float GetRoughness();
 float GetMetalness();
 float3 GetNormal();
 float4 GetBaseColor();
+float3 GetEmissiveColor();
 
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
@@ -309,6 +311,11 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	
 	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
 	//return saturate(finalColor);// * lightIntensity;
+	if (g_isEmissive)
+	{
+		float luma = sqrt(dot(finalColor.rgb, float3(0.299f, 0.587f, 0.114f)));
+		finalColor = float4(float3(GetEmissiveColor() * luma), 1.0f);
+	}
 	return finalColor * g_albedoTint;// * lightIntensity;
 
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
@@ -518,4 +525,12 @@ float GetRoughness()
 float3 GetNormal()
 {
 	return float3(1.0f, 1.0f, 1.0f);
+}
+float3 GetEmissiveColor()
+{
+	float3 L = float3(1.0f, 0.0f, 0.0f);
+	float N = 0.75f;
+	float3 out_M = multiply3(L, float3(N, N, N));
+
+	return out_M;
 }

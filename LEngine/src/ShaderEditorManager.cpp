@@ -939,48 +939,57 @@ bool ShaderEditorManager::SaveMaterial(std::string filename)
 	}
 	GenerateVariableNames();
 	{
-		std::ofstream output("Materials/" + filename + ".material", std::ios::binary);
-
-		int count = m_blocks.size();
-		std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
-		output << count << "\n";
-
-		for (const auto& block : m_blocks)
+		if (std::ofstream output{ "Materials/" + filename + ".material", std::ios::binary })
 		{
-			output << "BLOCK" << "\n";
-			float x = block->GetPosition().x;
-			float y = block->GetPosition().y;
-			std::string name = block->m_fileName;
-			
-			output << x << "\n";
-			output << y << "\n";
-			output << name << "\n";
-			output << SaveBlockValueMaterial(block);
-			if (block->m_inputNodes.size() == 0 && block->GetFirstOutputNode())
+			int count = m_blocks.size();
+			std::vector<std::string> functions = GetFilenamesInDirectory("ShaderFunctions", false);
+			output << count << "\n";
+
+			for (const auto& block : m_blocks)
 			{
-				output << block->GetFirstOutputNode()->GetVisibleName() << "\n";
+				output << "BLOCK" << "\n";
+				float x = block->GetPosition().x;
+				float y = block->GetPosition().y;
+				std::string name = block->m_fileName;
+
+				output << x << "\n";
+				output << y << "\n";
+				output << name << "\n";
+				output << SaveBlockValueMaterial(block);
+				if (block->m_inputNodes.size() == 0 && block->GetFirstOutputNode())
+				{
+					output << block->GetFirstOutputNode()->GetVisibleName() << "\n";
+				}
 			}
+
+			output << m_pbrBlock->GetPosition().x << "\n";
+			output << m_pbrBlock->GetPosition().y << "\n";
 		}
-
-		output << m_pbrBlock->GetPosition().x << "\n";
-		output << m_pbrBlock->GetPosition().y << "\n";
-
-		output.clear();
-		output.close();
+		//output.clear();
+		//output.close();
 	}
 	//
 	{
-		std::ofstream output("Materials/" + filename + ".materialpins", std::ios::binary);
-
-		for (const auto& block : m_blocks)
+		if (std::ofstream output{ "Materials/" + filename + ".materialpins", std::ios::binary })
 		{
-			for (const auto& out : block->m_outputNodes)
-				output << out->m_variableName << "\n";
-		}
+			for (const auto& block : m_blocks)
+			{
+				for (const auto& out : block->m_outputNodes)
+					output << out->m_variableName << "\n";
+			}
 
-		for (const auto& block : m_blocks)
-		{
-			for (const auto& in : block->m_inputNodes)
+			for (const auto& block : m_blocks)
+			{
+				for (const auto& in : block->m_inputNodes)
+				{
+					if (in->m_connectedOutputNode)
+						output << in->m_connectedOutputNode->m_variableName << "\n";
+					else
+						output << "test" << "\n";
+				}
+			}
+
+			for (const auto& in : m_pbrBlock->m_inputNodes)
 			{
 				if (in->m_connectedOutputNode)
 					output << in->m_connectedOutputNode->m_variableName << "\n";
@@ -988,19 +997,16 @@ bool ShaderEditorManager::SaveMaterial(std::string filename)
 					output << "test" << "\n";
 			}
 		}
-
-		for (const auto& in : m_pbrBlock->m_inputNodes)
-		{
-			if (in->m_connectedOutputNode)
-				output << in->m_connectedOutputNode->m_variableName << "\n";
-			else
-				output << "test" << "\n";
-		}
-
-		output.clear();
-		output.close();
+		//output.clear();
+		//output.close();
 	}
-
+	//Save additional settings
+	{	
+		if (std::ofstream output{ "Materials/" + filename + ".settings", std::ios::binary })
+		{
+			output << m_isEmissive;
+		}
+	}
 	GenerateCodeToFile(filename);
 	GeneratePBRClassCode(filename);
 	LoadAllMaterialsToArray(); //Generate array of materials again to show all materials on GUI
@@ -1118,6 +1124,7 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 #pragma endregion
 		}
 
+		//Set PBR block position
 		getline(input, line);
 		x = static_cast<float>(::atof(line.c_str()));
 
@@ -1171,6 +1178,19 @@ bool ShaderEditorManager::LoadMaterial(std::string filename)
 
 		input.clear();
 		input.close();
+	}
+	//Additional material options
+	{
+		std::ifstream input("Materials/" + filename + ".settings", std::ios::binary);
+		if (input.fail())
+			return false;
+
+		std::string line;
+
+		//Set material additional options
+		getline(input, line);
+
+		m_isEmissive = (line == "1");
 	}
 
 	LoadMaterialInputs();
@@ -1397,7 +1417,9 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 	{
 		if (const UIShaderEditorOutput* const out = m_pbrBlock->m_inputNodes.at(i)->m_connectedOutputNode)
 		{
-			const std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
+			std::string inputName = m_pbrBlock->m_inputNames.at(i);
+			inputName.erase(std::remove(inputName.begin(), inputName.end(), ' '), inputName.end());
+			const std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + inputName + "()" };
 			std::string funcBody{ "\n{\n" };
 
 			for (const auto& block : m_blocks)
@@ -1422,7 +1444,9 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 		}
 		else
 		{
-			const std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + m_pbrBlock->m_inputNames.at(i) + "()" };
+			std::string inputName = m_pbrBlock->m_inputNames.at(i);
+			inputName.erase(std::remove(inputName.begin(), inputName.end(), ' '), inputName.end());
+			const std::string funcName{ m_pbrBlock->m_inputTypes.at(i) + " Get" + inputName + "()" };
 			func += funcName;
 			func += "\n{\n";
 
@@ -1452,7 +1476,7 @@ void ShaderEditorManager::GenerateCodeToFile(std::string filename)
 	GeneratePBRClassCode(filename);
 	if (filename == "")
 	{
-		filename = "pbr_used.ps";
+		filename = "gold.ps";
 	}
 	else
 	{

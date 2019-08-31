@@ -70,17 +70,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 #pragma region PBR Shader loading
 	//Create input format for vertex data
 	BaseShaderClass::vertexInputType input = m_D3D->GetBaseInputType();
-
-	m_pbrShader = new ShaderPBRGenerated;
-	if (!m_pbrShader->Initialize(m_D3D->GetDevice(), hwnd, L"pbr_used.vs", L"pbr_used.ps", input))
-		return false;
-
-	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 5.0f, -5.0f }, 5.0f, 1.0f, 1.0f, 1.0f);
-	
-	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 0.0f, -1.0f }, 0.4f, 1.0f, 0.0f, 0.0f);
-	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 2.0f, 6.0f }, 0.7f, 0.0f, 1.0f, 0.0f);
-	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 0.0f, 10.f, 3.0f}, 1.25f, 0.0f, 0.0f, 1.0f);
-	m_pbrShader->AddDirectionalLight(XMFLOAT3{ 5.0f , -3.0f, 0.0f}, 1.0f, 1.0f, 1.0f, 0.4f);
 #pragma endregion
 
 #pragma region Creating UI
@@ -297,16 +286,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_shadowMapTexture->InitializeShadowMap(m_D3D->GetDevice(), 1280, 720);
 
 #pragma endregion
-
-	if (!m_pbrShader->LoadIrradianceMap(m_D3D->GetDevice(), L"Skyboxes/conv_cubemap.dds"))
-		return false;
-	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_0.dds");
-	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_1.dds");
-	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_2.dds");
-	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_3.dds");
-	m_pbrShader->AddEnvironmentMapLevel(m_D3D->GetDevice(), L"Skyboxes/enviro_cubemap_4.dds");
-	if (!m_pbrShader->LoadBrdfLut(m_D3D->GetDevice(), L"Skyboxes/LutBRDF.dds"))
-		return false;
 
 	CreateShadowMap(m_shadowMapTexture);
 
@@ -887,7 +866,7 @@ bool GraphicsClass::RenderScene()
 
 	//RENDER MAIN SCENE MODEL
 	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
 
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
@@ -910,6 +889,87 @@ bool GraphicsClass::RenderScene()
 	}
 
 	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
+	//if (m_postprocessBloom)
+	{
+		for (ModelClass* const& model : m_sceneModels)
+		{
+			if (!model->GetMaterial())
+			{
+				//TODO Create function - repeated in code many times
+				if (m_materialList.find("gold") == m_materialList.end())
+				{
+					m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
+				}
+				model->SetMaterial(m_materialList.at("gold"));
+				continue;
+			}
+			if (!m_postprocessBloom && !model->GetMaterial()->m_isEmissive)
+			{
+				continue;
+			}
+
+			m_Camera->GetViewMatrix(viewMatrix);
+			m_D3D->GetWorldMatrix(worldMatrix);
+			m_D3D->GetProjectionMatrix(projectionMatrix);
+
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+			model->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
+			model->Render(m_D3D->GetDeviceContext());
+			if (!model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+				return false;
+		}
+
+		//TODO Every frame initialization?
+		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+
+		m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
+		if (m_postprocessSSAO)
+			m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
+		else
+			m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
+
+		{
+			m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
+			m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0, 0, 0, 1);
+
+			m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+		}
+
+		m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
+		m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
+
+		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
+		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
+
+		BlurFilterScreenSpaceTexture(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
+		BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+		constexpr int numberOfBlurRepeats{ 5 };
+		for (int i = 2; i < numberOfBlurRepeats; i++)
+		{
+			BlurFilterScreenSpaceTexture(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / std::pow(2, i)); //Blur horizontal
+			BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / std::pow(2, i)); //Blur vertical
+		}
+
+		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
+
+		if (m_postprocessSSAA)
+		{
+			m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
+			m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
+		}
+		else
+		{
+			m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+			m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+		}
+	}
+
 	for (ModelClass* const& model : m_sceneModels)
 	{
 		if (!model->GetMaterial())
@@ -964,18 +1024,13 @@ bool GraphicsClass::RenderScene()
 	if (!RenderLightModels())
 		return false;
 
-	if (DRAW_SKYBOX)
-	{
-		if (RenderSkybox() == false)
-			return false;
-	}
 	m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
 	
 	//TODO Test post-process stack
 	if (!m_postprocessSSAO)
 		m_postProcessShader->ResetSSAO();
-	if (!m_postprocessBloom)
-		m_postProcessShader->ResetBloom();
+	//if (!m_postprocessBloom)
+	//	m_postProcessShader->ResetBloom();
 	if (!m_postprocessLUT)
 		m_postProcessShader->ResetLUT();
 	if (!m_postprocessChromaticAberration)
@@ -996,50 +1051,6 @@ bool GraphicsClass::RenderScene()
 		m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
 	}
 
-	if (m_postprocessBloom)
-	{
-		//TODO Every frame initialization?
-		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-
-		m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
-		if (m_postprocessSSAO)
-			m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
-		else
-			m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
-
-		{
-			m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0, 0, 0, 1);
-
-			m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-
-			m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
-		}
-
-		m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
-		m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
-
-		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		BlurFilterScreenSpaceTexture(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-		BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-		constexpr int numberOfBlurRepeats{ 5 };
-		for (int i = 2; i < numberOfBlurRepeats; i++)
-		{
-			BlurFilterScreenSpaceTexture(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / std::pow(i, 2)); //Blur horizontal
-			BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / std::pow(i, 2)); //Blur vertical
-		}
-
-		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
-	}
-
 	if (m_postprocessLUT)
 	{
 		ApplyLUT(m_lutShader->GetLUT());
@@ -1056,6 +1067,24 @@ bool GraphicsClass::RenderScene()
 	{
 		ApplyGrain();
 		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
+	}
+
+
+	if (DRAW_SKYBOX)
+	{
+		if (m_postprocessSSAA)
+		{
+			m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
+		}
+		else
+		{
+			m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		}
+
+		if (RenderSkybox() == false)
+			return false;
+
+		m_D3D->SetBackBufferRenderTarget(m_postprocessSSAA ? 1 : -1);
 	}
 
 	//Always render to create one buffer to present
@@ -1486,6 +1515,8 @@ bool GraphicsClass::RenderGUI()
 			{
 				m_shaderEditorManager->SaveMaterial(m_shaderEditorManager->m_materialToSaveName.data());
 			}
+			ImGui::Checkbox("Emissive material", &m_shaderEditorManager->m_isEmissive);
+
 			ImGui::Spacing();
 			ImGui::Spacing();
 
@@ -1914,9 +1945,6 @@ void GraphicsClass::ReinitializeMainModel()
 	static std::vector <LPCSTR> names{ "position", "texcoord", "normal", "tangent", "binormal" };
 	static std::vector <DXGI_FORMAT> formats{ DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT, DXGI_FORMAT_R32G32B32_FLOAT };
 	static const BaseShaderClass::vertexInputType input{ names, formats };
-
-	m_pbrShader->m_materialNames = m_shaderEditorManager->GetUsedTextures();
-	m_pbrShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"pbr_used.vs", L"pbr_used.ps", input);
 }
 
 void GraphicsClass::RefreshModelTick()
@@ -1953,7 +1981,7 @@ bool GraphicsClass::RenderSkybox()
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_Camera->GetRotation().y / 3.14f));
 	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_Camera->GetRotation().x / 3.14f));
 
-	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_EQUAL);
 
 	m_skyboxModel->Render(m_D3D->GetDeviceContext());
 	m_skyboxShader->Render(m_D3D->GetDeviceContext(), m_skyboxModel->GetIndexCount(), worldMatrix, /*viewMatrix*/ XMMatrixIdentity(), projectionMatrix);
@@ -2057,8 +2085,8 @@ bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const ID3D11Shad
 
 	if (vertical == false) //HORIZONTAL - 1st
 	{
-		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize));
-		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize), 0.0f, 0.0f, 0.0f, 1.0f);
+		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
+		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
 
 		m_Camera->Render();
 
@@ -2082,8 +2110,8 @@ bool GraphicsClass::BlurFilterScreenSpaceTexture(bool vertical, const ID3D11Shad
 	}
 	else //VERTICAL - 2nd
 	{
-		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize));
-		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(depthBufferSize), 0.0f, 0.0f, 0.0f, 1.0f);
+		textureToReturn->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
+		textureToReturn->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
 
 		m_Camera->Render();
 

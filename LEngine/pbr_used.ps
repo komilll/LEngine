@@ -58,7 +58,8 @@ cbuffer PBRBuffer : register(b2)
 {
 	float g_roughness;
 	float g_metalness;
-	float2 g_paddingPBR;
+	int g_isEmissive;
+	float g_paddingPBR;
 	float4 g_albedoTint;
 };
 
@@ -499,7 +500,7 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 // SHADER EDITOR METHODS
 ////////////////////////////////////////////////////////////////////////////////
-float4 GetBaseColor()
+float4 GetBase Color()
 {
 	return tex_0;
 }
@@ -518,4 +519,10 @@ float GetRoughness()
 float3 GetNormal()
 {
 	return float3(1.0f, 1.0f, 1.0f);
+}
+float3 GetEmissive Color()
+{
+	float3 L = float3(1.0f, 0.0f, 0.0f);
+
+	return L;
 }

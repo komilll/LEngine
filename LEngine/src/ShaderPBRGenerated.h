@@ -32,7 +32,8 @@ private:
 	{
 		float roughness;
 		float metalness;
-		XMFLOAT2 padding;
+		int isEmissive;
+		float padding;
 		XMFLOAT4 albedoTint;
 	};
 
@@ -110,6 +111,7 @@ public:
 	float m_metalness{ 0 };
 	std::array<float, 3> m_tint { 1,1,1 };
 	std::vector<std::string> m_materialNames;
+	bool m_isEmissive{ false };
 
 protected:
 	virtual bool CreateBufferAdditionals(ID3D11Device *&device) override;

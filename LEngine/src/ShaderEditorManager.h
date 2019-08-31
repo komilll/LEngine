@@ -122,6 +122,9 @@ public:
 	int m_refreshModelTicks{ -1 };
 	std::string m_materialToSaveName;
 
+	//Additional options to save
+	bool m_isEmissive{ false };
+
 private:
 	D3DClass* m_D3D;
 	MouseClass* m_mouse;

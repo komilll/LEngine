@@ -5,6 +5,7 @@
 #include "UIBase.h"
 #include "UIShaderEditorInput.h"
 #include "TextEngine.h"
+#include <array>
 
 ///<summary>Class used for rendering Material Editor blocks</summary>
 class UIShaderPBRBlock : public UIBase
@@ -53,9 +54,18 @@ private:
 	bool InitializeInputNodes();
 	RectangleVertices CalculateOutlineSize(RectangleVertices blockSize);
 
+private:
+	//INPUT - PBR
+	//0 - Base Color
+	//1 - Metallic
+	//2 - Roughness
+	//3 - Normal
+	//4 - Emissive Color
+	static const int m_inputNodesCount{ 5 };
+
 public:
-	const std::vector<std::string> m_inputTypes = { "float4", "float", "float", "float3" };
-	const std::vector<std::string> m_inputNames = { "BaseColor", "Metalness", "Roughness", "Normal" };
+	const std::array<std::string, m_inputNodesCount> m_inputTypes{ "float4", "float", "float", "float3", "float3" };
+	const std::array<std::string, m_inputNodesCount> m_inputNames{ "Base Color", "Metalness", "Roughness", "Normal", "Emissive Color" };
 	vector<UIShaderEditorInput*> m_inputNodes = {};
 	bool m_focused{ false };
 
@@ -73,14 +83,7 @@ private:
 
 	UIBase::RectangleVertices m_blockVertices;
 	TextEngine* m_textEngine{};
-	std::vector<pair<float, float>> m_textPositionModifiers{ {-0.01f, 0.27f}, { 0.02f, 0.195f }, { 0.02f, 0.11f }, { 0.0075f-0.01f, 0.03f } };
-
-	//INPUT - PBR
-	//0 - Base Color
-	//1 - Metallic
-	//2 - Roughness
-	//3 - Normal
-	int m_inputNodesCount = 4;	
+	const std::vector<std::pair<float, float>> m_textPositionModifiers{ {-0.04f, 0.295f}, { -0.04f, 0.21f }, { -0.04f, 0.13f }, { -0.04f, 0.05f }, { -0.04f, -0.03f } };
 
 private:
 	const Size blockSizeVector = Size{ 0.2f, 0.8f };

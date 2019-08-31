@@ -21,7 +21,8 @@ cbuffer PBRBuffer : register(b2)
 {
 	float g_roughness;
 	float g_metalness;
-	float2 g_paddingPBR;
+	int g_isEmissive;
+	float g_paddingPBR;
 	float4 g_albedoTint;
 };
 
@@ -56,6 +57,7 @@ float GetRoughness();
 float GetMetalness();
 float3 GetNormal();
 float4 GetBaseColor();
+float3 GetEmissiveColor();
 
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);

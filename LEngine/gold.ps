@@ -29,12 +29,6 @@ SamplerState BrdfLutSampleType : register(s1)
 	MinLOD = 0;
 	MaxLOD = D3D11_FLOAT32_MAX;
 };
-Texture2D additionalTexture_0 : register(t7);
-static float4 tex_0;
-Texture2D additionalTexture_1 : register(t8);
-static float4 tex_2;
-Texture2D additionalTexture_2 : register(t9);
-static float4 tex_8;
 
 #define NUM_LIGHTS_DIRECTIONAL 2
 #define NUM_LIGHTS_POINT 1
@@ -142,9 +136,6 @@ float substract(float a, float b);
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_2 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_8 = additionalTexture_1.Sample(SampleType, input.tex * float2(0.25, 0.25));
 
 //Calculated values
 	float3 specular;
@@ -304,7 +295,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 		specular = numerator / max(denominator, 0.001);
 
-		//finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
 	}
 	//finalColor += normalize(pointLight);
 #endif
@@ -508,7 +499,9 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return tex_0;
+	float4 A = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	return A;
 }
 float GetMetalness()
 {
@@ -518,9 +511,9 @@ float GetMetalness()
 }
 float GetRoughness()
 {
-	float K = 1.0f;
+	float C = 1.0f;
 
-	return K;
+	return C;
 }
 float3 GetNormal()
 {
@@ -528,9 +521,9 @@ float3 GetNormal()
 }
 float3 GetEmissiveColor()
 {
-	float3 L = float3(1.0f, 0.0f, 0.0f);
-	float N = 0.75f;
-	float3 out_M = multiply3(L, float3(N, N, N));
+	float3 D = float3(0.516484f, 1.0f, 1.0f);
+	float F = 0.25f;
+	float3 out_E = multiply3(D, float3(F, F, F));
 
-	return out_M;
+	return out_E;
 }

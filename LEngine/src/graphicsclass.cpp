@@ -436,6 +436,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_ssaaTexture->Initialize(m_D3D->GetDevice(), m_screenWidth * 2.0f, m_screenHeight * 2.0f, 1))
 		return false;
 
+	m_ssaaTextureHelper = new RenderTextureClass;
+	if (!m_ssaaTextureHelper->Initialize(m_D3D->GetDevice(), m_screenWidth * 2.0f, m_screenHeight * 2.0f, 1))
+		return false;
+
 	m_ssaaTextureBlurred_2 = new RenderTextureClass;
 	if (!m_ssaaTextureBlurred_2->Initialize(m_D3D->GetDevice(), m_screenWidth * 2.0f, m_screenHeight * 2.0f, 1))
 		return false;
@@ -791,21 +795,21 @@ bool GraphicsClass::Render()
 		if (m_antialiasingSettings.sampleCount == 2)
 		{
 			constexpr float size = 1.0f;
-			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, 1))
+			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTextureHelper, size, 1))
 				return false;
 		}
-		else if (m_antialiasingSettings.sampleCount == 4)
-		{
-			constexpr float size = 1.0f;
-			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size, 1))
-				return false;
-		}
-		else if (m_antialiasingSettings.sampleCount == 8)
-		{
-			constexpr float size = 1.0f;
-			if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTexture, size))
-				return false;
-		}
+		//else if (m_antialiasingSettings.sampleCount == 4)
+		//{
+		//	constexpr float size = 1.0f;
+		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTextureHelper, size, 1))
+		//		return false;
+		//}
+		//else if (m_antialiasingSettings.sampleCount == 8)
+		//{
+		//	constexpr float size = 1.0f;
+		//	if (!DownsampleTexture(m_renderTextureMainScene, m_ssaaTextureHelper, size))
+		//		return false;
+		//}
 
 		//Render antialiased buffer
 		m_D3D->SetBackBufferRenderTarget();
@@ -891,6 +895,9 @@ bool GraphicsClass::RenderScene()
 	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
 	//if (m_postprocessBloom)
 	{
+		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
 		for (ModelClass* const& model : m_sceneModels)
 		{
 			if (!model->GetMaterial())
@@ -959,15 +966,11 @@ bool GraphicsClass::RenderScene()
 		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
 
 		if (m_postprocessSSAA)
-		{
 			m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
-			m_ssaaTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
-		}
 		else
-		{
 			m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		}
+		
+		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	for (ModelClass* const& model : m_sceneModels)
@@ -1100,6 +1103,10 @@ bool GraphicsClass::RenderScene()
 	{
 		if (m_postprocessSSAA)
 		{
+			m_ssaaTextureHelper->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
+			m_ssaaTextureHelper->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount), 0.0f, 0.0f, 0.0f, 1.0f);
+			m_ssaaTextureHelper->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
 			if (!RenderPostprocess(m_ssaaTexture->GetShaderResourceView()))
 			{
 				return false;
@@ -1192,200 +1199,200 @@ bool GraphicsClass::RenderLightModels()
 
 bool GraphicsClass::RenderMaterialPreview()
 {
-	const std::string materialName = m_shaderEditorManager->GetCurrentMaterialName();
-	if (materialName == "")
-	{
-		return true;
-	}
-	if (m_materialList.find(materialName) == m_materialList.end())
-	{
-		m_materialList.insert({ materialName, new MaterialPrefab{ materialName, m_D3D } });
-		return true;
-	}
-	MaterialPrefab* const material = m_materialList.at(materialName);
+	//const std::string materialName = m_shaderEditorManager->GetCurrentMaterialName();
+	//if (materialName == "")
+	//{
+	//	return true;
+	//}
+	//if (m_materialList.find(materialName) == m_materialList.end())
+	//{
+	//	m_materialList.insert({ materialName, new MaterialPrefab{ materialName, m_D3D } });
+	//	return true;
+	//}
+	//MaterialPrefab* const material = m_materialList.at(materialName);
 
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
-	//RENDER MAIN SCENE MODEL
-	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+	////RENDER MAIN SCENE MODEL
+	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	//m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
 
-	m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	//m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	//m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	ModelClass* const& model = m_previewData.model;
-	XMFLOAT3 tmp = m_Camera->GetPosition();
-	m_Camera->SetPosition(0.0f, m_previewData.yCameraPos, 0.0f);
-	{
-		m_Camera->RenderPreview({ model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z });
-		m_Camera->GetViewPreviewMatrix(viewMatrix);
-		//m_Camera->Render();
-		//m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+	//ModelClass* const& model = m_previewData.model;
+	//XMFLOAT3 tmp = m_Camera->GetPosition();
+	//m_Camera->SetPosition(0.0f, m_previewData.yCameraPos, 0.0f);
+	//{
+	//	m_Camera->RenderPreview({ model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z });
+	//	m_Camera->GetViewPreviewMatrix(viewMatrix);
+	//	//m_Camera->Render();
+	//	//m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
-		material->GetShader()->m_cameraPosition = m_Camera->GetPosition();
-		model->Render(m_D3D->GetDeviceContext());
-		if (!material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-			return false;
-	}
-	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
+	//	material->GetShader()->m_cameraPosition = m_Camera->GetPosition();
+	//	model->Render(m_D3D->GetDeviceContext());
+	//	if (!material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+	//		return false;
+	//}
+	//m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
 
-	if (DRAW_SKYBOX)
-	{
-		if (RenderSkybox() == false)
-			return false;
-	}
-	m_D3D->SetBackBufferRenderTarget();
+	//if (DRAW_SKYBOX)
+	//{
+	//	if (RenderSkybox() == false)
+	//		return false;
+	//}
+	//m_D3D->SetBackBufferRenderTarget();
 
-	//TODO Post-process stack duplicated from RenderScene()
+	////TODO Post-process stack duplicated from RenderScene()
 
-	if (!m_postprocessSSAO)
-		m_postProcessShader->ResetSSAO();
-	if (!m_postprocessBloom)
-		m_postProcessShader->ResetBloom();
-	if (!m_postprocessLUT)
-		m_postProcessShader->ResetLUT();
-	if (!m_postprocessChromaticAberration)
-		m_postProcessShader->UseChromaticAberration(false);
-	if (!m_postprocessGrain)
-		m_postProcessShader->UseGrain(false);
+	//if (!m_postprocessSSAO)
+	//	m_postProcessShader->ResetSSAO();
+	//if (!m_postprocessBloom)
+	//	m_postProcessShader->ResetBloom();
+	//if (!m_postprocessLUT)
+	//	m_postProcessShader->ResetLUT();
+	//if (!m_postprocessChromaticAberration)
+	//	m_postProcessShader->UseChromaticAberration(false);
+	//if (!m_postprocessGrain)
+	//	m_postProcessShader->UseGrain(false);
 
-	if (m_postprocessSSAO)
-	{
-		if (m_postprocessBloom)
-		{
-			m_postSSAOTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		}
+	//if (m_postprocessSSAO)
+	//{
+	//	if (m_postprocessBloom)
+	//	{
+	//		m_postSSAOTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	//		m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	//	}
 
-		ApplySSAO(m_ssaoTexture->GetShaderResourceView());
+	//	ApplySSAO(m_ssaoTexture->GetShaderResourceView());
 
-		m_D3D->SetBackBufferRenderTarget();
-	}
+	//	m_D3D->SetBackBufferRenderTarget();
+	//}
 
-	if (m_postprocessBloom)
-	{
-		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//if (m_postprocessBloom)
+	//{
+	//	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+	//	m_Camera->Render();
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
-		if (m_postprocessSSAO)
-			m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
-		else
-			m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
+	//	m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
+	//	if (m_postprocessSSAO)
+	//		m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
+	//	else
+	//		m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
 
-		{
-			m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-			m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0, 0, 0, 1);
+	//	{
+	//		m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	//		m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0, 0, 0, 1);
 
-			m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+	//		m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
 
-			m_D3D->SetBackBufferRenderTarget();
-		}
+	//		m_D3D->SetBackBufferRenderTarget();
+	//	}
 
-		m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
-		m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
+	//	m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
+	//	m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
 
-		BlurFilterScreenSpace(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-		BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-		for (int i = 0; i < 10; i++)
-		{
-			BlurFilterScreenSpace(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-			BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-		}
+	//	BlurFilterScreenSpace(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
+	//	BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+	//	for (int i = 0; i < 10; i++)
+	//	{
+	//		BlurFilterScreenSpace(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
+	//		BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+	//	}
 
-		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
-	}
+	//	ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
+	//}
 
-	if (!m_postprocessSSAO && !m_postprocessBloom && !m_postprocessLUT)
-	{
-		//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//if (!m_postprocessSSAO && !m_postprocessBloom && !m_postprocessLUT)
+	//{
+	//	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+	//	m_Camera->Render();
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-			return false;
-	}
+	//	m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+	//	if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+	//		return false;
+	//}
 
-	if (m_postprocessLUT)
-	{
-		ApplyLUT(m_lutShader->GetLUT());
-	}
+	//if (m_postprocessLUT)
+	//{
+	//	ApplyLUT(m_lutShader->GetLUT());
+	//}
 
-	if (m_postprocessChromaticAberration)
-	{
-		ApplyChromaticAberration();
-		m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
-		m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
-	}
+	//if (m_postprocessChromaticAberration)
+	//{
+	//	ApplyChromaticAberration();
+	//	m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
+	//	m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
+	//}
 
-	if (m_postprocessGrain)
-	{
-		ApplyGrain();
-		m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
-	}
+	//if (m_postprocessGrain)
+	//{
+	//	ApplyGrain();
+	//	m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
+	//}
 
-	if (m_postprocessBloom)
-	{
-		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-	}
+	//if (m_postprocessBloom)
+	//{
+	//	m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	//	m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	//}
 
-	if (m_postprocessVignette)
-	{
-		m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	//if (m_postprocessVignette)
+	//{
+	//	m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
+	//	m_Camera->Render();
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
-		m_D3D->EnableAlphaBlending();
+	//	m_D3D->EnableAlphaBlending();
 
-		m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
-		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-			return false;
+	//	m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
+	//	if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+	//		return false;
 
-		m_D3D->DisableAlphaBlending();
-	}
+	//	m_D3D->DisableAlphaBlending();
+	//}
 
-	if (m_postprocessBloom)
-	{
-		//Clear to make sure there is no pointer to local variable which outlives scope
-		m_bloomShader->m_bloomTexture = nullptr;
-		m_bloomShader->m_bloomTextureView = nullptr;
-	}
+	//if (m_postprocessBloom)
+	//{
+	//	//Clear to make sure there is no pointer to local variable which outlives scope
+	//	m_bloomShader->m_bloomTexture = nullptr;
+	//	m_bloomShader->m_bloomTextureView = nullptr;
+	//}
 
-	//Draw model picker
-	m_D3D->TurnZBufferOff();
-	if (m_selectedModel)
-	{
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-		if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, m_selectedModel))
-			return false;
-	}
-	m_D3D->TurnZBufferOn();
+	////Draw model picker
+	//m_D3D->TurnZBufferOff();
+	//if (m_selectedModel)
+	//{
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//	if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, m_selectedModel))
+	//		return false;
+	//}
+	//m_D3D->TurnZBufferOn();
 
 	return true;
 }

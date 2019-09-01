@@ -312,7 +312,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
 		specular = numerator / max(denominator, 0.001);
 
-		//finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
 	}
 	//finalColor += normalize(pointLight);
 #endif

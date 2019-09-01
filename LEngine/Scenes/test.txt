@@ -1,3 +1,2 @@
-{"material": "Rock", "modelName": "bunny.obj", "position": [0.27144405245780945, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Rock bunny"}
-{"material": "gold", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Gold bunny"}
-{"color": [0.097014904022216797, 0.47867113351821899, 1], "material": "gold", "modelName": "sphere.obj", "position": [1.5787869691848755, 0.75846582651138306, -0.3449782133102417], "radius": 0.34999999403953552, "rotation": [0, 0, 0], "scale": [0.10000000149011612, 0.10000000149011612, 0.10000000149011612], "sceneName": "Blue light", "strength": 0.029999999329447746}
+{"material": "Ground", "modelName": "LP_B-Rocks_05.fbx.obj", "position": [0, 0, 200], "rotation": [0, 65, 80], "scale": [0.82999998331069946, 0.68999999761581421, 2.6400001049041748], "sceneName": "Rock_5"}
+{"material": "GroundEmissive", "modelName": "test.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1000, 1, 1000], "sceneName": "Ground"}

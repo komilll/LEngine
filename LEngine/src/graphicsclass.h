@@ -662,6 +662,7 @@ private:
 	FXAAShader* m_fxaaShader;
 	RenderTextureClass* m_antialiasedTexture;
 	RenderTextureClass* m_ssaaTexture;
+	RenderTextureClass* m_ssaaTextureHelper;
 	RenderTextureClass* m_ssaaTextureBlurred_2;
 	RenderTextureClass* m_ssaaTextureBlurredHor;
 	RenderTextureClass* m_ssaaTextureBlurredVer;

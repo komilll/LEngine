@@ -62,6 +62,7 @@ public:
 	std::vector<MaterialPrefab>& GetAllMaterials();
 	std::vector<UIShaderEditorBlock*>& GetMaterialInputs();
 	std::vector<std::string> GetUsedTextures() const;
+	void LoadAllMaterialsToArray();
 
 private:
 	bool RenderBlocks(ID3D11DeviceContext* deviceContext);
@@ -108,7 +109,6 @@ private:
 	std::string GenerateMaterialName();
 
 	//MATERIALS
-	void LoadAllMaterialsToArray();
 	void LoadMaterialInputs();
 
 public:

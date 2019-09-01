@@ -195,17 +195,24 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	PointLightBuffer* pointBuffer{ static_cast<PointLightBuffer*>(mappedResource.pData) };
 
 	//const int pointLightSize = min(m_pointLight.size(), NUM_LIGHTS_POINT);
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < NUM_LIGHTS_POINT; ++i)
 	{
-		pointBuffer->point_positionWithRadius[i] = k_pointLight.at(i).m_positionWithRadius;
-		pointBuffer->point_colorWithStrength[i] = k_pointLight.at(i).m_colorWithStrength;
+		if (i >= k_pointLight.size())
+		{
+			pointBuffer->point_positionWithRadius[i] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			pointBuffer->point_colorWithStrength[i] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		}
+		else
+		{
+			pointBuffer->point_positionWithRadius[i] = k_pointLight.at(i).m_positionWithRadius;
+			pointBuffer->point_colorWithStrength[i] = k_pointLight.at(i).m_colorWithStrength;
+		}
 	}
 	//pointBuffer->point_positionWithRadius[0] = { 1.5f, 0.75f, 0.0f, 5.0f };
 	//pointBuffer->point_colorWithStrength[0] = { 1.0f, 0.0f, 0.0f, 0.5f };
 
 	deviceContext->Unmap(m_pointLightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(1, 1, &m_pointLightBuffer);
-
 	//PBR Buffer
 	result = deviceContext->Map(m_PBRBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))

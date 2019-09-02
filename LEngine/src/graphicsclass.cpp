@@ -3296,18 +3296,48 @@ void GraphicsClass::TryPickObjects()
 		return;
 	}
 
-	if (TryPickObjectsIterate(m_sceneModels))
+	//const XMFLOAT3 camPos = m_Camera->GetPosition();
+	//std::sort(m_sceneModels.begin(), m_sceneModels.end(), [camPos](ModelClass* a, ModelClass* b)
+	//{
+	//	const XMFLOAT3 vecA = a->GetPositionXYZ();
+	//	const XMFLOAT3 vecB = a->GetPositionXYZ();
+
+	//	const float dotA = vecA.x * camPos.x + vecA.y * camPos.y + vecA.z * camPos.z;
+	//	const float dotB = vecB.x * camPos.x + vecB.y * camPos.y + vecB.z * camPos.z;
+
+	//	if (dotA <= 0.0f)
+	//		return false;
+	//	else if (dotB <= 0.0f)
+	//		return true;
+
+	//	const float distA = (vecA.x - camPos.x) * (vecA.x - camPos.x) +
+	//		(vecA.y - camPos.y) * (vecA.y - camPos.y) +
+	//		(vecA.z - camPos.z) * (vecA.z - camPos.z);
+	//	const float distB = (vecB.x - camPos.x) * (vecB.x - camPos.x) +
+	//		(vecB.y - camPos.y) * (vecB.y - camPos.y) +
+	//		(vecB.z - camPos.z) * (vecB.z - camPos.z);
+
+	//	if (distA <= distB)
+	//		return true;
+
+	//	return false;
+	//}
+	//);
+
+	if (TryPickObjectsIterate(m_sceneModels, m_Camera->GetPosition()))
 		return;
 
-	if (TryPickObjectsIterate(m_pointLights))
+	if (TryPickObjectsIterate(m_pointLights, m_Camera->GetPosition()))
 		return;
 
 	m_selectedModel = nullptr;
 }
 
 template<class T>
-bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models)
+bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models, const XMFLOAT3 camPos)
 {
+	float minDist = FLT_MAX;
+
 	for (const auto& model : models)
 	{
 		const auto result = RaycastToModel(model);
@@ -3316,6 +3346,15 @@ bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models)
 
 		if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac))
 		{
+			//XMFLOAT3 modelPos = model->GetPositionXYZ();
+			//const float dist = (modelPos.x - camPos.x) * (modelPos.x - camPos.x) +
+			//	(modelPos.y - camPos.y) * (modelPos.y - camPos.y) +
+			//	(modelPos.z - camPos.z) * (modelPos.z - camPos.z);
+			//if (dist < minDist)
+			//{
+			//	m_selectedModel = model;
+			//	minDist = dist;
+			//}
 			if (m_selectedModel)
 			{
 				for (const auto& model : m_sceneModels)
@@ -3323,9 +3362,21 @@ bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models)
 			}
 			m_selectedModel = model;
 			model->m_selected = true;
+			
+			float dist = DistanceToAABB(result.origin, result.dirfrac, model->GetBounds(), model);
+
 			return true;
 		}
 	}
+
+	//if (minDist < FLT_MAX)
+	//{
+	//	for (const auto& model : models)
+	//		model->m_selected = false;
+	//	m_selectedModel->m_selected = true;
+	//	return true;
+	//}
+
 	return false;
 }
 
@@ -3430,6 +3481,61 @@ void GraphicsClass::ResetRayPick()
 			m_mouse->GetMouse()->SetVisibility(TRUE);
 		}
 	}
+}
+
+float GraphicsClass::DistanceToAABB(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model) const
+{
+	//Test dimension X
+	float lo = -FLT_MAX;
+	float hi = FLT_MAX;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		float dimLo = GetDimLoAxis(origin, dir, bounds, model, i);
+		float dimHi = GetDimHiAxis(origin, dir, bounds, model, i);
+
+		if (dimLo > dimHi)
+		{
+			//std::swap(dimLo, dimHi);
+			const auto tmp = dimLo;
+			dimLo = dimHi;
+			dimHi = tmp;
+		}
+
+		if (dimHi < lo || dimLo > hi)
+			return FLT_MAX;
+
+		if (dimLo > lo)
+			lo = dimLo;
+		if (dimHi < hi)
+			hi = dimHi;
+	}
+
+	return lo > hi ? FLT_MAX : lo;
+}
+
+float GraphicsClass::GetDimLoAxis(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model, const int axis) const
+{
+	if (axis == 0)
+		return (bounds.GetMinBounds(model).x - origin.x) / dir.x;
+	else if (axis == 1)
+		return (bounds.GetMinBounds(model).y - origin.y) / dir.y;
+	else if (axis == 2)
+		return (bounds.GetMinBounds(model).z - origin.z) / dir.z;
+
+	return FLT_MAX;
+}
+
+float GraphicsClass::GetDimHiAxis(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model, const int axis) const
+{
+	if (axis == 0)
+		return (bounds.GetMaxBounds(model).x - origin.x) / dir.x;
+	else if (axis == 1)
+		return (bounds.GetMaxBounds(model).y - origin.y) / dir.y;
+	else if (axis == 2)
+		return (bounds.GetMaxBounds(model).z - origin.z) / dir.z;
+
+	return FLT_MAX;
 }
 
 float GraphicsClass::CalculateMouseArrowDotProduct(ModelClass * const model, const ModelPicker::Axis axis, const XMFLOAT2 mouseNormalized)
@@ -3689,4 +3795,39 @@ bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker
 	const XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, axis);
 
 	return TestAABBIntersection(lb, rt, origin, dirfrac);
+}
+
+bool GraphicsClass::CopyModel()
+{
+	if (!m_selectedModel)
+		return false;
+
+	m_copiedModel = m_selectedModel;
+
+	return true;
+}
+
+bool GraphicsClass::PasteModel()
+{
+	if (!m_copiedModel)
+		return false;
+
+	ModelClass* newModel = new ModelClass;	
+	if (!newModel->InitializeFBX(m_D3D, m_copiedModel->GetModelFilename().c_str()))
+	{
+		if (!newModel->Initialize(m_D3D, m_copiedModel->GetModelFilename().c_str()))
+		{
+			delete(newModel);
+			return false;
+		}
+	}
+	newModel->SetMaterial(m_materialList.at(m_copiedModel->GetMaterial()->GetName()));
+	newModel->SetPosition(m_copiedModel->GetPositionXYZ());
+	newModel->SetRotation(m_copiedModel->GetRotation());
+	newModel->SetScale(m_copiedModel->GetScale());
+
+	m_sceneModels.push_back(std::move(newModel));
+	CreateAABB(newModel);
+
+	return true;
 }

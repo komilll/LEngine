@@ -371,6 +371,20 @@ void SystemClass::HandleInput()
 			movementPerTick = speedLimitMax;
 		else if (movementPerTick < speedLimitMin)
 			movementPerTick = speedLimitMin;
+
+		if ((::GetKeyState(VK_CONTROL) & 0x8000) != 0 && !m_Mouse->GetLMBPressed())
+		{
+			if (m_Input->IsKeyDown(VK_C))
+			{
+				if (m_Graphics->CopyModel())
+					m_Input->KeyUp(VK_C);
+			}
+			else if (m_Input->IsKeyDown(VK_V))
+			{				
+				if (m_Graphics->PasteModel())
+					m_Input->KeyUp(VK_V);
+			}
+		}
 	}
 	else if (m_Graphics->MouseAboveEditorPreview())
 	{

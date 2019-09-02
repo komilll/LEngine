@@ -106,6 +106,7 @@ public:
 	virtual void SetPosition(XMFLOAT3 position);
 	void SetScale(float x, float y, float z);
 	void SetScale(XMFLOAT3 scale);
+	void SetRotation(XMFLOAT3 rotation);
 	void SetRotation(float x, float y, float z);
 
 	XMFLOAT4 GetPosition() const;

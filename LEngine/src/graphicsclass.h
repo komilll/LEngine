@@ -454,6 +454,10 @@ public:
 	void ToggleGUI();
 	void ToggleMSAA();
 
+	//Managing models
+	bool CopyModel();
+	bool PasteModel();
+
 	///// HELPER FUNCTIONS /////
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
 	static float lerp(float a, float b, float val);
@@ -462,10 +466,13 @@ public:
 #pragma region Model picker
 public:
 	void TryPickObjects();
-	template<class T> bool TryPickObjectsIterate(std::vector<T*>& models);
+	template<class T> bool TryPickObjectsIterate(std::vector<T*>& models, const XMFLOAT3 camPos);
 	void TryRayPick();
 	void UpdateRayPick();
 	void ResetRayPick();
+	float DistanceToAABB(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass* const model) const;
+	float GetDimLoAxis(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model, const int axis) const;
+	float GetDimHiAxis(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model, const int axis) const;
 
 private:
 	float CalculateMouseArrowDotProduct(ModelClass* const model, const ModelPicker::Axis axis, const XMFLOAT2 mouseNormalized);
@@ -548,6 +555,7 @@ private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
 	std::vector<ModelClass*> m_sceneModels;
+	ModelClass* m_copiedModel;
 	ModelClass* m_selectedModel;
 	ModelClass* m_Model;
 	ModelClass* m_cubeModel;

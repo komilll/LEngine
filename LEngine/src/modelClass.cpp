@@ -229,6 +229,11 @@ void ModelClass::SetScale(XMFLOAT3 scale)
 	m_scale = scale;
 }
 
+void ModelClass::SetRotation(XMFLOAT3 rotation)
+{
+	m_rotation = rotation;
+}
+
 void ModelClass::SetRotation(float x, float y, float z)
 {
 	m_rotation = { x, y, z };

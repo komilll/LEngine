@@ -1278,22 +1278,38 @@ XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, 
 
 XMFLOAT3 Bounds::GetMinBounds(ModelClass * const model) const
 {
-	const XMFLOAT3 basePosition{ model->GetPositionXYZ().x + GetCenterX(), model->GetPositionXYZ().y + GetCenterY(), model->GetPositionXYZ().z + GetCenterZ() };
+	XMMATRIX matrix = XMMatrixIdentity();
+	matrix = DirectX::XMMatrixMultiply(matrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
 
-	const float lengthX{ GetSizeX() * 0.5f * model->GetScale().x };
-	const float lengthY{ GetSizeY() * 0.5f * model->GetScale().y };
-	const float lengthZ{ GetSizeZ() * 0.5f * model->GetScale().z };
+	XMMATRIX matrixRotation = XMMatrixIdentity();
+	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
 
-	return{ basePosition.x - lengthX, basePosition.y - lengthY, basePosition.z - lengthZ };
+	XMVECTOR position { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
+	XMVECTOR result = XMVector3Transform(position, matrix);
+	result += { model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z};
+	
+	//result = XMVector3Transform(result, matrixRotation);
+
+	return{ result.m128_f32[0], result.m128_f32[1], result.m128_f32[2] };
 }
 
 XMFLOAT3 Bounds::GetMaxBounds(ModelClass * const model) const
 {
-	const XMFLOAT3 basePosition{ model->GetPositionXYZ().x + GetCenterX(), model->GetPositionXYZ().y + GetCenterY(), model->GetPositionXYZ().z + GetCenterZ() };
+	XMMATRIX matrix = XMMatrixIdentity();
+	matrix = DirectX::XMMatrixMultiply(matrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
 
-	const float lengthX{ GetSizeX() * 0.5f * model->GetScale().x };
-	const float lengthY{ GetSizeY() * 0.5f * model->GetScale().y };
-	const float lengthZ{ GetSizeZ() * 0.5f * model->GetScale().z };
+	XMMATRIX matrixRotation = XMMatrixIdentity();
+	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
 
-	return{ basePosition.x + lengthX, basePosition.y + lengthY, basePosition.z + lengthZ };
+	XMVECTOR position{ model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
+	XMVECTOR result = XMVector3Transform(position, matrix);
+	result += { model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z};
+
+	//result = XMVector3Transform(result, matrixRotation);
+
+	return{ result.m128_f32[0], result.m128_f32[1], result.m128_f32[2] };
 }

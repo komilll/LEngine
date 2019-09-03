@@ -3343,39 +3343,34 @@ bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models, const XMFLOAT
 		const auto result = RaycastToModel(model);
 		const XMFLOAT3 lb = model->GetBounds().GetMinBounds(model);
 		const XMFLOAT3 rt = model->GetBounds().GetMaxBounds(model);
+		float dist{ 0.0f };
 
-		if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac))
+		if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac, dist))
 		{
-			//XMFLOAT3 modelPos = model->GetPositionXYZ();
-			//const float dist = (modelPos.x - camPos.x) * (modelPos.x - camPos.x) +
-			//	(modelPos.y - camPos.y) * (modelPos.y - camPos.y) +
-			//	(modelPos.z - camPos.z) * (modelPos.z - camPos.z);
-			//if (dist < minDist)
-			//{
-			//	m_selectedModel = model;
-			//	minDist = dist;
-			//}
-			if (m_selectedModel)
+			if (dist < minDist)
 			{
-				for (const auto& model : m_sceneModels)
-					model->m_selected = false;
+				m_selectedModel = model;
+				minDist = dist;
 			}
-			m_selectedModel = model;
-			model->m_selected = true;
+			//if (m_selectedModel)
+			//{
+			//	for (const auto& model : m_sceneModels)
+			//		model->m_selected = false;
+			//}
+			//m_selectedModel = model;
+			//model->m_selected = true;
 			
-			float dist = DistanceToAABB(result.origin, result.dirfrac, model->GetBounds(), model);
-
-			return true;
+			//return true;
 		}
 	}
 
-	//if (minDist < FLT_MAX)
-	//{
-	//	for (const auto& model : models)
-	//		model->m_selected = false;
-	//	m_selectedModel->m_selected = true;
-	//	return true;
-	//}
+	if (minDist < FLT_MAX)
+	{
+		for (const auto& model : models)
+			model->m_selected = false;
+		m_selectedModel->m_selected = true;
+		return true;
+	}
 
 	return false;
 }
@@ -3756,7 +3751,7 @@ void GraphicsClass::CreateAABBBox(const Bounds bounds)
 	}
 }
 
-bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac)
+bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac, float& distance)
 {
 	assert(lb.x <= rt.x);
 	assert(lb.y <= rt.y);
@@ -3783,6 +3778,7 @@ bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 orig
 	{
 		return false;
 	}
+	distance = tmin;
 	return true;
 }
 
@@ -3793,8 +3789,9 @@ bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker
 	const XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, axis);
 	m_D3D->GetWorldMatrix(wMatrix);
 	const XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, axis);
+	float dist{ 0.0f };
 
-	return TestAABBIntersection(lb, rt, origin, dirfrac);
+	return TestAABBIntersection(lb, rt, origin, dirfrac, dist);
 }
 
 bool GraphicsClass::CopyModel()

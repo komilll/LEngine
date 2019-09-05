@@ -193,8 +193,10 @@ private:
 			X, Y, Z
 		};
 
-		ModelPicker(D3DClass* d3d)
+		ModelPicker(D3DClass* d3d, CameraClass* camera)
 		{
+			m_cameraModelPicker = camera;
+
 			m_colorShader = new ModelPickerShader;
 			m_colorShader->Initialize(d3d->GetDevice(), *d3d->GetHWND(), L"modelpicker.vs", L"modelpicker.ps", d3d->GetBaseInputType());
 
@@ -213,6 +215,7 @@ private:
 
 		bool Render(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix, XMMATRIX& projectionMatrix, ModelClass* mainModel)
 		{
+			SetScales(mainModel);
 			{
 				const XMFLOAT3 position = GetPosition(mainModel, Axis::X);
 
@@ -390,6 +393,21 @@ private:
 			return{ clipSpacePos.m128_f32[0], clipSpacePos.m128_f32[1] };
 		}
 
+		void SetScales(ModelClass* model)
+		{
+			const XMFLOAT3 cameraPos = m_cameraModelPicker->GetPosition();
+			const XMFLOAT3 modelPos = model->GetPositionXYZ();
+			float dist = (cameraPos.x - modelPos.x) * (cameraPos.x - modelPos.x) + (cameraPos.y - modelPos.y) * (cameraPos.y - modelPos.y) + (cameraPos.z - modelPos.z) * (cameraPos.z - modelPos.z);
+			dist = sqrt(dist);
+
+			scaleMult = dist * 0.15f;
+			scale = { pickerLength * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
+
+			m_axisX->SetScale({ scale.x - 0.001f, scale.y - 0.001f, scale.z - 0.001f });
+			m_axisY->SetScale(scale);
+			m_axisZ->SetScale({ scale.x - 0.001f, scale.y, scale.z });
+		}
+
 	private:
 		XMFLOAT3 GetPosition(ModelClass* mainModel, Axis axis) {
 			const float length = m_axisX->GetBounds().GetSizeX() * scale.x * 0.5f;
@@ -404,10 +422,11 @@ private:
 		ModelClass* m_axisZ;
 	private:
 		ModelPickerShader* m_colorShader;
+		CameraClass* m_cameraModelPicker;
 		const std::string modelName = "modelPicker.obj";
-		const float scaleMult = 0.15f;
+		float scaleMult = 15.0f;
 		const float pickerLength = 0.35f;
-		const XMFLOAT3 scale = { pickerLength * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
+		XMFLOAT3 scale = { pickerLength * scaleMult, 0.025f * scaleMult, 0.025f * scaleMult };
 	};
 
 public:

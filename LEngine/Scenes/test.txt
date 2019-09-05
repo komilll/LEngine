@@ -1,3 +1,1 @@
-{"material": "GroundEmissive", "modelName": "test.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1000, 0.97000002861022949, 1000], "sceneName": "Ground"}
-{"material": "Ground", "modelName": "LP_B-Rocks_05.fbx.obj", "position": [100, 10, 200], "rotation": [0, 0, 0], "scale": [0.97000002861022949, 3.6099998950958252, 0.97000002861022949], "sceneName": "Rock_5_copy"}
-{"material": "Ground", "modelName": "LP_B-Rocks_05.fbx.obj", "position": [0, 0, 0], "rotation": [0, 85, 105], "scale": [1.3899999856948853, 0.97000002861022949, 1.809999942779541], "sceneName": "Rock_5_copy_2"}
+{"material": "Ground", "modelName": "LP_B-Rocks_05.fbx.obj", "position": [0, 0, 300], "rotation": [0, 0, 0], "scale": [2.3599998950958252, 1.3899999856948853, 3.75], "sceneName": "Rock"}

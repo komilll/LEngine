@@ -127,6 +127,7 @@ public:
 	HRESULT LoadModelFBX(const char* modelFilename);
 	std::string LoadModelCalculatePath(bool fbx = false);
 	void SaveVisibleName();
+	void SetSavedName(std::string name);
 
 	MaterialPrefab* const GetMaterial() const { return m_material; };
 	void SetMaterial(MaterialPrefab* const material);

@@ -453,7 +453,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 #pragma endregion
 
-	m_modelPicker = new ModelPicker(m_D3D);
+	m_modelPicker = new ModelPicker(m_D3D, m_Camera);
 
 	m_singleColorShader = new ModelPickerShader;
 	if (!m_singleColorShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"modelpicker.vs", L"modelpicker.ps", m_D3D->GetBaseInputType()))
@@ -3822,9 +3822,21 @@ bool GraphicsClass::PasteModel()
 	newModel->SetPosition(m_copiedModel->GetPositionXYZ());
 	newModel->SetRotation(m_copiedModel->GetRotation());
 	newModel->SetScale(m_copiedModel->GetScale());
+	std::string copy = "";
+	for (const auto& c : m_copiedModel->m_name)
+	{
+		if (c == '\0')
+			break;
+		copy += c;
+	}
+	newModel->SetSavedName(copy + "_Copy");
+	newModel->SaveVisibleName();
 
-	m_sceneModels.push_back(std::move(newModel));
+	m_selectedModel = newModel;
+
 	CreateAABB(newModel);
+	m_sceneModels.push_back(std::move(newModel));
+	m_copiedModel = nullptr;
 
 	return true;
 }

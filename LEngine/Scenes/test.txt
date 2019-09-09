@@ -1,1 +1,1 @@
-{"material": "Ground", "modelName": "LP_B-Rocks_05.fbx.obj", "position": [0, 0, 300], "rotation": [0, 0, 0], "scale": [2.3599998950958252, 1.3899999856948853, 3.75], "sceneName": "Rock"}
+{"material": "gold", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [140, 55, 80], "scale": [1, 1, 1], "sceneName": ""}

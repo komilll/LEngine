@@ -291,6 +291,14 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	// Create the viewport.
     m_deviceContext->RSSetViewports(1, &m_viewport);
 
+	// Craete viewport for material editor
+	m_materialViewport.Width = (float)screenWidth;
+	m_materialViewport.Height = (float)screenHeight;
+	m_materialViewport.MinDepth = 0.0f;
+	m_materialViewport.MaxDepth = 1.0f;
+	m_materialViewport.TopLeftX = 318.0f;
+	m_materialViewport.TopLeftY = 0.0f;
+
 	// Setup the projection matrix.
 	fieldOfView = (float)3.14f / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
@@ -589,6 +597,11 @@ void D3DClass::EnableDepthTesting() const
 void D3DClass::ResetViewport() const
 {
 	m_deviceContext->RSSetViewports(1, &m_viewport);
+}
+
+void D3DClass::SetViewportMaterial() const
+{
+	m_deviceContext->RSSetViewports(1, &m_materialViewport);
 }
 
 BaseShaderClass::vertexInputType D3DClass::GetBaseInputType() const

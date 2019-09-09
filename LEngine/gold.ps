@@ -499,7 +499,7 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float4 A = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	float4 A = float4(0.251572f, 0.0906639f, 0.00791107f, 1.0f);
 
 	return A;
 }
@@ -521,9 +521,5 @@ float3 GetNormal()
 }
 float3 GetEmissiveColor()
 {
-	float3 D = float3(0.516484f, 1.0f, 1.0f);
-	float F = 0.25f;
-	float3 out_E = multiply3(D, float3(F, F, F));
-
-	return out_E;
+	return float3(0.0f, 0.0f, 0.0f);
 }

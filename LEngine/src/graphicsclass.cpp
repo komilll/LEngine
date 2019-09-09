@@ -693,6 +693,7 @@ std::pair<float, float> GraphicsClass::GetCurrentMousePosition() const
 
 bool GraphicsClass::Render()
 {
+	m_D3D->ResetViewport();
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
 	// Clear the buffers to begin the scene.
@@ -747,17 +748,19 @@ bool GraphicsClass::Render()
 		}
 		else
 		{
+			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 			m_D3D->SetBackBufferRenderTarget();
 			m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-			//if (!RenderMaterialPreview())
-			//	return false;
+			if (!RenderMaterialPreview())
+				return false;
+			m_D3D->SetBackBufferRenderTarget();
 
 			m_renderTexturePreview->BindTexture(m_shaderPreview->GetShaderResourceView());
 			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 				return false;
 
-			m_D3D->ResetViewport();
+			m_D3D->SetViewportMaterial();
 			m_D3D->TurnZBufferOff();
 			UpdateUI();
 			m_D3D->TurnZBufferOn();
@@ -833,9 +836,9 @@ bool GraphicsClass::Render()
 	}
 	else
 	{
-		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-			return false;
+		//m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
+		//if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+		//	return false;
 	}
 
 	if (ENABLE_GUI)
@@ -895,6 +898,7 @@ bool GraphicsClass::RenderScene()
 	m_singleColorShader->ChangeColor(0.7f, 0.7f, 0.7f, 1.0f);
 	//if (m_postprocessBloom)
 	{
+		bool anyModelEmissive{ false };
 		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
 		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -914,6 +918,7 @@ bool GraphicsClass::RenderScene()
 			{
 				continue;
 			}
+			anyModelEmissive = true;
 
 			m_Camera->GetViewMatrix(viewMatrix);
 			m_D3D->GetWorldMatrix(worldMatrix);
@@ -931,47 +936,50 @@ bool GraphicsClass::RenderScene()
 				return false;
 		}
 
-		//TODO Every frame initialization?
-		m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-		m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-		m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
-		if (m_postprocessSSAO)
-			m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
-		else
-			m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
-
+		if (anyModelEmissive)
 		{
-			m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
-			m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0, 0, 0, 1);
+			//TODO Every frame initialization?
+			m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+			m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
-			m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+			m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
+			if (m_postprocessSSAO)
+				m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
+			else
+				m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
+
+			{
+				m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
+				m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0, 0, 0, 1);
+
+				m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
+			}
+
+			m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
+			m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
+
+			m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
+			m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
+
+			BlurFilterScreenSpaceTexture(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
+			BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
+			constexpr int numberOfBlurRepeats{ 5 };
+			for (int i = 2; i < numberOfBlurRepeats; i++)
+			{
+				BlurFilterScreenSpaceTexture(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / std::pow(2, i)); //Blur horizontal
+				BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / std::pow(2, i)); //Blur vertical
+			}
+
+			ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
 		}
-
-		m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
-		m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
-
-		m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
-		m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), nullptr, 0.0f, 0.0f, 0.0f, 1.0f);
-
-		BlurFilterScreenSpaceTexture(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-		BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-		constexpr int numberOfBlurRepeats{ 5 };
-		for (int i = 2; i < numberOfBlurRepeats; i++)
-		{
-			BlurFilterScreenSpaceTexture(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / std::pow(2, i)); //Blur horizontal
-			BlurFilterScreenSpaceTexture(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / std::pow(2, i)); //Blur vertical
-		}
-
-		ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
-
-		if (m_postprocessSSAA)
-			m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
-		else
-			m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-		
-		m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 	}
+
+	if (m_postprocessSSAA)
+		m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
+	else
+		m_renderTextureMainScene->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+
+	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
 	for (ModelClass* const& model : m_sceneModels)
 	{
@@ -1022,6 +1030,27 @@ bool GraphicsClass::RenderScene()
 			}
 			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 		}
+	}
+	
+	m_singleColorShader->ChangeColor(1.0f, 0.0f, 0.0f, 1.0f);
+	if (m_raycastModel)
+	{
+		m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(m_raycastModel->GetScale().x, m_raycastModel->GetScale().y, m_raycastModel->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(m_raycastModel->GetRotation().x * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(m_raycastModel->GetRotation().y * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(m_raycastModel->GetRotation().z * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_raycastModel->GetPosition().x, m_raycastModel->GetPosition().y, m_raycastModel->GetPosition().z));
+
+		m_raycastModel->Render(m_D3D->GetDeviceContext());
+		if (!m_singleColorShader->Render(m_D3D->GetDeviceContext(), m_raycastModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+
+		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
 	}
 
 	if (!RenderLightModels())
@@ -1199,200 +1228,48 @@ bool GraphicsClass::RenderLightModels()
 
 bool GraphicsClass::RenderMaterialPreview()
 {
-	//const std::string materialName = m_shaderEditorManager->GetCurrentMaterialName();
-	//if (materialName == "")
-	//{
-	//	return true;
-	//}
-	//if (m_materialList.find(materialName) == m_materialList.end())
-	//{
-	//	m_materialList.insert({ materialName, new MaterialPrefab{ materialName, m_D3D } });
-	//	return true;
-	//}
-	//MaterialPrefab* const material = m_materialList.at(materialName);
+	const std::string materialName = m_shaderEditorManager->GetCurrentMaterialName();
+	if (materialName == "")
+	{
+		return true;
+	}
+	if (m_materialList.find(materialName) == m_materialList.end())
+	{
+		m_materialList.insert({ materialName, new MaterialPrefab{ materialName, m_D3D } });
+		return true;
+	}
+	MaterialPrefab* const material = m_materialList.at(materialName);
 
-	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
-	////RENDER MAIN SCENE MODEL
-	//m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
-	//m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS_EQUAL);
+	//RENDER MAIN SCENE MODEL
+	m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	m_D3D->ChangeDepthStencilComparison(D3D11_COMPARISON_LESS);
 
-	//m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	//m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+	m_shaderPreview->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+	m_shaderPreview->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	//ModelClass* const& model = m_previewData.model;
-	//XMFLOAT3 tmp = m_Camera->GetPosition();
-	//m_Camera->SetPosition(0.0f, m_previewData.yCameraPos, 0.0f);
-	//{
-	//	m_Camera->RenderPreview({ model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z });
-	//	m_Camera->GetViewPreviewMatrix(viewMatrix);
-	//	//m_Camera->Render();
-	//	//m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+	ModelClass* const& model = m_previewData.model;
+	XMFLOAT3 tmp = m_Camera->GetPosition();
+	m_Camera->SetPosition(0.0f, m_previewData.yCameraPos, 0.0f);
+	{
+		m_Camera->RenderPreview({ model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z });
+		m_Camera->GetViewPreviewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
 
-	//	material->GetShader()->m_cameraPosition = m_Camera->GetPosition();
-	//	model->Render(m_D3D->GetDeviceContext());
-	//	if (!material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-	//		return false;
-	//}
-	//m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
-
-	//if (DRAW_SKYBOX)
-	//{
-	//	if (RenderSkybox() == false)
-	//		return false;
-	//}
-	//m_D3D->SetBackBufferRenderTarget();
-
-	////TODO Post-process stack duplicated from RenderScene()
-
-	//if (!m_postprocessSSAO)
-	//	m_postProcessShader->ResetSSAO();
-	//if (!m_postprocessBloom)
-	//	m_postProcessShader->ResetBloom();
-	//if (!m_postprocessLUT)
-	//	m_postProcessShader->ResetLUT();
-	//if (!m_postprocessChromaticAberration)
-	//	m_postProcessShader->UseChromaticAberration(false);
-	//if (!m_postprocessGrain)
-	//	m_postProcessShader->UseGrain(false);
-
-	//if (m_postprocessSSAO)
-	//{
-	//	if (m_postprocessBloom)
-	//	{
-	//		m_postSSAOTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	//		m_postSSAOTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-	//	}
-
-	//	ApplySSAO(m_ssaoTexture->GetShaderResourceView());
-
-	//	m_D3D->SetBackBufferRenderTarget();
-	//}
-
-	//if (m_postprocessBloom)
-	//{
-	//	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-	//	m_Camera->Render();
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	//	m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
-	//	if (m_postprocessSSAO)
-	//		m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
-	//	else
-	//		m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
-
-	//	{
-	//		m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
-	//		m_bloomHelperTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0, 0, 0, 1);
-
-	//		m_bloomShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix * 0, viewMatrix, projectionMatrix);
-
-	//		m_D3D->SetBackBufferRenderTarget();
-	//	}
-
-	//	m_blurShaderHorizontal->SetWeights(m_bloomSettings.weights);
-	//	m_blurShaderVertical->SetWeights(m_bloomSettings.weights);
-
-	//	BlurFilterScreenSpace(false, m_bloomHelperTexture, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-	//	BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-	//	for (int i = 0; i < 10; i++)
-	//	{
-	//		BlurFilterScreenSpace(false, m_bloomVerticalBlur, m_bloomHorizontalBlur, m_screenWidth / 2); //Blur horizontal
-	//		BlurFilterScreenSpace(true, m_bloomHorizontalBlur, m_bloomVerticalBlur, m_screenHeight / 2); //Blur vertical
-	//	}
-
-	//	ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
-	//}
-
-	//if (!m_postprocessSSAO && !m_postprocessBloom && !m_postprocessLUT)
-	//{
-	//	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-	//	m_Camera->Render();
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	//	m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
-	//	if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-	//		return false;
-	//}
-
-	//if (m_postprocessLUT)
-	//{
-	//	ApplyLUT(m_lutShader->GetLUT());
-	//}
-
-	//if (m_postprocessChromaticAberration)
-	//{
-	//	ApplyChromaticAberration();
-	//	m_postProcessShader->SetChromaticAberrationOffsets(m_chromaticOffset.red, m_chromaticOffset.green, m_chromaticOffset.blue);
-	//	m_postProcessShader->SetChromaticAberrationIntensity(m_chromaticIntensity);
-	//}
-
-	//if (m_postprocessGrain)
-	//{
-	//	ApplyGrain();
-	//	m_postProcessShader->SetGrainSettings(m_grainSettings.intensity, m_grainSettings.size, (int)m_grainSettings.type, m_grainSettings.hasColor);
-	//}
-
-	//if (m_postprocessBloom)
-	//{
-	//	m_bloomHorizontalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-	//	m_bloomVerticalBlur->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-	//}
-
-	//if (m_postprocessVignette)
-	//{
-	//	m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-	//	m_Camera->Render();
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-
-	//	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-
-	//	m_D3D->EnableAlphaBlending();
-
-	//	m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
-	//	if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-	//		return false;
-
-	//	m_D3D->DisableAlphaBlending();
-	//}
-
-	//if (m_postprocessBloom)
-	//{
-	//	//Clear to make sure there is no pointer to local variable which outlives scope
-	//	m_bloomShader->m_bloomTexture = nullptr;
-	//	m_bloomShader->m_bloomTextureView = nullptr;
-	//}
-
-	////Draw model picker
-	//m_D3D->TurnZBufferOff();
-	//if (m_selectedModel)
-	//{
-	//	m_Camera->GetViewMatrix(viewMatrix);
-	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_D3D->GetProjectionMatrix(projectionMatrix);
-	//	if (!m_modelPicker->Render(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, m_selectedModel))
-	//		return false;
-	//}
-	//m_D3D->TurnZBufferOn();
+		material->GetShader()->m_cameraPosition = m_Camera->GetPosition();
+		model->Render(m_D3D->GetDeviceContext());
+		if (!material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+	}
+	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
 
 	return true;
 }
@@ -3098,54 +2975,54 @@ GraphicsClass::EMaterialInputResult GraphicsClass::RenderInputForMaterial(UIShad
 
 bool GraphicsClass::ApplySSAO(ID3D11ShaderResourceView* ssaoMap)
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	m_Camera->Render();
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	//m_Camera->Render();
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	if (ssaoMap != nullptr)
 		m_postProcessShader->SetSSAOBuffer(ssaoMap);
 
-	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	worldMatrix = worldMatrix * 0;
+	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//worldMatrix = worldMatrix * 0;
 	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	return true;
 }
 
 bool GraphicsClass::ApplyBloom(ID3D11ShaderResourceView * bloomTexture)
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	m_Camera->Render();
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	//m_Camera->Render();
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	if (bloomTexture != nullptr)
 		m_postProcessShader->SetBloomBuffer(bloomTexture);
 
-	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	worldMatrix = worldMatrix * 0;
+	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//worldMatrix = worldMatrix * 0;
 	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	return true;
 }
 
 bool GraphicsClass::ApplyLUT(ID3D11ShaderResourceView * lutTexture)
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	m_Camera->Render();
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	//m_Camera->Render();
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetProjectionMatrix(projectionMatrix);
 
 	if (lutTexture != nullptr)
 		m_postProcessShader->SetLUTBuffer(lutTexture);
 
-	m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
-	m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
-	worldMatrix = worldMatrix * 0;
+	//m_convoluteQuadModel->Initialize(m_D3D->GetDevice(), ModelClass::ShapeSize::RECTANGLE, -1.0f, 1.0f, 1.0f, -1.0f, true);
+	//m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
+	//worldMatrix = worldMatrix * 0;
 	//return m_postProcessShader->Render(m_D3D->GetDeviceContext(), m_convoluteQuadModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	return true;
 }
@@ -3229,6 +3106,11 @@ inline __int64 GraphicsClass::GetTimeMillis()
 	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 
 	return millis;
+}
+
+float GraphicsClass::dot(XMFLOAT3 a, XMFLOAT3 b)
+{
+	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 void GraphicsClass::SaveScene(const std::string name)
@@ -3344,8 +3226,14 @@ bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models, const XMFLOAT
 		const XMFLOAT3 lb = model->GetBounds().GetMinBounds(model);
 		const XMFLOAT3 rt = model->GetBounds().GetMaxBounds(model);
 		float dist{ 0.0f };
-
-		if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac, dist))
+		if (!m_raycastModel)
+		{
+			m_raycastModel = new ModelClass();
+		}
+		//ModelClass* model = new ModelClass();
+		//model->Initialize()
+		//if (TestAABBIntersection(lb, rt, result.origin, result.dirfrac, dist))
+		if (TestOBBIntersection(model, result.origin, result.dirfrac, { lb.x, lb.y, lb.z }, { rt.x, rt.y, rt.z }, dist))
 		{
 			if (dist < minDist)
 			{
@@ -3447,7 +3335,7 @@ void GraphicsClass::UpdateRayPick()
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::X, mouseNormalized);
 			const float sizeX = model->GetBounds().GetSizeX() * model->GetScale().x * (mouseLength * 0.5f / boundsScreenSize.x);
-			model->SetPosition(model->GetPosition().x + std::abs(sizeX * dot) * (mouse.x > 0.0f ? 1.0f : -1.0f), model->GetPosition().y, model->GetPosition().z);
+			model->SetPosition(model->GetPosition().x + std::abs(sizeX) * dot * (mouse.x > 0.0f ? 1.0f : -1.0f), model->GetPosition().y, model->GetPosition().z);
 		}
 		else if (m_modelPickerBools.yAxis)
 		{
@@ -3458,7 +3346,7 @@ void GraphicsClass::UpdateRayPick()
 		else if (m_modelPickerBools.zAxis)
 		{
 			const float dot = CalculateMouseArrowDotProduct(model, ModelPicker::Axis::Z, mouseNormalized);
-			const float sizeZ = model->GetBounds().GetSizeZ() * model->GetScale().z * (mouseLength * 0.1f / boundsScreenSize.z);
+			const float sizeZ = model->GetBounds().GetSizeZ() * model->GetScale().z * (mouseLength * 5.0f / 0.5f/*boundsScreenSize.z*/);
 			model->SetPosition(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z + sizeZ * dot);
 		}
 	}
@@ -3543,8 +3431,13 @@ float GraphicsClass::CalculateMouseArrowDotProduct(ModelClass * const model, con
 
 	std::vector<float> arrowDir{ dir.x, dir.y };
 	std::vector<float> mouseDir{ mouseNormalized.x, mouseNormalized.y };
-
-	return std::inner_product(std::begin(arrowDir), std::end(arrowDir), std::begin(mouseDir), 0.0f);
+	
+	const float dot = std::inner_product(std::begin(arrowDir), std::end(arrowDir), std::begin(mouseDir), 0.0f);
+	if (axis == ModelPicker::Axis::X)
+	{
+		return max.x > min.x ? std::abs(dot) : -std::abs(dot);
+	}
+	return dot;
 }
 
 void GraphicsClass::CreateModelPickerMVP(ModelClass* const model, XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
@@ -3607,9 +3500,13 @@ GraphicsClass::MouseRaycastResult GraphicsClass::RaycastToModel(ModelClass* cons
 
 	rayDirection = XMVector3Normalize(rayDirection);
 
-	XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
+	//const XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
+	const XMFLOAT3 dirfrac{ rayDirection.m128_f32[0], rayDirection.m128_f32[1], rayDirection.m128_f32[2] };
+	const XMVECTOR dirfracNormalized = XMVector3Normalize({ dirfrac.x, dirfrac.y, dirfrac.z });
+	const XMFLOAT3 dir = { dirfracNormalized.m128_f32[0], dirfracNormalized.m128_f32[1], dirfracNormalized.m128_f32[2] };
+	//const XMFLOAT3 dir = dirfrac;
 
-	return MouseRaycastResult{ {origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dirfrac };
+	return MouseRaycastResult{ {origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dir };
 }
 
 void GraphicsClass::LoadPointLightSave(PointLight * model, json11::Json json)
@@ -3791,7 +3688,51 @@ bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker
 	const XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, axis);
 	float dist{ 0.0f };
 
+	dirfrac = { 1.0f / dirfrac.x, 1.0f / dirfrac.y, 1.0f / dirfrac.z };
 	return TestAABBIntersection(lb, rt, origin, dirfrac, dist);
+}
+
+bool GraphicsClass::RaySlabIntersect(ModelClass* model, float start, float dir, float min, float max, float & tfirst, float & tlast)
+{
+	if (abs(dir) < 1.0E-8)
+	{
+		return (start < max && start > min);
+	}
+
+	float tmin = (min - start) * dir;
+	float tmax = (max - start) * dir;
+	if (tmin > tmax)
+		std::swap(tmin, tmax);
+
+	if (tmax < tfirst || tmin > tlast)
+		return false;
+
+	if (tmin > tfirst)
+		tfirst = tmin;
+
+	if (tmax < tlast)
+		tlast = tmax;
+
+	return true;
+}
+
+bool GraphicsClass::TestOBBIntersection(ModelClass* model, XMFLOAT3 origin, XMFLOAT3 dir, XMFLOAT3 lb, XMFLOAT3 rt, float & dist)
+{
+	XMMATRIX worldMatrix = XMMatrixIdentity();
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+	worldMatrix = XMMatrixInverse(NULL, worldMatrix);
+
+	const XMVECTOR originTransformed = XMVector3Transform({ origin.x, origin.y, origin.z }, worldMatrix);
+	const XMVECTOR dirTransformed = XMVector3Transform({ dir.x, dir.y, dir.z }, worldMatrix);
+	origin = { originTransformed.m128_f32[0], originTransformed.m128_f32[1], originTransformed.m128_f32[2] };
+	dir = { dirTransformed.m128_f32[0], dirTransformed.m128_f32[1], dirTransformed.m128_f32[2] };
+
+	m_raycastModel->Initialize(m_D3D, origin, { origin.x + dir.x * 100.0f, origin.y + dir.y * 100.0f, origin.z + dir.z * 100.0f });
+	dir = { 1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z };
+
+	return TestAABBIntersection(lb, rt, origin, dir, dist);
 }
 
 bool GraphicsClass::CopyModel()

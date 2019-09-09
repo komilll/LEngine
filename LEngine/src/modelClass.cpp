@@ -42,8 +42,7 @@ bool ModelClass::Initialize(D3DClass * d3d, XMFLOAT3 origin, XMFLOAT3 destinatio
 	}
 	m_D3D = d3d;
 	m_device = d3d->GetDevice();
-	Initialize(d3d->GetDevice(), ShapeSize::RECTANGLE, -0.25f, 0.25f, 0.25f, -0.25f, true, false);
-	SetPosition(origin);
+	Initialize(m_D3D->GetDevice(), origin, destination, origin, destination);
 	return true;
 }
 
@@ -232,11 +231,13 @@ void ModelClass::SetScale(XMFLOAT3 scale)
 void ModelClass::SetRotation(XMFLOAT3 rotation)
 {
 	m_rotation = rotation;
+
+
 }
 
 void ModelClass::SetRotation(float x, float y, float z)
 {
-	m_rotation = { x, y, z };
+	SetRotation(XMFLOAT3{ x, y, z });
 }
 
 XMFLOAT4 ModelClass::GetPosition() const
@@ -1286,17 +1287,10 @@ XMFLOAT3 Bounds::GetMinBounds(ModelClass * const model) const
 {
 	XMMATRIX matrixPosition = XMMatrixIdentity();
 	matrixPosition = DirectX::XMMatrixMultiply(matrixPosition, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-	
-	XMMATRIX matrixRotation = XMMatrixIdentity();
-	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
 
 	XMVECTOR position { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
 	XMVECTOR result = XMVector3Transform(position, matrixPosition);
-
 	result += { model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z};
-	//result = XMVector3Transform(result, matrixRotation);
 
 	return{ result.m128_f32[0], result.m128_f32[1], result.m128_f32[2] };
 }
@@ -1306,16 +1300,9 @@ XMFLOAT3 Bounds::GetMaxBounds(ModelClass * const model) const
 	XMMATRIX matrixPosition = XMMatrixIdentity();
 	matrixPosition = DirectX::XMMatrixMultiply(matrixPosition, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
 
-	XMMATRIX matrixRotation = XMMatrixIdentity();
-	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-	matrixRotation = DirectX::XMMatrixMultiply(matrixRotation, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-
 	XMVECTOR position{ model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
 	XMVECTOR result = XMVector3Transform(position, matrixPosition);
-	
 	result += { model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z};
-	//result = XMVector3Transform(result, matrixRotation);
 
 	return{ result.m128_f32[0], result.m128_f32[1], result.m128_f32[2] };
 }

@@ -481,6 +481,7 @@ public:
 	///<summary>Return a when value == 0, return b when value is >= 1</summary> ///
 	static float lerp(float a, float b, float val);
 	inline static __int64 GetTimeMillis();
+	static float dot(XMFLOAT3 a, XMFLOAT3 b);
 
 #pragma region Model picker
 public:
@@ -570,6 +571,10 @@ private:
 	bool TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac, float& distance);
 	bool TryPickModelPickerArrow(ModelClass* model, const ModelPicker::Axis axis, XMFLOAT3&& origin, XMFLOAT3 dirfrac);
 
+	//OBB tests
+	bool RaySlabIntersect(ModelClass* model, float start, float dir, float min, float max, float& tfirst, float& tlast);
+	bool TestOBBIntersection(ModelClass* model, XMFLOAT3 origin, XMFLOAT3 dir, XMFLOAT3 lb, XMFLOAT3 rt, float& dist);
+
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
@@ -579,6 +584,7 @@ private:
 	ModelClass* m_Model;
 	ModelClass* m_cubeModel;
 	ModelClass* m_skyboxModel;
+	ModelClass* m_raycastModel;
 	PreviewModelData m_previewData;
 	ShaderSpecularClass* m_specularShader;
 	SkyboxShaderClass* m_skyboxShader;

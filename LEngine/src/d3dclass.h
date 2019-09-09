@@ -60,6 +60,7 @@ public:
 	void EnableDepthTesting() const;
 
 	void ResetViewport() const;
+	void SetViewportMaterial() const;
 	BaseShaderClass::vertexInputType GetBaseInputType() const;
 
 	WindowSize GetWindowSize() const;
@@ -104,6 +105,7 @@ private:
 	XMMATRIX m_orthoMatrix;
 
 	D3D11_VIEWPORT m_viewport;
+	D3D11_VIEWPORT m_materialViewport;
 
 	HWND* m_hwnd;
 

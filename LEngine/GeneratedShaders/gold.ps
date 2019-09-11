@@ -65,7 +65,7 @@ cbuffer PBRBuffer : register(b2)
 	float g_roughness;
 	float g_metalness;
 	int g_isEmissive;
-	float g_paddingPBR;
+	int g_isPreview;
 	float4 g_albedoTint;
 };
 
@@ -100,6 +100,7 @@ float GetRoughness();
 float GetMetalness();
 float3 GetNormal();
 float4 GetBaseColor();
+float3 GetEmissiveColor();
 
 float GeometrySchlickGGX(float NdotV, float k);
 float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
@@ -289,36 +290,44 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	accumulatedLightStrength = 0.0f;
 	float4 pointLight;
 #if NUM_LIGHTS_POINT > 0
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
-		accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
-
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
+	if (g_isPreview == 0)
 	{
-		float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
-		float3 H = normalize(V - L);
-		float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
-		float attenuation = 1.0f / (distance * distance);
-		float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
-		
-		// //Cook-torrance brdf
-		float NdotH = max(dot(N, H), 0.0f);
-		float NdotV = max(dot(N, V), 0.0f);
-		float NdotL = max(dot(N, -L), 0.0f);
-		
-		float NDF = NormalDistributionFunction(roughness, NdotH);
-		float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
-		
-		float3 numerator = NDF * G * F;
-		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
-		specular = numerator / max(denominator, 0.001);
+		for (int i = 0; i < NUM_LIGHTS_POINT; i++)
+			accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
 
-		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
+		{
+			float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+			float3 H = normalize(V - L);
+			float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+			float attenuation = 1.0f / (distance * distance);
+			float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
+			
+			// //Cook-torrance brdf
+			float NdotH = max(dot(N, H), 0.0f);
+			float NdotV = max(dot(N, V), 0.0f);
+			float NdotL = max(dot(N, -L), 0.0f);
+			
+			float NDF = NormalDistributionFunction(roughness, NdotH);
+			float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+			
+			float3 numerator = NDF * G * F;
+			float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+			specular = numerator / max(denominator, 0.001);
+
+			finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		}
+		//finalColor += normalize(pointLight);
 	}
-	//finalColor += normalize(pointLight);
 #endif
 	
 	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
 	//return saturate(finalColor);// * lightIntensity;
+	if (g_isEmissive)
+	{
+		float luma = sqrt(dot(finalColor.rgb, float3(0.299f, 0.587f, 0.114f)));
+		finalColor = float4(float3(GetEmissiveColor() * luma), 1.0f);
+	}
 	return finalColor * g_albedoTint;// * lightIntensity;
 
 	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
@@ -553,4 +562,8 @@ float GetRoughness()
 float3 GetNormal()
 {
 	return tex_22;
+}
+float3 GetEmissiveColor()
+{
+	return float3(0.0f, 0.0f, 0.0f);
 }

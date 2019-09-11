@@ -29,6 +29,18 @@ SamplerState BrdfLutSampleType : register(s1)
 	MinLOD = 0;
 	MaxLOD = D3D11_FLOAT32_MAX;
 };
+Texture2D additionalTexture_0 : register(t7);
+static float4 tex_0;
+Texture2D additionalTexture_1 : register(t8);
+static float4 tex_1;
+Texture2D additionalTexture_2 : register(t9);
+static float4 tex_2;
+Texture2D additionalTexture_3 : register(t10);
+static float4 tex_3;
+Texture2D additionalTexture_4 : register(t11);
+static float4 tex_14;
+Texture2D additionalTexture_5 : register(t12);
+static float4 tex_22;
 
 #define NUM_LIGHTS_DIRECTIONAL 2
 #define NUM_LIGHTS_POINT 1
@@ -136,6 +148,12 @@ float substract(float a, float b);
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
+	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
+	tex_14 = additionalTexture_1.Sample(SampleType, input.tex);
+	tex_22 = additionalTexture_2.Sample(SampleType, input.tex);
+	tex_1 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.017, 0.2134));
+	tex_2 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.1, 0.05));
+	tex_3 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.05, 0.005));
 
 //Calculated values
 	float3 specular;
@@ -499,25 +517,48 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float4 A = float4(0.251572f, 0.0906639f, 0.00791107f, 1.0f);
+	float4 M = float4(0.490566f, 0.490561f, 0.490561f, 1.0f);
+	float4 N = float4(1.0f, 0.99999f, 0.99999f, 1.0f);
+	float2 E = float2(0.017f, 0.2134f);
+	float out_G = get_x(tex_1);
+	float2 F = float2(0.1f, 0.05f);
+	float out_H = get_x(tex_2);
+	float out_J = multiply1(out_G, out_H);
+	float2 X = float2(0.05f, 0.005f);
+	float out_I = get_x(tex_3);
+	float out_K = multiply1(out_J, out_I);
+	float4 out_L = lerp4(M, N, out_K);
+	float4 out_P = multiply4(out_L, tex_14);
 
-	return A;
+	return out_P;
 }
 float GetMetalness()
 {
-	float B = 0.0f;
+	float V = 1.0f;
 
-	return B;
+	return V;
 }
 float GetRoughness()
 {
-	float C = 1.0f;
+	float Q = 0.3f;
+	float R = 0.1f;
+	float2 E = float2(0.017f, 0.2134f);
+	float out_G = get_x(tex_1);
+	float2 F = float2(0.1f, 0.05f);
+	float out_H = get_x(tex_2);
+	float out_J = multiply1(out_G, out_H);
+	float2 X = float2(0.05f, 0.005f);
+	float out_I = get_x(tex_3);
+	float out_K = multiply1(out_J, out_I);
+	float out_U = get_a(tex_14);
+	float out_T = multiply1(out_K, out_U);
+	float out_S = lerp1(Q, R, out_T);
 
-	return C;
+	return out_S;
 }
 float3 GetNormal()
 {
-	return float3(1.0f, 1.0f, 1.0f);
+	return tex_22;
 }
 float3 GetEmissiveColor()
 {

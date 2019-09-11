@@ -22,7 +22,7 @@ cbuffer PBRBuffer : register(b2)
 	float g_roughness;
 	float g_metalness;
 	int g_isEmissive;
-	float g_paddingPBR;
+	int g_isPreview;
 	float4 g_albedoTint;
 };
 

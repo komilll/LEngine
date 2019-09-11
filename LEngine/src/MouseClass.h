@@ -35,7 +35,7 @@ public:
 	bool GetMMBPressed() const;
 	float GetMouseScroll() const;
 
-	POINT CurrentMouseLocation() const;
+	POINT CurrentMouseLocation(bool ignoreViewport = false) const;
 	std::pair<float, float> MouseFrameMovement();
 	
 	D3DClass* GetD3D();

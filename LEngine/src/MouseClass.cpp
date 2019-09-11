@@ -155,9 +155,18 @@ float MouseClass::GetMouseScroll() const
 	return (m_mouseState.lZ / 120.0f);
 }
 
-POINT MouseClass::CurrentMouseLocation() const
+POINT MouseClass::CurrentMouseLocation(bool ignoreViewport) const
 {
-	return m_lastMousePoint;
+	if (ignoreViewport)
+	{
+		return m_lastMousePoint;
+	}
+
+	D3D11_VIEWPORT viewport;
+	UINT count = 1;
+	m_d3d->GetDeviceContext()->RSGetViewports(&count, &viewport);
+
+	return{ m_lastMousePoint.x - static_cast<LONG>(viewport.TopLeftX), m_lastMousePoint.y };
 }
 
 std::pair<float, float> MouseClass::MouseFrameMovement()

@@ -48,7 +48,7 @@ public:
 	UIShaderEditorOutput* GetPickingColorElement();
 
 	bool MouseAbovePreview() const;
-	std::pair<float, float> GetCurrentMousePosition() const;
+	std::pair<float, float> GetCurrentMousePosition(bool ignoreViewport = false) const;
 
 	//SAVE MATERIAL TO FILE
 	bool SaveMaterial(std::string filename);

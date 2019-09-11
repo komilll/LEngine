@@ -222,7 +222,7 @@ bool ShaderPBRGenerated::SetShaderParameters(ID3D11DeviceContext *deviceContext,
 	dataPtr4->roughness = m_roughness;
 	dataPtr4->metalness = m_metalness;
 	dataPtr4->albedoTint = XMFLOAT4{ m_tint[0], m_tint[1], m_tint[2], 1.0f };
-	dataPtr4->padding = 0;
+	dataPtr4->isPreview = static_cast<int>(m_isPreview);
 	dataPtr4->isEmissive = static_cast<int>(m_isEmissive);
 
 	deviceContext->Unmap(m_PBRBuffer, 0);

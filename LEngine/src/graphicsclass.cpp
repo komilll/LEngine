@@ -1266,8 +1266,10 @@ bool GraphicsClass::RenderMaterialPreview()
 
 		material->GetShader()->m_cameraPosition = m_Camera->GetPosition();
 		model->Render(m_D3D->GetDeviceContext());
+		material->GetShader()->m_isPreview = true;
 		if (!material->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 			return false;
+		material->GetShader()->m_isPreview = false;
 	}
 	m_Camera->SetPosition(tmp.x, tmp.y, tmp.z);
 
@@ -3366,61 +3368,6 @@ void GraphicsClass::ResetRayPick()
 	}
 }
 
-float GraphicsClass::DistanceToAABB(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model) const
-{
-	//Test dimension X
-	float lo = -FLT_MAX;
-	float hi = FLT_MAX;
-
-	for (int i = 0; i < 3; ++i)
-	{
-		float dimLo = GetDimLoAxis(origin, dir, bounds, model, i);
-		float dimHi = GetDimHiAxis(origin, dir, bounds, model, i);
-
-		if (dimLo > dimHi)
-		{
-			//std::swap(dimLo, dimHi);
-			const auto tmp = dimLo;
-			dimLo = dimHi;
-			dimHi = tmp;
-		}
-
-		if (dimHi < lo || dimLo > hi)
-			return FLT_MAX;
-
-		if (dimLo > lo)
-			lo = dimLo;
-		if (dimHi < hi)
-			hi = dimHi;
-	}
-
-	return lo > hi ? FLT_MAX : lo;
-}
-
-float GraphicsClass::GetDimLoAxis(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model, const int axis) const
-{
-	if (axis == 0)
-		return (bounds.GetMinBounds(model).x - origin.x) / dir.x;
-	else if (axis == 1)
-		return (bounds.GetMinBounds(model).y - origin.y) / dir.y;
-	else if (axis == 2)
-		return (bounds.GetMinBounds(model).z - origin.z) / dir.z;
-
-	return FLT_MAX;
-}
-
-float GraphicsClass::GetDimHiAxis(const XMFLOAT3 origin, const XMFLOAT3 dir, const Bounds bounds, ModelClass * const model, const int axis) const
-{
-	if (axis == 0)
-		return (bounds.GetMaxBounds(model).x - origin.x) / dir.x;
-	else if (axis == 1)
-		return (bounds.GetMaxBounds(model).y - origin.y) / dir.y;
-	else if (axis == 2)
-		return (bounds.GetMaxBounds(model).z - origin.z) / dir.z;
-
-	return FLT_MAX;
-}
-
 float GraphicsClass::CalculateMouseArrowDotProduct(ModelClass * const model, const ModelPicker::Axis axis, const XMFLOAT2 mouseNormalized)
 {
 	XMFLOAT2 min = m_modelPicker->GetMinScreenspace(this, model, axis);
@@ -3467,46 +3414,28 @@ GraphicsClass::MouseRaycastResult GraphicsClass::RaycastToModel(ModelClass* cons
 	else if (y < -1.0f)
 		y = -1.0f;
 
-	float pointX, pointY;
-	XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
-	XMVECTOR origin, rayOrigin, direction, rayDirection;
+	XMMATRIX projectionMatrix, viewMatrix;
 
-	pointX = x;
-	pointY = y;
-
+	//Transform by projection matrix
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	pointX = pointX / projectionMatrix.r[0].m128_f32[0];
-	pointY = pointY / projectionMatrix.r[1].m128_f32[1];
+	x = x / projectionMatrix.r[0].m128_f32[0];
+	y = y / projectionMatrix.r[1].m128_f32[1];
 
+	//Create inverse matrix
 	m_Camera->GetViewMatrix(viewMatrix);
-	inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
+	const XMMATRIX inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
 
-	direction = {
-		(pointX * inverseViewMatrix.r[0].m128_f32[0]) + (pointY * inverseViewMatrix.r[1].m128_f32[0]) + inverseViewMatrix.r[2].m128_f32[0],
-		(pointX * inverseViewMatrix.r[0].m128_f32[1]) + (pointY * inverseViewMatrix.r[1].m128_f32[1]) + inverseViewMatrix.r[2].m128_f32[1],
-		(pointX * inverseViewMatrix.r[0].m128_f32[2]) + (pointY * inverseViewMatrix.r[1].m128_f32[2]) + inverseViewMatrix.r[2].m128_f32[2]
+	//Find ray direction in world space
+	const XMVECTOR direction = {
+		(x * inverseViewMatrix.r[0].m128_f32[0]) + (y * inverseViewMatrix.r[1].m128_f32[0]) + inverseViewMatrix.r[2].m128_f32[0],
+		(x * inverseViewMatrix.r[0].m128_f32[1]) + (y * inverseViewMatrix.r[1].m128_f32[1]) + inverseViewMatrix.r[2].m128_f32[1],
+		(x * inverseViewMatrix.r[0].m128_f32[2]) + (y * inverseViewMatrix.r[1].m128_f32[2]) + inverseViewMatrix.r[2].m128_f32[2]
 	};
 
-	origin = { m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z };
-
-	m_D3D->GetWorldMatrix(worldMatrix);
-	translateMatrix = XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z);
-	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
-
-	inverseWorldMatrix = XMMatrixInverse(nullptr, worldMatrix);
-
-	rayOrigin = XMVector3TransformCoord(origin, inverseWorldMatrix);
-	rayDirection = XMVector3TransformNormal(direction, inverseWorldMatrix);
-
-	rayDirection = XMVector3Normalize(rayDirection);
-
-	//const XMFLOAT3 dirfrac{ 1.0f / rayDirection.m128_f32[0], 1.0f / rayDirection.m128_f32[1], 1.0f / rayDirection.m128_f32[2] };
-	const XMFLOAT3 dirfrac{ rayDirection.m128_f32[0], rayDirection.m128_f32[1], rayDirection.m128_f32[2] };
-	const XMVECTOR dirfracNormalized = XMVector3Normalize({ dirfrac.x, dirfrac.y, dirfrac.z });
-	const XMFLOAT3 dir = { dirfracNormalized.m128_f32[0], dirfracNormalized.m128_f32[1], dirfracNormalized.m128_f32[2] };
-	//const XMFLOAT3 dir = dirfrac;
-
-	return MouseRaycastResult{ {origin.m128_f32[0], origin.m128_f32[1], origin.m128_f32[2] }, dir };
+	//Origin is equal to camera position in world space;
+	//Dir is transformed, not-normalized, not-inversed ray
+	const XMFLOAT3 dir = { direction.m128_f32[0], direction.m128_f32[1], direction.m128_f32[2] };
+	return MouseRaycastResult{ m_Camera->GetPosition(), dir };
 }
 
 void GraphicsClass::LoadPointLightSave(PointLight * model, json11::Json json)
@@ -3648,11 +3577,13 @@ void GraphicsClass::CreateAABBBox(const Bounds bounds)
 	}
 }
 
-bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dirfrac, float& distance)
+bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 origin, XMFLOAT3 dir, float& distance)
 {
 	assert(lb.x <= rt.x);
 	assert(lb.y <= rt.y);
 	assert(lb.z <= rt.z);
+
+	const XMFLOAT3 dirfrac = { 1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z };
 
 	const float t1 = (lb.x - origin.x)*dirfrac.x;
 	const float t2 = (rt.x - origin.x)*dirfrac.x;
@@ -3679,17 +3610,13 @@ bool GraphicsClass::TestAABBIntersection(XMFLOAT3 lb, XMFLOAT3 rt, XMFLOAT3 orig
 	return true;
 }
 
-bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker::Axis axis, XMFLOAT3&& origin, XMFLOAT3 dirfrac)
+bool GraphicsClass::TryPickModelPickerArrow(ModelClass* model, const ModelPicker::Axis axis, XMFLOAT3&& origin, XMFLOAT3 dir)
 {
-	XMMATRIX wMatrix;
-	m_D3D->GetWorldMatrix(wMatrix);
 	const XMFLOAT3 lb = m_modelPicker->GetMinBounds(model, axis);
-	m_D3D->GetWorldMatrix(wMatrix);
 	const XMFLOAT3 rt = m_modelPicker->GetMaxBounds(model, axis);
 	float dist{ 0.0f };
 
-	dirfrac = { 1.0f / dirfrac.x, 1.0f / dirfrac.y, 1.0f / dirfrac.z };
-	return TestAABBIntersection(lb, rt, origin, dirfrac, dist);
+	return TestAABBIntersection(lb, rt, origin, dir, dist);
 }
 
 bool GraphicsClass::RaySlabIntersect(ModelClass* model, float start, float dir, float min, float max, float & tfirst, float & tlast)
@@ -3718,20 +3645,25 @@ bool GraphicsClass::RaySlabIntersect(ModelClass* model, float start, float dir, 
 
 bool GraphicsClass::TestOBBIntersection(ModelClass* model, XMFLOAT3 origin, XMFLOAT3 dir, XMFLOAT3 lb, XMFLOAT3 rt, float & dist)
 {
+	//Create inverse world matrix
 	XMMATRIX worldMatrix = XMMatrixIdentity();
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
 	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-	worldMatrix = XMMatrixInverse(NULL, worldMatrix);
+	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+	const XMMATRIX inverseWorldMatrix = XMMatrixInverse(NULL, worldMatrix);
 
-	const XMVECTOR originTransformed = XMVector3Transform({ origin.x, origin.y, origin.z }, worldMatrix);
-	const XMVECTOR dirTransformed = XMVector3Transform({ dir.x, dir.y, dir.z }, worldMatrix);
+	//Transform origin point and direction ray vector
+	const XMVECTOR originTransformed = XMVector3Transform({ origin.x, origin.y, origin.z }, inverseWorldMatrix);
+	const XMVECTOR dirTransformed = XMVector3TransformNormal({ dir.x, dir.y, dir.z }, inverseWorldMatrix);
 	origin = { originTransformed.m128_f32[0], originTransformed.m128_f32[1], originTransformed.m128_f32[2] };
 	dir = { dirTransformed.m128_f32[0], dirTransformed.m128_f32[1], dirTransformed.m128_f32[2] };
 
+	//Draw debug ray
 	m_raycastModel->Initialize(m_D3D, origin, { origin.x + dir.x * 100.0f, origin.y + dir.y * 100.0f, origin.z + dir.z * 100.0f });
-	dir = { 1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z };
 
+	//Call AABB test for origin, ray transformed to OBB-space
 	return TestAABBIntersection(lb, rt, origin, dir, dist);
 }
 

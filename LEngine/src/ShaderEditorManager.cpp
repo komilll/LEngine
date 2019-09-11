@@ -1217,11 +1217,11 @@ std::vector<UIShaderEditorBlock*>& ShaderEditorManager::GetMaterialInputs()
 	return m_materialInputs;
 }
 
-std::pair<float, float> ShaderEditorManager::GetCurrentMousePosition() const
+std::pair<float, float> ShaderEditorManager::GetCurrentMousePosition(bool ignoreViewport) const
 {
 	float mouseX{ 0 };
 	float mouseY{ 0 };
-	POINT p = m_mouse->CurrentMouseLocation();
+	POINT p = m_mouse->CurrentMouseLocation(ignoreViewport);
 
 	//Calculate mouse X
 	mouseX = (float)p.x / (float)m_D3D->GetWindowSize().x;
@@ -1750,7 +1750,7 @@ UIShaderEditorOutput* ShaderEditorManager::GetPickingColorElement()
 
 bool ShaderEditorManager::MouseAbovePreview() const
 {
-	const std::pair<float, float> mousePosCurrent = GetCurrentMousePosition();
+	const std::pair<float, float> mousePosCurrent = GetCurrentMousePosition(true);
 	if (mousePosCurrent.first < -0.5f && mousePosCurrent.second > 0.5f)
 	{
 		return true;

@@ -279,7 +279,7 @@ void SystemClass::HandleInput()
 	XMVECTOR cameraRotation{ 0, 0, 0 };
 	static float movementPerTick = 0.1f;
 	constexpr float rotatePerTick = 0.75f;
-	constexpr float previewRotateScale = 50.0f;
+	constexpr float previewRotateScale = 5.0f;
 	constexpr float speedUpCameraMovementPerScroll = 0.1f;
 	constexpr float speedLimitMax = 4.0f;
 	constexpr float speedLimitMin = 0.02f;
@@ -390,6 +390,7 @@ void SystemClass::HandleInput()
 	{
 		if (m_Mouse->GetLMBPressed())
 		{
+			m_Graphics->GetD3D()->ResetViewport();
 			if (!lmbPressed)
 			{
 				lmbPressed = true;
@@ -397,16 +398,17 @@ void SystemClass::HandleInput()
 			}
 			else
 			{
-				const float xDiff = m_Graphics->GetCurrentMousePosition().first - pos.first;
-				const float yDiff = m_Graphics->GetCurrentMousePosition().second - pos.second;
+				const float xDiff = (m_Graphics->GetCurrentMousePosition().first - pos.first) * rotatePerTick * previewRotateScale;
+				const float yDiff = (m_Graphics->GetCurrentMousePosition().second - pos.second) * rotatePerTick * previewRotateScale;
 
-				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -xDiff * rotatePerTick * previewRotateScale, 0 });
-				cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ yDiff * rotatePerTick * previewRotateScale, 0, 0 });
+				//cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ 0, -xDiff * rotatePerTick * previewRotateScale, 0 });
+				//cameraRotation = XMVectorAdd(cameraRotation, XMVECTOR{ yDiff * rotatePerTick * previewRotateScale, 0, 0 });
 				//m_Graphics->RotateCamera(cameraRotation);
 				m_Graphics->AddPreviewCameraRotation(xDiff * 10.0f, yDiff * 10.0f);
 
 				pos = m_Graphics->GetCurrentMousePosition();
 			}
+			m_Graphics->GetD3D()->SetViewportMaterial();
 		}
 		else
 		{

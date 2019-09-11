@@ -1,1 +1,1 @@
-{"material": "gold", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [140, 55, 80], "scale": [1, 1, 1], "sceneName": ""}
+{"material": "gold", "modelName": "bunny.obj", "position": [0.73218947649002075, 0.33239436149597168, 0.24722088873386383], "rotation": [95, 135, 65], "scale": [1, 0.97000002861022949, 0.97000002861022949], "sceneName": ""}

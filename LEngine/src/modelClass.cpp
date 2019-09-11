@@ -1285,24 +1285,12 @@ XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, 
 
 XMFLOAT3 Bounds::GetMinBounds(ModelClass * const model) const
 {
-	XMMATRIX matrixPosition = XMMatrixIdentity();
-	matrixPosition = DirectX::XMMatrixMultiply(matrixPosition, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-
-	XMVECTOR position { model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
-	XMVECTOR result = XMVector3Transform(position, matrixPosition);
-	result += { model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z};
-
-	return{ result.m128_f32[0], result.m128_f32[1], result.m128_f32[2] };
+	//return{ model->GetBounds().minX + model->GetPositionXYZ().x, model->GetBounds().minY + model->GetPositionXYZ().y, model->GetBounds().minZ + model->GetPositionXYZ().z };;
+	return{ model->GetBounds().minX, model->GetBounds().minY, model->GetBounds().minZ };
 }
 
 XMFLOAT3 Bounds::GetMaxBounds(ModelClass * const model) const
 {
-	XMMATRIX matrixPosition = XMMatrixIdentity();
-	matrixPosition = DirectX::XMMatrixMultiply(matrixPosition, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-
-	XMVECTOR position{ model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
-	XMVECTOR result = XMVector3Transform(position, matrixPosition);
-	result += { model->GetPositionXYZ().x, model->GetPositionXYZ().y, model->GetPositionXYZ().z};
-
-	return{ result.m128_f32[0], result.m128_f32[1], result.m128_f32[2] };
+	//return{ model->GetBounds().maxX + model->GetPositionXYZ().x, model->GetBounds().maxY + model->GetPositionXYZ().y, model->GetBounds().maxZ + model->GetPositionXYZ().z };;
+	return{ model->GetBounds().maxX, model->GetBounds().maxY, model->GetBounds().maxZ };
 }

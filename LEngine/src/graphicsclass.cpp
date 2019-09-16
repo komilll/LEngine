@@ -726,6 +726,7 @@ bool GraphicsClass::Render()
 		//CreateShadowMap(m_shadowMapTexture);
 		if (RENDER_MATERIAL_EDITOR == false)
 		{
+			m_D3D->ResetViewport();
 			if (m_postprocessSSAO)
 			{
 				if (!RenderGBufferPosition(m_positionBuffer, m_GBufferShaderPosition))
@@ -2734,13 +2735,13 @@ bool GraphicsClass::RenderGBufferPosition(RenderTextureClass *targetTex, GBuffer
 	//Render test buddha
 	for (ModelClass* const& model : m_sceneModels)
 	{
-		model->Render(m_D3D->GetDeviceContext());
-
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
 		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+		model->Render(m_D3D->GetDeviceContext());
 		result = shaderToExecute->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		if (!result)
 			return false;
@@ -3661,7 +3662,7 @@ bool GraphicsClass::TestOBBIntersection(ModelClass* model, XMFLOAT3 origin, XMFL
 	dir = { dirTransformed.m128_f32[0], dirTransformed.m128_f32[1], dirTransformed.m128_f32[2] };
 
 	//Draw debug ray
-	m_raycastModel->Initialize(m_D3D, origin, { origin.x + dir.x * 100.0f, origin.y + dir.y * 100.0f, origin.z + dir.z * 100.0f });
+	//m_raycastModel->Initialize(m_D3D, origin, { origin.x + dir.x * 100.0f, origin.y + dir.y * 100.0f, origin.z + dir.z * 100.0f });
 
 	//Call AABB test for origin, ray transformed to OBB-space
 	return TestAABBIntersection(lb, rt, origin, dir, dist);

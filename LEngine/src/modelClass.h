@@ -172,6 +172,7 @@ private:
 
 	Bounds bounds;
 	std::vector<ModelClass*> m_wireframeModels;
+	bool m_isFBX{ false };
 
 	struct PrimitiveModel
 	{

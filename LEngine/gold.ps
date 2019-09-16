@@ -38,9 +38,9 @@ static float4 tex_2;
 Texture2D additionalTexture_3 : register(t10);
 static float4 tex_3;
 Texture2D additionalTexture_4 : register(t11);
-static float4 tex_14;
+static float4 tex_10;
 Texture2D additionalTexture_5 : register(t12);
-static float4 tex_22;
+static float4 tex_13;
 
 #define NUM_LIGHTS_DIRECTIONAL 2
 #define NUM_LIGHTS_POINT 1
@@ -65,7 +65,7 @@ cbuffer PBRBuffer : register(b2)
 	float g_roughness;
 	float g_metalness;
 	int g_isEmissive;
-	float g_paddingPBR;
+	int g_isPreview;
 	float4 g_albedoTint;
 };
 
@@ -149,11 +149,11 @@ float substract(float a, float b);
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_14 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_22 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_1 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.017, 0.2134));
-	tex_2 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.1, 0.05));
-	tex_3 = additionalTexture_0.Sample(SampleType, input.tex * float2(0.05, 0.005));
+	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
+	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
+	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
+	tex_10 = additionalTexture_4.Sample(SampleType, input.tex);
+	tex_13 = additionalTexture_4.Sample(SampleType, input.tex * float2(3, 3));
 
 //Calculated values
 	float3 specular;
@@ -290,32 +290,35 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	accumulatedLightStrength = 0.0f;
 	float4 pointLight;
 #if NUM_LIGHTS_POINT > 0
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
-		accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
-
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
+	if (g_isPreview == 0)
 	{
-		float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
-		float3 H = normalize(V - L);
-		float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
-		float attenuation = 1.0f / (distance * distance);
-		float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
-		
-		// //Cook-torrance brdf
-		float NdotH = max(dot(N, H), 0.0f);
-		float NdotV = max(dot(N, V), 0.0f);
-		float NdotL = max(dot(N, -L), 0.0f);
-		
-		float NDF = NormalDistributionFunction(roughness, NdotH);
-		float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
-		
-		float3 numerator = NDF * G * F;
-		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
-		specular = numerator / max(denominator, 0.001);
+		for (int i = 0; i < NUM_LIGHTS_POINT; i++)
+			accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
 
-		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
+		{
+			float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+			float3 H = normalize(V - L);
+			float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+			float attenuation = 1.0f / (distance * distance);
+			float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
+			
+			// //Cook-torrance brdf
+			float NdotH = max(dot(N, H), 0.0f);
+			float NdotV = max(dot(N, V), 0.0f);
+			float NdotL = max(dot(N, -L), 0.0f);
+			
+			float NDF = NormalDistributionFunction(roughness, NdotH);
+			float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+			
+			float3 numerator = NDF * G * F;
+			float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+			specular = numerator / max(denominator, 0.001);
+
+			finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		}
+		//finalColor += normalize(pointLight);
 	}
-	//finalColor += normalize(pointLight);
 #endif
 	
 	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
@@ -517,48 +520,33 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float4 M = float4(0.490566f, 0.490561f, 0.490561f, 1.0f);
-	float4 N = float4(1.0f, 0.99999f, 0.99999f, 1.0f);
-	float2 E = float2(0.017f, 0.2134f);
-	float out_G = get_x(tex_1);
-	float2 F = float2(0.1f, 0.05f);
-	float out_H = get_x(tex_2);
-	float out_J = multiply1(out_G, out_H);
-	float2 X = float2(0.05f, 0.005f);
-	float out_I = get_x(tex_3);
-	float out_K = multiply1(out_J, out_I);
-	float4 out_L = lerp4(M, N, out_K);
-	float4 out_P = multiply4(out_L, tex_14);
+	float4 L = float4(0.647799f, 0.875951f, 1.0f, 1.0f);
+	float4 out_M = multiply4(tex_0, L);
 
-	return out_P;
+	return out_M;
 }
 float GetMetalness()
 {
-	float V = 1.0f;
+	float out_E = get_x(tex_1);
+	float H = 0.5f;
+	float out_G = multiply1(out_E, H);
 
-	return V;
+	return out_G;
 }
 float GetRoughness()
 {
-	float Q = 0.3f;
-	float R = 0.1f;
-	float2 E = float2(0.017f, 0.2134f);
-	float out_G = get_x(tex_1);
-	float2 F = float2(0.1f, 0.05f);
-	float out_H = get_x(tex_2);
-	float out_J = multiply1(out_G, out_H);
-	float2 X = float2(0.05f, 0.005f);
-	float out_I = get_x(tex_3);
-	float out_K = multiply1(out_J, out_I);
-	float out_U = get_a(tex_14);
-	float out_T = multiply1(out_K, out_U);
-	float out_S = lerp1(Q, R, out_T);
+	float2 O = float2(3.0f, 3.0f);
+	float out_P = get_x(tex_13);
+	float out_F = get_x(tex_2);
+	float I = 2.0f;
+	float out_J = multiply1(out_F, I);
+	float out_Q = multiply1(out_P, out_J);
 
-	return out_S;
+	return out_Q;
 }
 float3 GetNormal()
 {
-	return tex_22;
+	return tex_3;
 }
 float3 GetEmissiveColor()
 {

@@ -231,8 +231,6 @@ void ModelClass::SetScale(XMFLOAT3 scale)
 void ModelClass::SetRotation(XMFLOAT3 rotation)
 {
 	m_rotation = rotation;
-
-
 }
 
 void ModelClass::SetRotation(float x, float y, float z)
@@ -257,7 +255,7 @@ XMFLOAT3 ModelClass::GetScale() const
 
 XMFLOAT3 ModelClass::GetRotation() const
 {
-	return m_rotation;
+	return{ m_rotation.x + (m_isFBX ? 90.0f : 0.0f), m_rotation.y + (m_isFBX ? 180.0f : 0.0f), m_rotation.z + (m_isFBX ? 180.0f : 0.0f) };
 }
 
 float* ModelClass::GetPositionRef()
@@ -314,6 +312,9 @@ void ModelClass::LoadModel()
 
 HRESULT ModelClass::LoadModelFBX(const char* modelFilename)
 {
+	//Rotate to LH later on
+	m_isFBX = true;
+
 	//std::unique_ptr<FbxManager> fbxManager = make_unique<FbxManager>(FbxManager::Create());
 	static FbxManager* fbxManager;
 	if (!fbxManager)
@@ -362,7 +363,6 @@ HRESULT ModelClass::LoadModelFBX(const char* modelFilename)
 
 				FbxMesh* mesh = static_cast<FbxMesh*>(fbxChildNode->GetNodeAttribute());
 				FbxVector4* fbxVertices = mesh->GetControlPoints();
-
 
 				std::vector<DirectX::XMFLOAT3> vertexPosition;
 				std::vector<DirectX::XMFLOAT3> normalPosition;

@@ -55,7 +55,7 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
-const bool DRAW_AABB = true;
+const bool DRAW_AABB = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;

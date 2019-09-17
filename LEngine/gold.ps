@@ -33,14 +33,6 @@ Texture2D additionalTexture_0 : register(t7);
 static float4 tex_0;
 Texture2D additionalTexture_1 : register(t8);
 static float4 tex_1;
-Texture2D additionalTexture_2 : register(t9);
-static float4 tex_2;
-Texture2D additionalTexture_3 : register(t10);
-static float4 tex_3;
-Texture2D additionalTexture_4 : register(t11);
-static float4 tex_10;
-Texture2D additionalTexture_5 : register(t12);
-static float4 tex_13;
 
 #define NUM_LIGHTS_DIRECTIONAL 2
 #define NUM_LIGHTS_POINT 1
@@ -150,10 +142,6 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
 	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
 	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
-	tex_2 = additionalTexture_2.Sample(SampleType, input.tex);
-	tex_3 = additionalTexture_3.Sample(SampleType, input.tex);
-	tex_10 = additionalTexture_4.Sample(SampleType, input.tex);
-	tex_13 = additionalTexture_4.Sample(SampleType, input.tex * float2(3, 3));
 
 //Calculated values
 	float3 specular;
@@ -520,35 +508,33 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	float4 L = float4(0.647799f, 0.875951f, 1.0f, 1.0f);
-	float4 out_M = multiply4(tex_0, L);
-
-	return out_M;
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 float GetMetalness()
 {
-	float out_E = get_x(tex_1);
-	float H = 0.5f;
-	float out_G = multiply1(out_E, H);
+	float C = 0.0f;
 
-	return out_G;
+	return C;
 }
 float GetRoughness()
 {
-	float2 O = float2(3.0f, 3.0f);
-	float out_P = get_x(tex_13);
-	float out_F = get_x(tex_2);
-	float I = 2.0f;
-	float out_J = multiply1(out_F, I);
-	float out_Q = multiply1(out_P, out_J);
+	float G = 1.0f;
 
-	return out_Q;
+	return G;
 }
 float3 GetNormal()
 {
-	return tex_3;
+	return tex_1;
 }
 float3 GetEmissiveColor()
 {
-	return float3(0.0f, 0.0f, 0.0f);
+	float3 K = float3(1.0f, 0.0f, 0.0f);
+	float out_E = get_x(tex_0);
+	float F = 0.8f;
+	float out_D = substract(out_E, F);
+	float J = 5.0f;
+	float out_I = multiply1(out_D, J);
+	float3 out_H = multiply3(K, float3(out_I, out_I, out_I));
+
+	return out_H;
 }

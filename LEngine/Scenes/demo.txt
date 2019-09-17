@@ -1,0 +1,6 @@
+{"isFBX": true, "material": "gold", "modelName": "LP_S-Rock_26.fbx.obj", "position": [-26.332275390625, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Rock_3"}
+{"isFBX": true, "material": "gold", "modelName": "LP_S-Rock_30.fbx.obj", "position": [0, 0, 26.382196426391602], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Rock_6"}
+{"isFBX": true, "material": "gold", "modelName": "LP_S-Rock_24.fbx.obj", "position": [28.629650115966797, -1.6111340522766113, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Rock_4"}
+{"isFBX": true, "material": "gold", "modelName": "LP_S-Rock_29.fbx.obj", "position": [0, 30.236371994018555, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Rock_1"}
+{"isFBX": true, "material": "gold", "modelName": "LP_S-Rock_23.fbx.obj", "position": [0, 18.486038208007813, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Rock_2"}
+{"isFBX": true, "material": "Ground", "modelName": "LP_S-Rock_02.fbx.obj", "position": [-73.38043212890625, -614.44207763671875, 0], "rotation": [0, 0, 0], "scale": [100, 100, 100], "sceneName": "Rock_7"}

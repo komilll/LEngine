@@ -1,2 +1,1 @@
-{"material": "Metal01", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [5, 5, 5], "sceneName": "Bunny"}
-{"material": "Metal01", "modelName": "sphere.obj", "position": [-1.3156954050064087, 0.53106951713562012, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": "Sphere"}
+{"isFBX": false, "material": "gold", "modelName": "bunny.obj", "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": [1, 1, 1], "sceneName": ""}

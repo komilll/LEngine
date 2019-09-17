@@ -291,7 +291,8 @@ std::string ModelClass::GetSaveData() const
 		{"position", json11::Json::array{m_position.x, m_position.y, m_position.z}},
 		{"scale", json11::Json::array{m_scale.x, m_scale.y, m_scale.z}},
 		{"rotation", json11::Json::array{m_rotation.x, m_rotation.y, m_rotation.z}},
-		{"material", m_materialName}
+		{"material", m_materialName},
+		{"isFBX", m_isFBX}
 	};
 	return obj.dump();
 }
@@ -1201,6 +1202,11 @@ void ModelClass::SetMaterial(MaterialPrefab * const material)
 {
 	m_material = material;
 	m_materialName = m_material->GetName();
+}
+
+void ModelClass::SetIsFBX()
+{
+	m_isFBX = true;
 }
 
 XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)

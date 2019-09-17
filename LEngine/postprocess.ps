@@ -10,6 +10,22 @@ Texture2D chromaticTexture : register(t4);
 Texture2D whiteNoise : register(t5);
 Texture2D whiteNoiseSmall : register(t6);
 SamplerState SampleType : register(s0);
+SamplerState BrdfLutSampleType : register(s1)
+{
+	Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	MipLODBias = 0.0f;
+	MaxAnisotropy = 1;
+	ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	BorderColor[0] = 0;
+	BorderColor[1] = 0;
+	BorderColor[2] = 0;
+	BorderColor[3] = 0;
+	MinLOD = 0;
+	MaxLOD = D3D11_FLOAT32_MAX;
+};
 
 struct PixelInputType
 {
@@ -62,16 +78,26 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	}
 	
 	//LUT
-	[branch] if (g_hasLUT > 0)
+	if (g_hasLUT > 0)
 	{
-		float4 lut = finalColor;
-		float2 lutTex;
+		float4 lut = saturate(finalColor);
+		lut.r = clamp(lut.r, 0.0f, 1.0f);
+		lut.g = clamp(lut.g, 0.0f, 1.0f);
+		lut.b = clamp(lut.b, 0.0f, 1.0f);		
+		float2 lutTex = 0;
 
 		lutTex.x = lut.r * 0.0625f; //RED
 		lutTex.y = lut.g; //GREEN
 		lutTex.x += (floor(lut.b * 16.0f)) * 0.0625f; //BLUE
-
-		finalColor = lutTexture.Sample(SampleType, lutTex);
+		
+		if (luma(lut) > 0.805f)
+		{
+			//finalColor = float4(1, 0, 0, 1);
+		}
+		else
+		{
+			finalColor = lutTexture.Sample(BrdfLutSampleType, lutTex);
+		}
 		//finalColor = float4(0.0f, saturate(lutTex.y), 0.0f, 1.0f);
 	}
 

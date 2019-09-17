@@ -131,6 +131,7 @@ public:
 
 	MaterialPrefab* const GetMaterial() const { return m_material; };
 	void SetMaterial(MaterialPrefab* const material);
+	void SetIsFBX();
 
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);

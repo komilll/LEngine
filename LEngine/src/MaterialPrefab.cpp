@@ -23,7 +23,7 @@ MaterialPrefab::MaterialPrefab(const std::string name, D3DClass* d3d)
 
 	//Base light
 	m_shader->AddDirectionalLight(XMFLOAT3{ 0.0f, 1.0f, -5.0f }, 1.0f, 1.0f, 1.0f, 1.0f);
-	m_shader->AddDirectionalLight(XMFLOAT3{ 0.0f, 1.0f, 5.0f }, 0.5f, 1.0f, 0.5f, 0.75f);
+	m_shader->AddDirectionalLight(XMFLOAT3{ 0.0f, 1.0f, 5.0f }, 0.5f, 1.0f, 0.5f, /*0.75f*/ 0.0f);
 	//Additional lights
 	m_shader->AddDirectionalLight(XMFLOAT3{ 0.0f, 0.0f, -1.0f }, 0.4f, 1.0f, 0.0f, 0.0f);
 	m_shader->AddDirectionalLight(XMFLOAT3{ 0.0f, 2.0f, 6.0f }, 0.7f, 0.0f, 1.0f, 0.0f);

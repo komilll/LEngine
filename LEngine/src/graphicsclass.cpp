@@ -3462,11 +3462,16 @@ void GraphicsClass::LoadModelSave(ModelClass * model, json11::Json json)
 	const json11::Json::array scale = json["scale"].array_items();
 	const json11::Json::array rotation = json["rotation"].array_items();
 	const std::string materialName = json["material"].string_value();
+	const bool isFBX = json["isFBX"].bool_value();
 	if (materialName != "" && m_materialList.find(materialName) != m_materialList.end())
 	{
 		model->SetMaterial(m_materialList.at(materialName));
 	}
 
+	if (isFBX)
+	{
+		model->SetIsFBX();
+	}
 	model->m_name = sceneName;
 	model->SaveVisibleName();
 	if (position.size() == 3 && scale.size() == 3 && rotation.size() == 3)

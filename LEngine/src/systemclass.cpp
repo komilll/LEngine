@@ -353,6 +353,11 @@ void SystemClass::HandleInput()
 			m_Input->KeyUp(VK_G);
 			m_Graphics->ToggleGUI();
 		}
+		if (m_Input->IsKeyDown(VK_H))
+		{
+			m_Input->KeyUp(VK_H);
+			m_Graphics->DRAW_AABB = !m_Graphics->DRAW_AABB;
+		}
 		else if (m_Input->IsKeyDown(VK_M))
 		{
 			m_Input->KeyUp(VK_M);

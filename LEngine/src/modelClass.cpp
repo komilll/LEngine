@@ -1209,6 +1209,11 @@ void ModelClass::SetIsFBX()
 	m_isFBX = true;
 }
 
+bool ModelClass::GetIsFBX() const
+{
+	return m_isFBX;
+}
+
 XMFLOAT3 Bounds::BoundingBoxSize(XMMATRIX & worldMatrix, XMMATRIX & viewMatrix, XMMATRIX & projectionMatrix)
 {
 	//TODO Test if there is need to create local matrices for every scope

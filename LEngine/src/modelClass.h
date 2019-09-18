@@ -132,6 +132,7 @@ public:
 	MaterialPrefab* const GetMaterial() const { return m_material; };
 	void SetMaterial(MaterialPrefab* const material);
 	void SetIsFBX();
+	bool GetIsFBX() const;
 
 private:
 	bool InitializeBuffers(ID3D11Device* device, const char* modelFilename);
@@ -154,6 +155,7 @@ private:
 public:
 	std::string m_name;
 	bool m_selected;
+	bool m_isFBX{ false };
 
 protected:
 	XMFLOAT4 m_position{ 0.0f, 0.0f, 0.0f, 0.0f };
@@ -173,7 +175,6 @@ private:
 
 	Bounds bounds;
 	std::vector<ModelClass*> m_wireframeModels;
-	bool m_isFBX{ false };
 
 	struct PrimitiveModel
 	{

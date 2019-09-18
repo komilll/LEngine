@@ -821,6 +821,8 @@ bool GraphicsClass::Render()
 		m_renderTexturePreview->BindTexture(m_renderTextureMainScene->GetShaderResourceView());
 		if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
 			return false;
+
+		RenderVignette();
 	}
 	else if (m_postprocessFXAA)
 	{
@@ -944,10 +946,10 @@ bool GraphicsClass::RenderScene()
 			m_convoluteQuadModel->Render(m_D3D->GetDeviceContext());
 
 			m_bloomShader->SetBloomIntensity(XMFLOAT3{ m_bloomSettings.intensity });
-			if (m_postprocessSSAO)
-				m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
-			else
-				m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
+			//if (m_postprocessSSAO)
+			//	m_bloomShader->m_bloomTextureView = m_postSSAOTexture->GetShaderResourceView();
+			//else
+			m_bloomShader->m_bloomTextureView = m_renderTextureMainScene->GetShaderResourceView();
 
 			{
 				m_bloomHelperTexture->SetRenderTarget(m_D3D->GetDeviceContext(), nullptr);
@@ -973,6 +975,11 @@ bool GraphicsClass::RenderScene()
 
 			ApplyBloom(m_bloomVerticalBlur->GetShaderResourceView());
 		}
+	}
+
+	if (!m_postprocessBloom)
+	{
+		m_postProcessShader->ResetBloom();
 	}
 
 	if (m_postprocessSSAA)
@@ -1152,22 +1159,9 @@ bool GraphicsClass::RenderScene()
 		}
 	}
 
-	if (m_postprocessVignette)
+	if (!m_postprocessSSAA)
 	{
-		m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
-
-		m_Camera->Render();
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-
-		m_D3D->EnableAlphaBlending();
-		{
-			m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
-			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
-				return false; 
-		}
-		m_D3D->DisableAlphaBlending();
+		RenderVignette();
 	}
 
 	//TODO SHADOWMAPPING presentation
@@ -1288,8 +1282,8 @@ bool GraphicsClass::RenderGUI()
 	//Render material-choose window
 	if (!RENDER_MATERIAL_EDITOR)
 	{
-		ImGui::SetNextWindowPos({ 1042, 24 });
-		ImGui::SetNextWindowSize({ 226, 659 });
+		ImGui::SetNextWindowPos({ 0.814f * m_screenWidth, 0.033f * m_screenHeight });
+		ImGui::SetNextWindowSize({ 0.176f * m_screenWidth, 0.915f * m_screenHeight });
 		ImGui::Begin("Scene manager", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 		if (ImGui::CollapsingHeader("Scene hierarchy"))
 		{
@@ -1354,8 +1348,8 @@ bool GraphicsClass::RenderGUI()
 		m_shaderEditorManager->ResetMouseHoveredOnImGui();
 		//Base window of editor - flow control/variables
 		{
-			ImGui::SetNextWindowPos({ 2, 180 });
-			ImGui::SetNextWindowSize({ 318, 541 });
+			ImGui::SetNextWindowPos({ 2.0f, 0.25f * m_screenHeight });
+			ImGui::SetNextWindowSize({ 0.25f * m_screenWidth, 0.75f * m_screenHeight });
 			ImGui::Begin(m_shaderEditorManager->IsWorkingOnSavedMaterial() ? m_shaderEditorManager->m_materialToSaveName.data() : "Shader editor", (bool*)0, 
 				ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 			if (ImGui::Button("Change preview model"))
@@ -1487,6 +1481,8 @@ bool GraphicsClass::RenderGUI()
 		goto Finished_drawing;
 	}
 
+	ImGui::SetNextWindowPos(ImVec2{ 0.01875f * m_screenWidth, 0.01875f * m_screenHeight });
+	ImGui::SetNextWindowSize(ImVec2{ 0.19f * m_screenWidth, 0.91f * m_screenHeight });
 	ImGui::Begin("BaseWindow", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 	if (m_selectedModel)
 	{
@@ -3042,6 +3038,30 @@ bool GraphicsClass::ApplyGrain()
 	return true;
 }
 
+bool GraphicsClass::RenderVignette()
+{
+	if (m_postprocessVignette)
+	{
+		XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+
+		m_ssaoTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+		m_Camera->Render();
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		m_D3D->EnableAlphaBlending();
+		{
+			m_renderTexturePreview->BindTexture(m_vignetteShader->m_vignetteResourceView);
+			if (!m_renderTexturePreview->Render(m_D3D->GetDeviceContext(), 0, worldMatrix, viewMatrix, projectionMatrix))
+				return false;
+		}
+		m_D3D->DisableAlphaBlending();
+	}
+	return true;
+}
+
 bool GraphicsClass::RenderPostprocess(ID3D11ShaderResourceView * mainFrameBuffer)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -3225,6 +3245,10 @@ bool GraphicsClass::TryPickObjectsIterate(std::vector<T*>& models, const XMFLOAT
 
 	for (const auto& model : models)
 	{
+		if (model->GetName() == "Rock_7")
+		{
+			continue;
+		}
 		const auto result = RaycastToModel(model);
 		const XMFLOAT3 lb = model->GetBounds().GetMinBounds(model);
 		const XMFLOAT3 rt = model->GetBounds().GetMaxBounds(model);
@@ -3699,8 +3723,18 @@ bool GraphicsClass::PasteModel()
 	}
 	newModel->SetMaterial(m_materialList.at(m_copiedModel->GetMaterial()->GetName()));
 	newModel->SetPosition(m_copiedModel->GetPositionXYZ());
-	newModel->SetRotation(m_copiedModel->GetRotation());
 	newModel->SetScale(m_copiedModel->GetScale());
+	if (m_copiedModel->GetIsFBX())
+	{
+		newModel->SetIsFBX();
+		m_copiedModel->m_isFBX = false;
+		newModel->SetRotation(m_copiedModel->GetRotation());
+		m_copiedModel->m_isFBX = true;
+	}
+	else
+	{
+		newModel->SetRotation(m_copiedModel->GetRotation());
+	}
 	std::string copy = "";
 	for (const auto& c : m_copiedModel->m_name)
 	{

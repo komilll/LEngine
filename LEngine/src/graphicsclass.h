@@ -55,7 +55,6 @@ const float SCREEN_NEAR = 0.1f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
-const bool DRAW_AABB = false;
 
 const int CONVOLUTION_DIFFUSE_SIZE = 256;
 const int ENVIRONMENT_SPECULAR_SIZE = 128;
@@ -83,6 +82,7 @@ class GraphicsClass
 public:
 	bool ENABLE_GUI = true;
 	bool RENDER_MATERIAL_EDITOR = true;
+	bool DRAW_AABB = false;
 
 	struct PreviewModelData
 	{
@@ -550,6 +550,7 @@ private:
 	bool ApplyLUT(ID3D11ShaderResourceView* lutTexture);
 	bool ApplyChromaticAberration();
 	bool ApplyGrain();
+	bool RenderVignette();
 	bool RenderPostprocess(ID3D11ShaderResourceView* mainFrameBuffer);
 
 	//FXAA

@@ -296,7 +296,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_materialViewport.Height = (float)screenHeight;
 	m_materialViewport.MinDepth = 0.0f;
 	m_materialViewport.MaxDepth = 1.0f;
-	m_materialViewport.TopLeftX = 318.0f;
+	m_materialViewport.TopLeftX = 0.25f * m_materialViewport.Width;
 	m_materialViewport.TopLeftY = 0.0f;
 
 	// Setup the projection matrix.

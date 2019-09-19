@@ -221,6 +221,7 @@
     <ClInclude Include="src\ShaderPBRGenerated.h" />
     <ClInclude Include="src\ShaderSpecularClass.h" />
     <ClInclude Include="src\ShadowMapClass.h" />
+    <ClInclude Include="src\ShadowShader.h" />
     <ClInclude Include="src\SingleColorClass.h" />
     <ClInclude Include="src\SkyboxShaderClass.h" />
     <ClInclude Include="src\systemclass.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="src\ShaderPBRGenerated.cpp" />
     <ClCompile Include="src\ShaderSpecularClass.cpp" />
     <ClCompile Include="src\ShadowMapClass.cpp" />
+    <ClCompile Include="src\ShadowShader.cpp" />
     <ClCompile Include="src\SingleColorClass.cpp" />
     <ClCompile Include="src\SkyboxShaderClass.cpp" />
     <ClCompile Include="src\systemclass.cpp" />

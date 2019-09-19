@@ -8,7 +8,7 @@ class ShaderPBRGenerated : public BaseShaderClass
 {
 private:
 	static constexpr int NUM_LIGHTS_DIRECTIONAL = 2;
-	static constexpr int NUM_LIGHTS_POINT = 1;
+	static constexpr int NUM_LIGHTS_POINT = 4;
 
 	struct LightingBufferType
 	{

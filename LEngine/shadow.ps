@@ -1,0 +1,34 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: shadowmap.ps
+////////////////////////////////////////////////////////////////////////////////
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+	float4 lightViewPosition : TEXCOORD0;
+};
+SamplerState SampleType : register(s0);
+Texture2D shadowmap : register(t0);
+Texture2D frame : register(t1);
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+	float visibility = 1.0f;
+	input.lightViewPosition.x += 1.0f;
+	input.lightViewPosition.x /= 2.0f;
+	input.lightViewPosition.y += 1.0f;
+	input.lightViewPosition.y /= 2.0f;
+	
+	if (shadowmap.Sample(SampleType, input.lightViewPosition.xy).z < input.lightViewPosition.z)
+	{
+		visibility = 0.5f;
+	}
+	
+	return visibility;
+}

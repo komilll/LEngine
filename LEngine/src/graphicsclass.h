@@ -44,14 +44,15 @@
 #include "FXAAShader.h"
 #include <array>
 #include "PointLight.h"
+#include "ShadowShader.h"
 
 /////////////
 // GLOBALS //
 /////////////
-const bool FULL_SCREEN = false;
+const bool FULL_SCREEN = true;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
-const float SCREEN_NEAR = 0.1f;
+const float SCREEN_NEAR = 0.01f;
 const bool BLUR_BILINEAR = false;
 const bool ENABLE_DEBUG = false;
 const bool DRAW_SKYBOX = true;
@@ -529,6 +530,7 @@ private:
 	//SHADOW MAPPING
 	bool CreateShadowMap(RenderTextureClass*& targetTex);
 	bool RenderDepthScene();
+	bool RenderShadow();
 	//IBL SPECULAR
 	bool PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView* srcTex, RenderTextureClass* dstTex);
 	bool PrepareLutBrdf(RenderTextureClass* dstTex);
@@ -651,6 +653,7 @@ private:
 
 	//SHADOW MAP
 	ShadowMapClass* m_shadowMapShader;
+	ShadowShader* m_shadowShader;
 	RenderTextureClass* m_shadowMapTexture;
 	ModelClass* m_shadowQuadModel;
 	ModelClass* m_groundQuadModel;

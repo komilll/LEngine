@@ -281,13 +281,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_shadowMapShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"shadowmap.vs", L"shadowmap.ps", input))
 		return false;
 
+	m_shadowShader = new ShadowShader;
+	if (!m_shadowShader->Initialize(m_D3D->GetDevice(), *m_D3D->GetHWND(), L"shadow.vs", L"shadow.ps", input))
+		return false;
+
 
 	m_shadowMapTexture = new RenderTextureClass;
 	m_shadowMapTexture->InitializeShadowMap(m_D3D->GetDevice(), 1280, 720);
 
 #pragma endregion
 
-	CreateShadowMap(m_shadowMapTexture);
+	//CreateShadowMap(m_shadowMapTexture);
 
 #pragma region SSAO
 	//Create textures that will hold buffers
@@ -2367,64 +2371,99 @@ bool GraphicsClass::CreateShadowMap(RenderTextureClass*& targetTex)
 
 	//m_renderTexturePreview->BindTexture(targetTex->GetShaderResourceView());
 
-	m_D3D->SetBackBufferRenderTarget();
-	m_D3D->ResetViewport();
-	m_D3D->BeginScene(0, 0, 0, 1);
+	//m_D3D->SetBackBufferRenderTarget();
+	//m_D3D->ResetViewport();
+	//m_D3D->BeginScene(0, 0, 0, 1);
 
 	return true;
 }
 
 bool GraphicsClass::RenderDepthScene()
 {
-	XMMATRIX worldMatrix, lightViewMatrix, lightProjectionMatrix, translateMatrix;
+	XMMATRIX worldMatrix, lightViewMatrix, lightProjectionMatrix;
 	XMMATRIX viewMatrix, projectionMatrix;
 
-	//Set light position
-	m_directionalLight->SetLookAt(0, 0, 0);
-	m_shadowMapShader->SetLightPosition(m_directionalLight->GetPosition());
-	for (ModelClass* const& model : m_sceneModels)
+	for (const auto& model : m_sceneModels)
 	{
+		XMVECTOR dir{ 0.0f, -1.0f, 0.0f };
+		dir *= -5;
+		m_directionalLight->SetLookAt(model->GetPositionXYZ());
+		m_directionalLight->SetPosition({ model->GetPositionXYZ().x + dir.m128_f32[0], model->GetPositionXYZ().y + dir.m128_f32[1], model->GetPositionXYZ().z + dir.m128_f32[2] });
+
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_directionalLight->GetViewMatrix(lightViewMatrix);
+		m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
+
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
 		model->Render(m_D3D->GetDeviceContext());
+		if (!m_shadowMapShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix))
+			return false;
 	}
 
-	//Create matrices based on light position
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_directionalLight->GenerateViewMatrix();
-	m_directionalLight->GetViewMatrix(lightViewMatrix);
-	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
-
-	//Translate model position and save to worldMatrix
-	//XMFLOAT4 position = m_Model->GetPosition();
-	//worldMatrix = XMMatrixTranslation(position.x, position.y, position.z);
-
-	//Render sphere model
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixRotationX(45.4f));
-	//worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(0, -0.6f, 0));
-	//m_groundQuadModel->Render(m_D3D->GetDeviceContext());
-	//result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_groundQuadModel->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	//if (!result)
-	//	return false;
-
-	//worldMatrix = XMMatrixTranslation(0.5f, 0.0f, -1.0f);
-	//worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixScaling(4.0f, 6.0f, 1.0f));
-	//m_cubeModel->Render(m_D3D->GetDeviceContext());
-	//m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_cubeModel->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-
-	//for (int i = 0; i < 5; i++)
+	//for (const auto& model : m_sceneModels)
 	//{
+	//	XMVECTOR dir{ 0.0f, 1.0f, -5.0f };
+	//	dir *= -5;
+	//	m_directionalLight->SetLookAt(model->GetPositionXYZ());
+	//	m_directionalLight->SetPosition({ model->GetPositionXYZ().x + dir.m128_f32[0], model->GetPositionXYZ().y + dir.m128_f32[1], model->GetPositionXYZ().z + dir.m128_f32[2] });
+
 	//	m_D3D->GetWorldMatrix(worldMatrix);
-	//	m_directionalLight->GenerateViewMatrix();
 	//	m_directionalLight->GetViewMatrix(lightViewMatrix);
 	//	m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
 
-	//	worldMatrix = XMMatrixTranslation(i * 2.0f, 2.0f, 1.0f);
-	//	m_Model->Render(m_D3D->GetDeviceContext());
-	//	result = m_shadowMapShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, lightViewMatrix, lightProjectionMatrix);
-	//	if (!result)
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+	//	model->Render(m_D3D->GetDeviceContext());
+	//	m_shadowShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
+	//	if (!m_shadowShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
 	//		return false;
 	//}
 
 	return true;
+}
+
+bool GraphicsClass::RenderShadow()
+{
+	XMMATRIX worldMatrix, lightViewMatrix, lightProjectionMatrix;
+	XMMATRIX viewMatrix, projectionMatrix;
+
+	for (const auto& model : m_sceneModels)
+	{
+		XMVECTOR dir{ 0.0f, 1.0f, -5.0f };
+		dir *= -5;
+		m_directionalLight->SetLookAt(model->GetPositionXYZ());
+		m_directionalLight->SetPosition({ model->GetPositionXYZ().x + dir.m128_f32[0], model->GetPositionXYZ().y + dir.m128_f32[1], model->GetPositionXYZ().z + dir.m128_f32[2] });
+
+		m_D3D->GetWorldMatrix(worldMatrix);
+		m_directionalLight->GetViewMatrix(lightViewMatrix);
+		m_directionalLight->GetProjectionMatrix(lightProjectionMatrix);
+		m_Camera->GetViewMatrix(viewMatrix);
+		m_D3D->GetProjectionMatrix(projectionMatrix);
+
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+		model->Render(m_D3D->GetDeviceContext());
+		m_shadowShader->SetLightViewProjection(lightViewMatrix, lightProjectionMatrix);
+		m_shadowShader->SetShadowMapResource(m_shadowMapTexture->GetShaderResourceView());
+		m_shadowShader->SetFrameResource(m_renderTextureMainScene->GetShaderResourceView());
+		if (!m_shadowShader->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+			return false;
+	}
 }
 
 bool GraphicsClass::PrepareEnvironmentPrefilteredMap(ID3D11ShaderResourceView * srcTex, RenderTextureClass * dstTex)

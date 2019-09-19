@@ -342,6 +342,9 @@
     <ClInclude Include="src\PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShadowShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UITick.cpp">
@@ -489,6 +492,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShadowShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

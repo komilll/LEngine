@@ -1,0 +1,528 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: pbr_used.ps
+////////////////////////////////////////////////////////////////////////////////
+
+/////////////
+// GLOBALS //
+/////////////
+TextureCube irradianceMap : register(t0);
+Texture2D specularLUT : register(t1);
+TextureCube environmentMap_1 : register(t2);
+TextureCube environmentMap_2 : register(t3);
+TextureCube environmentMap_3 : register(t4);
+TextureCube environmentMap_4 : register(t5);
+TextureCube environmentMap_5 : register(t6);
+SamplerState SampleType : register(s0);
+SamplerState BrdfLutSampleType : register(s1)
+{
+	Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	MipLODBias = 0.0f;
+	MaxAnisotropy = 1;
+	ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	BorderColor[0] = 0;
+	BorderColor[1] = 0;
+	BorderColor[2] = 0;
+	BorderColor[3] = 0;
+	MinLOD = 0;
+	MaxLOD = D3D11_FLOAT32_MAX;
+};
+Texture2D additionalTexture_0 : register(t7);
+static float4 tex_0;
+Texture2D additionalTexture_1 : register(t8);
+static float4 tex_1;
+
+#define NUM_LIGHTS_DIRECTIONAL 2
+#define NUM_LIGHTS_POINT 1
+cbuffer LightingBuffer : register(b0)
+{
+#if NUM_LIGHTS_DIRECTIONAL > 0
+	float4 g_directionalLightDirectionStrength[NUM_LIGHTS_DIRECTIONAL];
+	float4 g_directionalLightColor[NUM_LIGHTS_DIRECTIONAL];
+#endif
+};
+
+cbuffer PointLightBuffer : register(b1)
+{
+#if NUM_LIGHTS_POINT > 0
+	float4 g_pointLightPositionWithRadius[NUM_LIGHTS_POINT];
+	float4 g_pointLightColorWithStrength[NUM_LIGHTS_POINT];
+#endif
+};
+
+cbuffer PBRBuffer : register(b2)
+{
+	float g_roughness;
+	float g_metalness;
+	int g_isEmissive;
+	int g_isPreview;
+	float4 g_albedoTint;
+};
+
+cbuffer ShaderTextureBuffer : register(b3)
+{
+	int g_hasNormalMap;
+	int g_hasRoughnessMap;
+	int g_hasMetalnessMap;
+	int g_hasAlbedoMap;
+};
+
+//////////////
+// TYPEDEFS //
+//////////////
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex: TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 viewDirection : TEXCOORD1;
+	float3 tangent : TANGENT;
+    float3 binormal : BINORMAL;
+	float3 diffuseLookUp : TEXCOORD2;
+	float3 worldPosition : TEXCOORD3;
+};
+
+//////////////
+// CLASSES //
+//////////////
+float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 normal);
+float GetRoughness();
+float GetMetalness();
+float3 GetNormal();
+float4 GetBaseColor();
+float3 GetEmissiveColor();
+
+float GeometrySchlickGGX(float NdotV, float k);
+float GeometrySmithGGX(float roughness, float NdotV, float NdotL);
+float NormalDistributionFunction(float roughness, float NdotH);
+float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp);
+float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness);
+
+float3 GetPrefilteredColor(float roughness, float3 R);
+
+//////////////////
+// CONST VALUES //
+//////////////////
+static const float PI = 3.14159265359;
+//Point light const values
+static const float POINT_LIGHT_CONSTANT = 1.0f;
+static const float POINT_LIGHT_LINEAR = 0.7f;
+static const float POINT_LIGHT_QUADRATIC = 1.8f;
+float3 twotothree (float2 x, float y);
+float4 twotofour(float2 x, float y, float z);
+float4 twotofourtypetwo(float2 x, float2 y);
+float add1(float a, float b);
+float2 add2(float2 a, float2 b);
+float3 add3(float3 a, float3 b);
+float4 add4(float4 a, float4 b);
+float2 convertfloat2(float x, float y);
+float3 convertfloat3(float x, float y, float z);
+float4 convertfloat4(float x, float y, float z, float w);
+float divide(float a, float b);
+float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp);
+float get_a(float4 a);
+float get_x(float4 a);
+float lerp1(float a, float b, float alpha);
+float2 lerp2(float2 a, float2 b, float alpha);
+float3 lerp3(float3 a, float3 b, float alpha);
+float4 lerp4(float4 a, float4 b, float alpha);
+float multiply1(float a, float b);
+float2 multiply2(float2 a, float2 b);
+float3 multiply3(float3 a, float3 b);
+float4 multiply4(float4 a, float4 b);
+float4 sampletexture(float4 t, float2 uv);
+float substract(float a, float b);
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
+	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
+
+//Calculated values
+	float3 specular;
+	float3 normal;
+	float lightIntensity;
+	float3 lightDir;
+	float4 normalMap;
+	float roughnessMap;
+	float metalnessMap;
+	float accumulatedLightStrength = 0;
+
+//PBR parameters
+	float roughness;
+	float metalness;
+	float3 albedo;
+
+//Load texture data
+	//albedo = shaderTexture[0].Sample(SampleType, input.tex);
+	//normalMap = shaderTexture[1].Sample(SampleType, input.tex);
+	//roughnessMap = shaderTexture[2].Sample(SampleType, input.tex);
+	//metalnessMap = shaderTexture[3].Sample(SampleType, input.tex);
+
+//Calculate normal for model
+	input.tangent = normalize(input.tangent);
+	input.binormal = normalize(input.binormal);
+	input.normal = normalize(input.normal);
+
+	normal = GetNormalValue(GetNormal(), input.tangent, input.binormal, input.normal);
+
+//Calculate other PBR values
+	roughness = GetRoughness();
+	metalness = GetMetalness();
+
+//GAMMA CORRECTION
+	albedo = GetBaseColor();
+	albedo = albedo / (albedo + float3(1.0, 1.0, 1.0));
+	albedo = pow(albedo, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+
+//SPECULAR IBL	
+	float3 WorldPos = input.position.xyz;
+	float3 Normal = input.normal * GetNormal();
+
+	float3 N = normalize(Normal);
+    float3 V = normalize(input.viewDirection);
+	float3 R = reflect(-input.viewDirection, input.normal);
+
+	float NdotV = max(dot(N, V), 0.0);
+	float3 prefilteredColor = GetPrefilteredColor(roughness, R);
+	float2 envBRDF = specularLUT.Sample(BrdfLutSampleType, float2(NdotV, roughness)).rg;
+
+//FRESNEL EQUATION
+	float3 F0 = float3(0.04, 0.04, 0.04);
+	F0 = lerp(F0, albedo, metalness);
+	float3 F = FresnelSchlickRoughness(NdotV, F0, roughness);
+//////////////////
+//DIFFUSE IRRADIANCE
+	float3 irradiance = irradianceMap.Sample(SampleType, N).rgb;
+	float3 diffuse = irradiance * albedo;	
+
+	float3 kS = F;
+	float3 kD = 1.0 - kS;
+	kD *= (1.0 - metalness);
+
+//AMBIENT CALCULATIONS
+	specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+	float3 ambient = (kD * diffuse + specular);// * ao;
+
+//MULTIPLE DIRECTIONAL LIGHT PASS
+	float4 finalColor = float4(ambient, 1.0f); //Base of output color is ambient lighting
+	float4 directionalLight = 0;
+	
+#if NUM_LIGHTS_DIRECTIONAL > 0
+	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++)
+		accumulatedLightStrength += g_directionalLightDirectionStrength[i].w;
+
+	for (int i = 0; i < NUM_LIGHTS_DIRECTIONAL; i++) //Iterate over number of directional lights
+	{	
+		float3 L = normalize(g_directionalLightDirectionStrength[i].xyz);
+		float3 H = normalize(V + L);
+		//float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		//float attenuation = 1.0f / (distance * distance);
+		float3 radiance = g_directionalLightColor[i].xyz * g_directionalLightDirectionStrength[i].w;
+		
+		// //Cook-torrance brdf
+		float NdotH = max(dot(N, H), 0.0f);
+		float NdotV = max(dot(N, V), 0.0f);
+		float NdotL = max(dot(N, L), 0.0f);
+		
+		float NDF = NormalDistributionFunction(roughness, NdotH);
+		float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+		
+		float3 numerator = NDF * G * F;
+		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+		specular = numerator / max(denominator, 0.001);
+
+		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		
+/*
+		lightDir = normalize(g_directionalLightDirectionStrength[i].xyz);
+		lightIntensity = saturate(dot(Normal, lightDir));	
+
+	//Calculate multiple dot products
+		float3 halfV = (input.viewDirection + lightDir) / (length(lightDir + input.viewDirection));
+		float NdotH = max(dot(Normal, halfV), 0.0);
+		float NdotL = max(dot(Normal, lightDir), 0.0);
+
+	//NORMAL DISTRUBUTION FUNCTION
+		float D = NormalDistributionFunction(halfV, roughness, PI, NdotH);
+	//GEOMETRY FUNCTION
+		float G = GeometrySmithGGX(roughness, NdotV, NdotL);
+
+	//FINAL CALCULATIONS
+		float3 numerator = D * G * F;
+		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+		specular = numerator / max(denominator, 0.001);
+
+		//float3 tint = float3(1.0, 0.0, 0.0);
+		//albedo *= lerp(float3(1.0, 1.0, 1.0), tint, metalness);
+
+		float currentLightStrength = g_directionalLightDirectionStrength[i].w;
+		float lightPercentage = 1.0f;//currentLightStrength / accumulatedLightStrength;
+		float3 Lo = (kD * albedo / PI + specular) * NdotL * lightPercentage * g_directionalLightColor[i].xyz * currentLightStrength;
+
+		//return float4(Lo, 1.0f);
+		finalColor += float4(Lo, 1.0f);
+		directionalLight = float4(Lo, 1.0f);
+		//finalColor += float4(ambient + Lo, 1.0f);
+*/
+	}
+	//finalColor = saturate(finalColor);
+#endif
+
+//MULTIPLE POINT LIGHT PASS
+	accumulatedLightStrength = 0.0f;
+	float4 pointLight;
+#if NUM_LIGHTS_POINT > 0
+	if (g_isPreview == 0)
+	{
+		for (int i = 0; i < NUM_LIGHTS_POINT; i++)
+			accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
+
+		for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
+		{
+			float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+			float3 H = normalize(V - L);
+			float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+			float attenuation = 1.0f / (distance * distance);
+			float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
+			
+			// //Cook-torrance brdf
+			float NdotH = max(dot(N, H), 0.0f);
+			float NdotV = max(dot(N, V), 0.0f);
+			float NdotL = max(dot(N, -L), 0.0f);
+			
+			float NDF = NormalDistributionFunction(roughness, NdotH);
+			float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+			
+			float3 numerator = NDF * G * F;
+			float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+			specular = numerator / max(denominator, 0.001);
+
+			finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+		}
+		//finalColor += normalize(pointLight);
+	}
+#endif
+	
+	//finalColor = float4(g_directionalLightDirectionStrength[0].w, 0.0f, 0.0f, 1.0f);
+	//return saturate(finalColor);// * lightIntensity;
+	if (g_isEmissive)
+	{
+		float luma = sqrt(dot(finalColor.rgb, float3(0.299f, 0.587f, 0.114f)));
+		finalColor = float4(float3(GetEmissiveColor() * luma), 1.0f);
+	}
+	return finalColor * g_albedoTint;// * lightIntensity;
+
+	//return float4(kD * diffuse + specular, 1.0f) * g_lightStrength;//*lightIntensity;
+	//return float4(ambient, 1.0);
+	//return float4(diffuse, 1.0);
+}
+
+float GeometrySchlickGGX(float NdotV, float k)
+{
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return nom / denom;
+}
+
+float NormalDistributionFunction(float roughness, float NdotH)
+{
+	float a2 = max(roughness * roughness, 0.001);
+	float denom = 1.0 + NdotH * NdotH * (a2 - 1.0);
+	denom = denom * denom;
+	denom = denom * PI;
+	
+	return a2 / denom;
+}
+
+float GeometrySmithGGX(float roughness, float NdotV, float NdotL)
+{
+	float k = (roughness + 1);
+	k = (k * k) / 8;
+    float ggx1 = GeometrySchlickGGX(NdotV, k);
+    float ggx2 = GeometrySchlickGGX(NdotL, k);
+
+	return ggx1 * ggx2;
+}
+
+float FresnelSchlick(float3 F0, float3 albedo, float metalness, float NdotV, float exp)
+{
+	F0 = lerp(F0, albedo, metalness);
+
+	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
+}
+
+float3 FresnelSchlickRoughness(float NdotV, float3 F0, float roughness)
+{
+    return F0 + (max(float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness), F0) - F0) * pow(1.0 - NdotV, 5.0);
+}   
+
+////////////////////////////////////////////////////////////////////////////////
+// GET TEXTURE PBR VALUES
+////////////////////////////////////////////////////////////////////////////////
+float3 GetNormalValue(float3 normalMap, float3 tangent, float3 binormal, float3 normal)
+{
+	normalMap = (normalMap * 2.0f) - 1.0f; //Convert from [0, 1] to [-1, 1]
+	normal = (normalMap.x * tangent) + (normalMap.y * binormal) + (normalMap.z * normal);
+	return normalize(normal);
+}
+
+////////////////////////////////////////////////////////////
+// OTHER CALCULATIONS
+////////////////////////////////////////////////////////////
+float3 GetPrefilteredColor(float roughness, float3 R)
+{
+	float3 color_0 = environmentMap_1.Sample(SampleType, R);
+	float3 color_1 = environmentMap_2.Sample(SampleType, R);
+	float3 color_2 = environmentMap_3.Sample(SampleType, R);
+	float3 color_3 = environmentMap_4.Sample(SampleType, R);
+	float3 color_4 = environmentMap_5.Sample(SampleType, R);
+
+	float3 colors[5] = {color_0, color_1, color_2, color_3, color_4};
+	int index = clamp(roughness * 5, 0, 4);
+	float lerpVal = (roughness - index * 0.2f) / ((index + 1) * 0.2f - index * 0.2f);
+	lerpVal = clamp(lerpVal, 0.0f, 1.0f);
+
+	return lerp(colors[index], colors[clamp(index + 1, 0, 4)], lerpVal);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SHADER EDITOR METHODS
+////////////////////////////////////////////////////////////////////////////////
+float3 twotothree (float2 x, float y)
+{
+	return float3(x, y);
+}
+float4 twotofour(float2 x, float y, float z)
+{
+	return float4(x, y, z);
+}
+float4 twotofourtypetwo(float2 x, float2 y)
+{
+	return float4(x, y);
+}
+float add1(float a, float b)
+{
+	return a + b;
+}
+float2 add2(float2 a, float2 b)
+{
+	return a + b;
+}
+float3 add3(float3 a, float3 b)
+{
+	return a + b;
+}
+float4 add4(float4 a, float4 b)
+{
+	return a + b;
+}
+float2 convertfloat2(float x, float y)
+{
+	return float2(x, y);
+}
+float3 convertfloat3(float x, float y, float z)
+{
+	return float3(x, y, z);
+}
+float4 convertfloat4(float x, float y, float z, float w)
+{
+	return float4(x, y, z, w);
+}
+float divide(float a, float b)
+{
+	return a / b;
+}
+
+
+
+
+float fresnel(float4 F0, float4 albedo, float metalness, float NdotV, float exp)
+{
+	F0 = lerp(F0, albedo, metalness);
+
+	return F0 + (1.0 - F0) * pow((1.0 - NdotV), exp);
+}
+float get_a(float4 a)
+{
+	return a.w;
+}
+float get_x(float4 a)
+{
+	return a.r;
+}
+float lerp1(float a, float b, float alpha)
+{
+	alpha = saturate(alpha);
+	return lerp(a, b, alpha);
+}
+float2 lerp2(float2 a, float2 b, float alpha)
+{
+	alpha = saturate(alpha);
+	return lerp(a, b, alpha);
+}
+float3 lerp3(float3 a, float3 b, float alpha)
+{
+	alpha = saturate(alpha);
+	return lerp(a, b, alpha);
+}
+float4 lerp4(float4 a, float4 b, float alpha)
+{
+	alpha = saturate(alpha);
+	return lerp(a, b, alpha);
+}
+float multiply1(float a, float b)
+{
+	return a * b;
+}
+float2 multiply2(float2 a, float2 b)
+{
+	return a * b;
+}
+float3 multiply3(float3 a, float3 b)
+{
+	return a * b;
+}
+float4 multiply4(float4 a, float4 b)
+{
+	return a * b;
+}
+float4 sampletexture(float4 t, float2 uv)
+{
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
+}
+float substract(float a, float b)
+{
+	return a - b;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// SHADER EDITOR METHODS
+////////////////////////////////////////////////////////////////////////////////
+float4 GetBaseColor()
+{
+	return tex_0;
+}
+float GetMetalness()
+{
+	return 0.0f;
+}
+float GetRoughness()
+{
+	return 0.0f;
+}
+float3 GetNormal()
+{
+	return float3(1.0f, 1.0f, 1.0f);
+}
+float3 GetEmissiveColor()
+{
+	return float3(0.0f, 0.0f, 0.0f);
+}

@@ -508,33 +508,23 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return float4(0.0f, 0.0f, 0.0f, 0.0f);
+	return tex_0;
 }
 float GetMetalness()
 {
-	float C = 0.0f;
-
-	return C;
+	return 0.0f;
 }
 float GetRoughness()
 {
-	float G = 1.0f;
+	float out_C = get_x(tex_1);
 
-	return G;
+	return out_C;
 }
 float3 GetNormal()
 {
-	return tex_1;
+	return float3(1.0f, 1.0f, 1.0f);
 }
 float3 GetEmissiveColor()
 {
-	float3 K = float3(1.0f, 0.0f, 0.0f);
-	float out_E = get_x(tex_0);
-	float F = 0.8f;
-	float out_D = substract(out_E, F);
-	float J = 5.0f;
-	float out_I = multiply1(out_D, J);
-	float3 out_H = multiply3(K, float3(out_I, out_I, out_I));
-
-	return out_H;
+	return float3(0.0f, 0.0f, 0.0f);
 }

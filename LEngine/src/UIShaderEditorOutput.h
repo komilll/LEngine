@@ -40,6 +40,7 @@ public:
 	float m_valueTwo[2]{ 0.0f, 0.0f };
 	float m_valueThree[3]{ 0.0f, 0.0f, 0.0f };
 	float m_valueFour[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
+	//Do not use until you have a real reason to!
 	std::string m_visibleName{"Empty"};
 
 	std::string m_variableName{};

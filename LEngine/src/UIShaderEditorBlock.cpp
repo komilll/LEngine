@@ -260,7 +260,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				{
 					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
 						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->GetVisibleName();
 					m_textEngine->GetData(1)->scale = m_scale;
 				}
 				else
@@ -289,7 +289,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				{
 					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
 						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->GetVisibleName();
 					m_textEngine->GetData(1)->scale = m_scale;
 				}
 				else
@@ -318,7 +318,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				{
 					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
 						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->GetVisibleName();
 					m_textEngine->GetData(1)->scale = m_scale;
 				}
 				else
@@ -347,7 +347,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 				{
 					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
 						(m_translationY + (0.175f + 0.025f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
-					m_textEngine->GetData(1)->text = GetFirstOutputNode()->m_visibleName;
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->GetVisibleName();
 					m_textEngine->GetData(1)->scale = m_scale;
 				}
 				else
@@ -359,11 +359,25 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 			else
 			{
 				m_textEngine->GetData(0)->scale = m_scale;
-				m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
-					(m_translationY + 0.175f * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 
-				m_textEngine->GetData(1)->text = "";
-				m_textEngine->GetData(1)->scale = 0.0f;
+				if (GetFirstOutputNode()->m_isVariable)
+				{
+					m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + (0.175f - 0.015f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+
+					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + (0.175f + 0.035f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+					m_textEngine->GetData(1)->text = GetFirstOutputNode()->GetVisibleName();
+					m_textEngine->GetData(1)->scale = m_scale;
+				}
+				else
+				{
+					m_textEngine->GetData(0)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
+						(m_translationY + 0.175f * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+
+					m_textEngine->GetData(1)->text = "";
+					m_textEngine->GetData(1)->scale = 0.0f;
+				}
 			}
 			m_textEngine->RenderText(deviceContext, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 		}

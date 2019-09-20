@@ -1228,6 +1228,7 @@ bool GraphicsClass::RenderLightModels()
 bool GraphicsClass::RenderMaterialPreview()
 {
 	const std::string materialName = m_shaderEditorManager->GetCurrentMaterialName();
+	//const std::string materialName = "test";
 	if (materialName == "")
 	{
 		return true;
@@ -1387,8 +1388,12 @@ bool GraphicsClass::RenderGUI()
 			}
 			if (ImGui::Button("Generate shader"))
 			{
-				m_shaderEditorManager->GenerateCodeToFile();
-				ReinitializeMainModel();
+				const std::string name = m_shaderEditorManager->GetCurrentMaterialName();
+				m_shaderEditorManager->GenerateCodeToFile(name);
+				m_shaderEditorManager->SaveMaterial(name);
+				m_materialList.clear();
+				//m_materialList.insert({ name , new MaterialPrefab{ name, m_D3D } });
+				//ReinitializeMainModel();
 			}
 			ImGui::Spacing();
 			if (!m_shaderEditorManager->IsWorkingOnSavedMaterial())
@@ -1442,11 +1447,11 @@ bool GraphicsClass::RenderGUI()
 		}
 		//Adding new blocks
 		if (m_shaderEditorManager->WillRenderChoosingWindow())
-		{			
+		{
+			ImGui::SetNextWindowPos({ m_shaderEditorManager->GetWindowPositionX() + 0.25f * m_screenWidth, m_shaderEditorManager->GetWindowPositionY() });
 			ImGui::Begin("Add block", (bool*)0, ImGuiWindowFlags_::ImGuiWindowFlags_NoMove | ImGuiWindowFlags_::ImGuiWindowFlags_NoResize | ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings
 					| ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysAutoResize);
 			
-			ImGui::SetWindowPos({ m_shaderEditorManager->GetWindowPositionX(), m_shaderEditorManager->GetWindowPositionY() });
 			if (ImGui::InputText("SEARCH", const_cast<char*>(m_shaderEditorManager->m_choosingWindowSearch.data()), m_shaderEditorManager->k_choosingWindowSearchSize))
 			{
 			}

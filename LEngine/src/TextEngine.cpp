@@ -5,6 +5,7 @@ void TextEngine::Initialize(ID3D11Device* device, wchar_t const* fontPath)
 	//TODO Do in constructor
 	//TODO Should it be unique pointer?
 	m_font = std::make_unique<DirectX::SpriteFont>(device, fontPath);
+
 }
 
 TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight, float posX, float posY, std::string text_, float scale_, Align align_, XMVECTOR color_)
@@ -12,7 +13,10 @@ TextEngine::FontData* TextEngine::WriteText(ID3D11DeviceContext* deviceContext, 
 	FontData data;
 
 	//TODO Why unique ptr?
-	m_spriteBatch = std::make_unique<SpriteBatch>(deviceContext);
+	if (!m_spriteBatch)
+	{
+		m_spriteBatch = std::make_unique<SpriteBatch>(deviceContext);
+	}
 	const std::wstring wstr = std::wstring(text_.begin(), text_.end());
 
 	//Measure new text length and change position based on aligments

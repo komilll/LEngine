@@ -468,37 +468,55 @@ void ShaderEditorManager::CopyBlockValues(UIShaderEditorBlock * const src, UISha
 
 void ShaderEditorManager::CopyCreatedBlocksConnections(std::vector<UIShaderEditorBlock*> src, std::vector<UIShaderEditorBlock*> dst)
 {
-	return;
 	for (unsigned int bIndex = 0; bIndex < src.size(); ++bIndex)
 	{
 		for (unsigned int inIndex = 0; inIndex < src.at(bIndex)->m_inputNodes.size(); ++inIndex)
 		{
 			if (src.at(bIndex) && src.at(bIndex)->m_inputNodes.at(inIndex) && src.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode)
 			{
-				UIShaderEditorInput* in= src.at(bIndex)->m_inputNodes.at(inIndex);
+				UIShaderEditorInput* in = src.at(bIndex)->m_inputNodes.at(inIndex);
 				UIShaderEditorOutput* out = src.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode;
+				std::pair<int, int> blockInputIndexes{};
 
-				if (FindOutputNode(out, src))
+				if (FindOutputNode(out, src, blockInputIndexes))
 				{
+					in = dst.at(bIndex)->m_inputNodes.at(inIndex);
+					in->m_connectedOutputNode = dst.at(blockInputIndexes.first)->m_outputNodes.at(blockInputIndexes.second);
+					//out = dst.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode;
 					//dst.at(bIndex)->m_inputNodes.at(inIndex)->m_connectedOutputNode = out;
+					DrawLine(in, in->m_connectedOutputNode);
 				}
 			}
 		}
 	}
 }
 
-bool ShaderEditorManager::FindOutputNode(UIShaderEditorOutput * const out, std::vector<UIShaderEditorBlock*> const blocks) const
+bool ShaderEditorManager::FindOutputNode(UIShaderEditorOutput * const out, std::vector<UIShaderEditorBlock*> const blocks, std::pair<int, int>& blockInputIndexes) const
 {
-	for (const auto& block : blocks)
+	for (unsigned int bIndex = 0; bIndex < blocks.size(); ++bIndex)
 	{
-		for (const auto& blockOut : block->m_outputNodes)
+		const auto& block = blocks.at(bIndex);
+		for (unsigned int outIndex = 0; outIndex < block->m_outputNodes.size(); ++outIndex)
 		{
-			if (blockOut == out)
+			if (out == block->m_outputNodes.at(outIndex))
 			{
+				blockInputIndexes.first = bIndex;
+				blockInputIndexes.second = outIndex;
 				return true;
 			}
 		}
 	}
+
+	//for (const auto& block : blocks)
+	//{
+	//	for (const auto& blockOut : block->m_outputNodes)
+	//	{
+	//		if (blockOut == out)
+	//		{
+	//			return true;
+	//		}
+	//	}
+	//}
 	return false;
 }
 
@@ -1609,7 +1627,11 @@ void ShaderEditorManager::PressedOutsideOfChoosingWindow()
 void ShaderEditorManager::SearchThroughChoosingWindow()
 {
 	ChoosingWindowItems._Construct(ChoosingWindowItemsOriginal.begin(), ChoosingWindowItemsOriginal.end());
+	//std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end(),
+	//	[](const std::string& a, const std::string& b) {return a < b; });
+
 	std::string input = m_choosingWindowSearch.data();
+	int lastIndex = ChoosingWindowItems.size() - 1;
 
 	if (!input.empty())
 	{
@@ -1621,14 +1643,15 @@ void ShaderEditorManager::SearchThroughChoosingWindow()
 
 			const std::string str{ ChoosingWindowItems.at(i) };
 			const std::size_t found = str.find(mainStr);
-
 			if (found == std::string::npos)
 			{
 				ChoosingWindowItems.erase(ChoosingWindowItems.begin() + i);
+				//std::swap(ChoosingWindowItems.at(i), ChoosingWindowItems.at(lastIndex));
+				//--lastIndex;
 			}
 		}
 	}
-
+	ChoosingWindowItemsSize = lastIndex + 1;
 	std::sort(ChoosingWindowItems.begin(), ChoosingWindowItems.end(),
 		[](const std::string& a, const std::string& b) {return a < b; });
 }
@@ -1723,6 +1746,13 @@ void ShaderEditorManager::PasteBlocks()
 	ResetFocusOnAllBlocks();
 	std::vector<UIShaderEditorBlock*> createdBlocks;
 
+	std::pair<float, float> moveDistance{};
+	if (m_copiedBlocks.size() > 0)
+	{
+		moveDistance.first = GetCurrentMousePosition().first - m_copiedBlocks.at(0)->GetPosition().x;
+		moveDistance.second = GetCurrentMousePosition().second - m_copiedBlocks.at(0)->GetPosition().y;
+	}
+
 	for (const auto& block : m_copiedBlocks)
 	{
 		CreateBlock(block->m_fileName);
@@ -1730,7 +1760,8 @@ void ShaderEditorManager::PasteBlocks()
 		createdBlocks.push_back(newBlock);
 
 		CopyBlockValues(block, newBlock);
-		std::pair<float, float> pos = GetCurrentMousePosition();
+		//std::pair<float, float> pos = GetCurrentMousePosition();
+		std::pair<float, float> pos { moveDistance.first + block->GetPosition().x, moveDistance.second + block->GetPosition().y };
 		newBlock->Move(pos.first * m_scale, pos.second * m_scale);
 		newBlock->m_focused = true;
 	}

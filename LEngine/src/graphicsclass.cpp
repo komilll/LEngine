@@ -981,10 +981,10 @@ bool GraphicsClass::RenderScene()
 		}
 	}
 
-	if (!m_postprocessBloom)
-	{
-		m_postProcessShader->ResetBloom();
-	}
+	//if (!m_postprocessBloom)
+	//{
+	//	m_postProcessShader->ResetBloom();
+	//}
 
 	if (m_postprocessSSAA)
 		m_ssaaTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(m_antialiasingSettings.sampleCount));
@@ -993,56 +993,92 @@ bool GraphicsClass::RenderScene()
 
 	m_renderTextureMainScene->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	for (ModelClass* const& model : m_sceneModels)
+	static ModelClass* modelSphere;
+	if (!modelSphere)
 	{
-		if (!model->GetMaterial())
+		modelSphere = new ModelClass;
+		modelSphere->Initialize(m_D3D, "sphere.obj");
+		modelSphere->SetMaterial(m_materialList.at("adasdad"));
+	}
+
+	constexpr float roughnessCount = 5;
+	constexpr float metalnessCount = roughnessCount;
+	for (float roughness = 0; roughness < roughnessCount; ++roughness)
+	{
+		for (float metalness = 0; metalness < metalnessCount; ++metalness)
 		{
-			//TODO Create function - repeated in code many times
-			if (m_materialList.find("gold") == m_materialList.end())
-			{
-				m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
-			}
-			model->SetMaterial(m_materialList.at("gold"));
-			continue;
-		}
+			constexpr float distanceBetween = 1.0f;
+			modelSphere->SetPosition(roughness * distanceBetween, metalness * distanceBetween, 0.0f);
 
-		m_Camera->GetViewMatrix(viewMatrix);
-		m_D3D->GetWorldMatrix(worldMatrix);
-		m_D3D->GetProjectionMatrix(projectionMatrix);
-		
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-		worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+			m_Camera->GetViewMatrix(viewMatrix);
+			m_D3D->GetWorldMatrix(worldMatrix);
+			m_D3D->GetProjectionMatrix(projectionMatrix);
+				
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(modelSphere->GetScale().x, modelSphere->GetScale().y, modelSphere->GetScale().z));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(modelSphere->GetRotation().x * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(modelSphere->GetRotation().y * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(modelSphere->GetRotation().z * 0.0174532925f));
+			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(modelSphere->GetPosition().x, modelSphere->GetPosition().y, modelSphere->GetPosition().z));
 
-		model->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
-		model->Render(m_D3D->GetDeviceContext());
-		if (!model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-			return false;
-
-		if (DRAW_AABB)
-		{
-			m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
-			for (const auto& wireframe : model->GetWireframeList())
-			{
-				m_Camera->GetViewMatrix(viewMatrix);
-				m_D3D->GetWorldMatrix(worldMatrix);
-				m_D3D->GetProjectionMatrix(projectionMatrix);
-
-				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
-				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
-				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
-				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
-				worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
-
-				wireframe->Render(m_D3D->GetDeviceContext());
-				if (!m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-					return false;
-			}
-			m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+			modelSphere->GetMaterial()->GetShader()->SetRoughness(static_cast<float>(roughness / (roughnessCount - 1)));
+			modelSphere->GetMaterial()->GetShader()->SetMetalness(static_cast<float>(metalness / (metalnessCount - 1)));
+			modelSphere->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
+			modelSphere->Render(m_D3D->GetDeviceContext());
+			if (!modelSphere->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), modelSphere->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+				return false;
 		}
 	}
+
+	//for (ModelClass* const& model : m_sceneModels)
+	//{
+	//	if (!model->GetMaterial())
+	//	{
+	//		//TODO Create function - repeated in code many times
+	//		if (m_materialList.find("gold") == m_materialList.end())
+	//		{
+	//			m_materialList.insert({ "gold", new MaterialPrefab{ "gold", m_D3D } });
+	//		}
+	//		model->SetMaterial(m_materialList.at("gold"));
+	//		continue;
+	//	}
+
+	//	m_Camera->GetViewMatrix(viewMatrix);
+	//	m_D3D->GetWorldMatrix(worldMatrix);
+	//	m_D3D->GetProjectionMatrix(projectionMatrix);
+	//	
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+	//	worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+	//	model->GetMaterial()->GetShader()->m_cameraPosition = m_Camera->GetPosition();
+	//	model->Render(m_D3D->GetDeviceContext());
+	//	if (!model->GetMaterial()->GetShader()->Render(m_D3D->GetDeviceContext(), model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+	//		return false;
+
+	//	if (DRAW_AABB)
+	//	{
+	//		m_D3D->ChangeRasterizerCulling(D3D11_CULL_NONE);
+	//		for (const auto& wireframe : model->GetWireframeList())
+	//		{
+	//			m_Camera->GetViewMatrix(viewMatrix);
+	//			m_D3D->GetWorldMatrix(worldMatrix);
+	//			m_D3D->GetProjectionMatrix(projectionMatrix);
+
+	//			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z));
+	//			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationX(model->GetRotation().x * 0.0174532925f));
+	//			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationY(model->GetRotation().y * 0.0174532925f));
+	//			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, DirectX::XMMatrixRotationZ(model->GetRotation().z * 0.0174532925f));
+	//			worldMatrix = DirectX::XMMatrixMultiply(worldMatrix, XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z));
+
+	//			wireframe->Render(m_D3D->GetDeviceContext());
+	//			if (!m_singleColorShader->Render(m_D3D->GetDeviceContext(), wireframe->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+	//				return false;
+	//		}
+	//		m_D3D->ChangeRasterizerCulling(D3D11_CULL_BACK);
+	//	}
+	//}
 	
 	m_singleColorShader->ChangeColor(1.0f, 0.0f, 0.0f, 1.0f);
 	if (m_raycastModel)
@@ -1404,6 +1440,11 @@ bool GraphicsClass::RenderGUI()
 			if (ImGui::Button("Save material"))
 			{
 				m_shaderEditorManager->SaveMaterial(m_shaderEditorManager->m_materialToSaveName.data());
+				if (!m_shaderEditorManager->IsWorkingOnSavedMaterial())
+				{
+					m_shaderEditorManager->LoadMaterial(m_shaderEditorManager->m_materialToSaveName.data());
+					m_shaderEditorManager->m_refreshModel = true;
+				}
 			}
 			ImGui::Checkbox("Emissive material", &m_shaderEditorManager->m_isEmissive);
 
@@ -1454,6 +1495,7 @@ bool GraphicsClass::RenderGUI()
 			
 			if (ImGui::InputText("SEARCH", const_cast<char*>(m_shaderEditorManager->m_choosingWindowSearch.data()), m_shaderEditorManager->k_choosingWindowSearchSize))
 			{
+
 			}
 
 			if (*m_shaderEditorManager->GetChoosingWindowHandler() >= m_shaderEditorManager->ChoosingWindowItems.size())
@@ -1468,12 +1510,12 @@ bool GraphicsClass::RenderGUI()
 			}
 			m_shaderEditorManager->SearchThroughChoosingWindow();
 
-			if (ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), &m_shaderEditorManager->ChoosingWindowItems[0], m_shaderEditorManager->ChoosingWindowItems.size()))
+			if (m_shaderEditorManager->ChoosingWindowItems.size() > 0 && ImGui::ListBox("", m_shaderEditorManager->GetChoosingWindowHandler(), &m_shaderEditorManager->ChoosingWindowItems[0], m_shaderEditorManager->ChoosingWindowItems.size()))
 			{
 				m_hideShaderWindowOnNextTry = false;
 				m_shaderEditorManager->CreateBlock(m_shaderEditorManager->ChoosingWindowItems[*m_shaderEditorManager->GetChoosingWindowHandler()]);
 			}
-			else if (!ImGui::IsWindowFocused() && !ImGui::IsWindowHovered() && !m_mouse->GetMouse()->GetLMBPressed())
+			if (!ImGui::IsWindowFocused() && !ImGui::IsWindowHovered() && !m_mouse->GetMouse()->GetLMBPressed())
 			{
 				if (m_hideShaderWindowOnNextTry)
 				{

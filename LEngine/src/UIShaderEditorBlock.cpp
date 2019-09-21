@@ -366,7 +366,7 @@ bool UIShaderEditorBlock::Render(ID3D11DeviceContext * deviceContext)
 						(m_translationY + (0.175f - 0.015f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 
 					m_textEngine->GetData(1)->SetPosition((m_translationX - (m_blockVertices.maxX - m_blockVertices.minX) * 0.5f) * m_scale,
-						(m_translationY + (0.175f + 0.035f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
+						(m_translationY + (0.175f + 0.02f) * (m_blockVertices.maxY / 0.2f)) * m_scale, m_D3D->GetWindowSize().x, m_D3D->GetWindowSize().y);
 					m_textEngine->GetData(1)->text = GetFirstOutputNode()->GetVisibleName();
 					m_textEngine->GetData(1)->scale = m_scale;
 				}

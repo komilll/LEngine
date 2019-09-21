@@ -281,7 +281,7 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	accumulatedLightStrength = 0.0f;
 	float4 pointLight;
 #if NUM_LIGHTS_POINT > 0
-	if (g_isPreview == 0)
+	if (g_isPreview < 0)
 	{
 		for (int i = 0; i < NUM_LIGHTS_POINT; i++)
 			accumulatedLightStrength += g_pointLightColorWithStrength[i].w;

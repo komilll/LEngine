@@ -29,10 +29,6 @@ SamplerState BrdfLutSampleType : register(s1)
 	MinLOD = 0;
 	MaxLOD = D3D11_FLOAT32_MAX;
 };
-Texture2D additionalTexture_0 : register(t7);
-static float4 tex_0;
-Texture2D additionalTexture_1 : register(t8);
-static float4 tex_1;
 
 #define NUM_LIGHTS_DIRECTIONAL 2
 #define NUM_LIGHTS_POINT 1
@@ -140,8 +136,6 @@ float substract(float a, float b);
 ////////////////////////////////////////////////////////////////////////////////
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-	tex_0 = additionalTexture_0.Sample(SampleType, input.tex);
-	tex_1 = additionalTexture_1.Sample(SampleType, input.tex);
 
 //Calculated values
 	float3 specular;
@@ -508,7 +502,7 @@ float substract(float a, float b)
 ////////////////////////////////////////////////////////////////////////////////
 float4 GetBaseColor()
 {
-	return tex_0;
+	return float4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 float GetMetalness()
 {
@@ -516,9 +510,7 @@ float GetMetalness()
 }
 float GetRoughness()
 {
-	float out_C = get_x(tex_1);
-
-	return out_C;
+	return 0.0f;
 }
 float3 GetNormal()
 {

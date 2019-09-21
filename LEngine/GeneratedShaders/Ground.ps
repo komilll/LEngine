@@ -272,31 +272,31 @@ float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 	accumulatedLightStrength = 0.0f;
 	float4 pointLight;
 #if NUM_LIGHTS_POINT > 0
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++)
-		accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
+	// for (int i = 0; i < NUM_LIGHTS_POINT; i++)
+		// accumulatedLightStrength += g_pointLightColorWithStrength[i].w;
 
-	for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
-	{
-		float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
-		float3 H = normalize(V - L);
-		float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
-		float attenuation = 1.0f / (distance * distance);
-		float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
+	// for (int i = 0; i < NUM_LIGHTS_POINT; i++) //Iterate over number of point lights
+	// {
+		// float3 L = normalize(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		// float3 H = normalize(V - L);
+		// float distance = length(input.worldPosition.xyz - g_pointLightPositionWithRadius[i].xyz);
+		// float attenuation = 1.0f / (distance * distance);
+		// float3 radiance = g_pointLightColorWithStrength[i].xyz * attenuation * (distance / g_pointLightPositionWithRadius[i].w);
 		
-		// //Cook-torrance brdf
-		float NdotH = max(dot(N, H), 0.0f);
-		float NdotV = max(dot(N, V), 0.0f);
-		float NdotL = max(dot(N, -L), 0.0f);
+		// // //Cook-torrance brdf
+		// float NdotH = max(dot(N, H), 0.0f);
+		// float NdotV = max(dot(N, V), 0.0f);
+		// float NdotL = max(dot(N, -L), 0.0f);
 		
-		float NDF = NormalDistributionFunction(roughness, NdotH);
-		float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
+		// float NDF = NormalDistributionFunction(roughness, NdotH);
+		// float G = GeometrySmithGGX(roughness, NdotV, NdotL);		
 		
-		float3 numerator = NDF * G * F;
-		float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
-		specular = numerator / max(denominator, 0.001);
+		// float3 numerator = NDF * G * F;
+		// float denominator = 4.0 * max(NdotV, 0.0) * max(NdotL, 0.0);
+		// specular = numerator / max(denominator, 0.001);
 
-		finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
-	}
+		// finalColor += float4(((kD * albedo / PI) + specular) * radiance * NdotL, 1.0f);
+	// }
 	//finalColor += normalize(pointLight);
 #endif
 	

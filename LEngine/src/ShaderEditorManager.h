@@ -79,7 +79,7 @@ private:
 
 	void CopyBlockValues(UIShaderEditorBlock* const src, UIShaderEditorBlock* const dst) const;
 	void CopyCreatedBlocksConnections(std::vector<UIShaderEditorBlock*> src, std::vector<UIShaderEditorBlock*> dst);
-	bool FindOutputNode(UIShaderEditorOutput * const out, std::vector<UIShaderEditorBlock*> const blocks) const;
+	bool FindOutputNode(UIShaderEditorOutput * const out, std::vector<UIShaderEditorBlock*> const blocks, std::pair<int, int>& blockInputIndexes) const;
 
 	//GENERATING SHADER CODE
 	std::string GenerateBlockCode(UIShaderEditorBlock* block);
@@ -113,6 +113,7 @@ private:
 
 public:
 	std::vector<const char*> ChoosingWindowItems;
+	int ChoosingWindowItemsSize{ -1 };
 	std::string m_choosingWindowSearch;
 	const int k_choosingWindowSearchSize{ 10 };
 	UIShaderEditorBlock* m_focusedBlock{ nullptr };

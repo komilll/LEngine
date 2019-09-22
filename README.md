@@ -1,5 +1,9 @@
 <h1>LEngine: Forward Rendering Engine DirectX11</h1>
 
+tl;dr <b>Watch 1 minute reel!</b>
+</br>
+[![Video reel](http://img.youtube.com/vi/8yBFS8V1r2s/0.jpg)](http://www.youtube.com/watch?v=8yBFS8V1r2s "Video reel")
+
 LEngine is a based on PBR and IBL created in DirectX11 using DirectXTK (newer version of deprecated D3DX).
 Allows to generate materails through UE4-like system using only visual tools. Managing scene using only visual tools. Full postprocess stack with antialiasing options.
 
@@ -55,6 +59,14 @@ Allows to generate materails through UE4-like system using only visual tools. Ma
 <ul>
   <li><a href="https://3dtextures.me/">3D Textures: PBR texture maps</a></li>
   <li><a href="http://www.humus.name/index.php?page=Textures&start=0">Humus: Skyboxes</a></li>
+</ul>
+
+<h3>Dependencies:</h3>
+<ul>
+  <li><a href="https://github.com/ocornut/imgui">ImGui</a></li>
+  <li><a href="https://github.com/microsoft/DirectXTK">DirectXTK</a> - newer version of deprececated D3DX</li>
+  <li><a href="https://github.com/microsoft/DirectXTK/wiki/MakeSpriteFont">MakeSpriteFont</a> - part of DirectXTK</li>
+  <li><a href="https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2019-0">FBX SDK</a></li>  
 </ul>
 
 <h3>Special thanks:</h3>
